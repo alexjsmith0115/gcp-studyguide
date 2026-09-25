@@ -1,0 +1,29 @@
+# URL map for lab 72, part 3. It injects faults into all requests:
+# 20% of requests get HTTP 429, and 10% of requests wait 1 extra second.
+# Step 20 replaces PROJECT_ID with your project ID before import.
+name: lab72-urlmap
+defaultService: projects/PROJECT_ID/global/backendServices/lab72-bs
+hostRules:
+- hosts:
+  - '*'
+  pathMatcher: lab72-matcher
+pathMatchers:
+- name: lab72-matcher
+  defaultService: projects/PROJECT_ID/global/backendServices/lab72-bs
+  routeRules:
+  - priority: 1
+    matchRules:
+    - prefixMatch: /
+    routeAction:
+      weightedBackendServices:
+      - backendService: projects/PROJECT_ID/global/backendServices/lab72-bs
+        weight: 100
+      faultInjectionPolicy:
+        delay:
+          fixedDelay:
+            seconds: 1
+            nanos: 0
+          percentage: 10
+        abort:
+          httpStatus: 429
+          percentage: 20

@@ -1,0 +1,7 @@
+MachineId,MachineName,PrimaryIPAddress(optional),PrimaryMACAddress(optional),PublicIPAddress(optional),IpAddressListSemiColonDelimited(optional),TotalDiskAllocatedGiB,TotalDiskUsedGiB,MachineTypeLabel(optional),AllocatedProcessorCoreCount,MemoryGiB,HostingLocation(optional),OsType(optional),OsPublisher(optional),OsName,OsVersion(optional),MachineStatus(optional),ProvisioningState(optional),CreateDate(optional),IsPhysical
+vm-101,lab64-web-1,10.20.1.11,,,10.20.1.11,100,40,,4,16,,Linux/UNIX,Canonical,UbuntuServer,22.04 LTS,running,,2022-05-10 09:00:00+00:00,0
+vm-102,lab64-web-2,10.20.1.12,,,10.20.1.12,100,38,,4,16,,Linux/UNIX,Canonical,UbuntuServer,22.04 LTS,running,,2022-05-10 09:00:00+00:00,0
+vm-201,lab64-app-1,10.20.2.21,,,10.20.2.21,200,90,,8,32,,Linux/UNIX,Red Hat,Red Hat Enterprise Linux,8.8,running,,2022-05-10 09:00:00+00:00,0
+vm-301,lab64-db-1,10.20.3.31,,,10.20.3.31,2000,1400,,16,128,,Linux/UNIX,Red Hat,Red Hat Enterprise Linux,8.8,running,,2022-05-10 09:00:00+00:00,0
+vm-401,lab64-files-1,10.20.4.41,,,10.20.4.41,4000,3100,,4,16,,Windows,Microsoft,Windows Server 2019 Datacenter,10.0.17763,running,,2022-05-10 09:00:00+00:00,0
+vm-501,lab64-batch-1,10.20.5.51,,,10.20.5.51,500,120,,16,64,,Linux/UNIX,Canonical,UbuntuServer,22.04 LTS,running,,2022-05-10 09:00:00+00:00,0

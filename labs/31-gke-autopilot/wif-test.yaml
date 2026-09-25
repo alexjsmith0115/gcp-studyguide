@@ -1,0 +1,33 @@
+# Lab 31: two test Pods with the Google Cloud CLI image.
+# wif-reader uses the Kubernetes ServiceAccount that has an IAM grant on the bucket.
+# wif-default uses the namespace's default ServiceAccount, which has no IAM grants.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wif-reader
+  namespace: lab31
+spec:
+  serviceAccountName: lab31-reader
+  containers:
+  - name: cli
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+    command: ["sleep", "infinity"]
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: wif-default
+  namespace: lab31
+spec:
+  containers:
+  - name: cli
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+    command: ["sleep", "infinity"]
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi

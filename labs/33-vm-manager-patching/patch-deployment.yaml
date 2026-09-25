@@ -1,0 +1,25 @@
+# Patch deployment for lab 33.
+# It patches the VMs that have the label env=prod every Sunday at 03:00 UTC.
+# The rollout patches one zone at a time and disrupts at most one VM per zone.
+# Field reference: https://docs.cloud.google.com/compute/docs/osconfig/rest/v1/projects.patchDeployments
+description: "Lab 33 weekly patching for env=prod VMs"
+instanceFilter:
+  groupLabels:
+    - labels:
+        env: prod
+patchConfig:
+  rebootConfig: DEFAULT
+duration: 3600s
+recurringSchedule:
+  frequency: WEEKLY
+  weekly:
+    dayOfWeek: SUNDAY
+  timeOfDay:
+    hours: 3
+    minutes: 0
+  timeZone:
+    id: Etc/UTC
+rollout:
+  mode: ZONE_BY_ZONE
+  disruptionBudget:
+    fixed: 1

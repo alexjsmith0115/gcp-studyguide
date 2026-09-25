@@ -1,0 +1,24 @@
+# Lab 31: a load generator. Each Pod sends batches of 10,000 requests, 10 at a time, to the lab31-hello Service.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab31-load
+  namespace: lab31
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lab31-load
+  template:
+    metadata:
+      labels:
+        app: lab31-load
+    spec:
+      containers:
+      - name: load
+        image: gcr.io/google.com/cloudsdktool/google-cloud-cli:slim
+        command: ["bash", "-c", "while true; do curl -s --parallel --parallel-max 10 'http://lab31-hello/[1-10000]' > /dev/null; done"]
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi

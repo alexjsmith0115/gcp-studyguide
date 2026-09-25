@@ -1,0 +1,3434 @@
+[
+  {
+    "id": "cs-alto-001",
+    "objective": "2.2",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-storage",
+      "autoclass",
+      "cost"
+    ],
+    "stem": "Altostrat wants to optimize Cloud Storage costs for its growing media volumes. Some documentaries stay popular for years, while most news clips are rarely played after a few weeks. The content team cannot predict which items will stay popular. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Autoclass on the media buckets, so that each object moves to a storage class that fits its access pattern."
+      },
+      {
+        "id": "B",
+        "text": "Add a lifecycle rule that changes every object to Archive storage 30 days after upload."
+      },
+      {
+        "id": "C",
+        "text": "Store all new media in Coldline storage and serve it through Cloud CDN to reduce reads from the bucket."
+      },
+      {
+        "id": "D",
+        "text": "Use Cloud Run functions (formerly Cloud Functions) to move objects between storage classes each night by view count."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding facts are that access patterns vary by item and that nobody can predict them. Autoclass moves objects that are not accessed to colder storage classes, and it moves accessed objects back to Standard storage. Google lists unknown or unpredictable access patterns as a reason to use Autoclass. It needs no custom code, which fits the cost-management priority.",
+    "whyWrong": {
+      "B": "A fixed age rule also moves the documentaries that stay popular. Archive storage has higher access costs and a 365-day minimum storage duration, so frequent reads of those items cost more.",
+      "C": "Coldline storage suits data that you read at most once a quarter. Popular items would pay retrieval costs, and Cloud CDN does not change the storage class of the objects in the bucket.",
+      "D": "The custom mover is code to build and operate. It also pays the retrieval and early deletion fees that Autoclass does not charge after enablement."
+    },
+    "sources": [
+      {
+        "title": "Autoclass",
+        "url": "https://docs.cloud.google.com/storage/docs/autoclass",
+        "evidence": "The Autoclass feature automatically transitions objects in your bucket to appropriate storage classes based on each object's access pattern."
+      },
+      {
+        "title": "Autoclass",
+        "url": "https://docs.cloud.google.com/storage/docs/autoclass",
+        "evidence": "The access patterns for your data are unknown or unpredictable."
+      },
+      {
+        "title": "Storage classes",
+        "url": "https://docs.cloud.google.com/storage/docs/storage-classes",
+        "evidence": "Archive storage also has higher costs for data access and operations, as well as a 365-day minimum storage duration."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-002",
+    "objective": "1.2",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-storage",
+      "bucket-location",
+      "availability"
+    ],
+    "stem": "Altostrat wants its media library to stay available for playback if a whole Google Cloud region fails. The application must not change object paths during a failover. Viewers are spread across the United States, and Altostrat does not need to choose the exact regions that hold copies. Cost management is a top priority. Which bucket configuration should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A regional bucket with turbo replication enabled"
+      },
+      {
+        "id": "B",
+        "text": "A dual-region bucket with turbo replication enabled"
+      },
+      {
+        "id": "C",
+        "text": "A multi-region bucket in the US location"
+      },
+      {
+        "id": "D",
+        "text": "Two regional buckets that Storage Transfer Service keeps in sync, with failover logic in the application"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Dual-region and multi-region buckets both fail over automatically on a regional failure, with no change to storage paths. The deciding facts are that Altostrat does not need to choose the regions and that cost management is a priority. Multi-region storage costs less than dual-region storage, and Google recommends multi-region locations for content serving with cross-geography access. Turbo replication is a premium feature for a short RPO, which the case does not require.",
+    "whyWrong": {
+      "A": "A regional bucket keeps its data in one region, so a regional outage affects it. Turbo replication is an option of dual-region buckets, not of regional buckets.",
+      "B": "A dual-region bucket meets the availability need, but it has the highest storage price of the location types. Turbo replication adds a premium charge for an RPO target that Altostrat did not state.",
+      "D": "Two buckets need a sync job and failover code, and the object path changes during a failover. This breaks a stated constraint and adds operational work."
+    },
+    "sources": [
+      {
+        "title": "Bucket locations",
+        "url": "https://docs.cloud.google.com/storage/docs/locations",
+        "evidence": "RTO(recovery time objective)=0: automated failover and failback on regional failure (no need to change storage paths)"
+      },
+      {
+        "title": "Bucket locations",
+        "url": "https://docs.cloud.google.com/storage/docs/locations",
+        "evidence": "Higher storage price than regions, but lower than dual-regions"
+      },
+      {
+        "title": "Bucket locations",
+        "url": "https://docs.cloud.google.com/storage/docs/locations",
+        "evidence": "If you need a short and predictable recovery point objective (RPO), enable the premium turbo replication feature."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-003",
+    "objective": "1.3",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini",
+      "multimodal",
+      "summarization"
+    ],
+    "stem": "Altostrat wants automated summarization for diverse media: podcasts, interviews, and documentaries. Each summary must reflect both what people say and what appears on screen. The team wants the fewest components to build and operate. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Transcribe each file with Speech-to-Text, then send the transcript to a text-only model for summarization."
+      },
+      {
+        "id": "B",
+        "text": "Send each media file to a Gemini model on Agent Platform (formerly Vertex AI) with a summarization prompt."
+      },
+      {
+        "id": "C",
+        "text": "Run label detection with the Video Intelligence API, and fill a summary template in Cloud Run functions (formerly Cloud Functions)."
+      },
+      {
+        "id": "D",
+        "text": "Train a custom summarization model on Agent Platform with a labeled set of summaries written by Altostrat editors."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding requirements are one summary from both the audio and the pictures, and the fewest components. Gemini models natively understand text, video, audio, and images, so one request can summarize a video file together with its audio. Google describes a chain of a speech-to-text model and a text model as the older pattern, which adds latency and lowers performance.",
+    "whyWrong": {
+      "A": "A transcript loses what appears on screen. The chain of two models also adds a component and extra round trips.",
+      "C": "Label detection describes what the camera shows, not what people say. A template cannot turn labels into a concise summary of an interview.",
+      "D": "A custom model needs labeled training data, training, and serving. Gemini already summarizes video with audio without any training."
+    },
+    "sources": [
+      {
+        "title": "Long context",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/long-context",
+        "evidence": "These models can natively understand text, video, audio, and images."
+      },
+      {
+        "title": "Long context",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/long-context",
+        "evidence": "Historically, the typical developer workflow would involve stringing together multiple domain specific models, like a speech-to-text model and a text-to-text model, in order to process audio."
+      },
+      {
+        "title": "Video understanding",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/video-understanding",
+        "evidence": "The following shows you how to summarize a video file with audio and return chapters with timestamps."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-004",
+    "objective": "1.3",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigquery",
+      "object-tables",
+      "ai-generate"
+    ],
+    "stem": "Altostrat wants to analyze its podcast audio to identify trends, such as which topics gain an audience. Engagement data is already in BigQuery, and the media files stay in Cloud Storage. Analysts work in SQL, and the media files must not be copied to another system. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run a Managed Service for Apache Spark (formerly Dataproc) job that calls a custom model on the media files."
+      },
+      {
+        "id": "B",
+        "text": "Load each media file into a BYTES column of a BigQuery table and parse the content with SQL string functions."
+      },
+      {
+        "id": "C",
+        "text": "Label each file with the Video Intelligence API from Cloud Run functions (formerly Cloud Functions), and save labels in Firestore."
+      },
+      {
+        "id": "D",
+        "text": "Create BigQuery object tables over the media buckets, extract topics with AI.GENERATE, and join the results with engagement data."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding constraints are SQL for the analysts, no copy of the media files, and a join with engagement data. Object tables are read-only tables over unstructured objects in Cloud Storage. You can run inference over them and join the results with structured data in BigQuery. AI.GENERATE analyzes structured or unstructured data from SQL.",
+    "whyWrong": {
+      "A": "This moves the analysis out of SQL, and it adds Spark jobs and a custom model to build and operate.",
+      "B": "Loading the files into a table copies them, which the stem does not allow. SQL string functions also cannot interpret audio or video.",
+      "C": "Labels in Firestore create a new data silo outside the warehouse. Label detection also describes pictures, so it misses the spoken topics."
+    },
+    "sources": [
+      {
+        "title": "Introduction to object tables",
+        "url": "https://docs.cloud.google.com/bigquery/docs/object-table-introduction",
+        "evidence": "This document describes object tables, which are read-only tables over unstructured data objects that reside in Cloud Storage."
+      },
+      {
+        "title": "Introduction to object tables",
+        "url": "https://docs.cloud.google.com/bigquery/docs/object-table-introduction",
+        "evidence": "You can perform analysis with remote functions or perform inference by using BigQuery ML, and then join the results of these operations with the rest of your structured data in BigQuery."
+      },
+      {
+        "title": "Generative AI overview",
+        "url": "https://docs.cloud.google.com/bigquery/docs/generative-ai-overview",
+        "evidence": "`AI.GENERATE` is the most flexible inference function, which lets you analyze any structured or unstructured data."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-005",
+    "objective": "5.1",
+    "caseStudy": "altostrat",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "storage-transfer-service",
+      "archive-storage",
+      "migration"
+    ],
+    "stem": "Altostrat plans to migrate its on-premises archival workflow to Google Cloud. The archive holds several hundred terabytes on NFS servers. A new Cloud Interconnect connection has enough bandwidth to meet the deadline. Archived items are read less than once a year. Altostrat wants a managed transfer with incremental copies and the lowest storage cost. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Order a Transfer Appliance and ship the archive to Google."
+      },
+      {
+        "id": "B",
+        "text": "Use Storage Transfer Service for on-premises data, with transfer agents on servers that mount the NFS shares."
+      },
+      {
+        "id": "C",
+        "text": "Write the archive to a bucket that has Autoclass enabled."
+      },
+      {
+        "id": "D",
+        "text": "Run gcloud storage rsync from one on-premises server on a cron schedule."
+      },
+      {
+        "id": "E",
+        "text": "Write the archive to a bucket whose default storage class is Archive storage."
+      },
+      {
+        "id": "F",
+        "text": "Write the archive to a bucket whose default storage class is Coldline storage."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "Two facts decide the answer. First, the network has enough bandwidth, and Altostrat wants a managed transfer with incremental copies. Google suggests Storage Transfer Service for on-premises data in this case, and it supports full or incremental copies at petabyte scale. Second, the access pattern is known: reads happen less than once a year. Archive storage is the best choice for that pattern.",
+    "whyWrong": {
+      "A": "Google suggests Transfer Appliance when the network does not have enough bandwidth to meet the deadline. Here the bandwidth is enough.",
+      "C": "Google does not recommend Autoclass when the data clearly fits the use case of one storage class. The archive access pattern is known.",
+      "D": "The gcloud storage command suits smaller, as-needed transfers. One server with cron gives no agent pool and no managed error reporting.",
+      "F": "Coldline storage suits data that you read about once a quarter. For data kept only for archiving, Archive storage is more cost-effective."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Transfer your large datasets",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+        "evidence": "Storage Transfer Service for on-premises data is designed for large-scale transfers (up to petabytes of data, billions of files). It supports full copies or incremental copies"
+      },
+      {
+        "title": "Storage classes",
+        "url": "https://docs.cloud.google.com/storage/docs/storage-classes",
+        "evidence": "Archive storage is the best choice for data that you plan to access less than once a year."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-006",
+    "objective": "2.1",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-interconnect",
+      "macsec",
+      "hybrid-connectivity"
+    ],
+    "stem": "Altostrat wants secure, high-performance hybrid cloud connectivity for data ingestion from its on-premises ingestion site. Media uploads need tens of Gbps, and the traffic must not cross the public internet. The security team requires encryption between the on-premises router and Google's edge routers. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Dedicated Interconnect with MACsec for Cloud Interconnect enabled"
+      },
+      {
+        "id": "B",
+        "text": "HA VPN tunnels over the internet to a Cloud Router in the ingestion VPC network"
+      },
+      {
+        "id": "C",
+        "text": "Direct Peering, with TLS configured on each upload client"
+      },
+      {
+        "id": "D",
+        "text": "Dedicated Interconnect, with no encryption configured on the connection"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Three stated needs decide the answer: high throughput, no public internet, and encryption between the on-premises router and Google's edge. Traffic on Cloud Interconnect does not traverse the public internet. MACsec for Cloud Interconnect encrypts the traffic on exactly that link, between the on-premises router and Google's edge routers.",
+    "whyWrong": {
+      "B": "HA VPN uses the public internet here, which the stem rules out. Google also positions Cloud VPN for lower bandwidth needs and Cloud Interconnect for higher throughput.",
+      "C": "Google recommends Cloud Interconnect instead of Direct Peering, except in certain circumstances. TLS on each client also leaves encryption to every upload tool.",
+      "D": "Dedicated Interconnect meets the throughput need, but the security team requires link encryption. You add MACsec, or IPsec with HA VPN over Cloud Interconnect, to encrypt this traffic."
+    },
+    "sources": [
+      {
+        "title": "MACsec for Cloud Interconnect overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/macsec-overview",
+        "evidence": "MACsec for Cloud Interconnect uses IEEE standard 802.1AE Media Access Control Security (MACsec) to encrypt traffic between your on-premises router and Google's edge routers."
+      },
+      {
+        "title": "Cloud Interconnect overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/overview",
+        "evidence": "Traffic between your networks doesn't traverse the public internet."
+      },
+      {
+        "title": "Choosing a Network Connectivity product",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/how-to/choose-product",
+        "evidence": "If you need an enterprise-grade connection to Google Cloud that has higher throughput, you can choose Dedicated Interconnect or Partner Interconnect."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-007",
+    "objective": "2.3",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "google-distributed-cloud",
+      "fleet",
+      "gke"
+    ],
+    "stem": "Altostrat wants scalable, performant Kubernetes environments both on-premises and in the cloud. On-premises, it wants to run its content ingestion containers directly on its existing physical servers, with no hypervisor layer. Operators want to manage the on-premises and cloud clusters together from Google Cloud. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the ingestion workloads to Google Cloud VMware Engine and manage them with vCenter."
+      },
+      {
+        "id": "B",
+        "text": "Install Google Distributed Cloud (software only) for bare metal (formerly Anthos clusters on bare metal), and use one fleet."
+      },
+      {
+        "id": "C",
+        "text": "Install Google Distributed Cloud (software only) for VMware (formerly part of Anthos) on new vSphere hosts, without a fleet."
+      },
+      {
+        "id": "D",
+        "text": "Run upstream Kubernetes with kubeadm on the servers, and forward its logs to Cloud Logging."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding needs are containers directly on the existing servers and one place to manage all clusters. Distributed Cloud for bare metal runs GKE clusters directly on your own servers, instead of on virtual machines. You manage these on-premises clusters in Google Cloud, together with regular GKE clusters, as part of a fleet.",
+    "whyWrong": {
+      "A": "VMware Engine runs the VMware platform in Google Cloud locations, not on Altostrat's own servers. It also adds the hypervisor layer that the stem rules out.",
+      "C": "The VMware option adds a hypervisor layer, which the stem rules out. Clusters outside a fleet also lose the shared management view.",
+      "D": "Altostrat would have to operate the Kubernetes distribution itself. Forwarding logs does not give one place to manage the clusters."
+    },
+    "sources": [
+      {
+        "title": "Distributed Cloud software only for bare metal overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/distributed-cloud/bare-metal/docs/concepts/about-bare-metal",
+        "evidence": "Using Distributed Cloud software only for bare metal instead of virtual machines gives you the ability to manage application containers on a wide variety of performance-optimized hardware types, like GPUs and SSDs."
+      },
+      {
+        "title": "Distributed Cloud software only for bare metal overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/distributed-cloud/bare-metal/docs/concepts/about-bare-metal",
+        "evidence": "You manage these on-premises clusters in Google Cloud along with regular GKE clusters and clusters in other environments as part of a fleet."
+      },
+      {
+        "title": "Google Cloud VMware Engine overview",
+        "url": "https://docs.cloud.google.com/vmware-engine/docs/overview",
+        "evidence": "Google Cloud VMware Engine is a fully managed service that lets you run the VMware platform in Google Cloud."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-008",
+    "objective": "4.1",
+    "caseStudy": "altostrat",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-deploy",
+      "artifact-registry",
+      "ci-cd"
+    ],
+    "stem": "Altostrat wants to modernize CI/CD for containerized deployments with a centralized management platform. Cloud Build already builds the container images. Each release must move through development, staging, and production in a defined order. Some production clusters run on-premises and are registered to a fleet. Which two services should you add? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Artifact Registry, to store and scan the container images in one location"
+      },
+      {
+        "id": "B",
+        "text": "Cloud Scheduler, to run kubectl apply against each cluster every night"
+      },
+      {
+        "id": "C",
+        "text": "Cloud Storage buckets, to hold exported image tarballs for each environment"
+      },
+      {
+        "id": "D",
+        "text": "Cloud Deploy, with delivery pipelines that target the GKE clusters and the fleet memberships"
+      },
+      {
+        "id": "E",
+        "text": "A Jenkins server on Compute Engine, with one deployment job for each cluster"
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "The deciding needs are one central platform and a defined promotion order across cloud and on-premises clusters. Artifact Registry is a single location for container images, and it can scan them for vulnerabilities. Cloud Deploy promotes each release through a defined sequence of targets. It deploys to on-premises clusters through Connect gateway by using their fleet membership.",
+    "whyWrong": {
+      "B": "A nightly script has no promotion order and no release history. It pushes the same change to every environment at the same time.",
+      "C": "A bucket of tarballs is not a container registry, so the clusters cannot pull images from it directly.",
+      "E": "A self-managed Jenkins server is one more system to patch and operate. That conflicts with the requirement to simplify infrastructure management."
+    },
+    "sources": [
+      {
+        "title": "Overview of Cloud Deploy",
+        "url": "https://docs.cloud.google.com/deploy/docs/overview",
+        "evidence": "Cloud Deploy is a managed service that automates delivery of your applications to a series of target environments in a defined promotion sequence."
+      },
+      {
+        "title": "Deploy to GKE attached clusters",
+        "url": "https://docs.cloud.google.com/deploy/docs/anthos-targets",
+        "evidence": "Support for GKE attached clusters enables deployment to AWS, Azure, and on-premises clusters."
+      },
+      {
+        "title": "Artifact Registry overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/overview",
+        "evidence": "Artifact Registry provides a single location for storing and managing your packages and Docker container images."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-009",
+    "objective": "6.2",
+    "caseStudy": "altostrat",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "managed-prometheus",
+      "alerting",
+      "notification-channels"
+    ],
+    "stem": "Altostrat runs self-managed Prometheus servers for its GKE and on-premises workloads, and alerts go out mainly by email. On-call engineers miss critical alerts at night. Altostrat wants to stop operating Prometheus storage but keep its PromQL alert rules and Grafana dashboards. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the Prometheus retention period and add larger disks to the Prometheus servers."
+      },
+      {
+        "id": "B",
+        "text": "Replace the Prometheus metrics with log-based metrics in Cloud Logging, and rewrite every alert."
+      },
+      {
+        "id": "C",
+        "text": "Adopt Google Cloud Managed Service for Prometheus for the cloud and on-premises workloads."
+      },
+      {
+        "id": "D",
+        "text": "Send all alerts to an SMS notification channel instead of email."
+      },
+      {
+        "id": "E",
+        "text": "Route critical alerting policies to PagerDuty, and keep email or Pub/Sub as a redundant channel."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Managed Service for Prometheus removes the Prometheus storage that Altostrat operates today. It keeps PromQL-based alerts and Grafana dashboards, and its collectors also run on-premises. For the missed alerts, Google recommends several notification channel types. When you use PagerDuty, use email or Pub/Sub as the redundant channel.",
+    "whyWrong": {
+      "A": "More retention and larger disks keep Altostrat operating Prometheus storage, which it wants to stop. This change also does nothing for the missed alerts.",
+      "B": "Rewriting every alert discards the PromQL rules that Altostrat wants to keep.",
+      "D": "Google states that SMS is not a fully reliable channel and might not be available in some regions. SMS alone needs a backup channel."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud Managed Service for Prometheus",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/managed-prometheus",
+        "evidence": "Managed Service for Prometheus collects metrics from Prometheus exporters and lets you query the data globally using PromQL, meaning that you can keep using any existing Grafana dashboards, PromQL-based alerts, and workflows."
+      },
+      {
+        "title": "Create and manage notification channels",
+        "url": "https://docs.cloud.google.com/monitoring/support/notification-options",
+        "evidence": "If you use one of these notification channels, then use email or Pub/Sub as the redundant channel."
+      },
+      {
+        "title": "Create and manage notification channels",
+        "url": "https://docs.cloud.google.com/monitoring/support/notification-options",
+        "evidence": "SMS isn't a fully reliable notification channel type, and it might not be available in certain regions."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-010",
+    "objective": "2.5",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "content-moderation",
+      "harmful-content"
+    ],
+    "stem": "Altostrat wants to design AI-powered detection of harmful content for podcasts, interviews, and news video. Its policy covers spoken hate speech and on-screen violence, with exceptions for news reporting and satire. Moderators must see why the system flagged each item. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run Video Intelligence API explicit content detection on every video, and block items above a likelihood threshold."
+      },
+      {
+        "id": "B",
+        "text": "Transcribe the audio with Speech-to-Text, and call the Natural Language API moderateText method on each transcript."
+      },
+      {
+        "id": "C",
+        "text": "Use Gemini on Agent Platform (formerly Vertex AI), with the policy in the system instruction and reasoning in JSON output."
+      },
+      {
+        "id": "D",
+        "text": "Put a Model Armor template in front of the media library, and screen each media file when it is uploaded."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Three details decide the answer: audio and video together, a custom policy with exceptions, and an explanation for moderators. Gemini analyzes text, images, video, and audio, and it can detect custom moderation policies that you define. Gemini can also explain its reasoning. For moderation, Google recommends temperature 0 and JSON output.",
+    "whyWrong": {
+      "A": "Explicit content detection looks for adult content. It evaluates frames and considers visual content only, so it misses spoken hate speech and cannot apply the satire exception.",
+      "B": "Text moderation of a transcript sees only the words. It misses on-screen violence.",
+      "D": "Model Armor screens the prompts and responses of LLM applications. It is not a moderation service for a media library."
+    },
+    "sources": [
+      {
+        "title": "Gemini for safety filtering and content moderation",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/gemini-for-filtering-and-moderation",
+        "evidence": "Customization: Gemini can detect custom moderation policies defined by you that are aligned with your specific needs and policy guidelines."
+      },
+      {
+        "title": "Gemini for safety filtering and content moderation",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/gemini-for-filtering-and-moderation",
+        "evidence": "Multimodal understanding: Gemini can analyze text, images, video, and audio, providing a holistic understanding of the content and context."
+      },
+      {
+        "title": "Detect explicit content in videos",
+        "url": "https://docs.cloud.google.com/video-intelligence/docs/analyze-safesearch",
+        "evidence": "When Explicit Content Detection evaluates a video, it does so on a per-frame basis and considers visual content only."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-011",
+    "objective": "2.5",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cx-agent-studio",
+      "conversational-ai",
+      "customer-support"
+    ],
+    "stem": "Altostrat wants natural language interaction with the platform and 24/7 user support. The customer support team, not developers, will build and change the agent. The agent must answer open questions with generative AI and also follow fixed steps for account tasks, such as a subscription change. Which tool should Altostrat use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Agent Development Kit, with the agent deployed on Agent Runtime (formerly Vertex AI Agent Engine)"
+      },
+      {
+        "id": "B",
+        "text": "Dialogflow ES, with one intent for each account task"
+      },
+      {
+        "id": "C",
+        "text": "An Agent Search (formerly Vertex AI Search) media app, with a search widget on the website"
+      },
+      {
+        "id": "D",
+        "text": "CX Agent Studio in Gemini Enterprise for Customer Experience (formerly Customer Engagement Suite and Contact Center AI)"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding facts are a team of non-developers and a mix of generative answers and fixed steps. CX Agent Studio is a minimal-code conversational agent builder. It creates agents with both generative AI and deterministic functionality for proactive, personalized self-service.",
+    "whyWrong": {
+      "A": "Agent Development Kit is a code-based framework, so it needs developers. The stem says that the support team builds the agent.",
+      "B": "Google lists Dialogflow ES under legacy conversational agents. It is not the tool to choose for a new generative agent.",
+      "C": "A media app gives search and recommendations over content. It does not hold a support conversation or run account tasks."
+    },
+    "sources": [
+      {
+        "title": "CX Agent Studio",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx/cx-agent-studio",
+        "evidence": "Customer Experience Agent Studio (CX Agent Studio) is a minimal code conversational agent builder."
+      },
+      {
+        "title": "Gemini Enterprise for CX",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx",
+        "evidence": "Customer Experience Agent Studio helps you create AI agents with both generative AI and deterministic functionality that provide proactive, personalized self-service"
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-012",
+    "objective": "3.1",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "model-armor",
+      "prompt-injection",
+      "securing-ai"
+    ],
+    "stem": "Altostrat is launching a support chatbot that uses a Gemini model. The security team expects users to try prompt injection and jailbreak attacks, and it wants to stop unsafe responses. The team wants one central policy that screens prompts and responses, managed outside the application code. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A VPC Service Controls perimeter around the Agent Platform API (formerly Vertex AI API)"
+      },
+      {
+        "id": "B",
+        "text": "Model Armor templates that screen the chatbot's prompts and responses"
+      },
+      {
+        "id": "C",
+        "text": "Cloud Armor preconfigured WAF rules on the chatbot's load balancer"
+      },
+      {
+        "id": "D",
+        "text": "A daily Sensitive Data Protection scan of the chatbot conversation logs"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding needs are screening of both prompts and responses, protection against prompt injection and jailbreaks, and a central policy. Model Armor screens LLM prompts and responses. Its templates hold the filters and thresholds, separate from the application code.",
+    "whyWrong": {
+      "A": "VPC Service Controls reduces data exfiltration risk at the API boundary. It does not inspect the content of prompts or responses.",
+      "C": "Cloud Armor protects against attacks such as DDoS, cross-site scripting, and SQL injection. It does not decide whether a model response is unsafe.",
+      "D": "A daily scan finds sensitive data after the conversation. It does not block a prompt injection or an unsafe response when it happens."
+    },
+    "sources": [
+      {
+        "title": "Model Armor overview",
+        "url": "https://docs.cloud.google.com/model-armor/overview",
+        "evidence": "Protect against prompt injection and jailbreak attacks, preventing malicious actors from manipulating AI systems to perform unintended actions."
+      },
+      {
+        "title": "Model Armor overview",
+        "url": "https://docs.cloud.google.com/model-armor/overview",
+        "evidence": "Model Armor templates let you configure how Model Armor screens prompts and responses."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-013",
+    "objective": "3.2",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "audit-logs",
+      "agent-platform",
+      "auditability"
+    ],
+    "stem": "Altostrat must ensure that its AI systems are auditable. Auditors want a record of which users and service accounts called the prediction endpoint of the recommendation model, and when. Admin Activity audit logs are already in Cloud Logging, but they show no prediction calls. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Data Access audit logs for the Agent Platform API (formerly Vertex AI API)."
+      },
+      {
+        "id": "B",
+        "text": "Enable VPC Flow Logs on the subnet that the clients of the endpoint use."
+      },
+      {
+        "id": "C",
+        "text": "Create a Cloud Monitoring dashboard that shows the prediction request count of the endpoint."
+      },
+      {
+        "id": "D",
+        "text": "Enable Model Monitoring (formerly Vertex AI Model Monitoring) on the endpoint, and export its alerts to BigQuery."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The auditors need to know who called the endpoint and when. Prediction calls read user-provided data, so Data Access audit logs record them. These logs are not written until you enable them explicitly, which is why the Admin Activity logs show no prediction calls.",
+    "whyWrong": {
+      "B": "Flow logs describe network traffic. They do not record which principal called the API.",
+      "C": "A request count shows the volume of calls, not who made each call.",
+      "D": "Model Monitoring tracks drift and alerts when deviations pass a threshold. It does not record who called the endpoint."
+    },
+    "sources": [
+      {
+        "title": "Agent Platform audit logging information",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/general/audit-logging",
+        "evidence": "To receive Data Access audit logs, you must explicitly enable them."
+      },
+      {
+        "title": "Agent Platform audit logging information",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/general/audit-logging",
+        "evidence": "Also includes \"data read\" and \"data write\" operations that read or write user-provided data."
+      },
+      {
+        "title": "Cloud Audit Logs overview",
+        "url": "https://docs.cloud.google.com/logging/docs/audit",
+        "evidence": "You can use Cloud Audit Logs to answer \"who did what, where, and when?\" within your Google Cloud resources"
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-014",
+    "objective": "2.4",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "explainable-ai",
+      "feature-attributions",
+      "agent-platform"
+    ],
+    "stem": "Altostrat trains a custom tabular model on Agent Platform (formerly Vertex AI) that predicts the virality of new videos. Editors use the score to plan promotion. Altostrat must ensure that AI decisions can be explained: for one video, editors and auditors must see which input features raised its score. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Model Monitoring (formerly Vertex AI Model Monitoring) on the endpoint to track feature drift over time."
+      },
+      {
+        "id": "B",
+        "text": "Log a sample of prediction requests and responses to BigQuery for later review."
+      },
+      {
+        "id": "C",
+        "text": "Compare the evaluation metrics of the model with those of an AutoML (formerly Vertex AI AutoML) model."
+      },
+      {
+        "id": "D",
+        "text": "Compute SHAP values for each prediction with the open-source SHAP library, and show them with the score."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The requirement is an explanation of one prediction, feature by feature. Google deprecated Vertex Explainable AI on March 16, 2026, and it suggests open-source libraries such as SHAP or LIME instead. Shapley values assign credit to each feature for the outcome of one prediction.",
+    "whyWrong": {
+      "A": "Model Monitoring tracks drift over time and alerts on thresholds. It does not explain a single prediction.",
+      "B": "Logs record what went into the model and what came out. They do not show why the model gave the score.",
+      "C": "Evaluation metrics describe the quality of the whole model. They do not explain the score of one video."
+    },
+    "sources": [
+      {
+        "title": "Vertex AI deprecations",
+        "url": "https://docs.cloud.google.com/vertex-ai/docs/deprecations",
+        "evidence": "For alternatives, consider open source libraries for explanations such as SHapley Additive exPlanations (SHAP) and Local Interpretable Model Agnostic Explanation (LIME)."
+      },
+      {
+        "title": "Introduction to Vertex Explainable AI",
+        "url": "https://docs.cloud.google.com/vertex-ai/docs/explainable-ai/overview",
+        "evidence": "Each feature attribution method is based on Shapley values - a cooperative game theory algorithm that assigns credit to each player in a game for a particular outcome."
+      },
+      {
+        "title": "Introduction to Model Monitoring",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/model-monitoring/overview",
+        "evidence": "Model Monitoring can track and alert you when deviations exceed a specified threshold."
+      }
+    ]
+  },
+  {
+    "id": "cs-alto-015",
+    "objective": "1.1",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "build-vs-buy",
+      "recommendations",
+      "agent-search"
+    ],
+    "stem": "Altostrat wants personalized recommendations that increase how much content each viewer consumes. Today, a function in Cloud Run functions (formerly Cloud Functions) ranks items with hand-written rules, and user events are already collected. The team has little ML experience, and the executives name reliability and cost management as top priorities. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Train a custom two-tower recommendation model on Agent Platform (formerly Vertex AI), and serve it on GPU endpoints."
+      },
+      {
+        "id": "B",
+        "text": "Send each viewer's watch history to a Gemini model on every page view, and ask it for ten titles."
+      },
+      {
+        "id": "C",
+        "text": "Create an Agent Search (formerly Vertex AI Search) media recommendations app from the user events, optimized for conversion rate."
+      },
+      {
+        "id": "D",
+        "text": "Add more hand-written rules to the Cloud Run function, and review the results every week."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding facts are the goal (more content consumption), little ML experience, and the reliability and cost priorities. These point to a managed service instead of a custom build. Agent Search media recommendations use the uploaded user events to personalize results. The conversion-rate objective targets the consumption of content.",
+    "whyWrong": {
+      "A": "A custom model is a build decision. It needs ML skills, training pipelines, and GPU serving, which conflicts with the team's skills and the cost priority.",
+      "B": "A model call on every page view adds cost and latency at scale. It also ignores the user events that Altostrat already collects.",
+      "D": "More rules keep the current approach, which does not learn from user behavior."
+    },
+    "sources": [
+      {
+        "title": "Introduction to media search and recommendations",
+        "url": "https://docs.cloud.google.com/generative-ai-app-builder/docs/about-media",
+        "evidence": "For example, you can decide whether to optimize recommendations for click-through-rate to increase the number of interactions with content or for conversion rate to increase the consumption of content."
+      },
+      {
+        "title": "Introduction to media search and recommendations",
+        "url": "https://docs.cloud.google.com/generative-ai-app-builder/docs/about-media",
+        "evidence": "You upload user events to personalize recommendations and rank search results for your audience."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-001",
+    "objective": "1.1",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "ai-commerce-search",
+      "build-vs-buy",
+      "search"
+    ],
+    "stem": "Cymbal Retail wants to improve product discoverability and drive sales conversion. Today, its web application finds products by querying the relational databases for product names and categories. Cymbal does not want to build, train, or tune its own ranking models. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add full-text indexes to the MySQL product tables, and tune the relevance weights for each category."
+      },
+      {
+        "id": "B",
+        "text": "Generate embeddings for all products, and build semantic search on Vector Search in Agent Platform (formerly Vertex AI)."
+      },
+      {
+        "id": "C",
+        "text": "Adopt AI Commerce Search (formerly Vertex AI Search for commerce), import the catalog, and record real-time user events."
+      },
+      {
+        "id": "D",
+        "text": "Fine-tune a Gemini model on the product catalog, and have it return matching product IDs for each query."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding constraint is that Cymbal does not want to build or tune ranking models. AI Commerce Search is a fully managed platform, and Google handles model training, tuning, and infrastructure. Its search is optimized for product ranking, which increases click-through and conversions. It uses real-time user events to produce search results, so recording events is part of the setup.",
+    "whyWrong": {
+      "A": "Full-text indexes still depend on keyword matching, which is the current weakness. Cymbal would also tune the relevance weights by hand.",
+      "B": "Vector Search can power semantic search, but Cymbal would then build and operate the ranking and personalization itself. This breaks the stated constraint.",
+      "D": "A fine-tuned model is a custom build that Cymbal must retrain as the catalog changes. This breaks the constraint against building and tuning its own models."
+    },
+    "sources": [
+      {
+        "title": "What is AI Commerce Search?",
+        "url": "https://docs.cloud.google.com/retail/docs/what-is-it",
+        "evidence": "AI Commerce Search is a fully managed platform accessible to users who aren't developers, such as ecommerce admins. Google Cloud automatically handles the technical complexities like data preprocessing, training and tuning machine learning models, load balancing, and infrastructure provisioning."
+      },
+      {
+        "title": "What is AI Commerce Search?",
+        "url": "https://docs.cloud.google.com/retail/docs/what-is-it",
+        "evidence": "AI-powered search optimized for product ranking increases click-through, order value, and conversions, and reduces search abandonment and No Results Found."
+      },
+      {
+        "title": "Record real-time user events",
+        "url": "https://docs.cloud.google.com/retail/docs/record-events",
+        "evidence": "AI Commerce Search uses real-time user events to generate recommendations and search results."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-002",
+    "objective": "1.2",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "provisioned-throughput",
+      "scalability"
+    ],
+    "stem": "Cymbal Retail's virtual shopping agent calls a Gemini model on Agent Platform (formerly Vertex AI) for every customer turn. Traffic has a steady daily baseline and sharp peaks during flash sales. The agent must stay responsive as traffic grows, and Cymbal does not want to pay for reserved capacity that sits idle. Which consumption approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Buy Provisioned Throughput sized for the largest flash-sale peak, and route all traffic to it."
+      },
+      {
+        "id": "B",
+        "text": "Buy Provisioned Throughput for the baseline traffic, and let spillover traffic use Standard PayGo."
+      },
+      {
+        "id": "C",
+        "text": "Use Standard PayGo for all traffic, and retry the requests that the service throttles."
+      },
+      {
+        "id": "D",
+        "text": "Send customer turns to Gemini batch inference jobs, and return each answer when its job completes."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Two constraints decide this: steady responsiveness and no idle reserved capacity. Google recommends that you cover baseline traffic with Provisioned Throughput, which gives guaranteed reliability for the core of the traffic. By default, Standard PayGo handles the spillover traffic above the baseline. The reserved capacity stays well used, and flash-sale peaks still get served.",
+    "whyWrong": {
+      "A": "Capacity sized for the peak sits idle for most of the day. Google notes that Provisioned Throughput can cause underutilization when traffic has spikes.",
+      "C": "Standard PayGo is flexible, but it cannot guarantee a quality of service. Retries also add latency to customer conversations.",
+      "D": "Batch inference is asynchronous and is not designed for real-time applications. Customers cannot wait for a batch job to finish."
+    },
+    "sources": [
+      {
+        "title": "Consumption options",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+        "evidence": "Cover baseline traffic with Provisioned Throughput. This improves utilization of your reserved capacity, making it economical while providing guaranteed reliability for the core of your traffic."
+      },
+      {
+        "title": "Consumption options",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+        "evidence": "By default, traffic that exceeds your Provisioned Throughput baseline (called spillover traffic) is handled by Standard PayGo."
+      },
+      {
+        "title": "Consumption options",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+        "evidence": "While Provisioned Throughput offers the highest reliability, it can cause underutilization if your traffic has spikes. Similarly, PayGo might offer the maximum flexibility but cannot guarantee a quality of service."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-003",
+    "objective": "1.3",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini",
+      "structured-output",
+      "catalog-enrichment"
+    ],
+    "stem": "Cymbal Retail wants to derive product attributes from supplier titles, descriptions, and images. Each attribute must align with the product category and use only the values in Cymbal's existing catalog structure. Invalid values cause manual rework today. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the supplier data to Gemini with a response schema that lists the allowed values for each attribute."
+      },
+      {
+        "id": "B",
+        "text": "Ask Gemini for free-form attribute text, and extract the values from the output with regular expressions."
+      },
+      {
+        "id": "C",
+        "text": "Run Cloud Vision API label detection on the product images, and save the returned labels as attributes."
+      },
+      {
+        "id": "D",
+        "text": "Run Natural Language API entity analysis on the descriptions, and map each entity to the closest attribute."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding requirement is that attributes must use only the values in Cymbal's catalog structure. When a prompt includes a response schema, the Gemini response always follows that schema. A schema can restrict the model to user-defined labels, such as the allowed values for a category, instead of labels that the model produces.",
+    "whyWrong": {
+      "B": "Free-form output can contain values that are not in the catalog, such as synonyms. The parsing code then fails or passes invalid values, so the manual rework stays.",
+      "C": "Label detection returns general labels for objects, activities, and products. It cannot limit results to Cymbal's attribute values, and it ignores the supplier text.",
+      "D": "Entity analysis finds entities in text, but it does not use Cymbal's catalog structure or the product images. The mapping step needs custom rules."
+    },
+    "sources": [
+      {
+        "title": "Structured output",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/control-generated-output",
+        "evidence": "To specify the structure of a model's output, define a response schema, which works like a blueprint for model responses. When you submit a prompt and include the response schema, the model's response always follows your defined schema."
+      },
+      {
+        "title": "Structured output",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/control-generated-output",
+        "evidence": "For example, you can have a model annotate text with user-defined labels, not with labels that the model produces."
+      },
+      {
+        "title": "Detect Labels",
+        "url": "https://docs.cloud.google.com/vision/docs/labels",
+        "evidence": "Labels can identify general objects, locations, activities, animal species, products, and more."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-004",
+    "objective": "5.1",
+    "caseStudy": "cymbal",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "database-migration-service",
+      "memorystore",
+      "cloud-sql"
+    ],
+    "stem": "Cymbal Retail wants to reduce data-center hosting costs by moving its MySQL, Microsoft SQL Server, and Redis databases to managed services. The application teams want to keep code changes small. Which two actions should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use Database Migration Service to move MySQL and SQL Server to the same engines in Cloud SQL."
+      },
+      {
+        "id": "B",
+        "text": "Export all three databases to BigQuery, and change the applications to read and write BigQuery tables."
+      },
+      {
+        "id": "C",
+        "text": "Move the Redis servers to Compute Engine with Migrate to Virtual Machines, and keep the current Redis configuration."
+      },
+      {
+        "id": "D",
+        "text": "Export the Redis data as RDB files to Cloud Storage, and import the files into Memorystore for Redis."
+      },
+      {
+        "id": "E",
+        "text": "Use Database Migration Service to convert the SQL Server databases to Cloud SQL for PostgreSQL."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "The deciding constraints are managed targets and small code changes. Database Migration Service runs homogeneous migrations, such as MySQL to Cloud SQL for MySQL. It also migrates self-managed SQL Server to Cloud SQL for SQL Server. For Redis, Memorystore for Redis imports native RDB files from Cloud Storage, so the data moves from the data center without an engine change. The Memorystore automated migration does not fit here, because the source Redis must be in the same project and region as the target. Both paths replace self-managed servers with managed services.",
+    "whyWrong": {
+      "B": "BigQuery is an analytics data warehouse, not a transactional or caching database. The applications would need a full redesign.",
+      "C": "Migrate to Virtual Machines moves the servers as they are. Cymbal would still patch, scale, and operate Redis, which misses the managed-service goal.",
+      "E": "A conversion to PostgreSQL is a heterogeneous migration. It changes the database engine, so the application code and queries must change."
+    },
+    "sources": [
+      {
+        "title": "Database Migration Service overview",
+        "url": "https://docs.cloud.google.com/database-migration/docs/overview",
+        "evidence": "Homogeneous migrations take place when you migrate data between the same database technology. For example, from MySQL to Cloud SQL for MySQL."
+      },
+      {
+        "title": "Migrate your SQL Server databases to Cloud SQL for SQL Server",
+        "url": "https://docs.cloud.google.com/database-migration/docs/sqlserver/guide",
+        "evidence": "This page describes how to migrate your self-managed or Amazon RDS SQL Server databases to Cloud SQL for SQL Server instance with Database Migration Service."
+      },
+      {
+        "title": "About importing and exporting data",
+        "url": "https://docs.cloud.google.com/memorystore/docs/redis/about-importing-exporting",
+        "evidence": "The use of the native RDB format prevents lock-in and makes it very easy to move data within Google Cloud or outside of Google Cloud."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-005",
+    "objective": "2.2",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "ai-commerce-search",
+      "bigquery",
+      "catalog-import"
+    ],
+    "stem": "Cymbal Retail adds and updates thousands of products each week after associates approve generated content. AI Commerce Search (formerly Vertex AI Search for commerce) must use Cymbal's custom key/value attributes, and the catalog must stay current. Cymbal is a new AI Commerce Search customer. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Link Cymbal's Merchant Center account to AI Commerce Search with the Merchant Center connector."
+      },
+      {
+        "id": "B",
+        "text": "Import the full catalog once from BigQuery during setup, and let recorded user events add the new products."
+      },
+      {
+        "id": "C",
+        "text": "Send the approved products to the inline import method once a month from a script."
+      },
+      {
+        "id": "D",
+        "text": "Stage approved products in a BigQuery table that uses the AI Commerce Search schema, and schedule regular imports."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Two facts decide this: custom key/value attributes and a catalog that must stay current. BigQuery import uses the AI Commerce Search schema, which has more product attributes than other import options, including key/value custom attributes. A BigQuery import is a one-time operation, so Google recommends regular scheduled imports, ideally daily, to keep the catalog current.",
+    "whyWrong": {
+      "A": "The Merchant Center connector is deprecated and only available to current users. New users must use the Catalog API or BigQuery.",
+      "B": "A single import goes out of date as products change. Google also advises against recording user events for products that were not imported.",
+      "C": "Inline import has fewer catalog attributes than the AI Commerce Search schema, and it does not scale well for large catalogs. A monthly run also leaves the catalog out of date."
+    },
+    "sources": [
+      {
+        "title": "Import catalog information",
+        "url": "https://docs.cloud.google.com/retail/docs/upload-catalog",
+        "evidence": "BigQuery import uses the AI Commerce Search schema, which has more product attributes than other import options, including key/value custom attributes."
+      },
+      {
+        "title": "Import catalog information",
+        "url": "https://docs.cloud.google.com/retail/docs/upload-catalog",
+        "evidence": "Each of these procedures are one-time imports with the exception of linking Merchant Center. Schedule regular catalog imports (ideally, daily) to verify that your catalog is current."
+      },
+      {
+        "title": "Import catalog information",
+        "url": "https://docs.cloud.google.com/retail/docs/upload-catalog",
+        "evidence": "The Merchant Center connector is deprecated and only available to current users. New users must use the Catalog API or BigQuery to import catalogs."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-006",
+    "objective": "2.3",
+    "caseStudy": "cymbal",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "iap",
+      "workflows",
+      "human-in-the-loop"
+    ],
+    "stem": "Cymbal Retail needs a user interface where associates approve, reject, or modify generated content before it updates the product catalog. Only Cymbal employees may reach the interface. The team does not want to manage servers. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish generated content to the catalog every hour with Cloud Scheduler, and let associates fix errors in the live catalog."
+      },
+      {
+        "id": "B",
+        "text": "Deploy the review interface to Cloud Run, and enable IAP directly on the Cloud Run service."
+      },
+      {
+        "id": "C",
+        "text": "Run the review interface on a Compute Engine VM, and give associates access through Cloud VPN."
+      },
+      {
+        "id": "D",
+        "text": "Send generated content through Pub/Sub straight to the catalog database, and log each change for a later audit."
+      },
+      {
+        "id": "E",
+        "text": "Run a workflow in Workflows for each item that waits on a callback until an associate records a decision."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "The deciding requirement is that associates review content before it updates the catalog. A workflow can wait on a callback without polling, for example to allow human review of an order. The review interface calls the callback with the decision, and the workflow then updates the catalog or discards the item. Cloud Run is fully managed, and IAP on the service limits access to authorized Cymbal identities.",
+    "whyWrong": {
+      "A": "Content reaches the live catalog before anyone reviews it. This breaks the human-in-the-loop requirement.",
+      "C": "A VM with VPN access works, but Cymbal must manage the server and the VPN. This breaks the constraint of no servers to manage.",
+      "D": "Content reaches the catalog database without review. A later audit does not meet the requirement to approve content first."
+    },
+    "sources": [
+      {
+        "title": "Wait using callbacks",
+        "url": "https://docs.cloud.google.com/workflows/docs/creating-callback-endpoints",
+        "evidence": "For example, you can create a workflow that notifies you when a product is back in stock or when an item has shipped; or that waits to allow human interaction such as reviewing an order or validating a translation."
+      },
+      {
+        "title": "Configure IAP for Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/securing/identity-aware-proxy-cloud-run",
+        "evidence": "By enabling IAP on Cloud Run directly, you can secure traffic with a single click from all ingress paths, including default run.app URLs and load balancers."
+      },
+      {
+        "title": "What is Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run",
+        "evidence": "Cloud Run is a fully managed application platform for running your code, function, or container on top of Google's highly scalable infrastructure."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-007",
+    "objective": "2.4",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "batch-inference",
+      "consumption-models"
+    ],
+    "stem": "Cymbal Retail wants Gemini to generate descriptions and attributes for its full back catalog before the new site launches. The launch is several weeks away, so results are not needed in real time. Cymbal wants the most cost-effective option for this high-volume job. The team does not want to write throttling or retry logic. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Call the Gemini API with Standard PayGo from a Cloud Run job, and retry requests that hit rate limits."
+      },
+      {
+        "id": "B",
+        "text": "Put the requests in a BigQuery table or a Cloud Storage JSONL file, and run a Gemini batch inference job."
+      },
+      {
+        "id": "C",
+        "text": "Call the Gemini API with Flex PayGo from a Cloud Run job, and handle throttled requests in the job code."
+      },
+      {
+        "id": "D",
+        "text": "Serve an open model from Model Garden (formerly Vertex AI Model Garden) on a GPU endpoint, and send parallel requests."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Two qualifiers decide this: the most cost-effective option for high-volume work, and no custom throttling or retry logic. Google describes batch inference as the most cost-effective option for high-volume inference. The batch service validates the format, runs requests in parallel, and retries automatically. Flex PayGo is also discounted, but it accepts higher throttling, so the job code must handle it.",
+    "whyWrong": {
+      "A": "Standard PayGo charges the standard rate. Cymbal must also write the retry logic that the stem rules out.",
+      "C": "Flex PayGo suits latency-tolerant work such as product catalog building, but it has higher throttling. The team would write the throttling logic that the stem rules out.",
+      "D": "Cymbal would deploy, scale, and pay for the GPU endpoint itself. This adds work and cost that a managed batch job avoids."
+    },
+    "sources": [
+      {
+        "title": "Consumption options",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+        "evidence": "This is the most cost-effective option for high-volume inference."
+      },
+      {
+        "title": "Batch inference with Gemini",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/batch-inference",
+        "evidence": "The service handles format validation, parallelizes requests for concurrent processing, and automatically retries to strive for a high completion rate with 24 hours turnaround time."
+      },
+      {
+        "title": "Consumption options",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+        "evidence": "Tasks that can tolerate slower response times and higher throttling in exchange for lower pricing"
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-008",
+    "objective": "2.5",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "image-editing",
+      "catalog-enrichment"
+    ],
+    "stem": "Cymbal Retail wants to generate product image variations from a base image, such as other colors and new backgrounds. Associates must refine each result in several conversational steps, for example by adjusting the color after a background change. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use Imagen mask-based editing and background replacement, and send a new request for each change."
+      },
+      {
+        "id": "B",
+        "text": "Detect the product regions with Cloud Vision API, and recolor them with custom image-processing code."
+      },
+      {
+        "id": "C",
+        "text": "Train a custom image generation model on Cymbal's product photos with Agent Platform (formerly Vertex AI) custom training."
+      },
+      {
+        "id": "D",
+        "text": "Use a Gemini image model, such as Gemini 3 Pro Image, and edit the image over multiple turns."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding requirement is step-by-step refinement of one image. Gemini image models support multi-turn image editing. Google describes Gemini 3 Pro Image, a GA model, as the best model for complex and multi-turn image generation and editing. Google lists the Imagen editing pages as deprecated.",
+    "whyWrong": {
+      "A": "Google lists the Imagen pages as deprecated. Separate requests also do not keep the context of earlier edits.",
+      "B": "Cloud Vision API detects content in images, but it does not generate or edit images. The custom code would not create new backgrounds.",
+      "C": "Custom training adds data preparation and model work without a stated need. Managed Gemini image models already support these edits."
+    },
+    "sources": [
+      {
+        "title": "Gemini 3 Pro Image (Nano Banana Pro)",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/gemini/3-pro-image",
+        "evidence": "It's the best model for complex and multi-turn image generation and editing, having improved accuracy and enhanced image quality."
+      },
+      {
+        "title": "Edit images with Gemini",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/gemini-edit-images",
+        "evidence": "Gemini supports improved editing of images and multi-turn editing, and supports updated safety filters that provide a more flexible and less restrictive experience."
+      },
+      {
+        "title": "Imagen documentation",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/imagen-links",
+        "evidence": "The following are a list of links to deprecated Imagen pages:"
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-009",
+    "objective": "2.5",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "ai-commerce-search",
+      "conversational-commerce",
+      "product-discovery"
+    ],
+    "stem": "Cymbal Retail wants shoppers to describe what they need in natural language, answer follow-up questions, and get highly relevant products. The product catalog and user events are already in AI Commerce Search (formerly Vertex AI Search for commerce). Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable the Conversational agent in AI Commerce Search, and call the Search API for products that match each refined request."
+      },
+      {
+        "id": "B",
+        "text": "Build a CX Agent Studio agent that generates SQL queries against the MySQL product tables for each request."
+      },
+      {
+        "id": "C",
+        "text": "Train a custom intent classifier on past search logs, and map each intent to a fixed list of products."
+      },
+      {
+        "id": "D",
+        "text": "Turn on autocomplete in AI Commerce Search, and keep the keyword search box as the only input."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding requirement is natural-language requests with follow-up questions. The Conversational agent lets users ask for what they need in natural language, with follow-up questions and improved intent understanding. The application calls the Search API to get product results based on the Conversational API suggestions. This reuses the catalog and events that are already in AI Commerce Search.",
+    "whyWrong": {
+      "B": "Generated SQL still searches names and categories in the relational tables, so relevance does not improve. It also bypasses the catalog and ranking that Cymbal already has in AI Commerce Search.",
+      "C": "A fixed product list for each intent cannot handle follow-up questions or new products. Cymbal would also build and maintain the classifier.",
+      "D": "Autocomplete helps users type queries faster, but the search stays keyword-based. It does not handle natural-language requests or follow-up questions."
+    },
+    "sources": [
+      {
+        "title": "Conversational agent overview",
+        "url": "https://docs.cloud.google.com/retail/conversational_search_backup/conversational-search",
+        "evidence": "Instead of searching with keywords, users utilize natural language to ask for what they need, which includes follow up questions, multimodal interactions, improved intent understanding, and grounding with data beyond the product catalog."
+      },
+      {
+        "title": "Conversational agent overview",
+        "url": "https://docs.cloud.google.com/retail/conversational_search_backup/conversational-search",
+        "evidence": "You must call the Search API to get product results based on suggestions from the Conversational API."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-010",
+    "objective": "2.5",
+    "caseStudy": "cymbal",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cx-agent-studio",
+      "agent-assist",
+      "contact-center"
+    ],
+    "stem": "Cymbal Retail wants to reduce call center staffing costs. Today, an IVR routes calls, and human agents enter orders by hand when customers cannot finish a transaction themselves. Most of these customers prefer to call. Cymbal wants to automate routine phone orders and speed up the calls that still need a human agent. Which two actions should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use Customer Experience Insights to report call drivers, and keep the current IVR flows unchanged."
+      },
+      {
+        "id": "B",
+        "text": "Add Speech-to-Text transcription to the current IVR, and store the transcripts for later review."
+      },
+      {
+        "id": "C",
+        "text": "Deploy a CX Agent Studio agent that handles routine calls and orders on a Google Telephony Platform phone number."
+      },
+      {
+        "id": "D",
+        "text": "Give human agents Agent Assist, so that they get real-time suggestions on the calls that still reach them."
+      },
+      {
+        "id": "E",
+        "text": "Add a CX Agent Studio chat widget to the website, and keep the phone line unchanged."
+      }
+    ],
+    "answer": [
+      "C",
+      "D"
+    ],
+    "explanation": "The deciding requirement is lower staffing cost for phone calls. CX Agent Studio agents give self-service and take on a greater volume of inquiries, so human agents can focus on specialized calls. Google Telephony Platform attaches a phone number to the agent. Agent Assist gives the remaining human agents in-the-moment help, so they resolve issues faster.",
+    "whyWrong": {
+      "A": "Customer Experience Insights finds call drivers and KPIs, but it does not answer calls. Staffing needs stay the same.",
+      "B": "Transcripts help later analysis, but they do not handle any calls. Human agents still take every order.",
+      "E": "A chat widget helps website users, but customers who prefer to call still reach human agents. It does not automate phone orders, so the phone workload does not go down."
+    },
+    "sources": [
+      {
+        "title": "Gemini Enterprise for CX",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx",
+        "evidence": "Customer Experience Agent Studio helps you create AI agents with both generative AI and deterministic functionality that provide proactive, personalized self-service and take on a greater volume of inquiries, enabling customer service representatives to focus on more specialized calls."
+      },
+      {
+        "title": "Gemini Enterprise for CX",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx",
+        "evidence": "Agent Assist provides customer care representatives with in-the-moment assistance, generated responses, and real-time coaching to help them resolve customer issues faster and with greater accuracy."
+      },
+      {
+        "title": "Google Telephony Platform",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx/cx-agent-studio/deploy/google-telephony-platform",
+        "evidence": "This out-of-the-box feature lets you attach a new phone number to your agent that can handle incoming traffic in only a few minutes."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-011",
+    "objective": "3.1",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "sensitive-data-protection",
+      "cx-agent-studio",
+      "redaction"
+    ],
+    "stem": "Cymbal Retail wants customer interactions with virtual agents to be handled securely. Customers sometimes tell the agent their phone numbers and home addresses. The security team does not want these values in stored conversation history or logs. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Encrypt the conversation history with customer-managed encryption keys (CMEK) in Cloud KMS."
+      },
+      {
+        "id": "B",
+        "text": "Run a nightly Sensitive Data Protection job that finds and deletes stored conversations with sensitive data."
+      },
+      {
+        "id": "C",
+        "text": "Enable redaction in the CX Agent Studio logging settings, with a Sensitive Data Protection inspect template."
+      },
+      {
+        "id": "D",
+        "text": "Place the CX Agent Studio project inside a VPC Service Controls perimeter."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding requirement is that the values must never be stored. When redaction is enabled, CX Agent Studio applies it before any conversation data is written to storage. Redaction covers conversation history, Cloud Logging, and audio recording. A Sensitive Data Protection (DLP) inspect template defines which sensitive data types to detect.",
+    "whyWrong": {
+      "A": "CMEK controls the keys that encrypt stored data, but the sensitive values are still stored. Users with access to the data can still read them.",
+      "B": "The data stays in storage until the nightly job runs, which breaks the requirement. Deleting whole conversations also loses useful history.",
+      "D": "A VPC Service Controls perimeter reduces the risk of data exfiltration, but it does not remove sensitive values from stored conversations."
+    },
+    "sources": [
+      {
+        "title": "Conversation history",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx/cx-agent-studio/conversation-history",
+        "evidence": "If Data Loss Prevention (DLP) redaction is enabled, it is applied before any conversation data is written to storage."
+      },
+      {
+        "title": "Package google.cloud.ces.v1",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx/cx-agent-studio/reference/rpc/google.cloud.ces.v1",
+        "evidence": "If true, redaction will be applied in various logging scenarios, including conversation history, Cloud Logging and audio recording."
+      },
+      {
+        "title": "Package google.cloud.ces.v1",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx/cx-agent-studio/reference/rpc/google.cloud.ces.v1",
+        "evidence": "DLP inspect template name to configure detection of sensitive data types."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-012",
+    "objective": "3.2",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "pci-dss",
+      "compliance",
+      "payments"
+    ],
+    "stem": "Cymbal Retail's web chat agent will help customers finish orders, including payment by credit card. Cymbal must comply with PCI DSS and wants its compliance scope to be as small as possible. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Let the agent collect card numbers, and store them in Cloud SQL encrypted with CMEK."
+      },
+      {
+        "id": "B",
+        "text": "Send customers to a payment provider's hosted payment page, so that card data never reaches Cymbal systems."
+      },
+      {
+        "id": "C",
+        "text": "Let the agent collect card numbers, and tokenize them with Sensitive Data Protection before any analytics use."
+      },
+      {
+        "id": "D",
+        "text": "Let the agent collect card numbers, and restrict access to the conversation logs with IAM conditions."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding qualifier is the smallest possible compliance scope. SAQ A covers merchants that fully outsource card processing to a third-party site, so the merchant cannot touch card data at all. SAQ A has the smallest scope, because SAQ A-EP and SAQ D are supersets of it. When Cymbal's agent receives card numbers, Cymbal cannot qualify for SAQ A.",
+    "whyWrong": {
+      "A": "Cymbal systems receive and store card data, which puts Cymbal in a larger scope. CMEK protects the stored data, but it does not reduce the scope.",
+      "C": "Tokenization narrows the scope only for downstream systems. The agent still receives card numbers, so the front-end systems stay in scope.",
+      "D": "IAM conditions limit who reads the logs, but the card data still passes through and stays in Cymbal systems."
+    },
+    "sources": [
+      {
+        "title": "PCI Data Security Standard compliance",
+        "url": "https://docs.cloud.google.com/architecture/pci-dss-compliance-in-gcp",
+        "evidence": "Merchants that have fully outsourced payment card processing to a third-party site."
+      },
+      {
+        "title": "PCI Data Security Standard compliance",
+        "url": "https://docs.cloud.google.com/architecture/pci-dss-compliance-in-gcp",
+        "evidence": "SAQ A-EP is a superset of SAQ A, and SAQ D is a superset of SAQ A-EP."
+      },
+      {
+        "title": "Pseudonymization",
+        "url": "https://docs.cloud.google.com/sensitive-data-protection/docs/pseudonymization",
+        "evidence": "Replace credit card numbers and personally identifiable information (PII) with format-preserving tokens to narrow PCI DSS or HIPAA compliance boundaries in downstream applications."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-013",
+    "objective": "4.2",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "committed-use-discounts",
+      "cloud-sql",
+      "cost"
+    ],
+    "stem": "Cymbal Retail moved its catalog databases to Cloud SQL to reduce hosting costs. The primary instances run all the time with steady, predictable use. Cymbal adds read replicas for a few weeks during holiday peaks. What should you do to reduce costs?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Buy committed use discounts sized for the holiday peak, including the extra read replicas."
+      },
+      {
+        "id": "B",
+        "text": "Stop the Cloud SQL primary instances each night, and start them again each morning."
+      },
+      {
+        "id": "C",
+        "text": "Move the databases to self-managed MySQL on Spot VMs to get lower compute prices."
+      },
+      {
+        "id": "D",
+        "text": "Buy committed use discounts for the steady baseline, and pay on-demand prices for the holiday replicas."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding fact is the steady, predictable baseline. With committed use discounts, Cymbal commits to a minimum level of use or spend for one or three years and gets lower prices. Service-specific spend-based commitments, which include Cloud SQL, suit predictable spend within one service. The short-lived replicas stay on on-demand prices, so no commitment goes unused.",
+    "whyWrong": {
+      "A": "Cymbal pays for a commitment for its full term. Capacity sized for a few peak weeks goes unused for the rest of the year.",
+      "B": "An online store serves customers at all hours, so stopped databases cause an outage. The primary instances must run all the time.",
+      "C": "Compute Engine can preempt Spot VMs at any time, which does not suit a primary database. Self-managed MySQL also brings back the administration that Cloud SQL removed."
+    },
+    "sources": [
+      {
+        "title": "Committed use discounts",
+        "url": "https://docs.cloud.google.com/docs/cuds",
+        "evidence": "When you purchase Google Cloud commitments, you commit to either using a minimum level of resources or spending a minimum amount, for a term duration of one or three years."
+      },
+      {
+        "title": "Committed use discounts",
+        "url": "https://docs.cloud.google.com/docs/cuds",
+        "evidence": "These commitments are ideal for scenarios where you have predictable spend needs within a Google Cloud service."
+      },
+      {
+        "title": "Spot VMs",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+        "evidence": "However, Compute Engine can preempt Spot VMs at any time to reclaim resources. Use Spot VMs to reduce costs for fault-tolerant workloads."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-014",
+    "objective": "1.1",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "application-integration",
+      "integration-connectors",
+      "sftp"
+    ],
+    "stem": "Cymbal Retail receives supplier product files of a few megabytes each over SFTP and loads them with on-premises ETL batch scripts. Failed transfers need manual fixes, which is slow and error-prone. Suppliers will keep sending files. Cymbal wants a managed integration service with prebuilt connectors and built-in error handling. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Build the flows in Application Integration with the SFTP connector, and configure retry strategies on the tasks."
+      },
+      {
+        "id": "B",
+        "text": "Move the ETL scripts to a Compute Engine VM, and schedule them with cron as they run today."
+      },
+      {
+        "id": "C",
+        "text": "Use Cloud Scheduler to trigger Cloud Run functions (formerly Cloud Functions) that download the files, with custom retry code."
+      },
+      {
+        "id": "D",
+        "text": "Ask each supplier to publish product records to a Pub/Sub topic, and stop the file transfers."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding constraint is a managed service with prebuilt connectors and built-in error handling. Application Integration is an Integration Platform as a Service (iPaaS) with a library of prebuilt connectors. The SFTP connector performs file transfer operations. Each task can have an error handling strategy for temporary errors, and integrations can run on a schedule or in response to events. The files are small, so they fit the 10 MB payload limit of the Connectors task.",
+    "whyWrong": {
+      "B": "The scripts move to the cloud unchanged, so failures still need manual fixes. Cymbal also manages the VM.",
+      "C": "A function works, but Cymbal writes and maintains the transfer and retry code. This breaks the need for built-in error handling.",
+      "D": "Suppliers will keep sending files, so this option breaks a stated constraint. Each supplier would also need new integration code."
+    },
+    "sources": [
+      {
+        "title": "Application Integration overview",
+        "url": "https://docs.cloud.google.com/application-integration/docs/overview",
+        "evidence": "A growing library of pre-built connectors to connect to various Google Cloud services and other business applications."
+      },
+      {
+        "title": "SFTP (Integration Connectors)",
+        "url": "https://docs.cloud.google.com/integration-connectors/docs/connectors/sftp/configure",
+        "evidence": "The SFTP connector lets you connect to a SFTP server and perform file transfer operations."
+      },
+      {
+        "title": "Error handling strategies for tasks",
+        "url": "https://docs.cloud.google.com/application-integration/docs/error-handling-strategy",
+        "evidence": "The error handling strategy for a task specifies the action to take if the task fails due to a temporary error."
+      }
+    ]
+  },
+  {
+    "id": "cs-cym-015",
+    "objective": "6.2",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "synthetic-monitoring",
+      "alerting",
+      "cloud-monitoring"
+    ],
+    "stem": "Cymbal Retail wants proactive monitoring of its online store as it replaces Nagios with Cloud Monitoring. The operations team wants an alert when customers cannot complete a checkout, before customers report it. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a public uptime check on the home page URL, and alert when the check fails."
+      },
+      {
+        "id": "B",
+        "text": "Create a log-based metric that counts HTTP 500 errors, and alert when the count rises."
+      },
+      {
+        "id": "C",
+        "text": "Create a synthetic monitor that runs a scripted checkout test, and alert on failed test results."
+      },
+      {
+        "id": "D",
+        "text": "Install the Ops Agent on the web servers, and alert when CPU use is high."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding requirement is to detect a broken checkout before customers report it. Synthetic monitors periodically send simulated requests, and they can test a sequence such as the checkout process of an ecommerce store. An alerting policy on the test results notifies the team when a test fails, even when no customers are active.",
+    "whyWrong": {
+      "A": "An uptime check tests one endpoint, and each check is an independent request. The home page can respond while the checkout is broken.",
+      "B": "A log-based metric reacts only after real customers get errors. It also misses checkout failures that do not return HTTP 500 errors.",
+      "D": "High CPU use is not a direct signal of a failed checkout. A checkout can fail while CPU use is normal."
+    },
+    "sources": [
+      {
+        "title": "Synthetic monitoring overview",
+        "url": "https://docs.cloud.google.com/monitoring/uptime-checks/introduction",
+        "evidence": "For example, you can test the login page of your application, the checkout process of your ecommerce store, or the API calls that your application makes to third-party services."
+      },
+      {
+        "title": "Synthetic monitoring overview",
+        "url": "https://docs.cloud.google.com/monitoring/uptime-checks/introduction",
+        "evidence": "You can be notified when a test fails by creating an alerting policy to monitor the test results."
+      },
+      {
+        "title": "Synthetic monitoring overview",
+        "url": "https://docs.cloud.google.com/monitoring/uptime-checks/introduction",
+        "evidence": "Uptime checks let Google Cloud periodically query an application that responds to HTTP, HTTPS, or TCP requests."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-001",
+    "objective": "1.4",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "migration-planning",
+      "rehost",
+      "gke"
+    ],
+    "stem": "EHR Healthcare must leave one colocation facility before its lease expires. That facility runs containerized customer-facing applications on Kubernetes. EHR wants the move to finish on time with the least rework, and it plans to modernize after the move. Which migration approach should you recommend for these applications?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Refactor each application into Cloud Run functions (formerly Cloud Functions) before the move, so it uses managed services."
+      },
+      {
+        "id": "B",
+        "text": "Rebuild the applications as new cloud-native services, and retire the old versions when the lease ends."
+      },
+      {
+        "id": "C",
+        "text": "Rehost the containers on GKE with only the changes they need to run, and optimize them after the move."
+      },
+      {
+        "id": "D",
+        "text": "Extend the lease, and wait until the legacy insurance integrations are replaced before moving any workload."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding constraints are the fixed lease date and the least rework. A rehost moves workloads with only the minimum changes that they need to run in the target environment. Of the migration types, it takes the least time. The applications already run in containers, so GKE is a direct target, and EHR can refactor after the lease risk is gone.",
+    "whyWrong": {
+      "A": "A refactor takes longer than a rehost, because each application must change before it moves. This puts the lease date at risk.",
+      "B": "A rebuild replaces each application with new code, which takes much longer than a rehost. The lease is about to expire.",
+      "D": "The legacy integrations will be replaced over several years, so waiting delays the whole migration. Google Cloud is also chosen to replace the colocation facilities."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "This migration is the type that requires the least amount of time because the amount of refactoring is kept to a minimum."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "The modifications you apply to the workloads to migrate are only the minimum changes you need to make in order for the workloads to operate in the target environment."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "However, refactor migrations take longer than rehost migrations because the workloads must be refactored in order for the app to migrate."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-002",
+    "objective": "1.2",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke",
+      "regional-cluster",
+      "availability"
+    ],
+    "stem": "EHR Healthcare must provide at least 99.9% availability for its customer-facing applications, which it is moving to GKE in one region. A single zone outage must not stop the applications or the cluster control plane. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a zonal GKE Standard cluster, and enable node auto-repair on all node pools."
+      },
+      {
+        "id": "B",
+        "text": "Create a regional GKE cluster, and run enough replicas of each workload across the zones."
+      },
+      {
+        "id": "C",
+        "text": "Create a zonal cluster with node pools in three zones, and keep the control plane in one zone."
+      },
+      {
+        "id": "D",
+        "text": "Create two zonal clusters in the same zone, and split the traffic between them."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding requirement is that a zone outage must not stop the workloads or the control plane. A regional cluster runs control plane replicas in several zones, and by default it spreads the nodes across zones. Google recommends regional clusters for production workloads. The workloads stay available if enough replicas run in the other zones.",
+    "whyWrong": {
+      "A": "A zonal cluster has a single control plane in a single zone. A zone outage stops the control plane and the nodes, and auto-repair cannot fix that.",
+      "C": "Nodes in several zones keep workloads running, but the control plane of a zonal cluster is still in one zone. The stem requires the control plane to survive a zone outage.",
+      "D": "Both clusters are in the same zone, so one zone outage stops both."
+    },
+    "sources": [
+      {
+        "title": "About cluster configuration choices",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/configuration-overview",
+        "evidence": "You can choose between regional clusters that have multiple control plane replicas across multiple compute zones in a Google Cloud region, or zonal clusters with a single control plane in a single zone."
+      },
+      {
+        "title": "About cluster configuration choices",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/configuration-overview",
+        "evidence": "For production workloads, use regional clusters because they generally offer higher availability than zonal clusters."
+      },
+      {
+        "title": "Regional clusters",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/regional-clusters",
+        "evidence": "Also, by default, regional clusters are created as multi-zonal clusters, so worker nodes are distributed across multiple zones in a region. This increases the availability of your workload, if you run sufficient replicas of the workload."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-003",
+    "objective": "2.1",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "dedicated-interconnect",
+      "macsec",
+      "hybrid-connectivity"
+    ],
+    "stem": "EHR Healthcare needs a secure and high-performance connection between its colocation facilities and Google Cloud. EHR treats this connection as mission-critical and wants the topology that Google recommends for production-level applications. The security team also requires encryption of the traffic on the physical links. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Provision four Dedicated Interconnect connections, two in each of two metros, and enable MACsec on the connections."
+      },
+      {
+        "id": "B",
+        "text": "Provision two Dedicated Interconnect connections in one metro, and enable MACsec on both connections."
+      },
+      {
+        "id": "C",
+        "text": "Create HA VPN tunnels over the internet from each facility, and use Cloud Router for dynamic routing."
+      },
+      {
+        "id": "D",
+        "text": "Provision one Dedicated Interconnect connection with MACsec, and add an HA VPN tunnel as a backup path."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Three constraints decide this: high performance, the recommended topology for mission-critical production use, and encryption on the links. Google recommends the 99.99% Dedicated Interconnect configuration for production-level applications. Its multi-region topology uses four connections in two metros. MACsec for Cloud Interconnect encrypts traffic between the on-premises router and Google's edge routers.",
+    "whyWrong": {
+      "B": "Two connections in one metro form the 99.9% topology. Google points to that topology for non-critical applications.",
+      "C": "HA VPN encrypts traffic, but the traffic crosses the public internet. Google suggests Cloud VPN for lower bandwidth needs, not for a high-performance connection.",
+      "D": "One Interconnect connection is a single point of failure on the primary path. This does not match the recommended topology for mission-critical applications."
+    },
+    "sources": [
+      {
+        "title": "Establish 99.99% availability for Dedicated Interconnect",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/tutorials/dedicated-creating-9999-availability",
+        "evidence": "The following configuration uses Dedicated Interconnect to achieve 99.99% availability. Google recommends this configuration for production-level applications, such as mission-critical operations that have a low tolerance for downtime."
+      },
+      {
+        "title": "Establish 99.99% availability for Dedicated Interconnect",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/tutorials/dedicated-creating-9999-availability",
+        "evidence": "Use two metropolitan areas (metros): at least two interconnect connections must be in one metro, and at least two interconnect connections must be in a different metro."
+      },
+      {
+        "title": "MACsec for Cloud Interconnect overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/macsec-overview",
+        "evidence": "MACsec for Cloud Interconnect uses IEEE standard 802.1AE Media Access Control Security (MACsec) to encrypt traffic between your on-premises router and Google's edge routers."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-004",
+    "objective": "2.3",
+    "caseStudy": "ehr",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "fleet",
+      "config-sync",
+      "policy-controller"
+    ],
+    "stem": "EHR Healthcare runs its customer-facing container applications on several GKE clusters for development, staging, and production. Many past outages came from misconfigured systems. EHR wants a consistent way to manage configuration across all clusters and to block noncompliant changes. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Give each application team cluster-admin access, so that teams fix configuration issues directly on each cluster."
+      },
+      {
+        "id": "B",
+        "text": "Register the clusters in one fleet for each environment, and use Config Sync to sync configuration from a Git repository."
+      },
+      {
+        "id": "C",
+        "text": "Write a runbook for configuration changes, and review each change in a weekly meeting."
+      },
+      {
+        "id": "D",
+        "text": "Enable Policy Controller on the fleets, and apply policy bundles that block noncompliant resources."
+      },
+      {
+        "id": "E",
+        "text": "Copy the production configuration to the other clusters each night with a kubectl script."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "The deciding needs are consistent configuration and prevention of misconfiguration. A fleet groups clusters so that they can be managed together, and Google recommends that a fleet contains clusters from only one environment. Config Sync syncs configuration from Git to any number of clusters and prevents configuration drift. Policy Controller enforces programmable policies as guardrails, so it blocks noncompliant changes.",
+    "whyWrong": {
+      "A": "Direct changes on each cluster cause configuration drift. This is the same pattern that caused past outages.",
+      "C": "Manual reviews are slow, and they do not stop drift between meetings.",
+      "E": "A custom script is code to maintain, and it gives no policy enforcement. Drift between runs is not corrected."
+    },
+    "sources": [
+      {
+        "title": "Plan fleet resources",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/fleet-management/docs/fleet-concepts/plan-fleets",
+        "evidence": "A fleet should only contain clusters from one environment. Three environments, with one fleet in each environment, might be sufficient for many organizations."
+      },
+      {
+        "title": "Config Sync overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/config-sync/docs/overview",
+        "evidence": "Config Sync helps you implement GitOps by automating the synchronization of your configuration and policies across any number of clusters. Automatic syncing lets you manage fleets of clusters centrally, prevent configuration drift, and empower both platform and application teams."
+      },
+      {
+        "title": "Policy Controller overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/policy-controller/docs/overview",
+        "evidence": "Policy Controller enables the application and enforcement of programmable policies for your Kubernetes clusters. These policies act as guardrails and can help with best practices, security, and compliance management of your clusters and fleet."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-005",
+    "objective": "1.3",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "load-balancing",
+      "latency",
+      "multi-region"
+    ],
+    "stem": "EHR Healthcare serves medical offices, hospitals, and insurance providers in many countries from GKE in one region. EHR wants to reduce latency to all customers and keep a single public IP address for its web applications. Responses contain patient data and must not be cached. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep one region, and enable Cloud CDN on the load balancer for all responses."
+      },
+      {
+        "id": "B",
+        "text": "Deploy regional external Application Load Balancers in several regions, and give each customer the closest address."
+      },
+      {
+        "id": "C",
+        "text": "Keep one region, and move the cluster to machine types with more CPUs and memory."
+      },
+      {
+        "id": "D",
+        "text": "Deploy the applications to clusters in several regions, behind one global external Application Load Balancer."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding requirements are lower latency for users in many countries, one public IP address, and no caching of patient data. Google recommends the global external Application Load Balancer for globally dispersed users or backends in multiple regions. One anycast IP address fronts backends in regions around the world. Backends in several regions end connections close to users.",
+    "whyWrong": {
+      "A": "Cloud CDN caches responses, which the stem rules out for patient data. Uncached requests still travel to one distant region.",
+      "B": "Each regional load balancer has its own address, so EHR loses the single IP address. Customers must also choose an address.",
+      "C": "Larger machines do not shorten the network distance to customers in other countries."
+    },
+    "sources": [
+      {
+        "title": "External Application Load Balancer overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https",
+        "evidence": "Use this load balancer for external HTTP(S) workloads with globally dispersed users or backend services in multiple regions."
+      },
+      {
+        "title": "Cloud Load Balancing overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/load-balancing-overview",
+        "evidence": "With Cloud Load Balancing, a single anycast IP address is the frontend for all of your backend instances in regions around the world."
+      },
+      {
+        "title": "Cloud Load Balancing overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/load-balancing-overview",
+        "evidence": "You can distribute your backends in single or multiple regions to terminate connections close to your users and to meet your high availability requirements."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-006",
+    "objective": "5.1",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "apigee",
+      "api-management",
+      "partner-onboarding"
+    ],
+    "stem": "EHR Healthcare wants to onboard new insurance providers as quickly as possible. Each provider needs secure access to EHR's claims and eligibility APIs, with documentation and self-service app registration. EHR also wants rate limits without changes to the backend services. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish the APIs through Apigee API proxies, and give providers a developer portal for documentation and app registration."
+      },
+      {
+        "id": "B",
+        "text": "Give each provider a service account key, and let the provider call the backend services directly."
+      },
+      {
+        "id": "C",
+        "text": "Create a Cloud VPN tunnel for each provider, and send each provider the API documentation by email."
+      },
+      {
+        "id": "D",
+        "text": "Expose each backend service on its own load balancer, and add rate-limit code to each service."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding requirements are fast, self-service onboarding and rate limits without backend changes. Apigee gives providers a developer portal where they discover APIs, read documentation, and register apps. The Apigee proxy layer controls security, rate limiting, and quotas. Because the policies run in the proxy layer, the backend services stay unchanged.",
+    "whyWrong": {
+      "B": "Direct access gives no central place for rate limits, documentation, or self-service registration. Each new provider also needs manual setup.",
+      "C": "A VPN tunnel for each provider adds network work to every onboarding. It also gives no documentation portal and no rate limits.",
+      "D": "Rate-limit code in each service changes the backends, which the stem rules out. There is also no portal for self-service onboarding."
+    },
+    "sources": [
+      {
+        "title": "What is Apigee?",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/get-started/what-apigee",
+        "evidence": "Apigee offers API producers a developer-focused portal where client app developers can discover your APIs, find the documentation required to build applications using them, and register as an app developer to stay in sync with any updates or changes."
+      },
+      {
+        "title": "What is Apigee?",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/get-started/what-apigee",
+        "evidence": "The proxy layer gives you granular control over security, rate limiting, quotas, analytics, and more for all of your services."
+      },
+      {
+        "title": "What is Apigee?",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/get-started/what-apigee",
+        "evidence": "Because the policies and actions are implemented on Apigee, in the API proxy layer, your underlying backend services can remain unchanged."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-007",
+    "objective": "2.2",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-healthcare-api",
+      "fhir",
+      "bigquery"
+    ],
+    "stem": "EHR Healthcare needs interfaces to ingest and process data from new providers. The providers send clinical records as FHIR resources through EHR's APIs. Analysts need each change in BigQuery within minutes for trend reports, and EHR does not want to write custom ETL code. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Store the records in a Cloud SQL for MySQL database, and export the database to BigQuery each night."
+      },
+      {
+        "id": "B",
+        "text": "Write the records to a Cloud Healthcare API FHIR store, and configure BigQuery streaming on the store."
+      },
+      {
+        "id": "C",
+        "text": "Write the records to Cloud Storage, and import them into a FHIR store that has BigQuery streaming enabled."
+      },
+      {
+        "id": "D",
+        "text": "Publish the records to Pub/Sub, and write a Dataflow pipeline that parses FHIR and loads BigQuery."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding requirements are changes in BigQuery within minutes and no custom ETL code. A FHIR store in the Cloud Healthcare API can export resources to BigQuery each time a resource is created, updated, patched, or deleted. This BigQuery streaming keeps the dataset in sync in near real time.",
+    "whyWrong": {
+      "A": "A nightly export does not meet the need for data within minutes. EHR would also have to map FHIR resources to tables itself.",
+      "C": "Changes that you import from Cloud Storage are not streamed to BigQuery. Analysts would not see these records.",
+      "D": "The pipeline works, but it is custom ETL code, which the stem rules out."
+    },
+    "sources": [
+      {
+        "title": "Streaming FHIR resource changes to BigQuery",
+        "url": "https://docs.cloud.google.com/healthcare-api/docs/how-tos/fhir-bigquery-streaming",
+        "evidence": "This page explains how to configure a FHIR store to automatically export FHIR resources to BigQuery tables every time a FHIR resource is created, updated, patched, or deleted. This process is called BigQuery streaming."
+      },
+      {
+        "title": "Streaming FHIR resource changes to BigQuery",
+        "url": "https://docs.cloud.google.com/healthcare-api/docs/how-tos/fhir-bigquery-streaming",
+        "evidence": "Synchronize the data in a FHIR store with a BigQuery dataset in near real time."
+      },
+      {
+        "title": "Streaming FHIR resource changes to BigQuery",
+        "url": "https://docs.cloud.google.com/healthcare-api/docs/how-tos/fhir-bigquery-streaming",
+        "evidence": "If you import FHIR resources from Cloud Storage, the changes aren't streamed to BigQuery."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-008",
+    "objective": "1.3",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigquery-ml",
+      "forecasting",
+      "timesfm"
+    ],
+    "stem": "EHR Healthcare wants to make predictions on industry trends, such as monthly claim volumes by region, from provider data in BigQuery. EHR's analysts know SQL but not Python or ML frameworks. EHR wants to avoid moving the data, and it does not want to create and manage a model. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Export the data to Cloud Storage, and train a forecasting model with Agent Platform (formerly Vertex AI) custom training."
+      },
+      {
+        "id": "B",
+        "text": "Create an `ARIMA_PLUS` model with BigQuery ML, and run `ML.FORECAST` against it on a schedule."
+      },
+      {
+        "id": "C",
+        "text": "Use the `AI.FORECAST` function in BigQuery with the built-in TimesFM model."
+      },
+      {
+        "id": "D",
+        "text": "Build Looker dashboards of historical volumes, and let analysts extend the trend lines by hand."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Three constraints decide this: SQL skills, no data movement, and no model to create or manage. BigQuery ML runs where the data is, so the data stays in the warehouse. The `AI.FORECAST` function uses the built-in TimesFM model, and it does not require you to create and manage a model.",
+    "whyWrong": {
+      "A": "Custom training needs a data export and ML programming skills that the analysts do not have.",
+      "B": "`ARIMA_PLUS` runs in SQL, but it requires you to create and manage a model, which the stem rules out.",
+      "D": "Dashboards show past data, but they do not produce predictions."
+    },
+    "sources": [
+      {
+        "title": "Forecasting overview",
+        "url": "https://docs.cloud.google.com/bigquery/docs/forecasting-overview",
+        "evidence": "By using the AI.FORECAST function with the built-in TimesFM model. Use this approach when you need to forecast future values for a single variable or multiple variables. This approach doesn't require you to create and manage a model."
+      },
+      {
+        "title": "Introduction to ML in BigQuery",
+        "url": "https://docs.cloud.google.com/bigquery/docs/bqml-introduction",
+        "evidence": "BigQuery ML increases the speed of model development and innovation by removing the need to move data from the data warehouse."
+      },
+      {
+        "title": "Introduction to ML in BigQuery",
+        "url": "https://docs.cloud.google.com/bigquery/docs/bqml-introduction",
+        "evidence": "However, with BigQuery ML, SQL practitioners can use existing SQL tools and skills to build and evaluate models, and to generate results from LLMs and Cloud AI APIs."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-009",
+    "objective": "3.1",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-identity",
+      "active-directory",
+      "single-sign-on"
+    ],
+    "stem": "EHR Healthcare manages its users in Microsoft Active Directory. EHR wants employees to sign in to Google Cloud with their Active Directory credentials, and the Active Directory MFA policies must still apply. When a user is deleted in Active Directory, the deletion must also reach Google Cloud. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Cloud Identity account for each employee by hand, and ask each user to choose a new password."
+      },
+      {
+        "id": "B",
+        "text": "Create a service account for each employee, and distribute the keys through Active Directory Group Policy."
+      },
+      {
+        "id": "C",
+        "text": "Sync password hashes from Active Directory to Cloud Identity, and let Google check each password at sign-in."
+      },
+      {
+        "id": "D",
+        "text": "Sync users and groups to Cloud Identity with Google Cloud Directory Sync, and use Active Directory for SAML single sign-on."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding requirements are Active Directory credentials, Active Directory MFA, and automatic deletions. Google Cloud Directory Sync (GCDS) periodically syncs users and groups from Active Directory to Cloud Identity, and it also propagates deletions. With SAML single sign-on, Google Cloud delegates authentication to Active Directory. Only Active Directory then manages credentials and enforces MFA.",
+    "whyWrong": {
+      "A": "Manual accounts create a second set of credentials. Deletions in Active Directory also do not reach Google Cloud.",
+      "B": "Service accounts are identities for workloads, not for people. Distributed keys are also hard to control.",
+      "C": "Google then checks the passwords, so Active Directory no longer controls the sign-in or its MFA policies."
+    },
+    "sources": [
+      {
+        "title": "Federate Google Cloud with Active Directory",
+        "url": "https://docs.cloud.google.com/architecture/identity/federating-gcp-with-active-directory-introduction",
+        "evidence": "Relevant users and groups are synchronized periodically from Active Directory to Cloud Identity or Google Workspace."
+      },
+      {
+        "title": "Federate Google Cloud with Active Directory",
+        "url": "https://docs.cloud.google.com/architecture/identity/federating-gcp-with-active-directory-introduction",
+        "evidence": "This delegation ensures that only Active Directory manages user credentials and that any applicable policies or multi-factor authentication (MFA) mechanisms are being enforced."
+      },
+      {
+        "title": "Federate Google Cloud with Active Directory",
+        "url": "https://docs.cloud.google.com/architecture/identity/federating-gcp-with-active-directory-introduction",
+        "evidence": "Google Cloud Directory Sync (GCDS) is a free Google-provided tool that implements the synchronization process."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-010",
+    "objective": "3.2",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "hipaa",
+      "baa",
+      "compliance"
+    ],
+    "stem": "EHR Healthcare will store protected health information (PHI) for US customers in Google Cloud and must maintain HIPAA compliance. The compliance officer asks what EHR must do before it moves any PHI. What should you do first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Request a HIPAA certification for Google Cloud from Google, and add it to the audit file."
+      },
+      {
+        "id": "B",
+        "text": "Accept the Google Cloud Business Associate Agreement (BAA), and use only BAA-covered products for PHI."
+      },
+      {
+        "id": "C",
+        "text": "Enable CMEK on all storage services, because CMEK makes the workloads HIPAA compliant."
+      },
+      {
+        "id": "D",
+        "text": "Put PHI in Preview healthcare features, because Google manages their HIPAA controls."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding requirement is HIPAA compliance before PHI moves. Google lists the execution of a Google Cloud BAA as an essential best practice. EHR must also not use products that the BAA does not cover when it works with PHI. HIPAA compliance is a shared responsibility, so EHR must still configure its environment correctly.",
+    "whyWrong": {
+      "A": "No certification recognized by the US HHS exists for HIPAA compliance. Compliance is a shared responsibility between EHR and Google.",
+      "C": "CMEK is one control, but it does not make a workload compliant by itself. EHR still needs the BAA and covered products.",
+      "D": "Google advises against Pre-GA offerings with PHI unless the terms say otherwise. Compliance also stays a shared responsibility."
+    },
+    "sources": [
+      {
+        "title": "HIPAA Compliance on Google Cloud",
+        "url": "https://cloud.google.com/security/compliance/hipaa",
+        "evidence": "Execute a Google Cloud BAA. You can follow the instructions in the Privacy compliance and records for Google Cloud to review and accept the BAA."
+      },
+      {
+        "title": "HIPAA Compliance on Google Cloud",
+        "url": "https://cloud.google.com/security/compliance/hipaa",
+        "evidence": "Disable or otherwise ensure that you do not use Google Cloud Products that are not explicitly covered by the BAA (see Covered Products) when working with PHI."
+      },
+      {
+        "title": "HIPAA Compliance on Google Cloud",
+        "url": "https://cloud.google.com/security/compliance/hipaa",
+        "evidence": "It is important to note that there is no certification recognized by the US HHS for HIPAA compliance and that complying with HIPAA is a shared responsibility between the customer and Google."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-011",
+    "objective": "6.2",
+    "caseStudy": "ehr",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-logging",
+      "log-buckets",
+      "slo-alerting"
+    ],
+    "stem": "EHR Healthcare needs consistent logging, log retention, monitoring, and alerting across many projects. Today, teams use different open source tools, and email alerts are often ignored. Compliance requires EHR to keep application logs in one place for several years. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Route logs with an organization-level aggregated sink to a log bucket in a central project, with custom retention."
+      },
+      {
+        "id": "B",
+        "text": "Keep the default log buckets, and ask each team to export its logs before the default retention ends."
+      },
+      {
+        "id": "C",
+        "text": "Send every warning-level log entry to a shared email list, so that more people see each problem."
+      },
+      {
+        "id": "D",
+        "text": "Run a separate open source monitoring stack in each project, and let each team choose its own alert rules."
+      },
+      {
+        "id": "E",
+        "text": "Define SLOs for the customer-facing services, and alert on error budget burn rate through an on-call channel such as PagerDuty."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "The deciding needs are logs in one place with long retention, and alerts that people act on. Aggregated sinks combine and route logs from the organization to a central location. A log bucket has a configurable retention period. Burn-rate alerts show how fast a service uses its error budget, so they point to problems that affect users.",
+    "whyWrong": {
+      "B": "Manual exports are inconsistent and easy to forget. The logs also stay spread across projects.",
+      "C": "More email alerts add noise, which is why alerts are ignored today.",
+      "D": "Separate stacks keep the inconsistent monitoring that the executive statement names as a cause of outages."
+    },
+    "sources": [
+      {
+        "title": "Collate and route organization- and folder-level logs to supported destinations",
+        "url": "https://docs.cloud.google.com/logging/docs/export/aggregated_sinks",
+        "evidence": "You can use aggregated sinks in Cloud Logging to combine and route logs from resources in your organization or folder to a centralized location."
+      },
+      {
+        "title": "Configure log buckets",
+        "url": "https://docs.cloud.google.com/logging/docs/buckets",
+        "evidence": "Cloud Logging buckets to store and centralize your log data using the Google Cloud console, Google Cloud CLI, or the Logging API. You can also configure retention periods and lock buckets to meet compliance requirements."
+      },
+      {
+        "title": "Alerting on your burn rate",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/solutions/slo-monitoring/alerting-on-budget-burn-rate",
+        "evidence": "The burn rate tells you how fast you are consuming your error budget for a compliance period."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-012",
+    "objective": "2.5",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "healthcare",
+      "deprecation"
+    ],
+    "stem": "EHR Healthcare wants more insight into healthcare trends from de-identified clinical notes that providers send. EHR needs medical concepts, such as medications and conditions, extracted into BigQuery columns for reports. EHR wants a prebuilt, generally available model, not a custom-trained one. EHR does not want to adopt a service that Google has deprecated. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the notes to a GA Gemini model on Agent Platform (formerly Vertex AI), and set a response schema."
+      },
+      {
+        "id": "B",
+        "text": "Send the notes to the Healthcare Natural Language API, and load the extracted medical entities into BigQuery."
+      },
+      {
+        "id": "C",
+        "text": "Send the notes to the Cloud Natural Language API for entity analysis, and load the general entities into BigQuery."
+      },
+      {
+        "id": "D",
+        "text": "Load the raw notes into BigQuery, and count keyword matches for each medication and condition with SQL."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding constraints are a prebuilt, generally available model and no deprecated services. Google deprecated the Healthcare Natural Language API, and it names a GA Gemini model on Gemini Enterprise Agent Platform (formerly Vertex AI) as the alternative. A response schema makes the Gemini output always follow the defined structure, so the results load into BigQuery columns.",
+    "whyWrong": {
+      "B": "The Feature deprecations page lists the Healthcare Natural Language API as deprecated on May 27, 2025. Its API page gives May 27, 2026 as the shutdown date. The stem rules out a deprecated service.",
+      "C": "Entity analysis in the Cloud Natural Language API returns general entities. It does not target medical concepts such as medications and conditions.",
+      "D": "Keyword counts miss synonyms, abbreviations, and negations in clinical text. The trend data would be unreliable."
+    },
+    "sources": [
+      {
+        "title": "Feature deprecations",
+        "url": "https://docs.cloud.google.com/healthcare-api/docs/deprecations",
+        "evidence": "The Healthcare Natural Language API is deprecated. As an alternative, you can use a Generally Available (GA) Gemini model on Vertex AI."
+      },
+      {
+        "title": "Healthcare Natural Language API",
+        "url": "https://docs.cloud.google.com/healthcare-api/docs/concepts/nlp",
+        "evidence": "The Healthcare Natural Language API is deprecated and will be shut down on May 27, 2026."
+      },
+      {
+        "title": "Structured output",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/control-generated-output",
+        "evidence": "To specify the structure of a model's output, define a response schema, which works like a blueprint for model responses. When you submit a prompt and include the response schema, the model's response always follows your defined schema."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-013",
+    "objective": "6.3",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-deploy",
+      "canary",
+      "continuous-deployment"
+    ],
+    "stem": "EHR Healthcare wants continuous deployment so that it can update its software at a fast pace. Each release must move through test, staging, and production GKE clusters in order. In production, a new version must reach a small share of users first, so that a bad release does not affect all customers. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run kubectl apply from each developer's workstation against each cluster after the tests pass."
+      },
+      {
+        "id": "B",
+        "text": "Use a Cloud Build trigger that replaces all production Pods with the new version in one step."
+      },
+      {
+        "id": "C",
+        "text": "Create a new production cluster for each release, and switch DNS to it after a manual check."
+      },
+      {
+        "id": "D",
+        "text": "Use a Cloud Deploy delivery pipeline with a promotion sequence, and a canary strategy for the production target."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding requirements are an ordered promotion through environments and a partial first release in production. Cloud Deploy delivers applications to a series of targets in a defined promotion sequence. A canary deployment sends the new version to a subset of users before the full rollout, so EHR can confirm that the version is reliable.",
+    "whyWrong": {
+      "A": "Manual deployments from workstations are inconsistent and have no promotion sequence. Misconfigured systems already caused many outages.",
+      "B": "All users get the new version at once, so a bad release affects every customer.",
+      "C": "A DNS switch moves all users at once. A new cluster for each release also adds cost and operational work."
+    },
+    "sources": [
+      {
+        "title": "Overview of Cloud Deploy",
+        "url": "https://docs.cloud.google.com/deploy/docs/overview",
+        "evidence": "Cloud Deploy is a managed service that automates delivery of your applications to a series of target environments in a defined promotion sequence."
+      },
+      {
+        "title": "Use a canary deployment strategy",
+        "url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/canary",
+        "evidence": "A canary deployment is a progressive rollout of an application that splits traffic between an already-deployed version and a new version, rolling it out to a subset of users before rolling out fully."
+      },
+      {
+        "title": "Use a canary deployment strategy",
+        "url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/canary",
+        "evidence": "A canary deployment gives you a chance to partially release your application. In this way, you can ensure the new version of your application is reliable before you deliver it to all users."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-014",
+    "objective": "4.1",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "disaster-recovery",
+      "cloud-sql",
+      "cross-region-replica"
+    ],
+    "stem": "EHR Healthcare is adapting its disaster recovery plan. Its customer-facing applications run on a regional GKE cluster and use a Cloud SQL for MySQL instance with high availability in the same region. EHR wants to recover from a full regional outage with an RTO and RPO measured in minutes, not hours. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rely on the Cloud SQL high availability configuration, and keep automated daily backups."
+      },
+      {
+        "id": "B",
+        "text": "Export the database to a multi-region Cloud Storage bucket each night, and import it in another region after an outage."
+      },
+      {
+        "id": "C",
+        "text": "Create a cross-region read replica of the Cloud SQL instance, and keep a standby GKE cluster in a second region."
+      },
+      {
+        "id": "D",
+        "text": "Back up with Backup for GKE and Cloud SQL backups, and restore both in another region after an outage."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding requirement is recovery from a regional outage in minutes. A Cloud SQL HA instance is regional, so it becomes unavailable when its region fails. Google's DR design for Cloud SQL uses a cross-region read replica, because failover to another region is faster than recreating a database. A standby cluster in the second region lets the application tier fail over too.",
+    "whyWrong": {
+      "A": "An HA instance protects against a zone failure, but it is unavailable when its whole region fails. Daily backups also allow up to a day of data loss.",
+      "B": "A nightly export allows up to a day of data loss. Export and import also take longer than a replica failover, especially for large databases.",
+      "D": "Restore-based recovery takes longer than a replica failover, especially for large databases. The RTO would not be minutes."
+    },
+    "sources": [
+      {
+        "title": "About disaster recovery (DR) in Cloud SQL",
+        "url": "https://docs.cloud.google.com/sql/docs/mysql/intro-to-cloud-sql-disaster-recovery",
+        "evidence": "Cloud SQL is a regional service (when Cloud SQL is configured for high availability (HA)). Therefore, if the Google Cloud region that hosts a Cloud SQL database becomes unavailable, then the Cloud SQL database also becomes unavailable."
+      },
+      {
+        "title": "About disaster recovery (DR) in Cloud SQL",
+        "url": "https://docs.cloud.google.com/sql/docs/mysql/intro-to-cloud-sql-disaster-recovery",
+        "evidence": "The DR plan requires you to configure a cross-region read replica in Cloud SQL. A failover based on export/import or backup/restore is also possible, but that approach takes longer, especially for large databases."
+      },
+      {
+        "title": "About disaster recovery (DR) in Cloud SQL",
+        "url": "https://docs.cloud.google.com/sql/docs/mysql/intro-to-cloud-sql-disaster-recovery",
+        "evidence": "The required recovery time objective (RTO) and recovery point objective (RPO) are in minutes rather than in hours. Failing over to another region is faster than recreating a database."
+      }
+    ]
+  },
+  {
+    "id": "cs-ehr-015",
+    "objective": "4.2",
+    "caseStudy": "ehr",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "gke-autopilot",
+      "operations-cost",
+      "managed-services"
+    ],
+    "stem": "EHR Healthcare wants to decrease infrastructure administration costs for its container platform after the migration. Its operations team spends much of its time on node upgrades, node scaling, and security settings for Kubernetes clusters. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the applications on GKE Autopilot clusters, where Google manages the nodes, scaling, and security settings."
+      },
+      {
+        "id": "B",
+        "text": "Run GKE Standard clusters, and write scripts that upgrade and resize the node pools each week."
+      },
+      {
+        "id": "C",
+        "text": "Run self-managed Kubernetes on Compute Engine VMs in a managed instance group."
+      },
+      {
+        "id": "D",
+        "text": "Keep the Kubernetes clusters in the remaining colocation facilities, and add more operators to the team."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding requirement is lower administration cost for the clusters. In GKE Autopilot, Google manages the infrastructure configuration, including nodes, scaling, and security settings. Google also handles node creation, upgrades, and repairs, so the operations team no longer spends time on these tasks.",
+    "whyWrong": {
+      "B": "Custom scripts keep node management with EHR, and they add code to maintain.",
+      "C": "Self-managed Kubernetes keeps all control plane and node work with EHR, which increases administration.",
+      "D": "More operators increase costs. Google Cloud is also chosen to replace the colocation facilities."
+    },
+    "sources": [
+      {
+        "title": "GKE Autopilot overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview",
+        "evidence": "GKE Autopilot is a mode of operation in GKE in which Google manages your infrastructure configuration, including your nodes, scaling, security, and other preconfigured settings."
+      },
+      {
+        "title": "GKE Autopilot overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview",
+        "evidence": "Node management: Google manages worker nodes, so you don't need to create new nodes to accommodate your workloads or configure automatic upgrades and repairs."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-001",
+    "objective": "1.1",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "data-monetization",
+      "data-clean-rooms",
+      "bigquery-sharing"
+    ],
+    "stem": "KnightMotives wants to monetize corporate data to finance new technology investments. An insurance partner wants to join KnightMotives driving data with its own policy data. After past data breaches, KnightMotives will not let the partner see or copy raw driver records. KnightMotives also wants to allow only the analyses that it approves. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Export aggregated CSV files to Cloud Storage each week, and send the partner signed URLs to download them."
+      },
+      {
+        "id": "B",
+        "text": "List the driving tables in a standard BigQuery sharing (formerly Analytics Hub) exchange, and let the partner subscribe."
+      },
+      {
+        "id": "C",
+        "text": "Share the driving data through a BigQuery data clean room with analysis rules and approved query templates."
+      },
+      {
+        "id": "D",
+        "text": "Grant the partner's analysts the BigQuery Data Viewer role on the dataset that contains the driving tables."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding needs are a join with partner data, no access to raw records, and only approved analyses. Data clean rooms let several parties join and analyze data without moving or revealing the underlying data. Analysis rules help prevent raw access and enforce query restrictions. Google also recommends query templates to restrict execution to approved queries.",
+    "whyWrong": {
+      "A": "The partner gets copies of the data, which it can keep and share. KnightMotives also cannot limit which analyses the partner runs on the files.",
+      "B": "Standard BigQuery sharing exchanges share data at scale, but Google recommends data clean rooms for sensitive and protected data. Subscribers can read the shared records.",
+      "D": "The Data Viewer role gives read access to the raw tables. It does not restrict the partner to approved analyses."
+    },
+    "sources": [
+      {
+        "title": "Share sensitive data with data clean rooms",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-clean-rooms",
+        "evidence": "You can use data clean rooms to establish a security-enhanced environment. In this environment, multiple parties share, join, and analyze their data assets. This collaboration occurs without moving or revealing the underlying data."
+      },
+      {
+        "title": "Share sensitive data with data clean rooms",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-clean-rooms",
+        "evidence": "As a data contributor, you configure analysis rules on the resources that you share in the data clean room. Analysis rules help prevent raw access to underlying data and enforce query restrictions."
+      },
+      {
+        "title": "Share sensitive data with data clean rooms",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-clean-rooms",
+        "evidence": "Analysis rules in data clean rooms provide privacy controls, but they might not fully prevent sophisticated queries from extracting unauthorized data. To maintain control and restrict execution to approved queries, use query templates."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-002",
+    "objective": "1.2",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "decoupling",
+      "pubsub",
+      "reliability"
+    ],
+    "stem": "KnightMotives's online build-to-order system is unreliable. When the outdated ERP slows down, order submissions time out, and dealers lose orders. KnightMotives will replace the ERP gradually over several years. You need to make order intake reliable now without changing the ERP. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the request timeout on the web tier, and add browser retries for failed order submissions."
+      },
+      {
+        "id": "B",
+        "text": "Publish orders to Pub/Sub, and have a pull subscriber write them to the ERP at a rate it can handle."
+      },
+      {
+        "id": "C",
+        "text": "Replace the ERP with a new cloud-based ERP first, and then change the ordering website to use it."
+      },
+      {
+        "id": "D",
+        "text": "Add more web server instances behind the load balancer, so that more order submissions run at once."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding constraint is that the ERP stays slow for now. Pub/Sub decouples the services that produce messages from the services that process them. A pull subscriber requests messages when it is ready, so the ERP receives orders at a rate it can handle. Pub/Sub keeps delivering an unacknowledged message until its retention duration expires.",
+    "whyWrong": {
+      "A": "Longer timeouts and retries still wait on the slow ERP. Retries also add load to the ERP when it is already slow.",
+      "C": "The ERP is replaced gradually over several years, so this fix comes too late. Order intake needs a fix now.",
+      "D": "More web servers do not help, because the ERP is the bottleneck. More concurrent submissions can make the ERP slower."
+    },
+    "sources": [
+      {
+        "title": "What is Pub/Sub?",
+        "url": "https://docs.cloud.google.com/pubsub/docs/overview",
+        "evidence": "Pub/Sub is an asynchronous and scalable messaging service that decouples services producing messages from services processing those messages."
+      },
+      {
+        "title": "Subscription overview",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-overview",
+        "evidence": "Pull subscriptions use a subscriber client to request messages from the Pub/Sub server."
+      },
+      {
+        "title": "Overview of the Pub/Sub service",
+        "url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics",
+        "evidence": "An unacknowledged message continues to be delivered until the message retention duration expires since the message was published."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-003",
+    "objective": "1.3",
+    "caseStudy": "knightmotives",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "telemetry",
+      "pubsub",
+      "bigtable",
+      "time-series"
+    ],
+    "stem": "KnightMotives needs reliable data transmission from vehicles to support real-time AI features. Vehicles in rural areas lose connectivity, and then they send buffered telemetry in bursts when they reconnect. The platform must absorb the bursts without losing data. It must also serve low-latency reads of recent readings for each vehicle. Which two services should you use? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pub/Sub, to receive telemetry from the vehicles and decouple them from the processing services"
+      },
+      {
+        "id": "B",
+        "text": "Cloud SQL for PostgreSQL, to store every reading as a row in one relational table"
+      },
+      {
+        "id": "C",
+        "text": "Bigtable, to store one row per reading with a row key that includes the vehicle ID and timestamp"
+      },
+      {
+        "id": "D",
+        "text": "Filestore, to store one file for each vehicle for each day of readings"
+      },
+      {
+        "id": "E",
+        "text": "A self-managed message broker on one Compute Engine VM, to queue the telemetry"
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "The deciding needs are burst absorption and low-latency reads for each vehicle. Pub/Sub gathers events from many clients at the same time, and it decouples producers from consumers. Bigtable supports high read and write throughput at low latency. The Bigtable time-series guide shows one row per event, with the timestamp as the row key suffix.",
+    "whyWrong": {
+      "B": "One relational instance must absorb every burst of writes. Bigtable is the documented fit for high-throughput time-series and IoT data.",
+      "D": "File shares give no indexed, low-latency reads of recent readings for each vehicle. They also add no buffering for bursts.",
+      "E": "One VM is a single point of failure, and the team must scale and patch the broker itself. Pub/Sub is a managed, scalable service."
+    },
+    "sources": [
+      {
+        "title": "What is Pub/Sub?",
+        "url": "https://docs.cloud.google.com/pubsub/docs/overview",
+        "evidence": "You can then use a stream processing tool, such as Dataflow, which delivers the events to databases. Examples of such databases are BigQuery, Bigtable, and Cloud Storage. Pub/Sub lets you gather events from many clients simultaneously."
+      },
+      {
+        "title": "Bigtable overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/overview",
+        "evidence": "Bigtable is ideal for storing large amounts of single-keyed data with low latency. It supports high read and write throughput at low latency, and it's an ideal data source for MapReduce operations."
+      },
+      {
+        "title": "Schema design for time series data",
+        "url": "https://docs.cloud.google.com/bigtable/docs/schema-design-time-series",
+        "evidence": "In this pattern, you create a row for each new event or measurement instead of adding cells to columns in existing rows. The row key suffix is the timestamp value."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-004",
+    "objective": "1.4",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "mainframe",
+      "migration-planning",
+      "mainframe-assessment-tool"
+    ],
+    "stem": "KnightMotives's supply chain runs on an outdated mainframe, and few staff understand its code. The outdated ERP depends on this mainframe. The company wants to modernize legacy systems gradually to improve efficiency and agility. Production must not stop during the change. What should you do first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Assess the codebase with Mainframe Assessment Tool, and define business domains and migratable units to set priorities."
+      },
+      {
+        "id": "B",
+        "text": "Rewrite all mainframe applications in Java at the same time, and switch to them in one weekend cutover."
+      },
+      {
+        "id": "C",
+        "text": "Rehost the mainframe applications on Compute Engine VMs, and assess the codebase after the move is complete."
+      },
+      {
+        "id": "D",
+        "text": "Copy all mainframe data to BigQuery with Mainframe Connector, and then shut down the mainframe."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding needs are a gradual change, little knowledge of the code, and no stop in production. Google gives a phased approach and tools for mainframe modernization. Mainframe Assessment Tool uses generative AI to help teams understand the codebase and generate documentation. Domains break the application into smaller, migratable units, so the team can set priorities.",
+    "whyWrong": {
+      "B": "A single rewrite and cutover is the opposite of a gradual change. With little knowledge of the code, it puts production at risk.",
+      "C": "A move before an assessment hides dependencies until they break. The team cannot plan a safe order of moves without first understanding the code.",
+      "D": "Mainframe Connector moves data, but the mainframe applications still run the supply chain. A shutdown would stop production."
+    },
+    "sources": [
+      {
+        "title": "Mainframe modernization overview",
+        "url": "https://docs.cloud.google.com/mainframe-assessment-tool/docs/mainframe-modernization-overview",
+        "evidence": "Google Cloud provides a phased approach and tools to guide your mainframe modernization journey."
+      },
+      {
+        "title": "Mainframe modernization overview",
+        "url": "https://docs.cloud.google.com/mainframe-assessment-tool/docs/mainframe-modernization-overview",
+        "evidence": "define domains when you create an assessment to break down and map your mainframe application into logical business domains and smaller, migratable units to prioritize your migration strategy."
+      },
+      {
+        "title": "Mainframe Assessment Tool overview",
+        "url": "https://docs.cloud.google.com/mainframe-assessment-tool/docs/overview",
+        "evidence": "Mainframe Assessment Tool automates assessment, saving you time and resources. It uses generative AI to help you understand your existing codebase and generate documentation."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-005",
+    "objective": "2.1",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "network-connectivity-center",
+      "site-to-site",
+      "hybrid-networking"
+    ],
+    "stem": "KnightMotives needs network upgrades to support increased data traffic and improve connectivity between plants and headquarters. Each site will also connect to Google Cloud as part of the hybrid cloud strategy. The network team wants traffic between sites to use Google's network. It does not want to manage a separate link for each pair of sites. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Connect each site to its own VPC network, and join all the VPC networks together with VPC Network Peering."
+      },
+      {
+        "id": "B",
+        "text": "Build a full mesh of IPsec VPN tunnels over the internet between every pair of sites."
+      },
+      {
+        "id": "C",
+        "text": "Connect each site to Google Cloud with Cross-Cloud Interconnect, and route traffic between sites through those connections."
+      },
+      {
+        "id": "D",
+        "text": "Attach each site's Cloud Interconnect connection as a spoke of a Network Connectivity Center hub with site-to-site data transfer."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding needs are site-to-site traffic on Google's network and no link for each pair of sites. With site-to-site data transfer, Network Connectivity Center (NCC) uses Google's network as part of a WAN that includes external sites. Each spoke attaches to a central hub, which gives full mesh connectivity between all spokes. Check that each site is in a supported location.",
+    "whyWrong": {
+      "A": "VPC Network Peering connects two VPC networks, and it does not provide transitive routing. It does not make Google's network a WAN between external sites.",
+      "B": "The number of tunnels grows with each new site, and the team manages every pair. Traffic uses the public internet, not Google's network.",
+      "C": "Cross-Cloud Interconnect connects Google Cloud to another cloud service provider. It is not a product for plants or headquarters."
+    },
+    "sources": [
+      {
+        "title": "Site-to-site data transfer overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/data-transfer",
+        "evidence": "Network Connectivity Center (NCC) lets you use Google's network as part of a wide area network (WAN) that includes your external sites. This feature is known as site-to-site data transfer."
+      },
+      {
+        "title": "Site-to-site data transfer overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/data-transfer",
+        "evidence": "Then you create a NCC spoke to represent each connectivity resource. Each spoke is attached to a central hub, which provides full mesh connectivity between all of the spokes."
+      },
+      {
+        "title": "NCC overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/overview",
+        "evidence": "Use a Google Cloud VPC network as an enterprise wide area network (WAN) to connect networks that are outside of Google Cloud. You can establish connectivity between your external sites by using any type of hybrid spoke."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-006",
+    "objective": "2.1",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cross-cloud-interconnect",
+      "multicloud"
+    ],
+    "stem": "KnightMotives runs some applications on another major cloud platform. These applications now exchange large volumes of data with new workloads on Google Cloud. The team wants dedicated, high-bandwidth connectivity between the two clouds. Traffic must not use the public internet. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cross-Cloud Interconnect between Google Cloud and the other cloud service provider"
+      },
+      {
+        "id": "B",
+        "text": "Dedicated Interconnect from the on-premises data center, with traffic sent through that data center"
+      },
+      {
+        "id": "C",
+        "text": "HA VPN tunnels between Google Cloud and the other cloud over the public internet"
+      },
+      {
+        "id": "D",
+        "text": "Direct Peering between Google's edge network and the other cloud service provider's network"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding needs are a dedicated, high-bandwidth link to another cloud without the public internet. Google recommends Cross-Cloud Interconnect when you connect to another cloud service provider. Google provisions a dedicated physical connection between its network and the network of the other provider.",
+    "whyWrong": {
+      "B": "Dedicated Interconnect connects on-premises networks to VPC networks. Cloud-to-cloud traffic through the data center adds hops and uses the data center's links.",
+      "C": "HA VPN traffic in this option uses the public internet, which the requirement does not allow.",
+      "D": "Google recommends Cloud Interconnect instead of Direct Peering, which you use only in certain circumstances. For another cloud service provider, Google recommends Cross-Cloud Interconnect."
+    },
+    "sources": [
+      {
+        "title": "Cross-Cloud Interconnect overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/cci-overview",
+        "evidence": "Cross-Cloud Interconnect is a product that helps you establish high-bandwidth dedicated connectivity between Google Cloud and another cloud service provider."
+      },
+      {
+        "title": "Choosing a Network Connectivity product",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/how-to/choose-product",
+        "evidence": "If you need to connect to another cloud service provider, choose Cross-Cloud Interconnect."
+      },
+      {
+        "title": "Cross-Cloud Interconnect overview",
+        "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/cci-overview",
+        "evidence": "When you buy Cross-Cloud Interconnect, Google provisions a dedicated physical connection between the Google network and that of another cloud service provider."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-007",
+    "objective": "1.3",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "knowledge-catalog",
+      "data-governance",
+      "data-lineage"
+    ],
+    "stem": "KnightMotives stores corporate data in many BigQuery datasets and Cloud Storage buckets across business units. The data remains siloed, and analysts cannot find trusted data or see where it came from. Before KnightMotives monetizes data, it needs a data management platform across these stores. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep a shared spreadsheet that lists each dataset and bucket, with owners and descriptions that teams update by hand."
+      },
+      {
+        "id": "B",
+        "text": "Use Knowledge Catalog (formerly Dataplex Universal Catalog) to discover assets, check data quality, and trace data lineage."
+      },
+      {
+        "id": "C",
+        "text": "Copy all datasets into one central BigQuery project each night, so that analysts search in one place."
+      },
+      {
+        "id": "D",
+        "text": "Use Cloud Asset Inventory to search the metadata of all BigQuery datasets and Cloud Storage buckets."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding needs are discovery, trust in data quality, and knowledge of where data came from. Knowledge Catalog helps teams discover assets and verify data quality across structured and unstructured data. Its data lineage traces column-level transformations across pipelines. Knowledge Catalog is the new name of Dataplex Universal Catalog.",
+    "whyWrong": {
+      "A": "A manual list goes out of date quickly, and it gives no data quality checks or lineage.",
+      "C": "Nightly copies make more copies of sensitive data and add cost. They also give no data quality checks or lineage.",
+      "D": "Cloud Asset Inventory is a metadata inventory of Google Cloud assets for tasks such as compliance tracking and audits. It does not check data quality or trace lineage."
+    },
+    "sources": [
+      {
+        "title": "Knowledge Catalog overview",
+        "url": "https://docs.cloud.google.com/knowledge-catalog/docs/introduction",
+        "evidence": "By building a dynamic context graph from structured and unstructured data, it helps data teams and developers discover assets, verify data quality, and securely ground generative AI applications to reduce hallucinations."
+      },
+      {
+        "title": "Knowledge Catalog overview",
+        "url": "https://docs.cloud.google.com/knowledge-catalog/docs/introduction",
+        "evidence": "Data lineage. Trace column-level transformations across pipelines to track where your data comes from and how it has changed."
+      },
+      {
+        "title": "Knowledge Catalog release notes",
+        "url": "https://docs.cloud.google.com/knowledge-catalog/docs/release-notes",
+        "evidence": "Dataplex Universal Catalog is now called Knowledge Catalog. The API, client library, CLI, and Identity and Access Management (IAM) names remain unchanged."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-008",
+    "objective": "2.3",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "batch",
+      "spot-vms",
+      "simulation",
+      "cost-optimization"
+    ],
+    "stem": "KnightMotives must build a simulation environment for autonomous vehicle development and testing. Each simulation run splits into many independent tasks, and a failed task can restart from the beginning. The team wants the lowest compute cost. It does not want to manage a job scheduler or provision VMs itself. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the tasks as Batch jobs on Spot VMs, and configure automatic retries for tasks that fail on preemption."
+      },
+      {
+        "id": "B",
+        "text": "Run the tasks on standard VMs, and install a third-party job scheduler on a separate VM to queue them."
+      },
+      {
+        "id": "C",
+        "text": "Run the tasks in a managed instance group of Spot VMs, and restart failed tasks by hand each morning."
+      },
+      {
+        "id": "D",
+        "text": "Buy 3-year committed use discounts for enough standard VMs to run all tasks at peak load."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding needs are independent, restartable tasks, the lowest cost, and no scheduler to manage. Batch schedules, queues, and runs batch work, so the team does not manage a job scheduler or provision resources. Spot VMs reduce cost for fault-tolerant work that can withstand preemption. Automatic task retries suit independent tasks and can recover from Spot VM preemption.",
+    "whyWrong": {
+      "B": "Standard VMs cost more than Spot VMs for fault-tolerant work. The team must also manage the scheduler, which the requirement does not allow.",
+      "C": "Manual restarts add toil and delay results. The team also manages the task queue itself.",
+      "D": "A 3-year commitment for peak capacity pays for VMs that sit idle between runs. Spot VMs cost less for fault-tolerant tasks."
+    },
+    "sources": [
+      {
+        "title": "Get started with Batch",
+        "url": "https://docs.cloud.google.com/batch/docs/get-started",
+        "evidence": "Using Batch, you don't need to configure and manage third-party job schedulers, provision and deprovision resources, or request resources one zone at a time."
+      },
+      {
+        "title": "Spot VMs",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+        "evidence": "If your workloads are fault-tolerant and can withstand possible VM preemption, Spot VMs can reduce your Compute Engine costs significantly. For example, batch processing jobs can run on Spot VMs."
+      },
+      {
+        "title": "Automate task retries",
+        "url": "https://docs.cloud.google.com/batch/docs/automate-task-retries",
+        "evidence": "Automatic retries are well-suited to loosely coupled (independent) tasks and can help with a variety of issues."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-009",
+    "objective": "2.4",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "ai-hypercomputer",
+      "calendar-mode",
+      "gpu-capacity"
+    ],
+    "stem": "KnightMotives's current AI infrastructure is obsolete. The autonomous driving team plans a distributed training run on clustered GPUs. The run starts on a fixed date and lasts about three weeks. It needs assured, densely allocated capacity for the whole run. The company does not want a commitment of one year or longer. Which consumption option should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Flex-start VMs, requested on the start date of the training run"
+      },
+      {
+        "id": "B",
+        "text": "Spot VMs, with training checkpoints saved to Cloud Storage every hour"
+      },
+      {
+        "id": "C",
+        "text": "Future reservations for capacity blocks, with a one-year resource-based commitment"
+      },
+      {
+        "id": "D",
+        "text": "A future reservation in calendar mode for the three weeks of the run"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding needs are assured, dense capacity for a fixed period of about three weeks, with no long commitment. Future reservations in calendar mode serve clustered GPU workloads of up to 90 days that require reserved capacity. You request resources for a set period, and you have exclusive access to them for that time.",
+    "whyWrong": {
+      "A": "Flex-start capacity is best-effort, and Google positions it for workloads of up to seven days. The run lasts about three weeks and needs assured capacity.",
+      "B": "Spot VMs are preemptible, and their capacity is best-effort. Checkpoints reduce lost work, but they do not assure capacity.",
+      "C": "The one-year commitment breaks the stated limit. Google positions capacity blocks for large-scale, long-running training."
+    },
+    "sources": [
+      {
+        "title": "Consumption options for AI Hypercomputer",
+        "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/consumption-models",
+        "evidence": "clustered GPU workloads up to 90 days that require reserved capacity."
+      },
+      {
+        "title": "Consumption options for AI Hypercomputer",
+        "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/consumption-models",
+        "evidence": "To run short-running distributed workloads that require densely allocated resources, you can request compute resources for up to 90 days."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-010",
+    "objective": "2.5",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini-enterprise",
+      "enterprise-search",
+      "dealer-tools"
+    ],
+    "stem": "KnightMotives's service technicians and sales staff need better tooling to find answers in service manuals, bulletins, and dealer procedures. These documents are in Microsoft SharePoint and Confluence, and some are restricted to certain roles. Dealers have no budget for new equipment. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy Gemini Enterprise with its prebuilt SharePoint and Confluence connectors, so staff get permissions-aware search."
+      },
+      {
+        "id": "B",
+        "text": "Build a custom retrieval app on Gemini Enterprise Agent Platform (formerly Vertex AI), and host its vector index on GKE."
+      },
+      {
+        "id": "C",
+        "text": "Upload all manuals each month to one shared Gemini Notebook Enterprise (formerly NotebookLM Enterprise) notebook for all staff."
+      },
+      {
+        "id": "D",
+        "text": "Give each dealer tablets with an offline app that stores a local copy of all service manuals and procedures."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding needs are search across SharePoint and Confluence, respect for document restrictions, and no new equipment. Gemini Enterprise includes prebuilt connectors for Confluence and Microsoft SharePoint. It gives employees one search interface with permissions-aware access to enterprise information. Staff use it through web and mobile apps.",
+    "whyWrong": {
+      "B": "A custom app can work, but KnightMotives must build and operate the app and its GKE cluster. The prebuilt connectors already meet the need.",
+      "C": "A notebook uses only the sources that users add, so monthly copies go stale. The copies also move restricted documents out of their source systems.",
+      "D": "New tablets are new equipment, and dealers have no budget for them. Local copies also go out of date."
+    },
+    "sources": [
+      {
+        "title": "What is Gemini Enterprise?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/docs",
+        "evidence": "Gemini Enterprise includes prebuilt connectors for commonly-used third-party applications like Confluence, Jira, Microsoft SharePoint, and ServiceNow."
+      },
+      {
+        "title": "What is Gemini Enterprise?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/docs",
+        "evidence": "This provides employees with a single, multimodal search interface offering permissions-aware access to enterprise information."
+      },
+      {
+        "title": "What is Gemini Enterprise?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/docs",
+        "evidence": "Search enterprise data, collaborate, and interact with AI assistants and agents using the web and mobile apps."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-011",
+    "objective": "3.1",
+    "caseStudy": "knightmotives",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "security-command-center",
+      "vpc-service-controls",
+      "data-exfiltration"
+    ],
+    "stem": "Security is a paramount concern for KnightMotives because of past data breaches. The company is moving corporate data to BigQuery and Cloud Storage. The security team wants threat detection across the Google Cloud organization. It also wants to reduce the risk of data exfiltration from these services. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the security team the Owner role on every project, so that it can respond to threats quickly."
+      },
+      {
+        "id": "B",
+        "text": "Activate Security Command Center Premium at the organization level for threat detection and attack paths."
+      },
+      {
+        "id": "C",
+        "text": "Attach Cloud Armor security policies to the BigQuery and Cloud Storage projects to block data exfiltration."
+      },
+      {
+        "id": "D",
+        "text": "Create a VPC Service Controls perimeter around the projects that hold the BigQuery and Cloud Storage data."
+      },
+      {
+        "id": "E",
+        "text": "Store service account keys in a shared Cloud Storage bucket, and rotate the keys each week."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "The deciding needs are threat detection across the organization and protection against data exfiltration. The Security Command Center Premium tier adds threat detection and attack paths, and you can activate it at the organization level. VPC Service Controls helps reduce data exfiltration risks from services such as Cloud Storage and BigQuery.",
+    "whyWrong": {
+      "A": "The Owner role gives far more access than detection needs. A stolen security account would then control every project.",
+      "C": "Cloud Armor helps protect applications and services from DDoS and web-based attacks. It does not control who can copy data out of BigQuery or Cloud Storage.",
+      "E": "A shared bucket exposes the keys to everyone who can read it. Weekly rotation does not detect threats or stop exfiltration."
+    },
+    "sources": [
+      {
+        "title": "Security Command Center service tiers",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/service-tiers",
+        "evidence": "Premium. Everything in Standard, plus advanced security and compliance posture management, attack paths, threat detection, and compliance monitoring for Google Cloud only. The Premium tier can be activated at the project or organization level."
+      },
+      {
+        "title": "Overview of VPC Service Controls",
+        "url": "https://docs.cloud.google.com/vpc-service-controls/docs/overview",
+        "evidence": "VPC Service Controls helps protect against accidental or targeted action by external entities or insider entities, which helps to minimize unwarranted data exfiltration risks from Google Cloud services such as Cloud Storage and BigQuery."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-012",
+    "objective": "3.2",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "assured-workloads",
+      "eu-data-boundary",
+      "data-residency"
+    ],
+    "stem": "KnightMotives will run parts of its autonomous platform on Google Cloud for EU customers. Adherence to EU data protection regulations is critical. The legal team requires EU-only data locations, and support access only by support personnel based in the EU. The team wants predefined controls instead of custom configuration. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create an Assured Workloads folder with the EU Data Boundary control package."
+      },
+      {
+        "id": "B",
+        "text": "Create an Assured Workloads folder with the EU Data Boundary and Support control package."
+      },
+      {
+        "id": "C",
+        "text": "Set the resource locations organization policy constraint on the folder to allow only EU locations."
+      },
+      {
+        "id": "D",
+        "text": "Create Cloud Storage buckets in EU regions, and encrypt the data with customer-managed encryption keys."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding needs are EU-only data locations and support by personnel based in the EU, with predefined controls. Assured Workloads applies predefined control packages to folders. The EU Data Boundary and Support package sets data location controls for EU-only regions. It also sets support access controls to EU support personnel based in the EU.",
+    "whyWrong": {
+      "A": "The EU Data Boundary package sets data location controls only. The support access requirement needs a package that also sets support controls.",
+      "C": "The constraint limits where new resources are created. It has no controls for support access, and it is custom configuration.",
+      "D": "Bucket location and CMEK cover only Cloud Storage and encryption. They do not control support access or the location of other services."
+    },
+    "sources": [
+      {
+        "title": "Control packages",
+        "url": "https://docs.cloud.google.com/assured-workloads/docs/control-packages",
+        "evidence": "The EU Data Boundary and Support control package sets data location controls to support EU-only regions. Support access controls are set to EU support personnel based in the EU"
+      },
+      {
+        "title": "Overview of Assured Workloads",
+        "url": "https://docs.cloud.google.com/assured-workloads/docs/overview",
+        "evidence": "You can use Assured Workloads to simplify management and configuration of regulated workloads by applying predefined control packages to folders."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-013",
+    "objective": "4.2",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-adoption-framework",
+      "upskilling",
+      "change-management"
+    ],
+    "stem": "KnightMotives prioritizes employee upskilling and better communication between business and technical teams. Leaders do not know which cloud skills their teams lack. They also do not know how strongly leadership supports the move to the cloud. They want a structured way to find the gaps before they plan training. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Outsource all cloud work to a partner, so that internal teams do not need new cloud skills."
+      },
+      {
+        "id": "B",
+        "text": "Let engineers learn during production incidents, and plan formal training after the first major outage."
+      },
+      {
+        "id": "C",
+        "text": "Assess readiness with the Google Cloud Adoption Framework, including its Learn and Lead themes, and then plan training."
+      },
+      {
+        "id": "D",
+        "text": "Buy certification exam vouchers for all engineers, and skip the readiness assessment to save time."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding need is a structured way to find skill and leadership gaps. The Google Cloud Adoption Framework assesses your readiness for Google Cloud and what you must do to fill the gaps. Its Learn theme covers the quality and scale of learning programs. Its Lead theme covers the mandate from leadership to migrate.",
+    "whyWrong": {
+      "A": "Outsourcing does not build internal skills, and the case makes upskilling a critical objective.",
+      "B": "Learning during incidents adds risk to production, and it gives no structured view of the gaps.",
+      "D": "Vouchers without an assessment do not show which skills are missing. They also do not measure leadership support."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "You can use this framework to assess your organization's readiness for Google Cloud and what you need to do to fill in the gaps and develop new competencies, as illustrated in the following diagram."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "Learn. The quality and scale of your learning programs."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "Lead. The extent to which your IT departments are supported by a mandate from leadership to migrate to Google Cloud."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-014",
+    "objective": "5.1",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "mainframe-connector",
+      "data-migration",
+      "bigquery"
+    ],
+    "stem": "KnightMotives's supply chain runs on an outdated mainframe, and reporting jobs use a large share of mainframe CPU. The data team wants to move mainframe data to Google Cloud and run the reports in BigQuery. The existing batch jobs are defined in JCL, and the team wants to keep scheduling them on the mainframe for now. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Export the mainframe data to CSV files by hand each week, and upload the files to Cloud Storage."
+      },
+      {
+        "id": "B",
+        "text": "Use Database Migration Service to replicate the mainframe data into a Cloud SQL for PostgreSQL instance."
+      },
+      {
+        "id": "C",
+        "text": "Use Storage Transfer Service to copy the mainframe datasets directly into BigQuery tables."
+      },
+      {
+        "id": "D",
+        "text": "Call Mainframe Connector from the existing JCL batch jobs to move data to Cloud Storage and BigQuery."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding needs are to offload reports to BigQuery and to keep the JCL batch jobs. Mainframe Connector moves mainframe data to Google Cloud so that you can offload CPU-intensive report workloads. It lets you submit BigQuery jobs from mainframe batch jobs defined in JCL.",
+    "whyWrong": {
+      "A": "Manual weekly exports are slow and error-prone. They also break the link to the scheduled JCL jobs.",
+      "B": "The reports must run in BigQuery, not Cloud SQL. This option also does not use the existing JCL batch jobs.",
+      "C": "Storage Transfer Service moves data to Cloud Storage or to on-premises storage, not into BigQuery tables. It also does not run from the JCL batch jobs."
+    },
+    "sources": [
+      {
+        "title": "Mainframe Connector overview",
+        "url": "https://docs.cloud.google.com/mainframe-connector/docs/overview",
+        "evidence": "Mainframe Connector lets you move your mainframe data to Google Cloud so that you can offload CPU-intensive report workloads to Google Cloud."
+      },
+      {
+        "title": "Mainframe Connector overview",
+        "url": "https://docs.cloud.google.com/mainframe-connector/docs/overview",
+        "evidence": "Batch job integration: Lets you submit BigQuery jobs using mainframe batch jobs defined in job control language (JCL)."
+      },
+      {
+        "title": "Mainframe Connector overview",
+        "url": "https://docs.cloud.google.com/mainframe-connector/docs/overview",
+        "evidence": "Simplified data transfer: Simplifies the movement of mainframe data to Google Cloud storage services like Cloud Storage and BigQuery."
+      }
+    ]
+  },
+  {
+    "id": "cs-km-015",
+    "objective": "6.1",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "incident-management",
+      "post-incident-review",
+      "operational-excellence"
+    ],
+    "stem": "KnightMotives must develop an incident response plan as part of its focus on security and risk management. In past incidents, nobody knew who led the response, and the same problems came back. The company wants a process that improves after each incident. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Let each team handle incidents in its own way, and send a summary to leadership each quarter."
+      },
+      {
+        "id": "B",
+        "text": "Record the name of the engineer at fault in each incident report, so that accountability is clear."
+      },
+      {
+        "id": "C",
+        "text": "Define incident roles and escalation paths in a runbook, and hold a blameless post-incident review after each incident."
+      },
+      {
+        "id": "D",
+        "text": "Close each incident as soon as service is restored, and skip reviews so that engineers return to planned work."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding needs are clear ownership during incidents and learning after them. Google recommends that you define roles such as incident commander, and document procedures in a runbook. After an incident, a post-incident review finds the root cause and lessons learned. A blameless culture keeps the focus on learning instead of blame.",
+    "whyWrong": {
+      "A": "Separate processes leave roles unclear across teams. A quarterly summary is too late to prevent repeat problems.",
+      "B": "Blame discourages open reporting. Google recommends a blameless culture that focuses on learning and improvement.",
+      "D": "Without a review, the team never finds the root cause, so the same problems come back."
+    },
+    "sources": [
+      {
+        "title": "Manage incidents and problems",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+        "evidence": "To establish incident response procedures, you need to define the roles and expectations of each team member, such as incident commanders, investigators, communicators, and technical experts."
+      },
+      {
+        "title": "Manage incidents and problems",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+        "evidence": "By documenting incident response procedures in a runbook or playbook, you can provide a standardized reference guide for teams to follow during an incident."
+      },
+      {
+        "title": "Manage incidents and problems",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+        "evidence": "To ensure a successful PIR process, your organization must foster a blameless culture that focuses on learning and improvement rather than assigning blame."
+      }
+    ]
+  }
+]

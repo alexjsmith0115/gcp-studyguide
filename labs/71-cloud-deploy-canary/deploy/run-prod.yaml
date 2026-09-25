@@ -1,0 +1,15 @@
+# Cloud Run service for the prod target. No traffic stanza: Cloud Deploy
+# controls the traffic split. "lab71-app" is an image placeholder that
+# Cloud Deploy replaces with the --images value of the release.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: lab71-app-prod
+  annotations:
+    run.googleapis.com/maxScale: '2'
+spec:
+  template:
+    spec:
+      serviceAccountName: lab71-runtime@__PROJECT_ID__.iam.gserviceaccount.com
+      containers:
+      - image: lab71-app

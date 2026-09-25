@@ -1,0 +1,47 @@
+# Delivery pipeline: staging (standard strategy), then prod (canary 25% -> 50% -> 100%).
+# Step 4 of the README replaces __PROJECT_ID__ and __REGION__ and writes the result to /tmp.
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: lab71-pipeline
+description: lab71 pipeline - staging, then prod with a canary
+serialPipeline:
+  stages:
+  - targetId: lab71-staging
+    profiles: [staging]
+  - targetId: lab71-prod
+    profiles: [prod]
+    strategy:
+      canary:
+        runtimeConfig:
+          cloudRun:
+            automaticTrafficControl: true
+        canaryDeployment:
+          percentages: [25, 50]
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: lab71-staging
+description: lab71 staging (Cloud Run)
+run:
+  location: projects/__PROJECT_ID__/locations/__REGION__
+executionConfigs:
+- usages:
+  - RENDER
+  - DEPLOY
+  serviceAccount: lab71-deployer@__PROJECT_ID__.iam.gserviceaccount.com
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: lab71-prod
+description: lab71 prod (Cloud Run), every rollout needs approval
+requireApproval: true
+run:
+  location: projects/__PROJECT_ID__/locations/__REGION__
+executionConfigs:
+- usages:
+  - RENDER
+  - DEPLOY
+  serviceAccount: lab71-deployer@__PROJECT_ID__.iam.gserviceaccount.com

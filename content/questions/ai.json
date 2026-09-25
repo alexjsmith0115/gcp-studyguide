@@ -1,0 +1,1032 @@
+[
+  {
+    "id": "ai-001",
+    "objective": "1.3",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["gemini", "structured-output", "build-vs-buy"],
+    "stem": "Cymbal Retail wants to derive product attributes from supplier titles, descriptions, and images. The attributes must match Cymbal's catalog schema so that the review UI can load them without extra parsing. The team has little ML experience and must deliver quickly. What should you do?",
+    "options": [
+      {"id": "A", "text": "Train a custom multimodal model with serverless training on labeled catalog data."},
+      {"id": "B", "text": "Call Vision API label detection and Natural Language entity analysis, and map the results in code."},
+      {"id": "C", "text": "Prompt a Gemini model with the text and images, and set a response schema that matches the catalog."},
+      {"id": "D", "text": "Train one AutoML image classification model for each product attribute."}
+    ],
+    "answer": ["C"],
+    "explanation": "The team needs output in a fixed schema, with little ML experience and little time. A Gemini multimodal prompt reads text and images together. A response schema makes the output always follow the catalog schema, so the review UI needs no extra parsing.",
+    "whyWrong": {
+      "A": "Custom training needs labeled data, ML skills, and time. It breaks the requirement to deliver quickly with a small team.",
+      "B": "Generic labels and entities do not match Cymbal's catalog categories. The team must write and maintain mapping code.",
+      "D": "AutoML image models ignore the supplier text. One model for each attribute adds training and operations work."
+    },
+    "sources": [
+      {
+        "title": "Structured output",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/control-generated-output",
+        "evidence": "When you submit a prompt and include the response schema, the model's response always follows your defined schema."
+      }
+    ]
+  },
+  {
+    "id": "ai-002",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["tuning", "gemini", "build-vs-buy"],
+    "stem": "A support team uses Gemini to classify tickets into 40 internal categories. After many rounds of prompt design and few-shot examples, the model still makes the same errors in some categories. The team has 8,000 labeled tickets. What is the Google-recommended next step?",
+    "options": [
+      {"id": "A", "text": "Train an AutoML text classification model on the labeled tickets."},
+      {"id": "B", "text": "Run supervised fine-tuning of Gemini with the labeled tickets."},
+      {"id": "C", "text": "Run preference tuning of Gemini with human ratings of responses."},
+      {"id": "D", "text": "Add Grounding with Google Search to each request."}
+    ],
+    "explanation": "Google recommends prompting first, then fine-tuning to fix recurrent errors. The team already optimized the prompt, and it has labeled examples. Supervised fine-tuning is the recommended method for classification.",
+    "answer": ["B"],
+    "whyWrong": {
+      "A": "AutoML now supports only tabular and image data. AutoML text models are no longer available.",
+      "C": "Preference tuning builds on supervised fine-tuning with human feedback data. The team has labels, not preference ratings.",
+      "D": "Web search results do not teach the model the company's internal categories."
+    },
+    "sources": [
+      {
+        "title": "Introduction to tuning",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/tuning",
+        "evidence": "We recommend starting with prompting to find the optimal prompt. Then, move on to fine-tuning (if required) to further boost performances or fix recurrent errors."
+      },
+      {
+        "title": "Introduction to tuning",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/tuning",
+        "evidence": "Supervised fine-tuning is recommended for classification, sentiment analysis, entity extraction, summarization of content that's not complex, and writing domain-specific queries."
+      }
+    ]
+  },
+  {
+    "id": "ai-003",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["grounding", "compliance", "vpc-sc"],
+    "stem": "A hospital network builds a Gemini assistant that answers clinicians' questions with current information from the public web. Compliance requires that the grounding service does not log customer data. The project is inside a VPC Service Controls perimeter. What should you use?",
+    "options": [
+      {"id": "A", "text": "Grounding with Google Search as a tool on each Gemini request."},
+      {"id": "B", "text": "RAG Engine with a corpus of web pages that a job downloads each week."},
+      {"id": "C", "text": "An Agent Search (formerly Vertex AI Search) website app for medical sites."},
+      {"id": "D", "text": "Web Grounding for Enterprise as a tool on each Gemini request."}
+    ],
+    "answer": ["D"],
+    "explanation": "The deciding requirements are current public web content, no logging of customer data, and VPC Service Controls. Web Grounding for Enterprise grounds on a web index, does not log customer data, and supports VPC Service Controls. Google positions it for highly regulated industries such as healthcare.",
+    "whyWrong": {
+      "A": "Grounding with Google Search has a broader index, but it lacks the extra compliance controls. Google says to use it only when you do not need them.",
+      "B": "A weekly download is not current web information, and the team must build and run the download job.",
+      "C": "A website app covers only the sites that you index, not the current public web."
+    },
+    "sources": [
+      {
+        "title": "Web Grounding for Enterprise",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/web-grounding-enterprise",
+        "evidence": "Web Grounding for Enterprise uses a web index that is used to generate grounded responses. The service doesn't log customer data and supports VPC service controls."
+      },
+      {
+        "title": "Web Grounding for Enterprise",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/web-grounding-enterprise",
+        "evidence": "If you don't require the additional compliance controls, use Ground with Google Search, because it offers access to a broader and even more up-to-date web index."
+      }
+    ]
+  },
+  {
+    "id": "ai-004",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["data-residency", "gemini", "endpoints"],
+    "stem": "A German insurer builds a claims summarizer with Gemini on Agent Platform (formerly Vertex AI). Regulators require that ML processing of claims data stays in the European Union. The team wants to call a Google-managed Gemini model, not host its own model. Which endpoint configuration should you recommend?",
+    "options": [
+      {"id": "A", "text": "Send all requests to the EU multi-region endpoint of Agent Platform."},
+      {"id": "B", "text": "Send all requests to the global endpoint for the highest availability."},
+      {"id": "C", "text": "Send all requests to the global endpoint, with an EU resource location policy."},
+      {"id": "D", "text": "Send all requests to the us-central1 endpoint, with CMEK on the data."}
+    ],
+    "answer": ["A"],
+    "explanation": "The deciding requirement is that ML processing stays in the EU. A jurisdictional multi-region endpoint keeps ML processing inside that geography, such as the European Union.",
+    "whyWrong": {
+      "B": "Google can process global endpoint requests in any location, so the global endpoint gives no data residency guarantee.",
+      "C": "A resource location policy does not change where Google processes global endpoint requests. Those requests can run in any location.",
+      "D": "CMEK controls encryption keys, not the processing location. A us-central1 endpoint processes data in the United States."
+    },
+    "sources": [
+      {
+        "title": "Data residency",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/data-residency",
+        "evidence": "Jurisdictional multi-region endpoints: When you use jurisdictional endpoints, ML processing stays within that specific geographical region (such as the United States or the European Union)."
+      },
+      {
+        "title": "Data residency",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/data-residency",
+        "evidence": "Requests submitted to a global endpoint may be processed in any Google Cloud location around the world, and therefore don't provide any data residency guarantees."
+      }
+    ]
+  },
+  {
+    "id": "ai-005",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["agent-runtime", "adk", "agents"],
+    "stem": "Developers built a customer-service agent with the Agent Development Kit (ADK). They want a managed service to deploy, operate, and scale the agent in production. They do not want to operate servers or clusters. What should they use?",
+    "options": [
+      {"id": "A", "text": "Agent Runtime (formerly Vertex AI Agent Engine) on Agent Platform"},
+      {"id": "B", "text": "A GKE Autopilot cluster that runs the agent in a custom Deployment"},
+      {"id": "C", "text": "Workflow Builder in Gemini Enterprise (formerly Google Agentspace)"},
+      {"id": "D", "text": "Agent Platform Pipelines (formerly Vertex AI Pipelines) with a scheduled run"}
+    ],
+    "answer": ["A"],
+    "explanation": "The requirement is a managed runtime with no servers or clusters to operate. Agent Runtime (formerly Agent Engine) is a fully managed runtime that deploys, operates, and scales agents. ADK has full integration with it.",
+    "whyWrong": {
+      "B": "GKE can host the agent, but the team must operate the cluster and the deployment. That breaks the no-clusters requirement.",
+      "C": "Workflow Builder (formerly Agent Designer) is a no-code and low-code tool for agents inside the Gemini Enterprise app. It does not host ADK code.",
+      "D": "Pipelines orchestrates ML workflows. It does not serve an interactive agent."
+    },
+    "sources": [
+      {
+        "title": "Agent Runtime",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime",
+        "evidence": "Agent Runtime is a fully-managed, opinionated runtime that you can use to deploy, operate, and scale agentic applications."
+      }
+    ]
+  },
+  {
+    "id": "ai-006",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["provisioned-throughput", "consumption", "gemini"],
+    "stem": "A bank runs a customer-facing Gemini assistant with steady, high traffic all day. The business requires an SLA and assured capacity for this workload. Sometimes traffic rises above the normal level, and those extra requests must still get answers. Which consumption option should you recommend?",
+    "options": [
+      {"id": "A", "text": "Priority PayGo for all of the assistant requests."},
+      {"id": "B", "text": "Standard PayGo on the global endpoint for all requests."},
+      {"id": "C", "text": "Provisioned Throughput sized for the steady traffic."},
+      {"id": "D", "text": "Batch inference jobs that run every five minutes."}
+    ],
+    "answer": ["C"],
+    "explanation": "The deciding facts are a steady, always-on workload, a required SLA, and assured capacity. Google positions Provisioned Throughput for exactly this case. By default, traffic above the Provisioned Throughput baseline spills over to Standard PayGo, so peak requests still get answers.",
+    "whyWrong": {
+      "A": "Priority PayGo gives higher reliability and limits than Standard PayGo, but it does not assure capacity. Google points workloads that need dedicated, assured capacity to Provisioned Throughput.",
+      "B": "The global endpoint reduces throttling, but Standard PayGo reserves no throughput for the workload.",
+      "D": "Batch inference suits large backlogs where latency does not matter. A customer-facing assistant needs immediate answers."
+    },
+    "sources": [
+      {
+        "title": "Consumption options",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+        "evidence": "Critical, steady-state, always-on workloads where an SLA is needed"
+      },
+      {
+        "title": "Consumption options",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+        "evidence": "By default, traffic that exceeds your Provisioned Throughput baseline (called spillover traffic) is handled by Standard PayGo."
+      },
+      {
+        "title": "Priority PayGo",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/priority-paygo",
+        "evidence": "For workloads that need dedicated, assured capacity, see Provisioned Throughput."
+      }
+    ]
+  },
+  {
+    "id": "ai-007",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": ["grounding", "rag", "hallucinations"],
+    "stem": "An insurer's HR assistant uses Gemini to answer employee questions about internal policies. The policies are PDF files in Cloud Storage, and they change every week. Users report answers that the model invents. Which two actions reduce invented answers with the least ongoing effort? Each correct answer is a complete solution by itself. (Choose two.)",
+    "options": [
+      {"id": "A", "text": "Ground responses in an Agent Search (formerly Vertex AI Search) data store of the policy files."},
+      {"id": "B", "text": "Ground responses with Grounding with Google Search as a tool on each Gemini request."},
+      {"id": "C", "text": "Fine-tune Gemini with supervised tuning on the policy files after each weekly change."},
+      {"id": "D", "text": "Use RAG Engine to retrieve the relevant policy passages from Cloud Storage into the prompt."},
+      {"id": "E", "text": "Set the temperature to 0 in the generation config so that the answers are always the same."}
+    ],
+    "answer": ["A", "D"],
+    "explanation": "The model invents answers because it does not know the private, changing policies. Grounding connects output to specific data sources and reduces invented content. Agent Search grounding and RAG Engine are alternative solutions. Each one retrieves the current policy text at request time, so weekly changes need only a data refresh.",
+    "whyWrong": {
+      "B": "Google Search results do not contain the insurer's internal policies.",
+      "C": "Weekly tuning jobs add cost and effort. Tuning also does not give the model a reliable, current copy of the policy text.",
+      "E": "A low temperature makes answers more consistent, but it does not give the model the missing policy facts."
+    },
+    "sources": [
+      {
+        "title": "Grounding overview",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/overview",
+        "evidence": "If you provide models with access to specific data sources, then grounding tethers their output to these data and reduces the chances of inventing content."
+      },
+      {
+        "title": "Grounding overview",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/overview",
+        "evidence": "Use retrieval-augmented generation (RAG) to connect your model to your website data or your sets of documents stored in Agent Search."
+      },
+      {
+        "title": "RAG Engine on Gemini Enterprise Agent Platform overview",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview",
+        "evidence": "With RAG Engine, you can enrich the LLM context with additional private information, so that the model can reduce hallucinations and answer questions more accurately."
+      }
+    ]
+  },
+  {
+    "id": "ai-008",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["bigquery-ml", "build-vs-buy"],
+    "stem": "A retailer keeps all its sales and customer data in BigQuery. Its analysts know SQL but not Python. They want a churn prediction model, and BigQuery ML supports the model type that they need. They want to avoid moving data. What should they use?",
+    "options": [
+      {"id": "A", "text": "Export the data to Cloud Storage and run a serverless custom training job."},
+      {"id": "B", "text": "Build a scikit-learn model in Agent Platform Workbench (formerly Vertex AI Workbench)."},
+      {"id": "C", "text": "Train a custom model on a GKE cluster with GPU nodes and a training container."},
+      {"id": "D", "text": "Create, train, and evaluate the model with BigQuery ML SQL statements."}
+    ],
+    "answer": ["D"],
+    "explanation": "All three conditions for BigQuery ML apply: the data is in BigQuery, the team knows SQL, and BigQuery ML supports the model type. BigQuery ML brings ML to the data, so the analysts do not need to move data out of the warehouse.",
+    "whyWrong": {
+      "A": "Export moves the data and adds custom training code that the analysts cannot write.",
+      "B": "The analysts do not know Python, and the notebook must read the data out of BigQuery.",
+      "C": "A GKE training platform is over-engineered for a churn model, and it needs skills the team does not have."
+    },
+    "sources": [
+      {
+        "title": "Best practices for implementing machine learning on Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/ml-on-gcp-best-practices",
+        "evidence": "All of your data is contained in BigQuery. You are comfortable with SQL. The set of models available in BigQuery ML matches the problem you are trying to solve."
+      },
+      {
+        "title": "Introduction to ML in BigQuery",
+        "url": "https://docs.cloud.google.com/bigquery/docs/bqml-introduction",
+        "evidence": "BigQuery ML increases the speed of model development and innovation by removing the need to move data from the data warehouse."
+      }
+    ]
+  },
+  {
+    "id": "ai-009",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["pipelines", "continuous-training", "eventarc"],
+    "stem": "A fraud team retrains a model with Agent Platform Pipelines (formerly Vertex AI Pipelines). New labeled data arrives in a BigQuery table at irregular times, sometimes twice a day and sometimes once a week. The team wants a retraining run to start soon after new data lands, without polling. What should you do?",
+    "options": [
+      {"id": "A", "text": "Create a recurring pipeline schedule with the scheduler API that starts a new run every hour."},
+      {"id": "B", "text": "Trigger a Cloud Run function (formerly Cloud Functions) from BigQuery insert events to start the pipeline."},
+      {"id": "C", "text": "Schedule a Workbench notebook that checks the BigQuery table each day and then trains the model."},
+      {"id": "D", "text": "Use Cloud Scheduler to call the pipeline API every night at midnight, whether or not new data arrived."}
+    ],
+    "answer": ["B"],
+    "explanation": "The data arrives at irregular times, and the run must start soon after new data lands. An Eventarc trigger for BigQuery insert events reacts to each new load, and the Cloud Run function submits the pipeline run.",
+    "whyWrong": {
+      "A": "An hourly schedule is polling. It starts many runs when no new data exists.",
+      "C": "A daily notebook is polling, and it moves training out of the pipeline, so the run loses pipeline lineage.",
+      "D": "A nightly schedule can wait almost a day after new data lands, and it runs even when no data arrived."
+    },
+    "sources": [
+      {
+        "title": "Data preparation overview",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/training/data-preparation-overview",
+        "evidence": "You can configure an Eventarc trigger to initiate a pipeline when a new job is inserted into a specific BigQuery table."
+      },
+      {
+        "title": "Build a pipeline for continuous model training",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/pipelines/continuous-training-tutorial",
+        "evidence": "Create a Cloud Function with an Eventarc trigger that runs the pipeline whenever new data is inserted into the BigQuery dataset."
+      }
+    ]
+  },
+  {
+    "id": "ai-010",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["pipelines", "airflow", "orchestration"],
+    "stem": "A manufacturer's ML workflow extracts data from an on-premises database, runs existing Spark jobs, and calls a partner API. It then trains and deploys a model on Agent Platform (formerly Vertex AI). The operations team already runs Apache Airflow DAGs. Which orchestration approach is Google-recommended?",
+    "options": [
+      {"id": "A", "text": "Run the whole flow in Agent Platform Pipelines, with a custom component for each system."},
+      {"id": "B", "text": "Chain Cloud Run functions (formerly Cloud Functions) with Pub/Sub topics between the steps."},
+      {"id": "C", "text": "Orchestrate the whole flow with Managed Service for Apache Airflow (formerly Cloud Composer)."},
+      {"id": "D", "text": "Run self-managed Kubeflow Pipelines on a GKE cluster that the team operates for the flow."}
+    ],
+    "answer": ["C"],
+    "explanation": "The flow spans heterogeneous systems: an on-premises database, Spark, a partner API, and Agent Platform. Google recommends Managed Service for Apache Airflow for the entire flow in that case. The team already knows Airflow.",
+    "whyWrong": {
+      "A": "Google recommends Pipelines when the workflow is entirely container-based and runs strictly inside Agent Platform. This flow crosses many systems.",
+      "B": "Chained functions have no central view of the workflow, retries, or dependencies. The team must build that logic itself.",
+      "D": "Self-managed Kubeflow adds a cluster to operate, and it is still focused on ML steps, not cross-system flows."
+    },
+    "sources": [
+      {
+        "title": "Best practices for implementing machine learning on Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/ml-on-gcp-best-practices",
+        "evidence": "we recommend that you use Managed Airflow to orchestrate the entire flow when your architecture spans heterogeneous systems."
+      },
+      {
+        "title": "Best practices for implementing machine learning on Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/ml-on-gcp-best-practices",
+        "evidence": "If your workflows are entirely container-based and if they execute strictly within the Agent Platform ecosystem, we recommend that you use Agent Platform Pipelines to orchestrate the flow."
+      }
+    ]
+  },
+  {
+    "id": "ai-011",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": ["pipelines", "iam", "least-privilege"],
+    "stem": "Your team runs Agent Platform Pipelines (formerly Vertex AI Pipelines) with the Compute Engine default service account. A security review requires least privilege for pipeline runs. It also requires control over which users can start runs as the pipeline identity. Which two actions should you take? (Choose two.)",
+    "options": [
+      {"id": "A", "text": "Grant the Editor role to the Compute Engine default service account."},
+      {"id": "B", "text": "Create a dedicated service account with a custom role, and specify it for pipeline runs."},
+      {"id": "C", "text": "Create a key for the dedicated service account, and store it in the pipeline repository."},
+      {"id": "D", "text": "Grant roles/aiplatform.admin to the pipeline service account for future needs."},
+      {"id": "E", "text": "Grant roles/iam.serviceAccountUser on the pipeline service account to the users who submit runs."}
+    ],
+    "answer": ["B", "E"],
+    "explanation": "Google recommends a dedicated service account with granular permissions, and a custom role gives least privilege. Users who submit runs need roles/iam.serviceAccountUser on that account, so you control who can run as the pipeline identity.",
+    "whyWrong": {
+      "A": "Editor is a broad basic role. It breaks least privilege for every workload that uses the default account.",
+      "C": "Pipelines does not need a key. A stored key is a long-lived credential that can leak.",
+      "D": "An admin role grants far more than a pipeline run needs, which breaks least privilege."
+    },
+    "sources": [
+      {
+        "title": "Configure your Google Cloud project for Gemini Enterprise Agent Platform Pipelines",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/pipelines/configure-project",
+        "evidence": "We recommend that you create a service account to run your pipelines and then grant this account granular permissions to the Google Cloud resources that are needed to run your pipeline."
+      },
+      {
+        "title": "Configure your Google Cloud project for Gemini Enterprise Agent Platform Pipelines",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/pipelines/configure-project",
+        "evidence": "To use Agent Platform Pipelines to run pipelines with this service account, run the following command to grant your user account the roles/iam.serviceAccountUser role for your service account."
+      }
+    ]
+  },
+  {
+    "id": "ai-012",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["endpoints", "private-service-connect", "vpc-sc"],
+    "stem": "A bank serves a fraud model from an Agent Platform (formerly Vertex AI) endpoint. Applications in a VPC network and on-premises systems over Cloud Interconnect call the model, and traffic must stay private. The project is inside a VPC Service Controls perimeter. The team rolls out new model versions with traffic splits. Which endpoint type should you use?",
+    "options": [
+      {"id": "A", "text": "A dedicated public endpoint with IAM authentication for each caller."},
+      {"id": "B", "text": "A private endpoint that uses private services access (VPC peering)."},
+      {"id": "C", "text": "A shared public endpoint in a project inside the perimeter."},
+      {"id": "D", "text": "A dedicated private endpoint that uses Private Service Connect."}
+    ],
+    "answer": ["D"],
+    "explanation": "The requirements are private traffic from the VPC and on-premises, VPC Service Controls, and traffic splits. Dedicated private endpoints with Private Service Connect give private on-premises access, support VPC Service Controls and traffic splits, and are the recommended practice.",
+    "whyWrong": {
+      "A": "Dedicated public endpoints do not support VPC Service Controls, and they receive requests from the public internet.",
+      "B": "Private endpoints based on private services access do not support traffic splitting.",
+      "C": "A shared public endpoint receives requests from the public internet, so traffic is not routed privately."
+    },
+    "sources": [
+      {
+        "title": "Choose an endpoint type",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/choose-endpoint-type",
+        "evidence": "Dedicated private endpoints using Private Service Connect provide a secure connection for private communication between on-premises and Google Cloud."
+      },
+      {
+        "title": "Use private services access endpoints for online inference",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/using-private-endpoints",
+        "evidence": "Private endpoints don't support traffic splitting. As a workaround, you can create traffic splitting manually by deploying your model to multiple private endpoints"
+      }
+    ]
+  },
+  {
+    "id": "ai-013",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["model-monitoring", "skew", "mlops"],
+    "stem": "A lender serves a tabular credit model on an Agent Platform (formerly Vertex AI) endpoint. The original training data is in BigQuery. The team wants alerts when production feature values start to differ from the data that trained the model. What should you configure?",
+    "options": [
+      {"id": "A", "text": "Model Monitoring with training-serving skew detection, with the training data as the baseline."},
+      {"id": "B", "text": "Model Monitoring with drift detection only, with recent production data as the baseline."},
+      {"id": "C", "text": "Vertex Explainable AI feature attributions on each online inference request."},
+      {"id": "D", "text": "A Cloud Monitoring alert on endpoint latency and HTTP error rates."}
+    ],
+    "answer": ["A"],
+    "explanation": "The team has the original training data and wants to compare production inputs with it. Google says to enable skew detection when the training data is available. Skew detection compares serving data with the training data.",
+    "whyWrong": {
+      "B": "Drift detection is for cases where the training data is not available. It compares inputs over time, not with the training data.",
+      "C": "Vertex Explainable AI is deprecated, and attributions do not alert on changes in the input data.",
+      "D": "Latency and error alerts show service health, not changes in feature values."
+    },
+    "sources": [
+      {
+        "title": "Introduction to Model Monitoring",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/model-monitoring/overview",
+        "evidence": "If the original training data is available, you can enable skew detection to monitor your models for training-serving skew."
+      },
+      {
+        "title": "Introduction to Model Monitoring",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/model-monitoring/overview",
+        "evidence": "If the original training data isn't available, you can enable drift detection to monitor the input data for changes over time."
+      }
+    ]
+  },
+  {
+    "id": "ai-014",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["notebooks", "colab-enterprise", "workbench"],
+    "stem": "A data science team wants to share notebooks and co-edit them, with access controlled by IAM. The team does not want to create, size, or patch notebook VMs. Which notebook environment should you recommend?",
+    "options": [
+      {"id": "A", "text": "Agent Platform Workbench (formerly Vertex AI Workbench) instances with idle shutdown"},
+      {"id": "B", "text": "Colab Enterprise notebooks with runtimes that the service provisions"},
+      {"id": "C", "text": "Compute Engine VMs with JupyterLab installed and shared through IAM"},
+      {"id": "D", "text": "Vertex AI managed notebooks instances with idle shutdown"}
+    ],
+    "answer": ["B"],
+    "explanation": "The priorities are collaboration and no infrastructure work. Google says that Colab Enterprise fits these priorities, because it provisions a runtime when you need it.",
+    "whyWrong": {
+      "A": "Workbench fits teams that want control and customization of the instance. The team must still manage the instances.",
+      "C": "Self-managed VMs put all the infrastructure work on the team.",
+      "D": "Managed notebooks are shut down. Use Workbench instances or Colab Enterprise."
+    },
+    "sources": [
+      {
+        "title": "Choose a notebook solution",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/notebooks/workbench/notebook-solution",
+        "evidence": "If your project's priorities are to collaborate with others and to avoid spending time managing infrastructure, Colab Enterprise might be the best option for you."
+      }
+    ]
+  },
+  {
+    "id": "ai-015",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["dws", "flex-start", "gpus", "consumption"],
+    "stem": "A team must fine-tune an open model on two A3 High VMs with 8 GPUs each for about three days. The job should start as soon as capacity is available, not on a fixed date. The job cannot tolerate preemption. The team wants to pay only for the time that the VMs run. What should you do?",
+    "options": [
+      {"id": "A", "text": "Run the job on Spot VMs and write a checkpoint every hour."},
+      {"id": "B", "text": "Create a future reservation in calendar mode for three days."},
+      {"id": "C", "text": "Create an on-demand reservation now and hold it until the job ends."},
+      {"id": "D", "text": "Request Flex-start VMs through Dynamic Workload Scheduler."}
+    ],
+    "answer": ["D"],
+    "explanation": "The job runs for less than seven days, starts when capacity is free, cannot be preempted, and must bill only for use. Flex-start VMs run for up to seven days, are not preemptible, and are billed for usage like on-demand VMs.",
+    "whyWrong": {
+      "A": "Compute Engine can preempt Spot VMs at any time. The job cannot tolerate preemption.",
+      "B": "Calendar mode starts on a date that you choose, at least 87 hours after the request for GPUs. You also pay for the full reserved period.",
+      "C": "An on-demand reservation bills for the reserved VMs from the time that you create it, even while no job uses them."
+    },
+    "sources": [
+      {
+        "title": "Consumption options for AI Hypercomputer",
+        "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/consumption-models",
+        "evidence": "To run short-duration workloads that require densely allocated resources, you can request compute resources for up to seven days by using Flex-start."
+      },
+      {
+        "title": "Schedule training jobs based on resource availability",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/training/schedule-jobs-dws",
+        "evidence": "However, preemptible quota is used only in name. Your resources aren't preemptible and behave like standard resources."
+      },
+      {
+        "title": "Dynamic Workload Scheduler pricing",
+        "url": "https://cloud.google.com/products/dws/pricing",
+        "evidence": "Dynamic Workload Scheduler Flex-start VMs are charged based on usage, in the same way as on-demand instances."
+      }
+    ]
+  },
+  {
+    "id": "ai-016",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["dws", "calendar-mode", "reservations", "gpus"],
+    "stem": "A research lab plans a three-week training run on eight A3 Mega VMs. The run must start on the first day of next month, five weeks from now, when the data is ready. The lab needs high assurance of capacity for exactly that period. What is the most cost-effective approach?",
+    "options": [
+      {"id": "A", "text": "Create a future reservation in calendar mode for the three-week period."},
+      {"id": "B", "text": "Request Flex-start VMs through Dynamic Workload Scheduler on the start date."},
+      {"id": "C", "text": "Create Spot VMs in a managed instance group that recreates them."},
+      {"id": "D", "text": "Create an on-demand reservation today and keep it until the run ends."}
+    ],
+    "answer": ["A"],
+    "explanation": "The run has a fixed start date, a defined length of three weeks, and needs assured capacity. Calendar mode provisions reserved resources at the date and time that you specify, for up to 90 days, at a discounted price.",
+    "whyWrong": {
+      "B": "Flex-start capacity is best effort and lasts at most seven days, so it cannot assure a three-week run on a fixed date.",
+      "C": "Spot VMs give no capacity assurance, and Compute Engine can preempt them at any time.",
+      "D": "An on-demand reservation made today bills for five extra weeks before the run starts."
+    },
+    "sources": [
+      {
+        "title": "About future reservation requests in calendar mode",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/future-reservations-calendar-mode-overview",
+        "evidence": "When Google Cloud approves a reservation request, Compute Engine provisions your reserved resources at your specified date and time, and for a duration of up to 90 days."
+      },
+      {
+        "title": "Plan your Cloud TPU resources",
+        "url": "https://docs.cloud.google.com/tpu/docs/plan-tpus",
+        "evidence": "Future reservations in calendar mode are a good fit for training and experimentation workloads that require precise start times and have a defined duration."
+      }
+    ]
+  },
+  {
+    "id": "ai-017",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["cloud-run", "gpus", "inference"],
+    "stem": "A media startup serves a small open-weight model for image captioning. Traffic arrives in short bursts during business hours and is near zero at night. The team wants no GPU cost when idle, no capacity reservations, and minimal operations. What should you do?",
+    "options": [
+      {"id": "A", "text": "Deploy the model to an Agent Platform (formerly Vertex AI) endpoint with one G2 replica minimum."},
+      {"id": "B", "text": "Run the model on a GKE Standard cluster with a GPU node pool and cluster autoscaling."},
+      {"id": "C", "text": "Deploy the model as a Cloud Run service with an NVIDIA L4 GPU that scales to zero."},
+      {"id": "D", "text": "Run the model on a G2 Spot VM in a managed instance group behind a load balancer."}
+    ],
+    "answer": ["C"],
+    "explanation": "The deciding requirements are no cost when idle, no reservations, and minimal operations. Cloud Run GPU services scale to zero when not in use, and Cloud Run needs no GPU reservation.",
+    "whyWrong": {
+      "A": "A standard Agent Platform deployment needs at least one replica, so it bills when idle.",
+      "B": "GKE Standard needs cluster and node pool operations, which breaks the minimal-operations requirement.",
+      "D": "A single Spot VM can be preempted at any time, and the team must operate the VM."
+    },
+    "sources": [
+      {
+        "title": "GPU support for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/gpu",
+        "evidence": "Instances of a Cloud Run service that has been configured to use GPU can scale down to zero for cost savings when not in use."
+      },
+      {
+        "title": "GPU support for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/gpu",
+        "evidence": "The GPU feature offers on-demand availability with no reservations needed, similar to the way on-demand CPU and on-demand memory work in Cloud Run."
+      }
+    ]
+  },
+  {
+    "id": "ai-018",
+    "objective": "2.4",
+    "caseStudy": "knightmotives",
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["reservations", "ai-hypercomputer", "gpus"],
+    "stem": "KnightMotives Automotive plans to pre-train a large autonomous-driving model on A4X machines for about five months. The run starts in four months. The company's current AI infrastructure is obsolete, so it depends on Google Cloud capacity. It needs high assurance that the capacity exists on the start date. What should you recommend?",
+    "options": [
+      {"id": "A", "text": "A future reservation in calendar mode for 90 days, renewed for the rest of the run."},
+      {"id": "B", "text": "A future reservation in AI Hypercomputer for the full period, through the account team."},
+      {"id": "C", "text": "Flex-start VMs through Dynamic Workload Scheduler, requested in seven-day blocks."},
+      {"id": "D", "text": "Spot VMs with frequent checkpoints to Cloud Storage during the run."}
+    ],
+    "answer": ["B"],
+    "explanation": "The run needs A4X machines for more than 90 days, from a known future date, with high assurance. Future reservations in AI Hypercomputer support A4X and can start up to one year in the future.",
+    "whyWrong": {
+      "A": "Calendar mode lasts at most 90 days and does not support A4X. A renewal has no assured capacity.",
+      "C": "Flex-start does not support A4X, lasts at most seven days, and is best effort.",
+      "D": "Spot VMs do not support A4X instances and give no capacity assurance."
+    },
+    "sources": [
+      {
+        "title": "Consumption options for AI Hypercomputer",
+        "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/consumption-models",
+        "evidence": "Premium machine support: reserve A4X Max, A4X, A4, A3 Ultra, A3 Mega, or A3 High (8 GPUs) machine types."
+      },
+      {
+        "title": "AI Hypercomputer release notes",
+        "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/release-notes",
+        "evidence": "You can use future reservations in AI Hypercomputer to request to reserve capacity starting on a specific date up to one year in the future."
+      }
+    ]
+  },
+  {
+    "id": "ai-019",
+    "objective": "2.4",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": ["storage", "checkpointing", "managed-lustre", "training"],
+    "stem": "A team trains a large model on GKE with thousands of GPUs. The job writes synchronous checkpoints often and needs low-latency file access from many Pods. The team also needs a scalable, cost-efficient store for the training dataset. Which two storage choices should you recommend? (Choose two.)",
+    "options": [
+      {"id": "A", "text": "Parallelstore for the synchronous checkpoints."},
+      {"id": "B", "text": "Managed Lustre for the synchronous checkpoints."},
+      {"id": "C", "text": "Cloud Storage for the training dataset."},
+      {"id": "D", "text": "Filestore Basic HDD for the training dataset."},
+      {"id": "E", "text": "Bigtable for the synchronous checkpoints."}
+    ],
+    "answer": ["B", "C"],
+    "explanation": "Google recommends Managed Lustre for latency-sensitive work such as synchronous checkpoints. It recommends Cloud Storage for training datasets and general cost efficiency.",
+    "whyWrong": {
+      "A": "Cluster Toolkit deprecated its Parallelstore blueprints and its Parallelstore module. The AI storage guide names Managed Lustre for synchronous checkpoints. Do not choose Parallelstore for a new design.",
+      "D": "The AI storage guide recommends Cloud Storage, not Filestore Basic, for training datasets at this scale.",
+      "E": "Bigtable is a NoSQL database, not a file system for checkpoint files."
+    },
+    "sources": [
+      {
+        "title": "About storage services for AI and ML workloads",
+        "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/storage",
+        "evidence": "Also recommended for latency-sensitive or high-metadata-concurrency workloads, such as KV caching offloads, synchronous checkpointing, and high-speed weight propagation for reinforcement learning."
+      },
+      {
+        "title": "About storage services for AI and ML workloads",
+        "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/storage",
+        "evidence": "Recommended for applications that need a scalable object store and general cost efficiency for training datasets, asynchronous multi-tier checkpointing, and model weight storage."
+      },
+      {
+        "title": "Cluster Toolkit release notes",
+        "url": "https://docs.cloud.google.com/cluster-toolkit/docs/release-notes",
+        "evidence": "This release adds a deprecation notice for the Parallelstore module."
+      }
+    ]
+  },
+  {
+    "id": "ai-020",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["document-ai", "vision-api", "ocr"],
+    "stem": "An insurer receives thousands of scanned claim forms as PDF files each day. It wants to extract tables and key-value pairs from the forms into its claims system through an automated pipeline. What should you use?",
+    "options": [
+      {"id": "A", "text": "Cloud Vision API text detection on each page"},
+      {"id": "B", "text": "Natural Language API entity analysis on the PDF text"},
+      {"id": "C", "text": "Speech-to-Text batch recognition on the files"},
+      {"id": "D", "text": "Document AI Form Parser in the pipeline"}
+    ],
+    "answer": ["D"],
+    "explanation": "The input is scanned forms, and the output is tables and key-value pairs in an automated pipeline. Google recommends Document AI for scanned documents and document pipelines, and Form Parser extracts tables and key-value pairs from forms.",
+    "whyWrong": {
+      "A": "Vision text detection returns raw text, not form structure. Google points scanned documents to Document AI.",
+      "B": "Entity analysis finds named entities in text. It does not read scanned pages or keep table structure.",
+      "C": "Speech-to-Text transcribes audio, not documents."
+    },
+    "sources": [
+      {
+        "title": "Document AI overview",
+        "url": "https://docs.cloud.google.com/document-ai/docs/overview",
+        "evidence": "Extract tables or kvp from a structured form in a document."
+      },
+      {
+        "title": "Vision API features list",
+        "url": "https://docs.cloud.google.com/vision/docs/features-list",
+        "evidence": "If you are detecting text in scanned documents, try Document AI for optical character recognition, structured form parsing, and entity extraction."
+      }
+    ]
+  },
+  {
+    "id": "ai-021",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["speech-to-text", "chirp-3", "audio"],
+    "stem": "A contact center stores 45-minute call recordings in Cloud Storage. It needs transcripts by the next morning, and it wants to use the Chirp 3 model for accuracy. What should you do?",
+    "options": [
+      {"id": "A", "text": "Use Speech-to-Text V1 synchronous recognition for each recording."},
+      {"id": "B", "text": "Use Speech-to-Text V1 streaming recognition with the Chirp 3 model."},
+      {"id": "C", "text": "Use Speech-to-Text V2 batch recognition with the Chirp 3 model."},
+      {"id": "D", "text": "Send each recording to the Agent Platform (formerly Vertex AI) speech-to-text feature."}
+    ],
+    "answer": ["C"],
+    "explanation": "The recordings are long, stored in Cloud Storage, and need no real-time answer. Batch recognition is ideal for long files in Cloud Storage. Chirp 3 is available only in the Speech-to-Text V2 API.",
+    "whyWrong": {
+      "A": "Synchronous recognition accepts only 1 minute of audio or less.",
+      "B": "Chirp 3 is not available in V1, and streaming is for real-time audio, not stored files.",
+      "D": "The Agent Platform speech feature accepts at most 60 seconds or 10 MB of audio."
+    },
+    "sources": [
+      {
+        "title": "Compare transcription models",
+        "url": "https://docs.cloud.google.com/speech-to-text/docs/transcription-model",
+        "evidence": "Batch recognition: Ideal for transcribing long audio files (minutes to hours) stored in a Cloud Storage bucket. This is an asynchronous operation."
+      },
+      {
+        "title": "Chirp 3 Transcription: Enhanced multilingual accuracy",
+        "url": "https://docs.cloud.google.com/speech-to-text/docs/models/chirp-3",
+        "evidence": "Chirp 3: Transcription, is exclusively available within the Speech-to-Text API V2."
+      }
+    ]
+  },
+  {
+    "id": "ai-022",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["translation", "glossary", "data-residency"],
+    "stem": "A medical device company translates user manuals from English into 12 languages. Product names and regulated terms must be translated the same way every time. Translation requests must be processed in the European Union. What should you use?",
+    "options": [
+      {"id": "A", "text": "Cloud Translation - Advanced with a glossary and an EU regional endpoint."},
+      {"id": "B", "text": "Cloud Translation - Basic with an API key and the global endpoint."},
+      {"id": "C", "text": "Cloud Translation - Basic with a service account and the global endpoint."},
+      {"id": "D", "text": "Natural Language API entity analysis to protect terms before translation."}
+    ],
+    "answer": ["A"],
+    "explanation": "Two requirements decide it: consistent translation of domain terms and processing in the EU. Advanced glossaries translate domain terms correctly and consistently. Advanced also offers a regional endpoint that keeps resources in the EU.",
+    "whyWrong": {
+      "B": "Basic has no glossaries, and the global endpoint does not keep processing in the EU.",
+      "C": "The authentication method does not add glossaries or EU processing to Basic.",
+      "D": "Entity analysis finds entities, but it does not control how the translation renders them."
+    },
+    "sources": [
+      {
+        "title": "Overview of the Cloud Translation API",
+        "url": "https://docs.cloud.google.com/translate/docs/api-overview",
+        "evidence": "Glossaries: A glossary is a custom dictionary that you create to translate domain-specific terms correctly and consistently."
+      },
+      {
+        "title": "Overview of the Cloud Translation API",
+        "url": "https://docs.cloud.google.com/translate/docs/api-overview",
+        "evidence": "you can use a regional endpoint to keep resources within a particular location, such as the European Union."
+      }
+    ]
+  },
+  {
+    "id": "ai-023",
+    "objective": "2.5",
+    "caseStudy": "altostrat",
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["gemini", "video-understanding", "deprecations"],
+    "stem": "Altostrat Media wants to extract rich metadata and short summaries from new videos in its Cloud Storage media library. The design must use Google-recommended services that will stay supported for years. The team wants to avoid training custom models. What should you do?",
+    "options": [
+      {"id": "A", "text": "Call the Video Intelligence API for label and shot detection on each video."},
+      {"id": "B", "text": "Send each video to a Gemini model with a prompt that returns metadata and a summary."},
+      {"id": "C", "text": "Train an AutoML video classification model on labeled clips from the library."},
+      {"id": "D", "text": "Extract frames, label them with the Vision API, and summarize the labels in code."}
+    ],
+    "answer": ["B"],
+    "explanation": "The design needs metadata and summaries, long-term support, and no custom training. Gemini accepts videos in requests and understands their content, so one prompt returns both metadata and a summary.",
+    "whyWrong": {
+      "A": "The Video Intelligence API is deprecated from September 14, 2026 and shuts down in 2027. Google recommends Gemini models instead.",
+      "C": "AutoML Video is no longer available, and the team wants to avoid custom training.",
+      "D": "Frame labels lose the audio and the story of the video. The team must write and maintain the summary code."
+    },
+    "sources": [
+      {
+        "title": "Video understanding",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/video-understanding",
+        "evidence": "You can add videos to Gemini requests to perform tasks that involve understanding the contents of the included videos."
+      },
+      {
+        "title": "Vertex AI deprecations",
+        "url": "https://docs.cloud.google.com/vertex-ai/docs/deprecations",
+        "evidence": "AutoML Video is no longer available. See Video tuning for detailed instructions for fine-tuning Gemini on video data using supervised learning."
+      }
+    ]
+  },
+  {
+    "id": "ai-024",
+    "objective": "2.5",
+    "caseStudy": "cymbal",
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["conversation", "cx-agent-studio", "gecx"],
+    "stem": "Cymbal Retail wants to replace its IVR with AI virtual agents that answer customer questions and route calls. The contact center team has few developers and wants a minimal-code builder. It also wants the current Google product line for customer experience. What should you recommend?",
+    "options": [
+      {"id": "A", "text": "Build the agents in CX Agent Studio in Gemini Enterprise for Customer Experience (formerly CES)."},
+      {"id": "B", "text": "Build a new Dialogflow ES agent with intents and a webhook for each type of call."},
+      {"id": "C", "text": "Build the agents with Workflow Builder in Gemini Enterprise (formerly Google Agentspace)."},
+      {"id": "D", "text": "Build a custom voice agent on GKE that calls the Gemini Live API for each call."}
+    ],
+    "answer": ["A"],
+    "explanation": "The team needs a minimal-code builder for customer-facing agents from the current product line. CX Agent Studio is a minimal-code conversational agent builder and the evolution of Dialogflow CX. It is part of Gemini Enterprise for Customer Experience (formerly Customer Engagement Suite, CES).",
+    "whyWrong": {
+      "B": "The docs now call Dialogflow ES a legacy conversational agent, and ES suits only small to medium agents.",
+      "C": "Workflow Builder creates agents for employees inside the Gemini Enterprise app, not customer-facing call agents.",
+      "D": "A custom GKE agent needs much more development and operations work than a minimal-code builder."
+    },
+    "sources": [
+      {
+        "title": "CX Agent Studio",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx/cx-agent-studio",
+        "evidence": "Customer Experience Agent Studio (CX Agent Studio) is a minimal code conversational agent builder."
+      },
+      {
+        "title": "Gemini Enterprise for CX",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-cx",
+        "evidence": "Gemini Enterprise for Customer Experience (CX), is an agentic solution designed to bring shopping and customer service together"
+      }
+    ]
+  },
+  {
+    "id": "ai-025",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["gemini-enterprise", "connectors", "enterprise-search"],
+    "stem": "Employees at a consulting firm lose time searching Confluence, Jira, SharePoint, and ServiceNow. The firm wants one AI search and assistant for employees. Results must include only documents that each employee can already open. The firm wants minimal development. What should you recommend?",
+    "options": [
+      {"id": "A", "text": "Build a RAG application on Agent Platform (formerly Vertex AI) with custom connectors for each system."},
+      {"id": "B", "text": "Upload all documents to Gemini Notebook Enterprise (formerly NotebookLM Enterprise) notebooks."},
+      {"id": "C", "text": "Deploy Gemini Enterprise (formerly Google Agentspace) with its prebuilt connectors for the four systems."},
+      {"id": "D", "text": "Create an Agent Search (formerly Vertex AI Search) website app for the firm's public website."}
+    ],
+    "answer": ["C"],
+    "explanation": "Gemini Enterprise is an intranet search and AI assistant for employees. It has prebuilt connectors for Confluence, Jira, SharePoint, and ServiceNow, and its search is permissions-aware. No custom development is needed.",
+    "whyWrong": {
+      "A": "A custom RAG application needs connector code and permission checks that the firm must build and maintain.",
+      "B": "Notebooks suit a known set of sources. Copies of all documents lose the source permissions and go stale.",
+      "D": "A website app covers the public website, not internal systems."
+    },
+    "sources": [
+      {
+        "title": "What is Gemini Enterprise?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/docs",
+        "evidence": "Gemini Enterprise includes prebuilt connectors for commonly-used third-party applications like Confluence, Jira, Microsoft SharePoint, and ServiceNow."
+      },
+      {
+        "title": "What is Gemini Enterprise?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/docs",
+        "evidence": "This provides employees with a single, multimodal search interface offering permissions-aware access to enterprise information."
+      }
+    ]
+  },
+  {
+    "id": "ai-026",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["gemini-notebook-enterprise", "notebooklm", "data-residency"],
+    "stem": "A legal team must analyze a fixed set of 40 contracts and share findings, including audio summaries, with five colleagues. The source data must be stored in the European Union. Company policy forbids public sharing links. What should you recommend?",
+    "options": [
+      {"id": "A", "text": "A Gemini Enterprise (formerly Google Agentspace) app with a SharePoint connector in the global location."},
+      {"id": "B", "text": "A custom RAG application on Agent Platform (formerly Vertex AI) in a European region."},
+      {"id": "C", "text": "An Agent Search (formerly Vertex AI Search) website app with a public widget for the contracts."},
+      {"id": "D", "text": "Gemini Notebook Enterprise (formerly NotebookLM Enterprise) in the EU multi-region, shared through IAM."}
+    ],
+    "answer": ["D"],
+    "explanation": "The team works from a known set of sources and needs EU storage with no public sharing. Gemini Notebook Enterprise fits known, authoritative sources, stores source data in the US or EU multi-region, and shares notebooks only through IAM roles.",
+    "whyWrong": {
+      "A": "Gemini Enterprise search fits cases where the starting point is unknown. The global location also does not keep data in the EU.",
+      "B": "A custom application needs development work that a ready product already covers.",
+      "C": "A public search widget breaks the policy against public sharing."
+    },
+    "sources": [
+      {
+        "title": "Gemini Notebook Enterprise, Gemini Enterprise, or both?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/docs/choose-product",
+        "evidence": "Establish a single, AI-powered reference point for a topic or project using known, authoritative sources."
+      },
+      {
+        "title": "What is Gemini Notebook Enterprise?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/overview",
+        "evidence": "Predefined IAM roles let users share notebooks with others and grant viewer or editor permissions. Notebooks can't be shared publicly."
+      },
+      {
+        "title": "What is Gemini Notebook Enterprise?",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/overview",
+        "evidence": "When your users add source data to a notebook, the data is stored in your project in the US or EU multi-region."
+      }
+    ]
+  },
+  {
+    "id": "ai-027",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["gemini-enterprise", "cmek", "locations"],
+    "stem": "A bank sets up Gemini Enterprise (formerly Google Agentspace) for its employees. The security policy requires customer-managed encryption keys (CMEK) for all indexed data. Where should you create the Gemini Enterprise app and its data stores?",
+    "options": [
+      {"id": "A", "text": "In the global location, which gets the latest features"},
+      {"id": "B", "text": "In the US or EU multi-region that fits the data"},
+      {"id": "C", "text": "In a single region such as us-central1"},
+      {"id": "D", "text": "In the global location, with keys in Cloud EKM"}
+    ],
+    "answer": ["B"],
+    "explanation": "CMEK is the deciding requirement. Gemini Enterprise supports CMEK only for apps and data stores in the US or EU multi-region, not in the global location.",
+    "whyWrong": {
+      "A": "Google recommends the global location when no security or regulatory reason applies. CMEK is such a reason, and CMEK does not work in the global location.",
+      "C": "The CMEK page names US or EU multi-region apps and data stores, not single regions such as us-central1.",
+      "D": "External keys do not change the location rule. CMEK needs a US or EU multi-region app."
+    },
+    "sources": [
+      {
+        "title": "Customer-managed encryption keys",
+        "url": "https://docs.cloud.google.com/gemini/enterprise/docs/cmek",
+        "evidence": "You must use US or EU multi-region apps or data stores (not global ones)."
+      }
+    ]
+  },
+  {
+    "id": "ai-028",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": ["model-garden", "partner-models", "org-policy", "iam"],
+    "stem": "A platform team wants a data science team to call a partner model, Anthropic Claude, as a managed API from Model Garden. The organization restricts which APIs projects can use through organization policies. Which two actions are required to enable the partner model? (Choose two.)",
+    "options": [
+      {"id": "A", "text": "Deploy the model to a dedicated GPU endpoint in the data science project."},
+      {"id": "B", "text": "Create a service account key and send it to the model partner for billing."},
+      {"id": "C", "text": "Grant the Consumer Procurement Entitlement Manager role to the person who enables it."},
+      {"id": "D", "text": "Allow the Cloud Commerce Consumer Procurement API in the organization policy."},
+      {"id": "E", "text": "Buy Provisioned Throughput for the partner model on the global endpoint."}
+    ],
+    "answer": ["C", "D"],
+    "explanation": "Enabling a partner model is a procurement step. The person who enables it needs the Consumer Procurement Entitlement Manager role. The organization policy must allow the Cloud Commerce Consumer Procurement API.",
+    "whyWrong": {
+      "A": "A managed API partner model is Model as a Service. You do not deploy it to your own endpoint.",
+      "B": "The partner does not need your credentials, and Google does not share prompts and responses with partners.",
+      "E": "Provisioned Throughput is optional, and partner models do not support it on the global endpoint."
+    },
+    "sources": [
+      {
+        "title": "Gemini Enterprise Agent Platform partner models for MaaS",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/use-partner-models",
+        "evidence": "You must have the Consumer Procurement Entitlement Manager Identity and Access Management (IAM) role. Anyone who's been granted this role can enable partner models in Model Garden."
+      },
+      {
+        "title": "Gemini Enterprise Agent Platform partner models for MaaS",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/use-partner-models",
+        "evidence": "To enable partner models, your organization policy must allow the following API: Cloud Commerce Consumer Procurement API"
+      }
+    ]
+  },
+  {
+    "id": "ai-029",
+    "objective": "2.5",
+    "caseStudy": "altostrat",
+    "type": "multi",
+    "difficulty": 2,
+    "tags": ["vision-api", "natural-language", "content-moderation"],
+    "stem": "Altostrat Media wants AI-powered detection of harmful content. Users upload images and post text comments. The first release must flag explicit images and harmful comments with pre-trained APIs, with no model training. Which two services should you use? (Choose two.)",
+    "options": [
+      {"id": "A", "text": "Cloud Vision API SafeSearch detection for the images"},
+      {"id": "B", "text": "Natural Language API text moderation for the comments"},
+      {"id": "C", "text": "Video Intelligence API explicit content detection for the images"},
+      {"id": "D", "text": "Cloud Vision API face detection to identify the uploaders"},
+      {"id": "E", "text": "Natural Language API sentiment analysis for the comments"}
+    ],
+    "answer": ["A", "B"],
+    "explanation": "SafeSearch rates images for explicit content categories such as adult, violence, and racy. Text moderation checks text against a list of safety attributes. Both are pre-trained and need no training.",
+    "whyWrong": {
+      "C": "The Video Intelligence API is for video, not still images, and it is deprecated.",
+      "D": "Face detection does not identify people, and identity does not show whether content is harmful.",
+      "E": "Sentiment shows a positive or negative opinion, not harmful content. A negative review is not harmful."
+    },
+    "sources": [
+      {
+        "title": "Vision API features list",
+        "url": "https://docs.cloud.google.com/vision/docs/features-list",
+        "evidence": "Provides likelihood ratings for the following explicit content categories: adult, spoof, medical, violence, and racy."
+      },
+      {
+        "title": "Moderate text",
+        "url": "https://docs.cloud.google.com/natural-language/docs/moderating-text",
+        "evidence": "Text moderation analyzes a document against a list of safety attributes"
+      }
+    ]
+  },
+  {
+    "id": "ai-030",
+    "objective": "2.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["model-garden", "self-deploy", "maas", "compliance"],
+    "stem": "A healthcare company fine-tuned an open-weight model with its own data and has the custom weights. Regulations prohibit sending patient data to a multi-tenant managed service. The company wants to serve the model in a region that it chooses, on dedicated accelerators. What should you do?",
+    "options": [
+      {"id": "A", "text": "Call the base open model through Model as a Service on an endpoint in its region."},
+      {"id": "B", "text": "Call a partner model through Model as a Service with Provisioned Throughput."},
+      {"id": "C", "text": "Call Gemini on the global endpoint, with the tuning examples in each prompt."},
+      {"id": "D", "text": "Self-deploy the custom weights from Model Garden to a dedicated endpoint."}
+    ],
+    "answer": ["D"],
+    "explanation": "Three facts decide it: custom fine-tuned weights, a ban on multi-tenant managed services, and a region choice. Google says self-deployment is the best choice for custom or fine-tuned weights. It also fits rules that prohibit multi-tenant services.",
+    "whyWrong": {
+      "A": "Model as a Service is a multi-tenant managed service, and it serves the base model, not the company's custom weights.",
+      "B": "A partner model does not contain the company's fine-tuned weights, and MaaS is multi-tenant.",
+      "C": "The global endpoint can process requests in any location, and prompts do not replace the tuned weights."
+    },
+    "sources": [
+      {
+        "title": "Open models overview",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/choose-serving-option",
+        "evidence": "Custom weights and fine-tuned models: Self-deployment is the best choice when your application requires using custom weights or a fine-tuned version of a model"
+      },
+      {
+        "title": "Open models overview",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/choose-serving-option",
+        "evidence": "This approach supports applications that must adhere to specific data residency policies or stringent regulations that prohibit using a multi-tenant managed service."
+      }
+    ]
+  }
+]

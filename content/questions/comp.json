@@ -1,0 +1,1409 @@
+[
+  {
+    "id": "comp-001",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "compute-choice",
+      "serverless"
+    ],
+    "stem": "A startup runs a containerized, stateless REST API. Traffic is near zero at night and spikes during marketing campaigns. The team has two developers, no Kubernetes experience, and no dependency on Kubernetes APIs. The team wants the least operational overhead. Which platform should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "GKE Autopilot, with a Horizontal Pod Autoscaler on CPU utilization."
+      },
+      {
+        "id": "B",
+        "text": "A regional managed instance group on Compute Engine, with autoscaling."
+      },
+      {
+        "id": "C",
+        "text": "Cloud Run, with the API deployed as a Cloud Run service."
+      },
+      {
+        "id": "D",
+        "text": "GKE Standard, with the cluster autoscaler on a Spot node pool."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The API is stateless and HTTP-based, and it has no Kubernetes dependency. Google recommends that you consider serverless first unless you need Kubernetes. Cloud Run has fewer settings than Autopilot and scales with requests, so it gives the **least operational overhead** for a small team without Kubernetes skills.",
+    "whyWrong": {
+      "A": "Autopilot manages the nodes, but the team still operates a cluster and Kubernetes objects. Google recommends Autopilot when a workload is less suitable for serverless, which is not the case here.",
+      "B": "A MIG needs instance templates, images, health checks, and OS patching. This adds operational work that Cloud Run avoids.",
+      "D": "GKE Standard adds node pool management on top of Kubernetes. The team has no Kubernetes skills and no need for node-level control."
+    },
+    "sources": [
+      {
+        "title": "Select a managed container runtime environment",
+        "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+        "evidence": "Unless you specifically want or need Kubernetes, we recommend that you consider serverless first as your target runtime environment."
+      },
+      {
+        "title": "Select a managed container runtime environment",
+        "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+        "evidence": "Using Cloud Run can result in less infrastructure to manage, less self-managed configuration, and therefore lower operational overhead."
+      }
+    ]
+  },
+  {
+    "id": "comp-002",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke-autopilot",
+      "compute-choice",
+      "helm"
+    ],
+    "stem": "A software vendor delivers its application as a Helm chart. The application includes an operator that calls the Kubernetes API to manage custom resources. The chart uses no privileged containers, host namespaces, or `hostPath` volumes. Your company wants to run the application on Google Cloud with the least infrastructure management and without changes to the vendor's code. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy the containers as Cloud Run services and replace the operator with Cloud Scheduler jobs."
+      },
+      {
+        "id": "B",
+        "text": "Deploy the Helm chart to a GKE Standard cluster with node pool auto-creation."
+      },
+      {
+        "id": "C",
+        "text": "Install Kubernetes with kubeadm on VMs in a regional managed instance group."
+      },
+      {
+        "id": "D",
+        "text": "Deploy the Helm chart to a GKE Autopilot cluster."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The Helm chart and the operator create an explicit dependency on Kubernetes, and Cloud Run does not support Kubernetes. For that case, Google names Autopilot as the target runtime. Autopilot blocks privileged containers, host namespaces, and most `hostPath` volumes by default, and the chart uses none of them. Autopilot manages the nodes, scaling, and security defaults, so it gives the **least infrastructure management** of the Kubernetes options.",
+    "whyWrong": {
+      "A": "Cloud Run does not support Kubernetes, so the Helm chart and the operator cannot run as delivered. Replacing the operator changes the vendor's code, which the stem rules out.",
+      "B": "Standard works, but you manage node pools and node settings. Google recommends Autopilot unless you need the control that Standard gives.",
+      "C": "A self-managed cluster makes you responsible for the control plane, upgrades, and OS patching. This is the most infrastructure management of all the options."
+    },
+    "sources": [
+      {
+        "title": "Select a managed container runtime environment",
+        "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+        "evidence": "In these scenarios, Autopilot is the target runtime environment because Cloud Run doesn't support Kubernetes."
+      },
+      {
+        "title": "About GKE modes of operation",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/choose-cluster-mode",
+        "evidence": "Unless you require the granular control and flexibility of Standard clusters, we recommend that you use Autopilot clusters."
+      },
+      {
+        "title": "GKE Autopilot security measures",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-security",
+        "evidence": "Containers can't run in Privileged mode unless the container is deployed by a Google Cloud partner."
+      }
+    ]
+  },
+  {
+    "id": "comp-003",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run-jobs",
+      "batch",
+      "timeouts"
+    ],
+    "stem": "Each night, a containerized process reads files from Cloud Storage, transforms them, and writes the results to BigQuery. The work splits into independent parts, and a full run takes about three hours. The process does not serve HTTP requests. The team already uses Cloud Run for its APIs and wants a serverless option. What should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Cloud Run service with the maximum request timeout, called by Cloud Scheduler each night."
+      },
+      {
+        "id": "B",
+        "text": "A Cloud Run function with an HTTP trigger, called by Cloud Scheduler each night."
+      },
+      {
+        "id": "C",
+        "text": "A Cloud Run job with several parallel tasks, executed on a nightly schedule."
+      },
+      {
+        "id": "D",
+        "text": "A Cloud Run worker pool with one instance, started by Cloud Scheduler each night."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A Cloud Run job runs its tasks to completion and exits, and it does not serve requests. Tasks can run in parallel, and each task can run up to 168 hours. The **three-hour** run therefore fits a job but not a single request, which stops at 60 minutes at most.",
+    "whyWrong": {
+      "A": "A service request times out after 60 minutes at most, so a three-hour run in one request fails.",
+      "B": "An HTTP function is a Cloud Run service, so the same request timeout applies.",
+      "D": "A worker pool is for always-on background work, such as queue consumers. A nightly run that must finish is a job: tasks that run to completion."
+    },
+    "sources": [
+      {
+        "title": "Set task timeout for jobs",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/task-timeout",
+        "evidence": "By default, each task runs for a maximum of 10 minutes: you can change this to a shorter time or a longer time up to 168 hours (7 days)."
+      },
+      {
+        "title": "Configure request timeout for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/request-timeout",
+        "evidence": "The timeout is set by default to 5 minutes (300 seconds) and can be extended up to 60 minutes (3600 seconds)."
+      },
+      {
+        "title": "What is Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run",
+        "evidence": "Handles always-on background workloads such as workloads from message queues (Kafka, Pub/Sub, RabbitMQ)."
+      }
+    ]
+  },
+  {
+    "id": "comp-004",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-run-functions",
+      "eventarc",
+      "event-driven"
+    ],
+    "stem": "When a partner uploads an image to a Cloud Storage bucket, a short piece of Python code must create a thumbnail. The team wants to write only the function code and manage no containers or servers. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Cloud Run function with an Eventarc trigger for object finalized events in the bucket."
+      },
+      {
+        "id": "B",
+        "text": "A Cloud Run function with an HTTP trigger that polls the bucket for new objects every minute."
+      },
+      {
+        "id": "C",
+        "text": "A GKE Autopilot Deployment that watches the bucket with the Cloud Storage client library."
+      },
+      {
+        "id": "D",
+        "text": "A Compute Engine VM with a cron job that lists the new objects in the bucket."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Cloud Run functions deploy from source code, so the team writes **only the function code**. Event-driven functions must use Eventarc triggers, and Eventarc receives Cloud Storage events directly from the source.",
+    "whyWrong": {
+      "B": "Polling adds delay, extra invocations, and code to track which objects are new. An event trigger reacts to each upload.",
+      "C": "A cluster and a watcher process add infrastructure that the team does not want to manage.",
+      "D": "A VM needs OS management and a polling script, which breaks the requirement to manage no servers."
+    },
+    "sources": [
+      {
+        "title": "Cloud Run function triggers",
+        "url": "https://docs.cloud.google.com/run/docs/function-triggers",
+        "evidence": "You must use Eventarc, Google's implementation of the CloudEvents spec that supports building event-driven architectures, to trigger functions in response to specified events."
+      },
+      {
+        "title": "Eventarc Standard overview",
+        "url": "https://docs.cloud.google.com/eventarc/standard/docs/overview",
+        "evidence": "Events from Google providers are either sent directly from the source (Cloud Storage, for example) or through Cloud Audit Logs entries, and use Pub/Sub as the transport layer."
+      }
+    ]
+  },
+  {
+    "id": "comp-005",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "vmware-engine",
+      "hcx",
+      "migration"
+    ],
+    "stem": "A company must exit its data center in four months. It runs 350 VMs on VMware vSphere, and its operations team uses vCenter, NSX, and existing VMware runbooks. There is no time to re-platform the VMs or to change operating procedures before the exit. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Convert the VMs to Compute Engine instances with Migrate to Virtual Machines, and retrain the team on Compute Engine tools."
+      },
+      {
+        "id": "B",
+        "text": "Build new VMs on Compute Engine sole-tenant nodes, and restore the application backups onto them."
+      },
+      {
+        "id": "C",
+        "text": "Containerize the applications with Migrate to Containers, and deploy them to GKE Autopilot."
+      },
+      {
+        "id": "D",
+        "text": "Create a VMware Engine private cloud, and move the VMs with VMware HCX."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "VMware Engine runs vSphere, vCenter, vSAN, NSX, and HCX, so the team keeps its tools, skills, and processes. VMware Engine deploys HCX when it creates the private cloud, and HCX moves the VMs without conversion. This meets the **four-month** deadline with **no change to operating procedures**.",
+    "whyWrong": {
+      "A": "Migrate to Virtual Machines converts the VMs to Compute Engine instances. The team must change its tools and runbooks, which the stem rules out.",
+      "B": "Rebuilding VMs and restoring backups is a re-platforming effort, and the team loses its VMware tools and runbooks.",
+      "C": "Containerizing 350 applications is a modernization project. It does not fit a four-month deadline and changes all operating procedures."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud VMware Engine overview",
+        "url": "https://docs.cloud.google.com/vmware-engine/docs/overview",
+        "evidence": "VMware Engine includes vSphere, vCenter, vSAN, NSX, HCX, and corresponding tools, so it's fully compatible with your existing VMware tools, skills training, and the processes used by teams already familiar with VMware."
+      },
+      {
+        "title": "Use VMware HCX to migrate VMware VMs",
+        "url": "https://docs.cloud.google.com/vmware-engine/docs/workloads/howto-migrate-vms-using-hcx",
+        "evidence": "Because VMware Engine automatically deploys HCX during private cloud creation, you don't need to provide a subnet IP address range for HCX services."
+      }
+    ]
+  },
+  {
+    "id": "comp-006",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "spot-vms",
+      "preemptible",
+      "batch"
+    ],
+    "stem": "A media company renders video on Compute Engine. The renderer saves checkpoints and can restart after an interruption. Some render tasks run for 30 hours on one VM, and each restart from a checkpoint loses about an hour of work. The company wants the lowest compute cost and wants to avoid stops that come from a fixed runtime limit. Which VM provisioning model should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Preemptible VMs"
+      },
+      {
+        "id": "B",
+        "text": "Spot VMs"
+      },
+      {
+        "id": "C",
+        "text": "Standard VMs with a resource-based committed use discount"
+      },
+      {
+        "id": "D",
+        "text": "Standard VMs on sole-tenant nodes"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The workload tolerates interruption and needs the **lowest cost**, so Spot VMs fit. Spot VMs have no maximum runtime unless you set one. Preemptible VMs always stop after 24 hours, so every 30-hour task would lose work to a **fixed runtime limit**.",
+    "whyWrong": {
+      "A": "Preemptible VMs use the same pricing model as Spot VMs, but Compute Engine always stops them after 24 hours. Google recommends Spot VMs instead.",
+      "C": "Standard VMs cost more than Spot VMs, and a commitment locks in spend for one or three years. The workload tolerates interruption, so it does not need standard VMs.",
+      "D": "Sole-tenant nodes provide dedicated hardware for isolation or licensing. They add cost and do not help an interruptible batch workload."
+    },
+    "sources": [
+      {
+        "title": "Preemptible VM instances",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/preemptible",
+        "evidence": "preemptible VMs can only run for up to 24 hours at a time, but Spot VMs don't have a maximum runtime unless you limit the runtime."
+      },
+      {
+        "title": "Spot VMs",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+        "evidence": "Spot VMs have significant discounts, but Compute Engine might preemptively stop or delete (preempt) Spot VMs to reclaim the capacity at any time."
+      }
+    ]
+  },
+  {
+    "id": "comp-007",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "custom-machine-types",
+      "licensing",
+      "rightsizing"
+    ],
+    "stem": "A licensed analytics engine is billed per vCPU. Load tests show that it needs 6 vCPUs and 36 GB of memory. The closest predefined machine types have 8 vCPUs, which raises the license cost. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use a predefined machine type with 8 vCPUs, and turn off two vCPUs in the guest operating system."
+      },
+      {
+        "id": "B",
+        "text": "Use a predefined machine type with 4 vCPUs, and add extended memory to reach 36 GB."
+      },
+      {
+        "id": "C",
+        "text": "Run the engine on a sole-tenant node, and limit the node to the licensed number of cores."
+      },
+      {
+        "id": "D",
+        "text": "Create the VM with a custom machine type that has 6 vCPUs and 36 GB of memory."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A custom machine type sets the exact number of vCPUs and the amount of memory. Google lists **per-CPU license costs** as a use case: match the vCPU count so that you do not pay licenses for unused processing power.",
+    "whyWrong": {
+      "A": "The VM still has 8 vCPUs, so you pay for them, and the license can still count them.",
+      "B": "Four vCPUs do not meet the tested need of six, and extended memory adds memory, not processing power.",
+      "C": "Sole-tenant nodes are for dedicated hardware requirements. They add cost, and a custom machine type already matches the vCPU count."
+    },
+    "sources": [
+      {
+        "title": "Create a VM with a custom machine type",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type",
+        "evidence": "Workloads that have per-CPU software license costs. Customize the number of vCPUs to avoid license costs for unused processing power or to match available software license counts."
+      }
+    ]
+  },
+  {
+    "id": "comp-008",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "sole-tenant",
+      "byol",
+      "licensing"
+    ],
+    "stem": "A company plans to move Windows Server workloads to Compute Engine. It wants to use its existing Windows Server licenses, which are licensed per physical core and require dedicated hardware. The licenses do not have License Mobility rights. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Import the images with the existing licenses, and run the VMs on standard multi-tenant hosts."
+      },
+      {
+        "id": "B",
+        "text": "Use Google-provided Windows Server images with licenses included, and run the VMs on sole-tenant nodes."
+      },
+      {
+        "id": "C",
+        "text": "Import the images with the existing licenses, and run the VMs on sole-tenant nodes."
+      },
+      {
+        "id": "D",
+        "text": "Use Google-provided Windows Server images with licenses included, and run the VMs as Spot VMs."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Physical-core licenses with **dedicated hardware requirements** need your own media on compliant hardware, such as sole-tenant nodes. Sole-tenant nodes are physical servers dedicated to your project, so the licenses stay compliant and the company **uses its existing licenses**.",
+    "whyWrong": {
+      "A": "Multi-tenant hosts do not meet the dedicated hardware requirement in the license terms.",
+      "B": "License-included images charge for new Windows Server licenses, so the company does not use its existing licenses.",
+      "D": "License-included images charge for new licenses, so the existing licenses are not used. Spot VMs also add preemption risk."
+    },
+    "sources": [
+      {
+        "title": "Bringing your own licenses",
+        "url": "https://docs.cloud.google.com/compute/docs/nodes/bringing-your-own-licenses",
+        "evidence": "Bringing your existing physical-core or physical-processor licenses that have dedicated hardware requirements requires you to bring your own media and to run that media on hardware configurations, such as sole-tenant nodes, that are compliant with your licenses."
+      },
+      {
+        "title": "Bringing your own licenses",
+        "url": "https://docs.cloud.google.com/compute/docs/nodes/bringing-your-own-licenses",
+        "evidence": "Sole-tenant nodes are physical servers dedicated to hosting virtual machine (VM) instances for only your project."
+      }
+    ]
+  },
+  {
+    "id": "comp-009",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "reservations",
+      "committed-use-discounts",
+      "capacity"
+    ],
+    "stem": "A retailer has a 3-year resource-based commitment for N2 vCPUs and memory in `us-central1`. For a sales event next month, it needs high assurance that 400 extra N2 VMs can start in `us-central1-a` on the day of the event. Finance wants the commitment discounts to apply wherever possible. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rely on the existing commitment, because a commitment holds capacity for its committed resources."
+      },
+      {
+        "id": "B",
+        "text": "Purchase a second commitment in `us-central1` that covers the 400 extra VMs."
+      },
+      {
+        "id": "C",
+        "text": "Create a reservation for the 400 VMs in `us-central1-a` before the event, and let the commitment discounts apply to it."
+      },
+      {
+        "id": "D",
+        "text": "Create the 400 VMs as Spot VMs on the day of the event to reduce the cost."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Commitments give discounts, but they do not reserve zonal capacity. To get discounted prices **and also ensure that capacity is reserved**, you must both purchase commitments and create reservations. A reservation in `us-central1-a` holds the capacity, and discounts from active commitments can apply to the reserved resources.",
+    "whyWrong": {
+      "A": "Commitments don't reserve zonal capacity, so the VMs can still fail to start if the zone lacks capacity.",
+      "B": "A new commitment adds discounts, but it still does not reserve capacity in the zone.",
+      "D": "Spot VMs have no availability guarantee and can be preempted at any time, so they cannot guarantee capacity for the event."
+    },
+    "sources": [
+      {
+        "title": "Combine reservations with committed use discounts",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/reservations-with-commitments",
+        "evidence": "To get zonal resources at discounted prices and also ensure that capacity is reserved for them, you must both purchase commitments and create reservations for those zonal resources."
+      },
+      {
+        "title": "Combine reservations with committed use discounts",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/reservations-with-commitments",
+        "evidence": "However, commitments don't reserve zonal capacity for your committed resources."
+      }
+    ]
+  },
+  {
+    "id": "comp-010",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "shielded-vm",
+      "confidential-vm",
+      "vm-security"
+    ],
+    "stem": "A financial services company runs a risk engine on Compute Engine. Its security policy adds two rules. First, the platform must detect boot-level or kernel-level malware on each VM. Second, data must stay encrypted in memory while the engine processes it. Which two features should you enable? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Shielded VM with Secure Boot and integrity monitoring"
+      },
+      {
+        "id": "B",
+        "text": "Customer-managed encryption keys (CMEK) for the persistent disks"
+      },
+      {
+        "id": "C",
+        "text": "Confidential VM"
+      },
+      {
+        "id": "D",
+        "text": "Sole-tenant nodes for the risk engine VMs"
+      },
+      {
+        "id": "E",
+        "text": "A VPC Service Controls perimeter around the project"
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Shielded VM gives verifiable integrity, so you can be confident that the VMs are not compromised by **boot-level or kernel-level malware**. Confidential VM uses hardware-based memory encryption, so data cannot be read or modified **while in use**.",
+    "whyWrong": {
+      "B": "CMEK controls the keys for data at rest on disks. It does not encrypt data in memory or check boot integrity.",
+      "D": "Sole-tenant nodes isolate hardware for your project. They do not encrypt memory or verify boot components.",
+      "E": "VPC Service Controls reduces data exfiltration through Google APIs. It does not protect the VM boot process or the VM memory."
+    },
+    "sources": [
+      {
+        "title": "Shielded VM overview",
+        "url": "https://docs.cloud.google.com/compute/shielded-vm/docs/shielded-vm",
+        "evidence": "Shielded VM offers verifiable integrity of your Compute Engine VM instances, so you can be confident your instances haven't been compromised by boot- or kernel-level malware or rootkits."
+      },
+      {
+        "title": "Confidential VM overview",
+        "url": "https://docs.cloud.google.com/confidential-computing/confidential-vm/docs/confidential-vm-overview",
+        "evidence": "They use hardware-based memory encryption to help ensure that your data and applications can't be read or modified while in use."
+      }
+    ]
+  },
+  {
+    "id": "comp-011",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "regional-mig",
+      "overprovisioning",
+      "high-availability"
+    ],
+    "stem": "A web tier needs 12 VMs to serve peak traffic. It runs in a region with three zones, behind a global external Application Load Balancer. If one zone fails during peak, the tier must keep serving all traffic without waiting for new VMs to start. You want the most cost-effective design that meets this goal. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a regional MIG with 12 VMs across the three zones, and enable autoscaling."
+      },
+      {
+        "id": "B",
+        "text": "Create two zonal MIGs in two zones, with 12 VMs in each group."
+      },
+      {
+        "id": "C",
+        "text": "Create a zonal MIG with 24 VMs, and enable autohealing."
+      },
+      {
+        "id": "D",
+        "text": "Create a regional MIG with 18 VMs across the three zones."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "With three zones, a zone failure removes one-third of the VMs. A regional MIG overprovisioned by 50% (18 VMs) still has 12 VMs in the other two zones, so it serves peak traffic **without waiting for new VMs**. Google recommends at least 50% overprovisioning for a regional MIG in three or more zones, and 18 VMs is the **most cost-effective** option that meets the goal.",
+    "whyWrong": {
+      "A": "After a zone fails, only 8 VMs remain until the autoscaler creates and starts new VMs. The stem does not allow that wait.",
+      "B": "This survives a zone failure, but it runs 24 VMs instead of 18 and has two groups to manage.",
+      "C": "A zonal MIG runs in one zone, so a zone failure stops all 24 VMs. Autohealing cannot recreate VMs in a failed zone."
+    },
+    "sources": [
+      {
+        "title": "About regional MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+        "evidence": "When you create a regional MIG in a region with at least three zones, Google recommends overprovisioning your group by at least 50%."
+      },
+      {
+        "title": "About regional MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+        "evidence": "No new instances are added and no instances are redistributed (unless you set up autoscaling)."
+      }
+    ]
+  },
+  {
+    "id": "comp-012",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "mig-updates",
+      "rolling-update",
+      "regional-mig"
+    ],
+    "stem": "A regional MIG runs 9 VMs across three zones and serves at full capacity all day. You must roll out a new instance template with a proactive update. At no time can fewer than 9 VMs serve traffic. The project has quota for extra VMs. Which update settings should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`maxSurge=3` and `maxUnavailable=0`"
+      },
+      {
+        "id": "B",
+        "text": "`maxSurge=1` and `maxUnavailable=0`"
+      },
+      {
+        "id": "C",
+        "text": "`maxSurge=0` and `maxUnavailable=3`"
+      },
+      {
+        "id": "D",
+        "text": "The default `maxSurge` and `maxUnavailable` values for a regional MIG"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "To avoid any unavailable VMs during an update, set `maxUnavailable` to 0 and `maxSurge` above 0. For a regional MIG, a fixed value must be 0 or at least the number of zones. With **three zones**, `maxSurge` must therefore be at least 3.",
+    "whyWrong": {
+      "B": "A fixed `maxSurge` of 1 is not allowed for a MIG in three zones, because the updater must create an extra VM in each zone.",
+      "C": "Without surge, the MIG takes 3 VMs offline at a time, so fewer than 9 VMs serve traffic.",
+      "D": "The regional defaults set both values to the number of zones, so up to 3 VMs can be unavailable at a time."
+    },
+    "sources": [
+      {
+        "title": "Automatically apply VM configuration updates in a MIG",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/rolling-out-updates-to-managed-instance-groups",
+        "evidence": "If you do not want any unavailable machines during an update, set the maxUnavailable value to 0 and the maxSurge value to greater than 0."
+      },
+      {
+        "title": "Automatically apply VM configuration updates in a MIG",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/rolling-out-updates-to-managed-instance-groups",
+        "evidence": "If you are using fixed numbers when specifying an update, the fixed number must be either 0 or equal to or greater than the number of zones associated with the regional MIG."
+      }
+    ]
+  },
+  {
+    "id": "comp-013",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "autohealing",
+      "health-checks",
+      "mig"
+    ],
+    "stem": "VMs in a MIG run a startup script that installs dependencies, which takes about 6 minutes. After you turned on autohealing, the MIG keeps recreating the new VMs before the application starts, and the group never becomes stable. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Turn off autohealing, and rely on the load balancer health check to remove failed VMs."
+      },
+      {
+        "id": "B",
+        "text": "Change the startup script to answer the health check before it installs the dependencies."
+      },
+      {
+        "id": "C",
+        "text": "Convert the group to a stateful MIG so that recreated VMs keep their disks."
+      },
+      {
+        "id": "D",
+        "text": "Set the autohealing initial delay to a value longer than the startup time."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "During the initial delay, the MIG ignores failed health checks because the VM might still be starting. An initial delay longer than the **6-minute startup** stops the MIG from recreating VMs too early, and autohealing still works after startup.",
+    "whyWrong": {
+      "A": "The load balancer only sends traffic away from unhealthy VMs. Without autohealing, the MIG still repairs VMs that fail, but it does not recreate VMs whose application freezes or crashes.",
+      "B": "The health check would report healthy before the application is ready, so the load balancer can send traffic to VMs that cannot serve it.",
+      "C": "A stateful MIG preserves disks and IP addresses. It does not change when the MIG starts to act on failed health checks."
+    },
+    "sources": [
+      {
+        "title": "Set up an application-based health check and autohealing",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/autohealing-instances-in-migs",
+        "evidence": "During a VM's initial delay period, the MIG ignores unsuccessful health checks because the VM might be in the startup process. This prevents the MIG from prematurely recreating a VM."
+      }
+    ]
+  },
+  {
+    "id": "comp-014",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "vm-manager",
+      "patch-management",
+      "os-config"
+    ],
+    "stem": "An operations team manages 200 Linux VMs across three zones. It must install OS patches every month during a weekend window. No more than 10% of the VMs in a zone can be disrupted at one time. The team wants a managed Google Cloud feature instead of custom scripts. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a startup script that upgrades all packages, and restart every VM once a month."
+      },
+      {
+        "id": "B",
+        "text": "Create a VM Manager patch deployment with a monthly schedule, a zone-by-zone rollout, and a 10% disruption budget."
+      },
+      {
+        "id": "C",
+        "text": "Create an OS policy assignment that installs a fixed list of package versions on all VMs."
+      },
+      {
+        "id": "D",
+        "text": "Use Cloud Scheduler to call a Cloud Run function that connects to each VM over SSH and runs updates."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A VM Manager patch deployment schedules patch jobs. A patch job can patch **one zone at a time** and uses a **disruption budget**, which is the maximum number or percentage of VMs per zone to disrupt at once. This is a managed feature, so no custom scripts are necessary.",
+    "whyWrong": {
+      "A": "Restarting every VM upgrades all VMs at the same time. There is no disruption budget and no patch compliance reporting.",
+      "C": "OS policies keep a configuration in place. A fixed package list does not schedule monthly patching or limit disruption in each zone.",
+      "D": "This is a custom solution that needs SSH access, retries, and error handling, which the team wants to avoid."
+    },
+    "sources": [
+      {
+        "title": "About Patch",
+        "url": "https://docs.cloud.google.com/compute/vm-manager/docs/patch",
+        "evidence": "Patch deployment, which automates the operating system and software patch update process. A patch deployment schedules patch jobs. A patch job runs across VM instances and applies patches."
+      },
+      {
+        "title": "Create patch jobs",
+        "url": "https://docs.cloud.google.com/compute/vm-manager/docs/patch/create-patch-job",
+        "evidence": "A disruption budget is the maximum number (or percentage) of VMs per zone to disrupt at any given moment."
+      },
+      {
+        "title": "Create patch jobs",
+        "url": "https://docs.cloud.google.com/compute/vm-manager/docs/patch/create-patch-job",
+        "evidence": "You can choose to either patch VMs one zone at a time (zone by zone), or to patch all zones at once (concurrent zones)."
+      }
+    ]
+  },
+  {
+    "id": "comp-015",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "workload-identity",
+      "gke",
+      "least-privilege"
+    ],
+    "stem": "Pods in a GKE Standard cluster must read objects from one Cloud Storage bucket. The security team forbids service account keys and requires least privilege. Workload Identity Federation for GKE is not enabled on the cluster yet. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Storage Object Viewer role on the bucket to the service account of the node pool."
+      },
+      {
+        "id": "B",
+        "text": "Enable Workload Identity Federation for GKE on the cluster and on its node pools."
+      },
+      {
+        "id": "C",
+        "text": "Create a key for a service account, and mount it into the Pods from a Kubernetes Secret."
+      },
+      {
+        "id": "D",
+        "text": "Grant the Storage Object Viewer role on the project to all Pods in the cluster."
+      },
+      {
+        "id": "E",
+        "text": "Grant the Storage Object Viewer role on the bucket to the principal identifier of the Pods' Kubernetes ServiceAccount."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "In Standard, you enable Workload Identity Federation for GKE on the cluster and then on the node pools. Enabling it grants no permissions. You then grant a role on the **one bucket** to the principal that represents the Kubernetes ServiceAccount. The Pods get their own identity with **least privilege** and **no keys**.",
+    "whyWrong": {
+      "A": "All workloads on a node share the node service account, so every Pod on those nodes gets access. This breaks least privilege.",
+      "C": "Service account keys are a security risk, and the security team forbids them.",
+      "D": "A grant on the project gives access to every bucket in the project, and to Pods that do not need it."
+    },
+    "sources": [
+      {
+        "title": "Authenticate to Google Cloud APIs from GKE workloads",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/workload-identity",
+        "evidence": "In Standard, you enable Workload Identity Federation for GKE on clusters and node pools using the Google Cloud CLI or the Google Cloud console."
+      },
+      {
+        "title": "About Workload Identity Federation for GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+        "evidence": "To provide access with Workload Identity Federation for GKE, you create an IAM allow policy that grants access on a specific Google Cloud resource to a principal that corresponds to your application's identity."
+      },
+      {
+        "title": "About Workload Identity Federation for GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+        "evidence": "The Compute Engine service account is shared by all workloads deployed on that node."
+      }
+    ]
+  },
+  {
+    "id": "comp-016",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "workload-identity",
+      "identity-sameness",
+      "multi-tenancy"
+    ],
+    "stem": "Your production GKE cluster uses Workload Identity Federation for GKE. IAM allows the `backend` Kubernetes ServiceAccount in the `backend` namespace to read customer data. A contractor team needs its own cluster, and the contractors will have cluster-admin rights on it. The platform team wants to create that cluster in the production project to save time. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create the contractor cluster in a separate project, so that it uses a different workload identity pool."
+      },
+      {
+        "id": "B",
+        "text": "Create the contractor cluster in the production project, and use Kubernetes RBAC to block the `backend` namespace name."
+      },
+      {
+        "id": "C",
+        "text": "Create the contractor cluster in the production project, with a dedicated service account for its nodes."
+      },
+      {
+        "id": "D",
+        "text": "Create the contractor cluster in the production project, and enable GKE Sandbox on its node pools."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Clusters in the same project share one workload identity pool, and IAM treats the same namespace and ServiceAccount in those clusters as one identity. Contractors with **cluster-admin rights** could create a `backend` namespace and ServiceAccount and get the production access. A separate project gives the contractor cluster a separate pool.",
+    "whyWrong": {
+      "B": "The contractors are cluster admins, so they can change RBAC in their own cluster. RBAC also does not change how IAM identifies principals.",
+      "C": "Workload Identity Federation for GKE principals do not depend on the node service account. The `backend` ServiceAccount still maps to the same IAM principal.",
+      "D": "GKE Sandbox isolates Pods from the node kernel. It does not change the workload identity pool or the IAM principals."
+    },
+    "sources": [
+      {
+        "title": "About Workload Identity Federation for GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+        "evidence": "This identity sameness also means that you must be able to trust every cluster in a specific workload identity pool."
+      },
+      {
+        "title": "About Workload Identity Federation for GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+        "evidence": "To avoid untrusted access, place your clusters in separate projects to ensure that they get different workload identity pools, or ensure that the namespace names are distinct from each other to avoid a common principal identifier."
+      }
+    ]
+  },
+  {
+    "id": "comp-017",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke-upgrades",
+      "maintenance-exclusions",
+      "release-channels"
+    ],
+    "stem": "A bank runs GKE Standard clusters in the Regular release channel. Before it adopts a new Kubernetes minor version, it runs a qualification process that takes about five months. During that time, the clusters must still receive security patches. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the clusters from the release channel, and disable node auto-upgrade."
+      },
+      {
+        "id": "B",
+        "text": "Add a \"No upgrades\" maintenance exclusion that lasts five months."
+      },
+      {
+        "id": "C",
+        "text": "Add a \"No minor upgrades\" maintenance exclusion that ends at the end of support for the current minor version."
+      },
+      {
+        "id": "D",
+        "text": "Move the clusters to the Rapid channel, so that new versions arrive earlier for testing."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The \"No minor upgrades\" scope keeps the current minor version while patch upgrades continue, and it can last until the end of support for that minor version. Google recommends maintenance exclusions, not leaving the release channel, to keep a cluster on a version. The **five-month** hold and the **security patches** both point to this scope.",
+    "whyWrong": {
+      "A": "\"No channel\" is deprecated, and clusters without a channel are still upgraded automatically. Google recommends a release channel with maintenance exclusions.",
+      "B": "A \"No upgrades\" exclusion cannot exceed 90 days, and it also blocks security patches.",
+      "D": "Rapid versions are excluded from the GKE SLA, and this change does not keep production clusters on their current minor version."
+    },
+    "sources": [
+      {
+        "title": "Maintenance windows and exclusions",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/maintenance-windows-and-exclusions",
+        "evidence": "No minor upgrades - maintain current Kubernetes minor version: You want to maintain the minor version of a cluster to, for example, avoid API changes or validate the next minor version."
+      },
+      {
+        "title": "Maintenance windows and exclusions",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/maintenance-windows-and-exclusions",
+        "evidence": "Cannot exceed 90 days. We recommend limiting the length of this type of maintenance exclusion to less than 30 days."
+      },
+      {
+        "title": "About release channels",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/release-channels",
+        "evidence": "If you need to keep a cluster on a specific version, for example to validate or test newer versions prior to upgrading, we recommend using maintenance exclusions."
+      }
+    ]
+  },
+  {
+    "id": "comp-018",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke-networking",
+      "control-plane-access",
+      "vpc-service-controls"
+    ],
+    "stem": "A GKE cluster has private nodes, and its external control plane endpoint is disabled. Developers on-premises and a CI system in another cloud must run `kubectl` against the cluster. The security team wants IAM to decide access and VPC Service Controls to protect the control plane. The team does not want to operate a bastion host. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable the DNS-based endpoint for the control plane, and grant IAM roles to the developers and to the CI identity."
+      },
+      {
+        "id": "B",
+        "text": "Enable the external IP-based endpoint, and add the office and CI IP ranges as authorized networks."
+      },
+      {
+        "id": "C",
+        "text": "Create a bastion VM in the cluster's VPC network, and allow SSH to it through IAP."
+      },
+      {
+        "id": "D",
+        "text": "Create Cloud VPN tunnels from each environment, and use the internal IP-based endpoint."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The DNS-based endpoint is reachable from any network that can reach Google Cloud APIs, and **IAM controls access**. It removes the need for a **bastion host**. Clusters get **VPC Service Controls** protection when clients use the DNS-based endpoint.",
+    "whyWrong": {
+      "B": "Authorized networks control access by IP address, not by IAM. VPC Service Controls also does not directly support a control plane with a public IP address.",
+      "C": "A bastion host is the operational overhead that the security team wants to avoid.",
+      "D": "VPN tunnels to each environment, including another cloud, add network setup and operations. The DNS-based endpoint needs only IAM permissions."
+    },
+    "sources": [
+      {
+        "title": "About network isolation in GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/network-isolation",
+        "evidence": "Enabling the DNS-based endpoint eliminates the need for a bastion host or proxy nodes to access the control plane from other VPC networks or external locations."
+      },
+      {
+        "title": "About network isolation in GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/network-isolation",
+        "evidence": "However, GKE clusters, including both private and public clusters, gain protection from VPC Service Controls when you access them using the DNS-based endpoint."
+      }
+    ]
+  },
+  {
+    "id": "comp-019",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "gke-autoscaling",
+      "hpa",
+      "cluster-autoscaler"
+    ],
+    "stem": "An order service runs on GKE Standard and pulls messages from a Pub/Sub subscription. During sales, the subscription backlog grows for hours, but the Deployment stays at 5 replicas. When an operator adds replicas manually, the new Pods stay Pending. You want the platform to scale automatically with the backlog. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure a Vertical Pod Autoscaler in `Auto` mode and a Horizontal Pod Autoscaler, both on CPU."
+      },
+      {
+        "id": "B",
+        "text": "Resize the node pool on a schedule before each sale by using a Cloud Scheduler job."
+      },
+      {
+        "id": "C",
+        "text": "Configure a Horizontal Pod Autoscaler that uses the subscription backlog as an external metric."
+      },
+      {
+        "id": "D",
+        "text": "Create a second cluster, and put both clusters behind a multi-cluster Gateway."
+      },
+      {
+        "id": "E",
+        "text": "Enable the cluster autoscaler on the node pool with a suitable maximum node count."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "The HPA can scale Pods on an external metric, such as the size of a Pub/Sub backlog. The new Pods stay **Pending** because the nodes are full. The cluster autoscaler adds nodes when Pods cannot be scheduled, up to the maximum size of the node pool.",
+    "whyWrong": {
+      "A": "Google says not to use the HPA and the VPA together on CPU or memory. The VPA also changes Pod requests, not the replica count that the backlog needs.",
+      "B": "A schedule does not follow the real backlog, so the service is still over-provisioned or under-provisioned.",
+      "D": "A multi-cluster Gateway routes HTTP traffic from a load balancer. This service pulls from Pub/Sub, and a second cluster does not make either cluster scale."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "You can create an external metric for the size of the queue, and configure the horizontal Pod autoscaler to automatically increase the number of Pods when the queue size reaches a given threshold"
+      },
+      {
+        "title": "About GKE cluster autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler",
+        "evidence": "If Pods fail to be scheduled on any of the current nodes, the cluster autoscaler adds nodes, up to the maximum size of the node pool."
+      },
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "Don't use the horizontal Pod autoscaler together with the vertical Pod autoscaler on CPU or memory."
+      }
+    ]
+  },
+  {
+    "id": "comp-020",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "multi-cluster-gateway",
+      "fleet",
+      "gke-networking"
+    ],
+    "stem": "A game company runs the same stateless HTTP service on GKE clusters in `us-central1` and `europe-west1`. It wants one global entry point that sends players to the closest healthy cluster. The platform team wants to manage the routing rules as Kubernetes resources in one place. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a `LoadBalancer` Service in each cluster, and use Cloud DNS geolocation routing between the two IP addresses."
+      },
+      {
+        "id": "B",
+        "text": "Create an Ingress resource in each cluster, and publish both load balancer IP addresses to players."
+      },
+      {
+        "id": "C",
+        "text": "Enable multi-cluster Services, and expose the Services through an internal passthrough Network Load Balancer in each cluster."
+      },
+      {
+        "id": "D",
+        "text": "Register both clusters to a fleet, choose a config cluster, and deploy a multi-cluster Gateway and HTTPRoutes there."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A multi-cluster Gateway uses Google Cloud global load balancing to give a single entry point for Services in several clusters. All the clusters must be registered to a fleet, and you deploy the Gateway and HTTPRoute resources only to the config cluster, which gives **one place** to manage routing.",
+    "whyWrong": {
+      "A": "DNS routing points players at two regional load balancer IP addresses, not one global entry point. The routing also lives in DNS, not in Kubernetes resources.",
+      "B": "Each Ingress creates a separate load balancer with its own IP address, so players do not get one global entry point.",
+      "C": "Multi-cluster Services handles service discovery between clusters. Internal load balancers do not serve players on the internet."
+    },
+    "sources": [
+      {
+        "title": "About multi-cluster Gateways",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-gateways",
+        "evidence": "Multi-cluster Gateways uses Google Cloud's global load-balancing infrastructure to provide a single, unified entry point for your applications."
+      },
+      {
+        "title": "About multi-cluster Gateways",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-gateways",
+        "evidence": "All GKE clusters that participate in a multi-cluster Gateway setup must be registered to a fleet."
+      },
+      {
+        "title": "About multi-cluster Gateways",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-gateways",
+        "evidence": "You deploy all multi-cluster Gateway API resources, such as Gateway and HTTPRoute, only to this designated cluster."
+      }
+    ]
+  },
+  {
+    "id": "comp-021",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-run",
+      "direct-vpc-egress",
+      "serverless-networking"
+    ],
+    "stem": "A Cloud Run service must connect to a Memorystore for Redis instance that has only a private IP address. You want the Google-recommended option with the lowest cost and no extra VMs to manage. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Serverless VPC Access connector, and attach it to the Cloud Run service."
+      },
+      {
+        "id": "B",
+        "text": "Configure Direct VPC egress on the service, with a subnet in the Memorystore VPC network."
+      },
+      {
+        "id": "C",
+        "text": "Set the ingress setting of the service to Internal, so that the service can reach the VPC network."
+      },
+      {
+        "id": "D",
+        "text": "Deploy a proxy VM with an external IP address in front of the Memorystore instance."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Direct VPC egress sends traffic from Cloud Run to a VPC network without a Serverless VPC Access connector. You pay only for network egress and no compute charges, so it has the **lowest cost** and **no extra VMs**. Google recommends it.",
+    "whyWrong": {
+      "A": "A connector works, but it runs Compute Engine VMs that you pay for. It also has higher latency and lower throughput than Direct VPC egress.",
+      "C": "Ingress settings control which sources can reach the service. They do not give the service a path into the VPC network.",
+      "D": "An extra VM with an external IP address adds cost, management work, and exposure to the internet."
+    },
+    "sources": [
+      {
+        "title": "Compare Direct VPC egress and VPC connectors",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/connecting-vpc",
+        "evidence": "With Direct VPC egress, you pay only for network egress (at the same rate as connectors). You do not pay any compute charges."
+      },
+      {
+        "title": "Direct VPC with a VPC network",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/vpc-direct-vpc",
+        "evidence": "Direct VPC egress allows your Cloud Run service to send traffic to a VPC network without a Serverless VPC Access connector."
+      }
+    ]
+  },
+  {
+    "id": "comp-022",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "ingress",
+      "cloud-armor"
+    ],
+    "stem": "A public web app runs on Cloud Run behind a global external Application Load Balancer with Google Cloud Armor policies. A penetration test shows that attackers can bypass Cloud Armor by calling the service's `run.app` URL directly. The app must stay public through the load balancer. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the ingress setting of the service to Internal."
+      },
+      {
+        "id": "B",
+        "text": "Set the ingress setting of the service to Internal and Cloud Load Balancing."
+      },
+      {
+        "id": "C",
+        "text": "Remove the `allUsers` Cloud Run Invoker binding from the service."
+      },
+      {
+        "id": "D",
+        "text": "Add a Cloud Armor rule that blocks requests for the `run.app` host name."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The Internal and Cloud Load Balancing setting accepts internet requests only through the external Application Load Balancer. Direct internet requests to the `run.app` URL are not allowed, so all internet traffic passes **Cloud Armor**, and the app **stays public** through the load balancer.",
+    "whyWrong": {
+      "A": "Internal allows internal Application Load Balancers but not the external Application Load Balancer, so the public app stops working.",
+      "C": "IAM authentication applies on every ingress path. Without public invoker access, anonymous requests through the load balancer also fail, so the public app breaks.",
+      "D": "Direct requests to the `run.app` URL do not pass through the load balancer, so Cloud Armor never sees them."
+    },
+    "sources": [
+      {
+        "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+        "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+        "evidence": "Accept requests from the internet through the external Application Load Balancer. Direct requests to the run.app URL from the internet are not allowed."
+      },
+      {
+        "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+        "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+        "evidence": "IAM authentication still applies to requests reaching the service or instance endpoints from any of the preceding network ingress paths."
+      }
+    ]
+  },
+  {
+    "id": "comp-023",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-run",
+      "iam",
+      "organization-policy"
+    ],
+    "stem": "Your organization enforces the domain restricted sharing constraint. A team must publish a public marketing API on Cloud Run. Its attempt to grant the Cloud Run Invoker role to `allUsers` fails. What is the Google-recommended way to make the service public?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Disable the Cloud Run Invoker IAM check on the service."
+      },
+      {
+        "id": "B",
+        "text": "Remove the domain restricted sharing constraint from the organization."
+      },
+      {
+        "id": "C",
+        "text": "Grant the Cloud Run Invoker role to a Google group that contains all company users."
+      },
+      {
+        "id": "D",
+        "text": "Put the service behind an internal Application Load Balancer."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Google recommends that you disable the Cloud Run Invoker IAM check to make a service public. Google names this solution for projects that are subject to the **domain restricted sharing** constraint.",
+    "whyWrong": {
+      "B": "Removing an organization-wide guardrail weakens security for every project to meet the need of one service.",
+      "C": "A group of company users does not make the API available to users on the internet.",
+      "D": "An internal load balancer is reachable only from internal networks, so internet users cannot call the API."
+    },
+    "sources": [
+      {
+        "title": "Allowing public (unauthenticated) access",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/public",
+        "evidence": "The recommended way to make a public service is to disable the Cloud Run Invoker IAM check."
+      },
+      {
+        "title": "Allowing public (unauthenticated) access",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/public",
+        "evidence": "Use this solution when the project is subject to the domain restricted sharing constraint in an organization policy."
+      }
+    ]
+  },
+  {
+    "id": "comp-024",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "cloud-nat",
+      "static-ip"
+    ],
+    "stem": "A Cloud Run service calls a partner API that accepts requests only from allowlisted IP addresses. The partner will allowlist one static IP address for your service. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure Direct VPC egress on the service with `--vpc-egress=private-ranges-only`."
+      },
+      {
+        "id": "B",
+        "text": "Configure Direct VPC egress on the service with `--vpc-egress=all-traffic`."
+      },
+      {
+        "id": "C",
+        "text": "Reserve a static external IP address, and assign it directly to the Cloud Run service."
+      },
+      {
+        "id": "D",
+        "text": "Create a Cloud NAT gateway for the egress subnet that uses a reserved static external IP address."
+      },
+      {
+        "id": "E",
+        "text": "Set the ingress setting of the service to Internal and Cloud Load Balancing."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "To use a **static outbound IP address**, send all outbound traffic from the service through a VPC network that has a Cloud NAT gateway with the static address. The `all-traffic` egress setting sends internet-bound calls into the VPC network, where Cloud NAT uses the reserved address.",
+    "whyWrong": {
+      "A": "`private-ranges-only` sends only traffic for private IP addresses to the VPC network. Calls to the partner's public address still leave from a dynamic IP address pool.",
+      "C": "By default, a Cloud Run service uses a dynamic IP address pool for outbound traffic. You get a static address through Cloud NAT, not by assigning an address to the service.",
+      "E": "Ingress settings control inbound requests. They do not change the source IP address of outbound calls."
+    },
+    "sources": [
+      {
+        "title": "Static outbound IP address",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/static-outbound-ip",
+        "evidence": "configure the Cloud Run service's VPC egress to route all outbound traffic through a VPC network that has a Cloud NAT gateway configured with the static IP address."
+      },
+      {
+        "title": "Static outbound IP address",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/static-outbound-ip",
+        "evidence": "By default, a Cloud Run service connects to external endpoints on the internet using a dynamic IP address pool."
+      },
+      {
+        "title": "gcloud run deploy",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/run/deploy",
+        "evidence": "Default option. Sends outbound traffic to private IP addresses (RFC 1918 and Private Google Access IPs) through Direct VPC egress or the VPC connector."
+      }
+    ]
+  },
+  {
+    "id": "comp-025",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "billing",
+      "background-processing"
+    ],
+    "stem": "A Cloud Run service returns an HTTP 202 response at once and then continues to process each request in a background thread for up to 2 minutes. Users report that the background work often stalls or never finishes. Traffic is steady during business hours. You want the smallest change that fixes the problem. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Switch the service to instance-based billing."
+      },
+      {
+        "id": "B",
+        "text": "Increase the request timeout of the service to 60 minutes."
+      },
+      {
+        "id": "C",
+        "text": "Set minimum instances to keep several instances warm."
+      },
+      {
+        "id": "D",
+        "text": "Enable startup CPU boost on the service."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "With request-based billing, Cloud Run allocates CPU only while it processes a request, so work **after the response** gets no CPU. Instance-based billing allocates CPU for the whole instance lifecycle and supports short background tasks after a response. **Steady traffic** also suits instance-based billing, and the change is a single setting.",
+    "whyWrong": {
+      "B": "The request ends when the service sends its response. A longer timeout does not give CPU to work that runs after the response.",
+      "C": "Minimum instances keep instances ready, but with request-based billing those instances still get CPU only during requests.",
+      "D": "Startup CPU boost adds CPU only during startup and for 10 seconds after it. It does not help work that runs after each response."
+    },
+    "sources": [
+      {
+        "title": "Billing settings for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+        "evidence": "Selecting instance-based billing allocates CPU even outside of request processing, letting you execute short-lived background tasks and other asynchronous processing work after returning responses."
+      },
+      {
+        "title": "Billing settings for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+        "evidence": "With request-based billing, CPU is only allocated during request processing."
+      },
+      {
+        "title": "Billing settings for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+        "evidence": "Instance-based billing is recommended when incoming traffic is steady, slowly varying."
+      }
+    ]
+  },
+  {
+    "id": "comp-026",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "vmware-engine",
+      "vpc-peering",
+      "hybrid-networking"
+    ],
+    "stem": "Your company created a new Google Cloud project this year and deployed a VMware Engine private cloud on a Standard VMware Engine network. Application servers on Compute Engine in an existing VPC network must reach the VMware VMs over internal IP addresses. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable private services access on the VPC network, and create a private connection to VMware Engine."
+      },
+      {
+        "id": "B",
+        "text": "Create a VPC Network Peering between the VPC network and the VMware Engine network."
+      },
+      {
+        "id": "C",
+        "text": "Create an HA VPN tunnel between the VPC network and the NSX edge of the private cloud."
+      },
+      {
+        "id": "D",
+        "text": "Attach the VMware Engine network to the VPC network as a Shared VPC service project."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A **Standard** VMware Engine network connects to a VPC network through a VPC Network Peering between the two networks. The peering gives communication over internal IP addresses between Compute Engine VMs and VMware VMs.",
+    "whyWrong": {
+      "A": "Private services access and private connections are for Legacy VMware Engine networks. Only projects created before November 2023 have them.",
+      "C": "A VPN adds gateways and tunnels to operate. The documented connection between a VPC network and a Standard VMware Engine network is VPC Network Peering.",
+      "D": "A VMware Engine network is not a project, so it cannot be a Shared VPC service project. It can peer with a Shared VPC network instead."
+    },
+    "sources": [
+      {
+        "title": "About VMware Engine networks",
+        "url": "https://docs.cloud.google.com/vmware-engine/docs/networking/vmware-engine-network",
+        "evidence": "To establish communication to VMware Engine from your VPC network, you must create a VPC Network peering relationship between your VPC network and a VMware Engine network."
+      },
+      {
+        "title": "About VMware Engine networks",
+        "url": "https://docs.cloud.google.com/vmware-engine/docs/networking/vmware-engine-network",
+        "evidence": "In addition, projects created before November 2023 have Legacy VMware Engine Networks, which are regional networks that must exist in each region that contains a private cloud."
+      }
+    ]
+  }
+]

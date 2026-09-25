@@ -1,0 +1,2820 @@
+[
+  {
+    "id": "arch-001",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "workload-disposition",
+      "rehost",
+      "migration-types"
+    ],
+    "stem": "A manufacturer must leave its colocation data center in five months, when the lease ends. One workload is a quality-control application from a vendor that went out of business. The company has only the compiled binaries, not the source code, and the plant cannot operate without the application. The application runs on a Linux version that Compute Engine supports. Which migration approach should you recommend for this workload?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Refactor the application into containers on GKE, so that it can scale horizontally after the move."
+      },
+      {
+        "id": "B",
+        "text": "Rebuild the application as a cloud-native service before the lease ends, and then retire the binaries."
+      },
+      {
+        "id": "C",
+        "text": "Rehost the application on Compute Engine VMs, with only the minimum changes that it needs to run."
+      },
+      {
+        "id": "D",
+        "text": "Retire the application now, and ask the plant to replace its functions with a SaaS product later."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding constraints are no source code, a workload that the business cannot decommission, and a five-month deadline. Google says that when you cannot refactor a workload and cannot decommission it, you must use a rehost migration. Rehost is also the quickest migration type, so it fits the lease deadline. The company can modernize the workload later if the business needs it.",
+    "whyWrong": {
+      "A": "A refactor changes the code of the workload, and the company has no source code. A refactor also takes longer than a rehost.",
+      "B": "A rebuild rewrites the application from scratch. It can take longer than a rehost or a refactor, which puts the five-month deadline at risk.",
+      "D": "The plant cannot operate without the application, so retiring it now breaks a business requirement."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "If you cannot refactor a workload to migrate and cannot decommission the workload, you must use a rehost migration."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "Because you migrate existing workloads with minimal refactoring, rehost migrations tend to be the quickest, compared to refactor or rebuild migrations."
+      }
+    ]
+  },
+  {
+    "id": "arch-002",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "success-measures",
+      "sli",
+      "slo",
+      "user-experience"
+    ],
+    "stem": "An online retailer wants a reliability measure for its checkout service that the business can track against a monthly target. Last month, CPU usage on the checkout VMs stayed high for several days while customers completed purchases without problems. On another day, CPU usage was low, but a misconfigured dependency made many payment requests fail. Which measure should you use as the service level indicator (SLI)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The ratio of successful checkout requests to all checkout requests, measured at the load balancer"
+      },
+      {
+        "id": "B",
+        "text": "The average CPU utilization of the checkout VMs, measured by Cloud Monitoring every minute"
+      },
+      {
+        "id": "C",
+        "text": "The percentage of time that all checkout VMs pass the health checks of the load balancer"
+      },
+      {
+        "id": "D",
+        "text": "The number of checkout VMs that the managed instance group runs during each hour"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The business needs a measure of what users experience. The reliability pillar says to focus on metrics like the success ratio of user requests. It also says not to rely only on server-centric metrics like CPU usage. When you cannot collect data on the user's device, the load balancer or the frontend is a good measurement point. The scenario shows that CPU usage did not match the user impact in either direction.",
+    "whyWrong": {
+      "B": "CPU usage is a server-centric metric. The scenario shows high CPU usage with no user impact, and low CPU usage while payments failed.",
+      "C": "Health checks measure whether instances respond, not whether checkout requests succeed. Instances can pass health checks while a failed dependency makes requests fail.",
+      "D": "The number of VMs describes capacity. It does not show whether customers can complete a checkout."
+    },
+    "sources": [
+      {
+        "title": "Define reliability based on user-experience goals",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/define-reliability-based-on-user-experience-goals",
+        "evidence": "Focus on metrics like the success ratio of user requests. Don't rely solely on server-centric metrics, like CPU usage, which can lead to misleading conclusions about your service's reliability."
+      },
+      {
+        "title": "Define reliability based on user-experience goals",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/define-reliability-based-on-user-experience-goals",
+        "evidence": "For example, you can use the load balancer or frontend service as the measurement point."
+      }
+    ]
+  },
+  {
+    "id": "arch-003",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "tco",
+      "business-case",
+      "cost-optimization",
+      "network-cost"
+    ],
+    "stem": "A logistics company prepares a business case to move 300 on-premises VMs to Google Cloud. The finance team compares the hourly price of equivalent Compute Engine VMs with the purchase price of new servers. It concludes that the cloud costs more. Several of the workloads exchange large volumes of data with partner systems every day. The CFO asks you to review the comparison before the board meeting. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Accept the comparison, and move only the workloads whose VM price is lower than the price of new servers."
+      },
+      {
+        "id": "B",
+        "text": "Redo the comparison with Spot VM prices for all 300 workloads, because Spot VMs cost less than standard VMs."
+      },
+      {
+        "id": "C",
+        "text": "Replace the comparison with a pricing calculator estimate for VMs that keep their current on-premises sizes."
+      },
+      {
+        "id": "D",
+        "text": "Build a TCO model that adds data center operating costs, such as power and cooling, and includes cloud network costs."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The comparison leaves out costs on both sides. Google says that a TCO model must include all the operational costs of your own data center, such as power, cooling, maintenance, and support services. Network use is a commonly overlooked cloud cost, and it matters here because several workloads move large volumes of data every day. A complete TCO model gives the board a fair comparison.",
+    "whyWrong": {
+      "A": "The comparison ignores data center operating costs and cloud network costs, so a decision based on it uses incomplete data.",
+      "B": "Spot VM prices assume that every workload can tolerate preemption. The comparison also still leaves out operating costs and network costs.",
+      "C": "A calculator estimate is one input to a TCO model. On its own, it still leaves out data center operating costs, and it keeps VM sizes that might be too large."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "When building this cost model, you should consider not only the costs for hardware and software, but also all the operational costs of running your own data center, such as power, cooling, maintenance, and other support services."
+      },
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "A commonly overlooked cost when considering cloud migrations is the use of a cloud network."
+      }
+    ]
+  },
+  {
+    "id": "arch-004",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "non-functional-requirements",
+      "availability",
+      "slo",
+      "sla"
+    ],
+    "stem": "A payments company had a 40-minute outage of its merchant portal in March. The operations team says that the portal still met its 99.99% availability target, because the portal was down for only 40 minutes this year. The sales team says that the portal missed the target, because merchants were promised at most about 4 minutes of downtime each month. Leadership asks you what to do before anyone changes the architecture. What should you do first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy the portal in a second region behind a global load balancer, so that it meets the stricter reading of the target."
+      },
+      {
+        "id": "B",
+        "text": "Agree with the business on the measurement window of the target, record it in the SLO, and then check the architecture."
+      },
+      {
+        "id": "C",
+        "text": "Raise the availability target to 99.999%, so that the portal meets both readings, and redesign the portal for it."
+      },
+      {
+        "id": "D",
+        "text": "Keep the annual reading of the target, because an annual window gives the operations team more room for maintenance."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The two teams read the same number with different measurement windows: a year or a month. Google's reliability guide uses this exact case to show that outages can expose mismatched expectations between teams. In its example, one team accepts a 45-minute outage once a year as 99.99% annual availability. Another team expects at most 4.3 minutes of downtime each month. You first clarify the requirement, including its window, and then adjust the architecture to meet it. The promise to merchants decides the window, not the preference of one team.",
+    "whyWrong": {
+      "A": "This changes the architecture before the requirement is clear. The window decides whether the current design already meets the target.",
+      "C": "A higher target can cost much more, and it does not settle which window the business promised to merchants.",
+      "D": "The window must follow the business promise to merchants. A window that suits the operations team ignores the business requirement."
+    },
+    "sources": [
+      {
+        "title": "Assess the reliability requirements for your cloud workloads",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+        "evidence": "Outages might expose mismatched expectations across different teams within your business."
+      },
+      {
+        "title": "Assess the reliability requirements for your cloud workloads",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+        "evidence": "Depending on how you decide to modify or clarify the availability requirements, you should adjust your architecture to meet the new requirements."
+      }
+    ]
+  },
+  {
+    "id": "arch-005",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "business-continuity",
+      "disaster-recovery",
+      "rto-rpo",
+      "business-impact-analysis"
+    ],
+    "stem": "A regional bank writes its business continuity plan for Google Cloud. It runs an online banking service, an email notification system for account alerts, and an archive of historical records that it keeps for compliance. The CIO proposes one DR design for all three systems: a hot standby in a second region with an RTO of minutes. The CFO says that the DR budget cannot support this design. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep a hot standby for all three systems, and lower its cost with smaller machine types in the standby region."
+      },
+      {
+        "id": "B",
+        "text": "Use a cold pattern for all three systems, because backups in another region protect the data of every system."
+      },
+      {
+        "id": "C",
+        "text": "Set an RTO and an RPO for each system from a business impact analysis, and match a hot, warm, or cold pattern to each."
+      },
+      {
+        "id": "D",
+        "text": "Set one RTO and one RPO for the bank from its strictest system, and size the DR budget from those values."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "DR is a subset of business continuity planning, and DR planning starts with a business impact analysis that defines the RTO and the RPO. Smaller RTO and RPO values cost more, so each system should get only the recovery that the business needs. Google's own examples fit this bank. Historical compliance data fits a cold pattern, and an online service fits a hot pattern. An email notification system fits a warm pattern.",
+    "whyWrong": {
+      "A": "The bank still pays for hot standby capacity for the archive and the notifications, which do not need it. A smaller standby might also not carry the online banking load after a failover.",
+      "B": "Backups protect the data, but a cold pattern is too slow for the online banking service, which must recover as quickly as possible.",
+      "D": "Values from the strictest system give every system the most expensive DR pattern. This repeats the design that the budget cannot support."
+    },
+    "sources": [
+      {
+        "title": "Disaster recovery planning guide",
+        "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+        "evidence": "DR is a subset of business continuity planning. DR planning begins with a business impact analysis that defines two key metrics:"
+      },
+      {
+        "title": "Disaster recovery planning guide",
+        "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+        "evidence": "For example, in the case of historical compliance-oriented data, you probably don't need speedy access to the data, so a large RTO value and cold DR pattern is appropriate."
+      },
+      {
+        "title": "Disaster recovery planning guide",
+        "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+        "evidence": "Typically, the smaller your RTO and RPO values are (that is, the faster your application must recover from an interruption), the more your application will cost to run."
+      }
+    ]
+  },
+  {
+    "id": "arch-006",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "success-measures",
+      "kpi",
+      "roi",
+      "migration-waves"
+    ],
+    "stem": "A media company starts a 12-month migration of 200 workloads in waves. The steering committee wants to decide after each wave whether the migration delivers the promised value: lower infrastructure cost and faster page loads for subscribers. Nobody has measured the current cost of each workload or the current page load times. What should you do first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Measure the current cost and performance as a baseline, and define measurable success criteria and milestones for each wave."
+      },
+      {
+        "id": "B",
+        "text": "Migrate the first wave, and then compare its first cloud bill with the average monthly cost of the data center."
+      },
+      {
+        "id": "C",
+        "text": "Report the number of workloads that each wave migrates as the main success measure for the steering committee."
+      },
+      {
+        "id": "D",
+        "text": "Use the published SLAs of the Google Cloud services in the target design as the success criteria for each wave."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The committee can only see an improvement if it has a baseline and a target before the move. Google recommends measurable success criteria with clear milestones for each migration phase or wave. The assess phase of a migration includes TCO calculations and app performance benchmarks, which give the baseline for cost and page load times.",
+    "whyWrong": {
+      "B": "Without a baseline for each workload, this compares unlike costs. It also measures cost only, not page load times.",
+      "C": "The number of migrated workloads measures activity, not business value. It does not show lower cost or faster pages.",
+      "D": "Provider SLAs describe the commitments of Google Cloud for its services. They do not measure the company's cost or page load goals."
+    },
+    "sources": [
+      {
+        "title": "Plan a hybrid and multicloud strategy",
+        "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/strategy",
+        "evidence": "Decide on measurable success criteria for the migration, with clear milestones for each migration phase or wave."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "perform total cost of ownership calculations, and establish app performance benchmarks."
+      }
+    ]
+  },
+  {
+    "id": "arch-007",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "workload-disposition",
+      "application-rationalization",
+      "re-architect",
+      "retire"
+    ],
+    "stem": "A retail group acquired a competitor and plans to exit the competitor's data center in two years. The CIO wants a disposition for each application of the competitor:\n\n- An email and collaboration suite that the competitor bought from a vendor and runs on premises.\n- A custom inventory monolith that cannot scale for holiday peaks. The business plans to extend it heavily.\n- An expense-reporting tool that does the same job as a tool that the group already runs.\n- A licensed warehouse application whose vendor forbids any change to its code.\n\nWhich two dispositions should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rebuild the licensed warehouse application as cloud-native microservices that use managed services."
+      },
+      {
+        "id": "B",
+        "text": "Rehost the inventory monolith on larger VMs, because rehost is the quickest type and the peaks are seasonal."
+      },
+      {
+        "id": "C",
+        "text": "Retire the competitor's expense-reporting tool, and move its users to the tool that the group already runs."
+      },
+      {
+        "id": "D",
+        "text": "Refactor the email and collaboration suite into containers on GKE, so that the group controls every feature."
+      },
+      {
+        "id": "E",
+        "text": "Re-architect the inventory monolith into independent microservices, so that each part can scale for the peaks."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Application rationalization after a merger looks for duplicate applications, and the duplicate expense tool is a candidate to retire. The inventory monolith cannot scale and faces a major extension, which justifies modernization during the move. Google's example of a re-architect migration is exactly this: one large monolithic workload becomes several independent microservices. The two-year timeline leaves time for this work.",
+    "whyWrong": {
+      "A": "The vendor forbids code changes, and a rebuild is not suitable for ready-made applications because it requires a rewrite. A rehost fits this application.",
+      "B": "A rehost keeps the monolith that cannot scale for the peaks. Rehosted workloads do not take full advantage of horizontal scalability, and the planned extension favors modernization now.",
+      "D": "The group does not own the code of the purchased suite, so it cannot refactor it. Purchased collaboration software is Google's example for a repurchase, for example a move to Google Workspace."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "For example, a re-architect migration can take one large, monolithic workload and turn it into several independent microservices that you deploy on Google Cloud."
+      },
+      {
+        "title": "Application rationalization: Why you need to take this first step in your migration journey",
+        "url": "https://cloud.google.com/blog/products/application-development/application-rationalization-what-why-and-how",
+        "evidence": "Enterprises going through M&A (mergers and acquisitions), which introduces the applications and services of a newly acquired business, many of which may duplicate those already in place."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "Moreover, this type of migration isn't suitable for ready-made apps because it requires rewriting the app."
+      }
+    ]
+  },
+  {
+    "id": "arch-008",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "non-functional-requirements",
+      "critical-periods",
+      "data-freshness",
+      "trade-offs"
+    ],
+    "stem": "A brokerage runs an online trading platform. Customers can trade only from 8 AM to 5 PM on weekdays. After the market closes, a batch job writes the day's trades to the accounting ledger. Finance needs the ledger up to date within eight hours. The CTO asks for 99.999% availability for every component at all times, which would triple the infrastructure budget. The CFO wants the lowest cost that still meets the business needs. How should you define the reliability requirements?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set 99.999% availability for every component at all times, because the trading platform is business critical."
+      },
+      {
+        "id": "B",
+        "text": "Set 99.999% availability for the trading service at all times, and a lower availability target for the ledger batch."
+      },
+      {
+        "id": "C",
+        "text": "Set one availability target for the whole platform at the highest level that the current budget can support."
+      },
+      {
+        "id": "D",
+        "text": "Set 99.999% availability for trading during market hours only, and an eight-hour data-freshness target for the ledger."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Reliability requirements depend on what each operation does and when the business needs it. Google's reliability guide gives both parts of this scenario as examples. An online trading platform might need 5-nines availability only during trading hours. A ledger batch might have a data-freshness target of eight hours. Requirements at this level of detail focus the budget on the critical operation in its critical period, which meets the CFO's qualifier.",
+    "whyWrong": {
+      "A": "This applies the strictest target to every component at all times. The batch and the hours outside trading do not need it, and the budget cannot support it.",
+      "B": "This is granular by component but not by time. It pays for 5-nines outside market hours, and availability is the wrong measure for a batch that has a freshness need.",
+      "C": "A budget-driven single target ignores the business needs. It under-protects trading during market hours and over-specifies the rest."
+    },
+    "sources": [
+      {
+        "title": "Assess the reliability requirements for your cloud workloads",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+        "evidence": "An online trading platform might need 5-nines availability and fast response time, but only during trading hours (for example, 8 AM to 5 PM from Monday to Friday)."
+      },
+      {
+        "title": "Assess the reliability requirements for your cloud workloads",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+        "evidence": "A batch process that writes banking transactions to an accounting ledger at the end of every day might have a data-freshness target of eight hours."
+      },
+      {
+        "title": "Assess the reliability requirements for your cloud workloads",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+        "evidence": "Assessing the reliability requirements of your workloads granularly helps you focus your spending and effort on the workloads that are critical for your business."
+      }
+    ]
+  },
+  {
+    "id": "arch-009",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-tasks",
+      "pub-sub",
+      "rate-limiting",
+      "integration"
+    ],
+    "stem": "An online retailer sends each order update to a logistics partner through the partner's REST API. The partner accepts a fixed number of requests per second and rejects calls above that rate. Orders arrive in large spikes during promotions, and the checkout service must not slow down. Failed calls must be retried, with a limit on the number of attempts. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish each update to a Pub/Sub topic with a push subscription to the partner endpoint, and set a retry policy with exponential backoff."
+      },
+      {
+        "id": "B",
+        "text": "Call the partner API directly from the checkout service, and retry failed calls with exponential backoff inside the checkout request."
+      },
+      {
+        "id": "C",
+        "text": "Create a Cloud Tasks queue with the partner endpoint as the HTTP target, set its maximum dispatch rate to the partner limit, and configure retries."
+      },
+      {
+        "id": "D",
+        "text": "Send each update to an Eventarc Advanced bus, and use an enrollment with a transformation to deliver the update to the partner endpoint."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding requirements are the partner's rate limit and a checkout service that must not wait. Cloud Tasks uses explicit invocation: the sender names the endpoint and controls the timing of delivery. The queue absorbs the spikes, acts as dispatch flow control at the rate that the partner accepts, and retries until the configured number of retries is exhausted. Checkout only adds a task and returns.",
+    "whyWrong": {
+      "A": "Pub/Sub decouples publishers from subscribers and gives the publisher no control over delivery, except the guarantee of delivery. Explicit rate control is a Cloud Tasks feature. In Pub/Sub, only pull subscriber clients can implement flow control, and the partner's REST API does not pull.",
+      "B": "A synchronous call makes checkout wait for the partner. During spikes, calls above the partner's rate fail, and retries inside the request slow checkout, which breaks a stated requirement.",
+      "D": "Eventarc Advanced is built to filter, transform, and route events between many providers and destinations. The requirement is rate control for calls to one endpoint, which is what a Cloud Tasks queue provides."
+    },
+    "sources": [
+      {
+        "title": "Choosing Pub/Sub or Cloud Tasks",
+        "url": "https://docs.cloud.google.com/pubsub/docs/choosing-pubsub-or-cloud-tasks",
+        "evidence": "Overall, Cloud Tasks is appropriate for use cases where a task producer needs to defer or control the execution timing of a specific webhook or remote procedure call."
+      },
+      {
+        "title": "Understand Cloud Tasks",
+        "url": "https://docs.cloud.google.com/tasks/docs/dual-overview",
+        "evidence": "Based on your initial configuration, the queue can also act as a dispatch flow control."
+      }
+    ]
+  },
+  {
+    "id": "arch-010",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "orchestration",
+      "choreography",
+      "workflows",
+      "pub-sub"
+    ],
+    "stem": "An insurance company runs its claims process on five microservices that one team owns: intake, fraud check, assessment, payment, and notification. The services pass events through Pub/Sub topics, and no service controls the whole flow. When a claim gets stuck, support staff cannot tell which step failed. The business wants the status of each claim in one place and a wait of up to two weeks for an adjuster's approval. The CRM and analytics domains already consume a 'claim settled' event and must keep receiving it. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the current event flow, add Cloud Trace to every service, and build a dashboard that correlates the traces of each claim."
+      },
+      {
+        "id": "B",
+        "text": "Replace the Pub/Sub topics with an Eventarc Advanced bus, and create one enrollment for each step of the claims process."
+      },
+      {
+        "id": "C",
+        "text": "Rebuild the claims process as a Python DAG in Managed Service for Apache Airflow, with a sensor that polls for the approval."
+      },
+      {
+        "id": "D",
+        "text": "Define the claims process in Workflows, use a callback to wait for the approval, and publish the 'claim settled' event to Pub/Sub."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The claims process sits inside one bounded context that one team owns, and the business needs one place to track it. Google recommends orchestration within the bounded context of a microservice and choreography between bounded contexts. Workflows orchestrates the five services, holds state, and can wait for up to a year. A callback resumes the workflow when the approval arrives, with no polling. The workflow still publishes the 'claim settled' event, so the CRM and analytics domains keep their choreographed integration.",
+    "whyWrong": {
+      "A": "Traces show individual requests, but the flow stays choreographed. The business logic stays spread across services, with no central source of truth for the status of a claim and no managed two-week wait.",
+      "B": "An Eventarc Advanced bus is still choreography: services react to events, and no component controls or records the whole process. It gives no single view of each claim and no managed wait for the approval.",
+      "C": "Managed Airflow is designed to orchestrate data-driven workflows, particularly ETL and ELT. It has seconds of latency between tasks and waits only by polling, while Workflows supports callbacks."
+    },
+    "sources": [
+      {
+        "title": "Service orchestration on Google Cloud",
+        "url": "https://cloud.google.com/blog/topics/developers-practitioners/service-orchestration-google-cloud",
+        "evidence": "You should prefer orchestration within the bounded context of a microservice, but prefer choreography between bounded contexts."
+      },
+      {
+        "title": "Workflows overview",
+        "url": "https://docs.cloud.google.com/workflows/docs/overview",
+        "evidence": "Callbacks allow workflow executions to wait for another service to make a request to the callback endpoint; that request resumes the execution of the workflow."
+      },
+      {
+        "title": "Choose Workflows or Managed Airflow for service orchestration",
+        "url": "https://docs.cloud.google.com/workflows/docs/choose-orchestration",
+        "evidence": "Managed Airflow is designed to orchestrate data driven workflows (particularly ETL/ELT). It's built on the Apache Airflow project, but Managed Airflow is fully managed."
+      }
+    ]
+  },
+  {
+    "id": "arch-011",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "data-transfer",
+      "transfer-appliance",
+      "storage-transfer-service"
+    ],
+    "stem": "A media company must move 300 TB of archived video from its data center to Cloud Storage within two months, before a new platform launches. The data center has a 100 Mbps internet connection that production traffic also uses. A new Dedicated Interconnect connection would take about three months to order and install. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Order Transfer Appliance, copy the archive to it in the data center, and ship it back to Google for upload to Cloud Storage."
+      },
+      {
+        "id": "B",
+        "text": "Install Storage Transfer Service agents on several servers, and set a bandwidth cap so that production traffic is not affected."
+      },
+      {
+        "id": "C",
+        "text": "Run `gcloud storage rsync` in parallel from several servers during nights and weekends, when production traffic is low."
+      },
+      {
+        "id": "D",
+        "text": "Order Dedicated Interconnect now, and start a Storage Transfer Service job on it as soon as the connection is ready."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding facts are the data size, the 100 Mbps link, and the two-month deadline. At 100 Mbps, an upload of 300 TB takes about 9 months, and more bandwidth cannot arrive in time. Google recommends Transfer Appliance when bandwidth cannot be acquired in time to meet the deadline. You can capture 300 TB on the appliance in under 25 days, and the data is typically in Cloud Storage within another 10 business days.",
+    "whyWrong": {
+      "B": "Storage Transfer Service is the right online tool when the bandwidth can meet the deadline. Over a shared 100 Mbps link, 300 TB takes about 9 months, and a bandwidth cap makes the transfer slower.",
+      "C": "`gcloud storage` is the standard tool for small to medium transfers. Parallel streams cannot exceed the 100 Mbps link, so the transfer still takes months.",
+      "D": "The connection takes about three months to install, which is already after the two-month deadline."
+    },
+    "sources": [
+      {
+        "title": "Transfer Appliance",
+        "url": "https://docs.cloud.google.com/transfer-appliance/docs/4.0/overview",
+        "evidence": "With a typical network bandwidth of 100 Mbps, 300 terabytes of data takes about 9 months to upload. However, with Transfer Appliance, you can receive the appliance and capture 300 terabytes of data in under 25 days."
+      },
+      {
+        "title": "Migrate to Google Cloud: Transfer your large datasets",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+        "evidence": "Bandwidth is available, but cannot be acquired in time to meet your deadline."
+      }
+    ]
+  },
+  {
+    "id": "arch-012",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "bigquery-omni",
+      "multicloud",
+      "egress",
+      "data-movement"
+    ],
+    "stem": "A retailer keeps 2 PB of clickstream logs in Amazon S3 and runs its marketing analytics in BigQuery. Each week, analysts need a small, filtered subset of the logs joined with BigQuery tables. Finance wants to minimize data transfer charges from AWS, and the security team wants the raw logs to stay in AWS. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a weekly Storage Transfer Service job that copies the S3 bucket to Cloud Storage, and load the new objects into BigQuery."
+      },
+      {
+        "id": "B",
+        "text": "Query the logs in place with BigQuery Omni, and move only the filtered results to a BigQuery region with CREATE TABLE AS SELECT."
+      },
+      {
+        "id": "C",
+        "text": "Schedule a weekly BigQuery Data Transfer Service transfer from Amazon S3, and filter the loaded data with SQL in BigQuery."
+      },
+      {
+        "id": "D",
+        "text": "Run a weekly Dataflow pipeline in Google Cloud that reads the S3 objects, filters the records, and writes the results to BigQuery."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding requirements are to keep the raw logs in AWS and to move as little data as possible. BigQuery Omni runs the BigQuery query engine in AWS, so processing happens where the data already sits. A CREATE TABLE AS SELECT statement in the BigQuery Omni region filters the data and moves only the result to a BigQuery region.",
+    "whyWrong": {
+      "A": "Storage Transfer Service copies the raw logs out of AWS. This breaks the security requirement, and the company pays AWS egress charges for the whole dataset.",
+      "C": "BigQuery Data Transfer Service doesn't support filtering. It moves the raw logs out of AWS before any SQL filter runs.",
+      "D": "The pipeline reads every object across clouds before it filters. The raw logs leave AWS, and the company pays egress charges for all of them."
+    },
+    "sources": [
+      {
+        "title": "Introduction to BigQuery Omni",
+        "url": "https://docs.cloud.google.com/bigquery/docs/omni-introduction",
+        "evidence": "BigQuery Omni extends this architecture by running the BigQuery query engine in other clouds. As a result, you don't have to physically move data into BigQuery storage."
+      },
+      {
+        "title": "Introduction to BigQuery Omni",
+        "url": "https://docs.cloud.google.com/bigquery/docs/omni-introduction",
+        "evidence": "Set up automated data transfer into BigQuery on a scheduled, managed basis. Supports a variety of sources and is suitable for data migration. BigQuery Data Transfer Service doesn't support filtering."
+      },
+      {
+        "title": "Migrate to Google Cloud: Transfer your large datasets",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+        "evidence": "However, if you're hosting your data on a public cloud provider, you can expect to pay an egress charge and potentially storage costs (for example, read operations) for transferring your data."
+      }
+    ]
+  },
+  {
+    "id": "arch-013",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "application-integration",
+      "workflows",
+      "saas-integration"
+    ],
+    "stem": "A manufacturer wants to connect three business systems. When a sales opportunity closes in Salesforce, the order details must be written to the order database on Cloud SQL, and a work order must be created in ServiceNow. The three systems use different data structures. A team of business analysts will build and maintain the flows, and the company wants as little custom code as possible. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use Application Integration with a Salesforce trigger, connectors for Cloud SQL and ServiceNow, and built-in data mapping."
+      },
+      {
+        "id": "B",
+        "text": "Use Workflows to call the Salesforce and ServiceNow REST APIs, and call a Cloud Run function that maps the fields."
+      },
+      {
+        "id": "C",
+        "text": "Publish Salesforce changes to Pub/Sub, and deploy Cloud Run subscribers that map fields and write to each system."
+      },
+      {
+        "id": "D",
+        "text": "Use a Managed Service for Apache Airflow DAG that polls Salesforce each hour and writes to Cloud SQL and ServiceNow."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding requirements are business systems with different data structures, business analysts as builders, and little custom code. Google recommends Application Integration for integrating business systems. Its built-in transformation functions convert the source data to fit the destination schema, and connectors give a standard interface to each system. The drag-and-drop editor lets the team build the flow with little or no code.",
+    "whyWrong": {
+      "B": "Workflows fits developers who orchestrate services for applications, pipelines, or infrastructure automation. The field mapping still needs custom code in a Cloud Run function.",
+      "C": "This design works, but each subscriber is custom code that maps fields and calls the API of each system. It breaks the requirement for as little custom code as possible.",
+      "D": "Managed Airflow runs data pipelines written as Python DAGs, so the analysts must write code. Hourly polling also delays each order, while Application Integration suits real-time business transactions."
+    },
+    "sources": [
+      {
+        "title": "Choose Workflows or Application Integration",
+        "url": "https://docs.cloud.google.com/workflows/docs/choose-app-integ-or-workflows",
+        "evidence": "Application Integration is ideal for integrating applications that have differing data structures and for exchanging data. It provides built-in transformation functions that let you convert the source application data to fit the destination application schema."
+      },
+      {
+        "title": "Choose Workflows or Application Integration",
+        "url": "https://docs.cloud.google.com/workflows/docs/choose-app-integ-or-workflows",
+        "evidence": "If you're integrating business systems or implementing a business process, consider using Application Integration. If you're orchestrating services for application development, pipelines, or infrastructure automation, consider using Workflows."
+      },
+      {
+        "title": "Application Integration overview",
+        "url": "https://docs.cloud.google.com/application-integration/docs/overview",
+        "evidence": "An intuitive drag-and-drop interface that lets you design and develop your entire integration flow with little or no code."
+      }
+    ]
+  },
+  {
+    "id": "arch-014",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "pub-sub",
+      "decoupling",
+      "idempotency",
+      "exactly-once"
+    ],
+    "stem": "A payments company's checkout service calls three services synchronously: fraud scoring, email receipts, and loyalty points. Checkout must have the fraud score before it authorizes a payment. Last month, an outage of the loyalty service made checkouts fail, although receipts and points can be processed later. The loyalty service must never add points twice for one order. The analytics team now also wants an event for each completed order. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish an order-completed event to a Pub/Sub topic that has separate subscriptions for the email, loyalty, and analytics consumers."
+      },
+      {
+        "id": "B",
+        "text": "Make the loyalty consumer idempotent: record the order ID of each applied update, and skip orders that are already recorded."
+      },
+      {
+        "id": "C",
+        "text": "Send the fraud scoring requests through a Pub/Sub topic, so that checkout never waits for the fraud service."
+      },
+      {
+        "id": "D",
+        "text": "Put the email, loyalty, and analytics work in one Cloud Tasks queue, so that each task reaches all three services."
+      },
+      {
+        "id": "E",
+        "text": "Enable exactly-once delivery on push subscriptions for the loyalty service, so that duplicate messages never reach it."
+      }
+    ],
+    "answer": [
+      "A",
+      "B"
+    ],
+    "explanation": "Two requirements decide the answer. First, receipts and points can wait, and one failed consumer must not stop checkout. Checkout publishes one event, and Pub/Sub delivers it to all the services that react to it. Each consumer fails and recovers alone, and analytics is one more subscription. Second, Pub/Sub delivers at least once, so the loyalty consumer must be idempotent. An update that runs twice for one order then gives the same outcome as the first run.",
+    "whyWrong": {
+      "C": "Checkout needs the fraud score before it authorizes the payment, so this call must stay synchronous. An asynchronous message fits only work whose result the caller does not wait for.",
+      "D": "Cloud Tasks does not support multiple handlers for one task. Fan-out of one event to several consumers is a Pub/Sub feature.",
+      "E": "Only pull subscriptions support exactly-once delivery. Push and export subscriptions don't support it."
+    },
+    "sources": [
+      {
+        "title": "What is Pub/Sub?",
+        "url": "https://docs.cloud.google.com/pubsub/docs/overview",
+        "evidence": "Publishers send events to the Pub/Sub service, without regard to how or when these events are to be processed. Pub/Sub then delivers events to all the services that react to them."
+      },
+      {
+        "title": "Exactly-once delivery",
+        "url": "https://docs.cloud.google.com/pubsub/docs/exactly-once-delivery",
+        "evidence": "Only the pull subscription type supports exactly-once delivery, including subscribers that use the StreamingPull API. Push and export subscriptions don't support exactly-once delivery."
+      },
+      {
+        "title": "What is microservices architecture?",
+        "url": "https://cloud.google.com/learn/what-is-microservices-architecture",
+        "evidence": "Idempotency is a core design principle: it guarantees that an operation, even if executed multiple times, will produce the same outcome as the first time it was run."
+      }
+    ]
+  },
+  {
+    "id": "arch-015",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "well-architected-framework",
+      "reliability",
+      "slo",
+      "error-budget"
+    ],
+    "stem": "An HR software company runs an internal expense-reporting application in one region. It uses a regional managed instance group behind a load balancer and a Cloud SQL instance with high availability. Load balancer logs show that 99.7% of user requests succeed each month, and employee surveys show that users are satisfied. The product owner proposes an active-active deployment in a second region to reach 99.99%, which roughly doubles infrastructure cost. A short outage has low business impact, and the team has a long backlog of features that users requested. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Build the active-active deployment in a second region with a global load balancer, because a regional outage would stop all expense reporting."
+      },
+      {
+        "id": "B",
+        "text": "Set a 100% availability SLO for the application so that the team treats every failed request as an incident that needs a postmortem."
+      },
+      {
+        "id": "C",
+        "text": "Keep the single-region design, set an SLO near the level at which users are satisfied, and use the error budget to balance reliability work against features."
+      },
+      {
+        "id": "D",
+        "text": "Replace the request-based SLI with VM CPU utilization and health-check status, and add VMs to the group whenever utilization is high."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding facts are that users are satisfied, an outage has low business impact, and the proposal doubles cost. The reliability pillar says to design systems to be just reliable enough for user happiness, because more reliability can cost much more and give a low return. An SLO near the level that satisfies users, with an error budget, lets the team spend its effort on features until reliability drops.",
+    "whyWrong": {
+      "A": "A second region removes a regional single point of failure, but it doubles cost for a gain that users do not need. The framework asks for a cost-benefit analysis before you add reliability.",
+      "B": "The framework says not to set a 100% target. Some failure is inevitable, and the gap between 100% and the target is the error budget that allows change.",
+      "D": "CPU utilization and health checks are server-centric metrics. The framework says to measure reliability by what users experience, such as the success ratio of their requests."
+    },
+    "sources": [
+      {
+        "title": "Set realistic targets for reliability",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/set-targets",
+        "evidence": "Design your systems to be just reliable enough for user happiness. It might seem counterintuitive, but a goal of 100% reliability is often not the most effective strategy."
+      },
+      {
+        "title": "Define reliability based on user-experience goals",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/define-reliability-based-on-user-experience-goals",
+        "evidence": "Focus on metrics like the success ratio of user requests. Don't rely solely on server-centric metrics, like CPU usage, which can lead to misleading conclusions about your service's reliability."
+      }
+    ]
+  },
+  {
+    "id": "arch-016",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "well-architected-framework",
+      "reliability",
+      "graceful-degradation",
+      "overload"
+    ],
+    "stem": "A ticketing company runs a stateless web frontend and an order service on GKE in three zones, behind a global external Application Load Balancer. The order service writes to one database that cannot scale during an event. For popular on-sales, demand exceeds the total capacity of the system. Clients and services then retry failed calls, the database overloads, and the site fails for all users. The business wants as many users as possible to keep buying tickets during these peaks. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a circuit breaker that stops all calls from the frontend to the order service when its error rate crosses a threshold, until the service recovers."
+      },
+      {
+        "id": "B",
+        "text": "Throttle requests and drop the excess at the frontend layer, and make the services handle partial errors with limited retries, so the backend serves the load it can handle."
+      },
+      {
+        "id": "C",
+        "text": "Raise the maximum replica counts of the frontend and the order service so that the cluster can accept every incoming request during an on-sale."
+      },
+      {
+        "id": "D",
+        "text": "Add a passive deployment in a second region, and fail all traffic over to it when the primary region shows overload during an on-sale."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding constraint is that demand exceeds capacity and the database cannot scale, so the system must serve part of the load instead of failing for everyone. The reliability pillar recommends graceful degradation: throttle requests, drop excess requests early at the frontend to protect the backend, and handle partial errors and retries. Some users get errors, but most users keep buying tickets.",
+    "whyWrong": {
+      "A": "A circuit breaker drops all traffic during an overload. The framework contrasts it with dropping only the excess requests, which keeps the service available for most users.",
+      "C": "More frontend and order-service replicas send even more load to the database, which is the bottleneck. The overload and the retry storm get worse.",
+      "D": "Failover does not add database capacity for an overload. Shifted excess traffic moves the overload to a new location and can cause cascading failures, so the framework recommends that replicas throttle requests instead."
+    },
+    "sources": [
+      {
+        "title": "Design for graceful degradation",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/graceful-degradation",
+        "evidence": "Configure your systems to drop excess requests at the frontend layer to protect backend components. Dropping some requests prevents global failures and enables the system to recover more gracefully."
+      },
+      {
+        "title": "Design for graceful degradation",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/graceful-degradation",
+        "evidence": "However, you can minimize the impact of outages, in contrast to an approach like circuit-breaking, where all traffic is dropped during an overload."
+      },
+      {
+        "title": "Design for graceful degradation",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/graceful-degradation",
+        "evidence": "This approach helps you to prevent cascading failures that are caused by shifts in excess traffic between zones."
+      }
+    ]
+  },
+  {
+    "id": "arch-017",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "well-architected-framework",
+      "cost-optimization",
+      "tco",
+      "managed-services"
+    ],
+    "stem": "A startup with four engineers runs its product on Compute Engine. PostgreSQL runs on two self-managed VMs, and the containers run on a Kubernetes cluster that the team installed on VMs. The engineers spend about a third of their time on patching, upgrades, and scaling. The CFO wants a lower total cost of ownership (TCO), and the CTO wants the engineers to spend their time on product features. Which two recommendations should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Buy resource-based committed use discounts for the current VMs."
+      },
+      {
+        "id": "B",
+        "text": "Migrate the PostgreSQL databases to Cloud SQL."
+      },
+      {
+        "id": "C",
+        "text": "Move the containers to GKE Autopilot."
+      },
+      {
+        "id": "D",
+        "text": "Consolidate the Kubernetes nodes onto fewer, larger VMs."
+      },
+      {
+        "id": "E",
+        "text": "Write scripts that resize the VMs on a fixed schedule."
+      }
+    ],
+    "answer": [
+      "B",
+      "C"
+    ],
+    "explanation": "Both goals point to managed services. The cost optimization pillar says that TCO includes the overhead to maintain, patch, and scale resources, not only their price. It recommends Cloud SQL instead of databases on VMs, and GKE Autopilot instead of containers on VMs. These moves remove most of the patching and scaling work, which lowers TCO and gives the engineers time for features.",
+    "whyWrong": {
+      "A": "Committed use discounts lower the price of the VMs, but they remove no operational work. They also commit the company to the self-managed design for a term of typically one to three years.",
+      "D": "Fewer, larger VMs still need the same patching and upgrades. Larger nodes also increase the impact of one node failure, and vertical scaling has hard limits.",
+      "E": "Custom scripts add more code for the team to maintain. They do not remove the patching and upgrade work that takes the engineers' time."
+    },
+    "sources": [
+      {
+        "title": "Align cloud spending with business value",
+        "url": "https://docs.cloud.google.com/architecture/framework/cost-optimization/align-cloud-spending-business-value",
+        "evidence": "However, when you consider the overhead to maintain, patch, and scale the VMs, the TCO can increase."
+      },
+      {
+        "title": "Align cloud spending with business value",
+        "url": "https://docs.cloud.google.com/architecture/framework/cost-optimization/align-cloud-spending-business-value",
+        "evidence": "To run PostgreSQL, MySQL, or Microsoft SQL Server server databases, use Cloud SQL instead of deploying those databases on VMs."
+      },
+      {
+        "title": "Align cloud spending with business value",
+        "url": "https://docs.cloud.google.com/architecture/framework/cost-optimization/align-cloud-spending-business-value",
+        "evidence": "To run and manage Kubernetes clusters, use Google Kubernetes Engine (GKE) Autopilot instead of deploying containers on VMs."
+      }
+    ]
+  },
+  {
+    "id": "arch-018",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "well-architected-framework",
+      "sustainability",
+      "organization-policy",
+      "resource-locations"
+    ],
+    "stem": "A company sets a sustainability target: every new workload in its Google Cloud organization must run in a low-carbon region in the US. The platform team wants a control that stops teams from creating resources in other regions, without a manual review of each project. What should the platform team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the resource locations organization policy constraint at the organization level to allow only the `in:us-low-carbon-locations` value group."
+      },
+      {
+        "id": "B",
+        "text": "Use the Google Cloud Region Picker to choose one low-carbon US region, and record that choice in the architecture documentation for all teams."
+      },
+      {
+        "id": "C",
+        "text": "Review the Carbon Footprint report each month, and ask the teams that run workloads in high-carbon regions to move those workloads."
+      },
+      {
+        "id": "D",
+        "text": "Require all new workloads to use Spot VMs, because Spot VMs run on spare capacity and reduce the energy that each workload uses."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The requirement is a preventive control for all projects, with no manual review. The sustainability pillar recommends the resource locations constraint in Organization Policy Service to restrict resource creation to low-carbon regions. For US-based low-carbon regions, the constraint allows the `in:us-low-carbon-locations` value group. The platform team sets the policy once at the organization level instead of reviewing each project.",
+    "whyWrong": {
+      "B": "The Region Picker helps you compare regions, and documentation informs teams. Neither one stops a team from creating resources in another region.",
+      "C": "Carbon Footprint measures emissions after the workloads run. A monthly review is a manual, detective process, not a control that prevents resource creation.",
+      "D": "Spot VMs lower the cost of fault-tolerant work. They do not control the region in which teams create resources."
+    },
+    "sources": [
+      {
+        "title": "Use regions that consume low-carbon energy",
+        "url": "https://docs.cloud.google.com/architecture/framework/sustainability/low-carbon-regions",
+        "evidence": "For example, to allow the creation of resources in only US-based low-carbon regions, create a constraint that specifies the in:us-low-carbon-locations value group."
+      },
+      {
+        "title": "Use regions that consume low-carbon energy",
+        "url": "https://docs.cloud.google.com/architecture/framework/sustainability/low-carbon-regions",
+        "evidence": "Restrict resource creation to environmentally optimal locations by using the resource locations constraint in Organization Policy Service."
+      }
+    ]
+  },
+  {
+    "id": "arch-019",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "well-architected-framework",
+      "sustainability",
+      "disaster-recovery",
+      "rto-rpo"
+    ],
+    "stem": "A retailer runs its order-management API in one region on a regional managed instance group, with data in Cloud SQL. For a regional outage, the business requires a recovery time objective (RTO) of 4 hours and a recovery point objective (RPO) of 15 minutes. The company also has a sustainability goal to reduce idle infrastructure, and the DR budget is small. Which DR design should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run a full-size copy of the stack in a second region as a warm standby that serves no traffic until a failover."
+      },
+      {
+        "id": "B",
+        "text": "Run active-active deployments in three regions behind a global load balancer, and size each region to carry the full peak load."
+      },
+      {
+        "id": "C",
+        "text": "Export a database backup each night to a multi-region Cloud Storage bucket, and rebuild the whole stack from that backup after an outage."
+      },
+      {
+        "id": "D",
+        "text": "Replicate the data to a second region within the RPO, define the compute stack in Terraform, and provision it there only during a failover that you test against the RTO."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The design must meet a 4-hour RTO and a 15-minute RPO with little idle infrastructure. The sustainability pillar recommends DR strategies that minimize idle resources without compromising the RTO, for example IaC that provisions the DR environment only when it is needed. The data must still reach the second region at least as often as the RPO. Regular tests prove that provisioning and recovery finish within 4 hours.",
+    "whyWrong": {
+      "A": "A warm standby meets the RTO, but the full-size copy stays idle. That wastes energy and budget, which conflicts with the sustainability goal and the small DR budget.",
+      "B": "Three regions at full peak size give far more capacity and cost than a 4-hour RTO needs. The framework says to replicate across regions only when HA or DR requirements need it.",
+      "C": "A nightly backup can lose up to a day of orders, which breaks the 15-minute RPO. Backups must run at least as often as the RPO."
+    },
+    "sources": [
+      {
+        "title": "Optimize resource usage for sustainability",
+        "url": "https://docs.cloud.google.com/architecture/framework/sustainability/optimize-resource-usage",
+        "evidence": "Automate recovery with infrastructure-as-code (IaC): Instead of keeping resources in the DR site running (warm), use an IaC tool like Terraform to rapidly provision environments only when needed."
+      },
+      {
+        "title": "Optimize resource usage for sustainability",
+        "url": "https://docs.cloud.google.com/architecture/framework/sustainability/optimize-resource-usage",
+        "evidence": "Right-size redundancy: Replicate data and services across regions only when the replication is necessary to meet high-availability or DR requirements."
+      },
+      {
+        "title": "Perform testing for recovery from data loss",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/perform-testing-for-recovery-from-data-loss",
+        "evidence": "Establish a backup frequency that aligns with your RPO. For example, if your RPO is 15 minutes, schedule backups to run at least every 15 minutes."
+      }
+    ]
+  },
+  {
+    "id": "arch-020",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "well-architected-framework",
+      "performance",
+      "elasticity",
+      "autoscaling"
+    ],
+    "stem": "An online retailer runs its storefront on a regional managed instance group with CPU-based autoscaling. New VMs take several minutes to start. Once a year, a one-day sale starts at a published time. Last year, users saw slow responses and errors in the first minutes of the sale while the group scaled out. Outside this event, traffic has no strong daily or weekly pattern. What should you do before the next sale?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable predictive autoscaling on the group so that it forecasts the sale from last year's load and adds VMs before the sale starts."
+      },
+      {
+        "id": "B",
+        "text": "Add a scaling schedule that raises the group's minimum number of VMs shortly before the sale starts, and keep CPU-based autoscaling for surges."
+      },
+      {
+        "id": "C",
+        "text": "Lower the autoscaler's CPU utilization target for the whole year so that the group always keeps a large amount of spare capacity."
+      },
+      {
+        "id": "D",
+        "text": "Change the instance template to a larger machine type so that each VM can handle more requests while the group scales out."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding facts are a known, one-time peak and VMs that take minutes to start. The performance pillar recommends that you scale out before known periods of high traffic, because reactive autoscaling can take several minutes. A scaling schedule adds the required VMs before the start time of a one-off event, and CPU-based autoscaling still handles unexpected load.",
+    "whyWrong": {
+      "A": "Predictive autoscaling forecasts daily and weekly load patterns from recent history. It does not predict monthly, annual, or one-time events.",
+      "C": "A low target for the whole year keeps extra VMs running when there is no sale. This raises cost, and the group still scales reactively when the sale starts.",
+      "D": "Larger VMs add some capacity, but the group still waits for new VMs to start when the load arrives. The recommended pattern is to scale out before a known peak."
+    },
+    "sources": [
+      {
+        "title": "Scaling based on predictions",
+        "url": "https://docs.cloud.google.com/compute/docs/autoscaler/predictive-autoscaling",
+        "evidence": "Compute Engine doesn't predict monthly, annual, or one-time events, and it doesn't predict load patterns that are shorter than 10 minutes. You can use schedule-based autoscaling to request capacity for one-time or other load patterns."
+      },
+      {
+        "title": "Take advantage of elasticity",
+        "url": "https://docs.cloud.google.com/architecture/framework/performance-optimization/elasticity",
+        "evidence": "We recommend that you manually scale up or scale out your systems before those sales to ensure that your system can immediately handle the increased load or immediately adjust existing limits."
+      },
+      {
+        "title": "Scaling based on schedules",
+        "url": "https://docs.cloud.google.com/compute/docs/autoscaler/scaling-schedules",
+        "evidence": "If you run your workload on a managed instance group (MIG), you can schedule a required number of virtual machine (VM) instances for recurring load patterns as well as one-off events."
+      }
+    ]
+  },
+  {
+    "id": "arch-021",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "deployment-archetypes",
+      "regional",
+      "cost"
+    ],
+    "stem": "A logistics company runs an internal time-tracking app for 4,000 employees. All employees work in one country, near one Google Cloud region. The app must keep serving users if one zone fails. The business accepts several hours of downtime during a full region outage. The CFO wants the lowest cost that meets these requirements. Which deployment approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the app in one zone, and keep a passive copy of the stack in a second zone for manual failover."
+      },
+      {
+        "id": "B",
+        "text": "Run the app in several zones of one region with regional MIGs and Cloud SQL HA, and back up data to another region."
+      },
+      {
+        "id": "C",
+        "text": "Run active stacks in two regions, and use a Cloud DNS routing policy with health checks to move traffic between them."
+      },
+      {
+        "id": "D",
+        "text": "Run the app behind a global external Application Load Balancer with backends in three regions and multi-region Spanner."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The requirements are: keep serving through a zone failure, accept downtime in a region outage, and pay the lowest cost. That is the **regional deployment archetype**. Google recommends it for apps that need resilience to zone outages but can tolerate some downtime from region outages. The archetypes guide also uses an internal app for employees in one area as the example where cost has priority over availability. Backups in another region give a recovery path for the rare region outage.",
+    "whyWrong": {
+      "A": "This is the zonal archetype. A zone failure stops the app until someone promotes the passive copy, so the app does not keep serving. The comparison guide gives the zonal archetype an RTO of hours or days for zone outages.",
+      "C": "This is the multi-regional archetype. It survives region outages, but the business accepts region-outage downtime. The second active region adds replication cost and operational complexity that the requirements do not need.",
+      "D": "This is the global archetype, which fits users worldwide. Three regions and multi-region Spanner far exceed the requirement and cost more than a regional deployment."
+    },
+    "sources": [
+      {
+        "title": "Regional deployment archetype",
+        "url": "https://docs.cloud.google.com/architecture/deployment-archetypes/regional",
+        "evidence": "We recommend the regional deployment archetype for applications that need robustness against zone outages but can tolerate some downtime caused by region outages."
+      },
+      {
+        "title": "Google Cloud deployment archetypes",
+        "url": "https://docs.cloud.google.com/architecture/deployment-archetypes",
+        "evidence": "But for an internal application that's used by employees in a single geographical region, you might prioritize cost over availability and, therefore, choose the regional deployment archetype."
+      }
+    ]
+  },
+  {
+    "id": "arch-022",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "composite-availability",
+      "sla",
+      "regional-mig"
+    ],
+    "stem": "An order service runs in one zone. It uses a regional external Application Load Balancer (SLA 99.99%), a web tier on a zonal MIG (99.9%), an internal load balancer (99.99%), an application tier on a zonal MIG (99.9%), and Cloud SQL Enterprise edition with HA (99.95%). Leadership sets an infrastructure availability target of 99.9% per month. The team wants the smallest change that meets the target. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add VMs to each zonal MIG so that every tier has N+1 redundancy inside the current zone."
+      },
+      {
+        "id": "B",
+        "text": "Replace Cloud SQL with a multi-region Spanner instance to raise the availability of the data tier."
+      },
+      {
+        "id": "C",
+        "text": "Convert the web and application tiers to regional MIGs that spread VMs across zones in the region."
+      },
+      {
+        "id": "D",
+        "text": "Keep the current design, because every component already meets or exceeds the 99.9% target."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The tiers are in series, so their availabilities multiply: 0.9999 × 0.999 × 0.9999 × 0.999 × 0.9995 ≈ 99.73%, which is below the target. The two zonal compute tiers are the weak links. With regional MIGs, each compute tier gets the multi-zone target of 99.99%. The stack then gives 0.9999 × 0.9999 × 0.9999 × 0.9999 × 0.9995 ≈ 99.91%, which meets the **99.9%** target. The reliability guide calculates this exact case, and the change touches only the two MIGs.",
+    "whyWrong": {
+      "A": "Extra VMs in the same zone do not help. Redundancy inside one zone is capped at the 99.9% target for a single zone, so the stack stays at about 99.73%.",
+      "B": "The two zonal tiers still multiply to less than the target: 0.9999 × 0.999 × 0.9999 × 0.999 × 0.99999 ≈ 99.78%. The change is also much larger than necessary.",
+      "D": "Serial tiers multiply. The stack is less available than its weakest tier: about 99.73% here, which misses the target."
+    },
+    "sources": [
+      {
+        "title": "Design reliable infrastructure for your workloads in Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/design",
+        "evidence": "Aggregate availability: 0.9999 x 0.9999 x 0.9999 x 0.9999 x 0.9995 = 99.91%"
+      },
+      {
+        "title": "Building blocks of reliability in Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/building-blocks",
+        "evidence": "the actual availability that you can expect is limited to the target availability of the deployment location: 99.9% if the resources are in a single Google Cloud zone"
+      },
+      {
+        "title": "Building blocks of reliability in Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/building-blocks",
+        "evidence": "That means, the aggregate availability of a multi-tier stack is lower than the availability of the tier that provides the least availability."
+      }
+    ]
+  },
+  {
+    "id": "arch-023",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "stateless",
+      "autoscaling",
+      "memorystore",
+      "stateful-mig"
+    ],
+    "stem": "A travel booking site runs on a zonal MIG of Compute Engine VMs. Each VM keeps shopping carts in local memory and writes uploaded travel documents to its local disk. After the team turned on autoscaling, users lost carts and files when the autoscaler deleted VMs. The team wants to autoscale across zones without losing user data. Which two changes should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Store cart and session data in a Memorystore instance that has replicas in several zones."
+      },
+      {
+        "id": "B",
+        "text": "Enable session affinity on the load balancer so that each user always reaches the same VM."
+      },
+      {
+        "id": "C",
+        "text": "Convert the group to a stateful MIG that preserves the boot and data disks of each VM."
+      },
+      {
+        "id": "D",
+        "text": "Write uploaded documents to a Cloud Storage bucket instead of to the local disks of the VMs."
+      },
+      {
+        "id": "E",
+        "text": "Turn off autoscaling, and move each VM to a larger machine type that can absorb the peak load."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Autoscaling needs **stateless** instances, because the autoscaler can create and delete VMs at any time. Move each kind of state out of the VMs. Carts and sessions go to Memorystore, which gives low-latency access and replicas across zones. Uploaded files go to Cloud Storage. After these changes, any VM can serve any request, and scale-in deletes no user data.",
+    "whyWrong": {
+      "B": "Session affinity is best effort. Adding or removing backends, which is what autoscaling does, can break it. A deleted VM also still loses the data in its memory and on its disk.",
+      "C": "You cannot use autoscaling when a MIG has a stateful configuration, so this change blocks the goal.",
+      "E": "This gives up autoscaling. Vertical scaling has hard limits, and a large VM can become a single point of failure."
+    },
+    "sources": [
+      {
+        "title": "Patterns for scalable and resilient apps",
+        "url": "https://docs.cloud.google.com/architecture/scalable-and-resilient-apps",
+        "evidence": "Statelessness is especially important when you are using an autoscaler, because the instances, nodes, or pods hosting the service can be created and destroyed unexpectedly."
+      },
+      {
+        "title": "Configuring stateful MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/configuring-stateful-migs",
+        "evidence": "You cannot use autoscaling if your MIG has stateful configuration."
+      },
+      {
+        "title": "Backend services overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/backend-service",
+        "evidence": "Google Cloud load balancers provide session affinity on a best-effort basis."
+      }
+    ]
+  },
+  {
+    "id": "arch-024",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "network-service-tiers",
+      "premium-tier",
+      "standard-tier"
+    ],
+    "stem": "A media company serves a public website to users on three continents. The website uses a global external Application Load Balancer with Cloud CDN. The company also runs a file-export endpoint in us-central1. Partner systems download large nightly files from it, and the downloads are not latency sensitive. The finance team wants lower network costs without harm to the website. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set Standard Tier as the project default so that every resource, including the website, uses it."
+      },
+      {
+        "id": "B",
+        "text": "Move the website to Standard Tier, and keep Premium Tier only for the file-export endpoint."
+      },
+      {
+        "id": "C",
+        "text": "Keep Premium Tier for every resource, because one project can use only one network tier."
+      },
+      {
+        "id": "D",
+        "text": "Keep Premium Tier for the website, and use Standard Tier for the export endpoint's regional IP address."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "You choose the network tier **per resource**, so one project can use both tiers. The website must stay on Premium Tier, because global load balancing and Cloud CDN need it. The export endpoint is regional and not latency sensitive, which is the use case for the lower-cost Standard Tier.",
+    "whyWrong": {
+      "A": "The global external Application Load Balancer and Cloud CDN do not support Standard Tier, so the website cannot use it.",
+      "B": "This reverses the correct choice. The website needs Premium Tier, and the export endpoint is the resource that can save cost on Standard Tier.",
+      "C": "The tier is chosen per resource. One project can use Standard Tier for some resources and Premium Tier for others."
+    },
+    "sources": [
+      {
+        "title": "Network Service Tiers overview",
+        "url": "https://docs.cloud.google.com/network-tiers/docs/overview",
+        "evidence": "Because you choose a tier at the resource level—such as the external IP address for a load balancer or VM—you can use Standard Tier for some resources and Premium Tier for others."
+      },
+      {
+        "title": "Best practices for Compute Engine regions selection",
+        "url": "https://docs.cloud.google.com/solutions/best-practices-compute-engine-region-selection",
+        "evidence": "Premium Tier networking is also necessary to use Google's global load-balancing products."
+      },
+      {
+        "title": "Network Service Tiers overview",
+        "url": "https://docs.cloud.google.com/network-tiers/docs/overview",
+        "evidence": "You have applications that are not latency or performance sensitive."
+      }
+    ]
+  },
+  {
+    "id": "arch-025",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "global-load-balancer",
+      "failover",
+      "cloud-dns",
+      "defense-in-depth"
+    ],
+    "stem": "An online retailer serves customers worldwide through a global external Application Load Balancer with Cloud Armor and Cloud CDN. Backends run in regional MIGs in three regions, and data is in multi-region Spanner. Last quarter, an engineer deleted a forwarding rule by mistake, and the store was unreachable in every country for 40 minutes. The board requires that one configuration error in the global frontend cannot take the store down. Cloud Armor protection and edge caching must stay in normal operation. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add regional external Application Load Balancers in the backend regions, and use Cloud DNS routing policies with health checks to fail over to them."
+      },
+      {
+        "id": "B",
+        "text": "Create a second global external Application Load Balancer in another project, and publish both IP addresses in the same DNS record."
+      },
+      {
+        "id": "C",
+        "text": "Add a fourth backend region and raise the minimum size of each MIG, so that the load balancer always has healthy capacity."
+      },
+      {
+        "id": "D",
+        "text": "Remove the global load balancer, and use a Cloud DNS geolocation policy that points users to the external IP addresses of the VMs."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A configuration error in a global resource can make it a single point of failure. Google recommends careful change management plus a **defense-in-depth fallback**: regional external Application Load Balancers, with Cloud DNS failover or bypass routing. Regional load balancers are isolated from the global load balancer infrastructure, so the same error or outage does not affect them. In normal operation, traffic still passes through the global load balancer with Cloud Armor and Cloud CDN.",
+    "whyWrong": {
+      "B": "A second global load balancer is not isolated from the global load balancer infrastructure. Also, a plain DNS record with two addresses has no health checks, so some users still get the failed address.",
+      "C": "More backend capacity does not help when the frontend itself fails. After a forwarding rule is deleted, the load balancer stops receiving requests, whatever the state of the backends.",
+      "D": "This removes Cloud Armor and edge caching from the serving path, which breaks a stated requirement. It also exposes the VMs directly to the internet."
+    },
+    "sources": [
+      {
+        "title": "Building blocks of reliability in Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/building-blocks",
+        "evidence": "To protect against global load balancer outages and configuration errors, you can implement an automated failover or bypass strategy by using Cloud DNS and regional backup load balancers."
+      },
+      {
+        "title": "Failover for global external Application Load Balancers",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/global-applb-failover-overview",
+        "evidence": "Regional external Application Load Balancers are self-contained within individual Google Cloud regions and are also isolated from any global external Application Load Balancer infrastructure running in the same region."
+      },
+      {
+        "title": "Design reliable infrastructure for your workloads in Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/design",
+        "evidence": "For example, while updating the frontend of the global load balancer, if you accidentally delete a forwarding rule, the load balancer stops receiving user requests."
+      }
+    ]
+  },
+  {
+    "id": "arch-026",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini-cloud-assist",
+      "data-residency",
+      "cmek",
+      "data-governance"
+    ],
+    "stem": "An insurance company runs two Google Cloud projects. The claims project stores customer data that must stay at rest in the EU and must be encrypted with customer-managed encryption keys (CMEK). The marketing website project holds no customer data and has no such rules. The operations team asks for Gemini Cloud Assist chat in the Google Cloud console for both projects. The compliance team allows no exceptions to the claims project rules.\n\nWhat should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Gemini Cloud Assist in both projects, and select Web Grounding for Enterprise, which Google prefers for industries with strict data residency rules."
+      },
+      {
+        "id": "B",
+        "text": "Enable Gemini Cloud Assist in both projects, and put the claims project and the Gemini Cloud Assist API inside a VPC Service Controls perimeter."
+      },
+      {
+        "id": "C",
+        "text": "Enable Gemini Cloud Assist only in the website project, and keep the Gemini Cloud Assist API disabled in the claims project."
+      },
+      {
+        "id": "D",
+        "text": "Enable Gemini Cloud Assist in both projects, and keep prompt and response sharing disabled so that Google keeps no copy of the conversations."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding requirement is \"no exceptions\" to data at rest in the EU with CMEK. Gemini Cloud Assist can store data, such as chat conversations, in any Google Cloud data center, and it does not support CMEK or data residency at rest. Google says not to enable the Gemini Cloud Assist API for projects that have data residency or CMEK requirements. The website project has no such rules, so the team can use Gemini Cloud Assist there.",
+    "whyWrong": {
+      "A": "Web Grounding for Enterprise changes which web content grounds the answers. It does not keep Gemini Cloud Assist data in the EU, and it does not add CMEK.",
+      "B": "A VPC Service Controls perimeter limits which data and APIs Gemini Cloud Assist can reach. It does not control where Gemini Cloud Assist stores conversations, and it does not add CMEK.",
+      "D": "Prompt and response sharing is already disabled by default and only controls use for product improvement. Conversation history is still stored, and it can be in any Google Cloud data center."
+    },
+    "sources": [
+      {
+        "title": "Set up Gemini Cloud Assist",
+        "url": "https://docs.cloud.google.com/cloud-assist/set-up-gemini",
+        "evidence": "Gemini Cloud Assist can store data in any Google Cloud data center globally. You shouldn't enable the Gemini Cloud Assist API for projects that have data residency or customer-managed encryption key requirements."
+      },
+      {
+        "title": "Use Gemini Cloud Assist in the Google Cloud console",
+        "url": "https://docs.cloud.google.com/cloud-assist/chat-panel",
+        "evidence": "Conversations from the chat panel can be stored in any Google Cloud data center. You shouldn't enter information into the chat panel that is subject to residency or jurisdictional regulatory compliances."
+      }
+    ]
+  },
+  {
+    "id": "arch-027",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini-cloud-assist",
+      "investigations",
+      "app-hub",
+      "root-cause-analysis"
+    ],
+    "stem": "A retailer has an organization resource and a Premium Support contract. Its checkout application runs in three projects: a Cloud Run frontend project, a GKE backend project, and a Cloud SQL data project. For compliance, the three projects must stay separate. During incidents, the SRE team wants one Gemini Cloud Assist investigation that correlates logs, metrics, and configuration across all three projects.\n\nWhat should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create the investigation in the frontend project, and add the backend and data project resources to it in the investigation creation panel."
+      },
+      {
+        "id": "B",
+        "text": "Put the three projects in a folder configured for application management, register their resources as one App Hub application, and investigate that application."
+      },
+      {
+        "id": "C",
+        "text": "Enable application management with a single-project boundary in the frontend project, register the resources of all three projects, and investigate that application."
+      },
+      {
+        "id": "D",
+        "text": "Move the backend and data resources into the frontend project, and run project-level investigations in that one project during incidents."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "An investigation diagnoses issues in a single project or a single App Hub application. An application-level investigation analyzes the resources of the application even when they are in different projects, so it meets the cross-project need while the projects stay separate. The application must be in a folder configured for application management; the investigation and its results live in that folder's management project. The retailer has an organization, so it can create the folder.",
+    "whyWrong": {
+      "A": "An investigation is limited to one project or one App Hub application. You can't proceed with an investigation that includes resources from a project outside its scope.",
+      "C": "Gemini Cloud Assist does not support applications in a single-project boundary. That boundary also holds only the resources of one project.",
+      "D": "This gives one project to investigate, but it breaks the stated rule that the three projects must stay separate."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+        "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+        "evidence": "An investigation is limited to diagnosing issues within a single Google Cloud project or single App Hub application."
+      },
+      {
+        "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+        "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+        "evidence": "The investigation analyzes resources within the selected application, even if they're spread across different projects."
+      },
+      {
+        "title": "Create a Gemini Cloud Assist investigation",
+        "url": "https://docs.cloud.google.com/cloud-assist/create-investigation",
+        "evidence": "Gemini Cloud Assist doesn't support applications created in a host project or a single-project boundary."
+      }
+    ]
+  },
+  {
+    "id": "arch-028",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "gemini-cloud-assist",
+      "application-design-center",
+      "governance",
+      "terraform"
+    ],
+    "stem": "A bank has an organization, and its application folders are configured for application management. The platform team wants application teams to turn natural-language requirements into infrastructure designs quickly. The bank has three rules: designs must start from templates that the platform team approved; designs must be checked against the bank's Security Command Center policies before deployment; and all deployments must go through the bank's existing CI/CD pipeline.\n\nWhich two actions should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Application teams ask Gemini Cloud Assist chat for gcloud commands, review the commands, and run them from Cloud Shell in each team project."
+      },
+      {
+        "id": "B",
+        "text": "The platform team publishes approved application templates to its Application Design Center catalog and shares the catalog with the spaces of the application teams."
+      },
+      {
+        "id": "C",
+        "text": "Application teams set up Application Design Center with a single-project boundary in each team project, so that Gemini Cloud Assist can refine designs there."
+      },
+      {
+        "id": "D",
+        "text": "Application teams refine a shared template with Gemini Cloud Assist in Application Design Center, run the security policy assessment, and download the Terraform for the pipeline."
+      },
+      {
+        "id": "E",
+        "text": "Application teams deploy each Gemini-generated design from the Application Design Center console, because the designs already follow Google Cloud best practices."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Each rule maps to one feature. Approved templates: the platform team publishes verified templates to a catalog and shares it with other spaces. Security checks: Application Design Center assesses a design against Security Command Center policies in the canvas, and Gemini Cloud Assist refines the open template. Existing pipeline: you can download the Terraform and use your own deployment tools instead of the console deployment.",
+    "whyWrong": {
+      "A": "Commands run from Cloud Shell skip the approved templates, the security policy assessment, and the CI/CD pipeline.",
+      "C": "Gemini Cloud Assist does not support applications in a single-project boundary, and the bank already has app-enabled folders.",
+      "E": "A console deployment bypasses the existing CI/CD pipeline. Google also recommends that you validate all Gemini output before you use it."
+    },
+    "sources": [
+      {
+        "title": "Application Design Center overview",
+        "url": "https://docs.cloud.google.com/application-design-center/docs/overview",
+        "evidence": "Enable self-service: platform engineers publish verified templates to a catalog."
+      },
+      {
+        "title": "Application Design Center overview",
+        "url": "https://docs.cloud.google.com/application-design-center/docs/overview",
+        "evidence": "By attaching security frameworks to your templates, you can perform application assessments directly in the design canvas."
+      },
+      {
+        "title": "Design an application with Gemini assistance",
+        "url": "https://docs.cloud.google.com/cloud-assist/design-application",
+        "evidence": "Download and deploy Terraform. This approach lets you use your own deployment tools and workflows."
+      }
+    ]
+  },
+  {
+    "id": "arch-029",
+    "objective": "1.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "launch-stages",
+      "preview",
+      "sla",
+      "deprecation"
+    ],
+    "stem": "A payment processor runs its card authorization API on Google Cloud. Its contract with merchants includes a monthly availability SLA. The team wants to use a new managed feature that would make the design simpler. The feature is in Preview. A GA feature can meet the same requirement, with more configuration work. The production release is in two months.\n\nWhat should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the Preview feature in production, because Google must give 12 months' notice before it removes a feature."
+      },
+      {
+        "id": "B",
+        "text": "Use the GA feature in production, and evaluate the Preview feature in a test environment until it reaches GA."
+      },
+      {
+        "id": "C",
+        "text": "Use the Preview feature in production, and deploy it in two regions to make up for the missing SLA."
+      },
+      {
+        "id": "D",
+        "text": "Use the Preview feature in production, and buy Premium Support to get a technical support commitment for it."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding facts are a contractual SLA and a production workload. Preview offerings have no SLAs or technical support commitments, and unless Google states otherwise, they are for test environments only. The 12-month discontinuation notice in the Google Cloud terms does not apply to pre-GA offerings. The GA feature is ready for production and has an SLA where applicable. The team can test the Preview feature until it reaches GA.",
+    "whyWrong": {
+      "A": "The discontinuation notice in the Google Cloud terms does not apply to pre-general availability offerings. A Preview feature can change or disappear with less notice.",
+      "C": "A second region does not give a Preview feature an SLA. Preview offerings are also for test environments only, unless Google states otherwise.",
+      "D": "Google provides no SLAs or technical support commitments for Preview offerings. A support plan does not make a Preview feature ready for production."
+    },
+    "sources": [
+      {
+        "title": "Products and Services: product launch stages",
+        "url": "https://cloud.google.com/products",
+        "evidence": "Preview offerings are often publicly announced, but are not necessarily feature-complete, and no SLAs or technical support commitments are provided for these."
+      },
+      {
+        "title": "Google Cloud Terms of Service",
+        "url": "https://cloud.google.com/terms",
+        "evidence": "This Section 1.4(e) (Discontinuation of Services) does not apply to Cloud Identity Services or pre-general availability Services, offerings, or functionality"
+      }
+    ]
+  },
+  {
+    "id": "arch-030",
+    "objective": "1.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "modernization",
+      "replatform",
+      "cloud-sql",
+      "memorystore",
+      "managed-services"
+    ],
+    "stem": "A retailer rehosted its order application to Compute Engine six months ago. The application runs on VMs. MySQL runs on two self-managed VMs, and a Redis cache runs on another VM. The operations team spends much of its time on database patches, backups, and cache maintenance. Leadership wants to reduce this operational work this quarter, with no changes to the application code.\n\nWhat should you recommend as the next modernization step?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Re-architect the application into microservices on Cloud Run, with a separate database for each service."
+      },
+      {
+        "id": "B",
+        "text": "Containerize the VMs with their current software, and run the MySQL and Redis containers in a GKE Standard cluster."
+      },
+      {
+        "id": "C",
+        "text": "Purchase committed use discounts for the database and cache VMs, and add a startup script that installs patches."
+      },
+      {
+        "id": "D",
+        "text": "Replatform the database to Cloud SQL for MySQL and the cache to Memorystore, and keep the application on its VMs."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding constraints are less operational work, a one-quarter timeline, and no code changes. This is a replatform step: replace self-hosted components with managed services, and keep the architecture. Cloud SQL and Memorystore are in-place replacements for self-hosted MySQL and Redis. Google says that these replacements should need no code changes and only minimal configuration changes, and that they need minimal management.",
+    "whyWrong": {
+      "A": "A re-architect migration changes how the code functions. It takes more time and effort than one quarter allows, and it breaks the no-code-change constraint.",
+      "B": "The team still runs and patches MySQL and Redis, now in containers. The change also adds cluster operations, so it does not remove the database and cache work.",
+      "C": "Commitments lower the price of the VMs, but the team still manages the database and cache software. A patch script automates one task but keeps the self-managed design."
+    },
+    "sources": [
+      {
+        "title": "Modernization path for .NET applications on Google Cloud",
+        "url": "https://docs.cloud.google.com/dotnet/docs/modernization-path-dotnet-applications-google-cloud",
+        "evidence": "These replacements should require no code changes and only minimal configuration changes, and they have the advantages of minimal management, enhanced security, and scalability."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "A re-architect migration is more complex than a refactor migration, so it takes more time and effort."
+      }
+    ]
+  },
+  {
+    "id": "arch-031",
+    "objective": "1.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-first",
+      "hybrid",
+      "apigee",
+      "api-facade",
+      "legacy"
+    ],
+    "stem": "A bank keeps customer account data in an on-premises core banking system. The bank follows a cloud-first approach for new workloads. It is building new mobile and partner applications on Google Cloud that need the account data. The bank plans to replace the core system within five years. The architects want the new applications to keep working without code changes when the core system is replaced.\n\nWhat should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Expose the core system through Apigee API proxies, and make the new applications call only the proxy APIs."
+      },
+      {
+        "id": "B",
+        "text": "Connect the new applications directly to the core system database over Cloud Interconnect with private addresses."
+      },
+      {
+        "id": "C",
+        "text": "Copy the core system data to Cloud SQL each night, and make the new applications read from the Cloud SQL copy."
+      },
+      {
+        "id": "D",
+        "text": "Delay the new applications until the core system replacement is complete, and then build them on the new system."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding requirement is that the new applications keep working when the backend changes. A cloud-first hybrid design puts API interfaces in front of legacy services, so that new cloud applications can use their data. Apigee API proxies decouple the app-facing API from the backend services. When the bank replaces the core system, the applications continue to call the same APIs.",
+    "whyWrong": {
+      "B": "Direct database access couples every new application to the schema of the old system. When the bank replaces the core system, each application needs code changes.",
+      "C": "A nightly copy gives stale data and still couples the applications to the old data model. It does not give the applications a stable interface for the future system.",
+      "D": "This delays business value for up to five years. In a cloud-first approach, new workloads go to the cloud now, while existing workloads stay where they are."
+    },
+    "sources": [
+      {
+        "title": "Understanding APIs and API proxies",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies",
+        "evidence": "API proxies decouple the app-facing API from your backend services, shielding those apps from backend code changes."
+      },
+      {
+        "title": "Architectural approaches to adopt a hybrid or multicloud architecture",
+        "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/adopt",
+        "evidence": "To complete the integration, you can use a hybrid architecture that modernizes legacy services by using API interfaces, which unlocks them for consumption by new cloud services and applications."
+      }
+    ]
+  },
+  {
+    "id": "arch-032",
+    "objective": "1.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "model-lifecycle",
+      "model-migration",
+      "regression-testing",
+      "agent-platform"
+    ],
+    "stem": "A health insurer runs a claims-summary feature on Gemini Enterprise Agent Platform (formerly Vertex AI). The feature uses a supervised fine-tuned version of a Gemini model and Provisioned Throughput. Google announced a retirement date for the base model six months from now, and a newer Gemini model is available. The feature is business-critical, and the compliance team must approve changes to AI systems.\n\nWhich migration approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run a new tuning job on the newer model with the hyperparameters of the current tuning job, and then move production traffic to the new tuned model."
+      },
+      {
+        "id": "B",
+        "text": "Keep the current model until the retirement date, then point the application to the replacement model, and fix any errors that users report."
+      },
+      {
+        "id": "C",
+        "text": "Involve compliance early, test the newer model without fine-tuning against your evaluation set, and run code, quality, and load regression tests before the switch."
+      },
+      {
+        "id": "D",
+        "text": "Copy the current tuned model to the newer model version in Model Registry, so that the tuning work carries over, and then move production traffic."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Several constraints decide the answer: a regulated business, a fine-tuned model, Provisioned Throughput, and six months before retirement. Google's migration guide says to get InfoSec, risk, and compliance approvals early. Newer models can give better quality, so first test the newer model without fine-tuning. Code and model quality regression tests apply to every upgrade, and load tests are required for applications that use Provisioned Throughput.",
+    "whyWrong": {
+      "A": "Google advises against reusing hyperparameter values from previous Gemini versions. This approach also skips the test without fine-tuning, the compliance approval, and the regression tests.",
+      "B": "The quick path is for teams that have no time for the migration guide. With six months left, a critical and regulated feature needs evaluations and regression tests before the switch, not after users report errors.",
+      "D": "You cannot move an existing tuned model from an older Gemini version. You must run a new tuning job for the new version."
+    },
+    "sources": [
+      {
+        "title": "Migrate to the latest Gemini models",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/migrate",
+        "evidence": "If your application uses supervised fine-tuning with an older Gemini model, first test your application with the latest model without fine-tuning and evaluate the results."
+      },
+      {
+        "title": "Migrate to the latest Gemini models",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/migrate",
+        "evidence": "Obtain approvals from your information security (InfoSec), risk, and compliance teams early."
+      },
+      {
+        "title": "Migrate to the latest Gemini models",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/migrate",
+        "evidence": "Load testing is required for applications that use Provisioned Throughput."
+      }
+    ]
+  },
+  {
+    "id": "arch-033",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "committed-use-discounts",
+      "flexible-cud",
+      "migration"
+    ],
+    "stem": "A software company spends a steady amount each hour on Compute Engine N2 VMs in `us-central1`. Over the next three years, it plans to move most services to GKE Autopilot and Cloud Run, and to add a second region, `europe-west1`. Finance approves a 3-year commitment only if the discount stays in use during and after the migration. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Purchase a 3-year resource-based commitment for N2 vCPUs and memory in `us-central1`, sized to the current fleet."
+      },
+      {
+        "id": "B",
+        "text": "Purchase 3-year service-specific spend-based commitments for Cloud Run and for GKE Autopilot, sized to the planned usage."
+      },
+      {
+        "id": "C",
+        "text": "Purchase a 3-year compute flexible commitment, sized to the steady hourly spend that remains through the migration."
+      },
+      {
+        "id": "D",
+        "text": "Keep all usage on demand, and rely on sustained use discounts to lower the cost until the migration is complete."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Compute flexible CUDs are spend-based. They apply to eligible spend on Compute Engine, GKE, and Cloud Run in any project and region of the Cloud Billing account. The deciding requirement is that the discount must stay in use while workloads move between services and regions. Size the commitment to the hourly spend that stays steady during the whole term.",
+    "whyWrong": {
+      "A": "A resource-based commitment covers only N2 resources in `us-central1`. As services move to GKE Autopilot, Cloud Run, and `europe-west1`, you still pay the commitment fee, but less usage consumes it.",
+      "B": "Service-specific commitments for Cloud Run and for GKE Autopilot are no longer available for purchase. Google tells you to purchase compute flexible commitments instead.",
+      "D": "Sustained use discounts apply only to Compute Engine and GKE VMs in some machine series, not to Cloud Run. They give less than a 3-year commitment and don't meet the finance goal."
+    },
+    "sources": [
+      {
+        "title": "Committed use discounts (CUDs) for Compute Engine",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/committed-use-discounts-overview",
+        "evidence": "With a compute flexible commitment, you can receive applicable CUDs on eligible Compute Engine spend across the commitment's Cloud Billing account, regardless of the project or region where you use your Compute Engine resources."
+      },
+      {
+        "title": "Committed use discounts",
+        "url": "https://docs.cloud.google.com/docs/cuds",
+        "evidence": "Cloud Run service-specific commitments are no longer available for purchase."
+      }
+    ]
+  },
+  {
+    "id": "arch-034",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "budgets",
+      "alerts"
+    ],
+    "stem": "A research lab links its projects to one Cloud Billing account. A team lead created an alerts-only budget of $2,000 per month for one project, with threshold rules at 50%, 90%, and 100%. The lead believes that the project stops when its spend reaches $2,000. What should you tell the lead?",
+    "options": [
+      {
+        "id": "A",
+        "text": "At 100%, Cloud Billing pauses all billable services in the project until the next month starts."
+      },
+      {
+        "id": "B",
+        "text": "The budget only sends alerts. Services keep running and keep accruing charges above $2,000."
+      },
+      {
+        "id": "C",
+        "text": "At 100%, Cloud Billing disables billing on the project, and all of its resources stop."
+      },
+      {
+        "id": "D",
+        "text": "At 100%, the Compute Engine quotas of the project drop to zero, so no new VMs can start."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "An alerts-only budget sends notifications when actual or forecasted cost passes a threshold. It doesn't stop services or block billing. To act on spend, connect the budget to Pub/Sub and automate a response, or use a spend cap budget (Preview) for an eligible service.",
+    "whyWrong": {
+      "A": "Only a spend cap budget (Preview) pauses usage, and only for one eligible service in one project. An alerts-only budget never pauses services.",
+      "C": "Cloud Billing doesn't disable billing by itself. You must build that response with Pub/Sub and a function, and Google warns that it can delete resources.",
+      "D": "Budgets don't change quotas. Quotas are a separate control that doesn't react to spend."
+    },
+    "sources": [
+      {
+        "title": "Create, edit, or delete budgets and budget alerts",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/budgets",
+        "evidence": "they don't automatically prevent the use or billing of your services when the alerts-only budget amount or threshold rules are met or exceeded"
+      },
+      {
+        "title": "Manage spend cap budgets",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps",
+        "evidence": "Spend caps are limited to budgets that are scoped to a single Google Cloud project and a single eligible service within the specified project."
+      }
+    ]
+  },
+  {
+    "id": "arch-035",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "budgets",
+      "pubsub",
+      "automation",
+      "cost-control"
+    ],
+    "stem": "A company gives each data science team its own development project. The teams run Compute Engine VMs for experiments and keep the results in Cloud Storage. Management wants an automatic action when a development project exceeds its monthly budget. The action must stop further compute cost without any risk to the stored results. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Connect each project budget to a Pub/Sub topic, and deploy a Cloud Run function that disables billing on the project when cost exceeds the budget."
+      },
+      {
+        "id": "B",
+        "text": "Create a spend cap budget (Preview) for Compute Engine in each project, so that Compute Engine usage pauses at the budget amount."
+      },
+      {
+        "id": "C",
+        "text": "Set the Compute Engine CPU quota of each project to a low value, and raise it again at the start of each month."
+      },
+      {
+        "id": "D",
+        "text": "Connect each project budget to a Pub/Sub topic, and deploy a Cloud Run function that stops the running VMs when cost exceeds the budget."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Budget notifications on Pub/Sub can trigger a Cloud Run function that controls resources selectively. Google's example stops Compute Engine VMs and leaves the Cloud Storage data intact. The deciding requirement is to stop compute cost while the stored results stay safe.",
+    "whyWrong": {
+      "A": "Disabling billing shuts down all resources in the project, and resources might be deleted irretrievably. This puts the stored results at risk.",
+      "B": "Compute Engine is not an eligible service for spend cap budgets (Preview), so you can't create this budget. Spend caps cover only the Gemini API, Agent Platform (formerly Vertex AI), Cloud Run, and Cloud Run functions. Spend caps also don't pause persistent resources, such as compute and storage services.",
+      "C": "Quotas limit amounts of resources, not cost. A low CPU quota doesn't react to the budget, and it blocks work even when a team is under budget."
+    },
+    "sources": [
+      {
+        "title": "Control resource usage with notifications",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/control-usage",
+        "evidence": "If you need a more nuanced response, you can selectively control resources. For example, you can stop some Compute Engine resources while leaving Cloud Storage resources intact."
+      },
+      {
+        "title": "Disable billing usage with notifications",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/disable-billing-with-notifications",
+        "evidence": "This tutorial removes Cloud Billing from your project, shutting down all resources. Resources might be irretrievably deleted."
+      },
+      {
+        "title": "Manage spend cap budgets",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps",
+        "evidence": "In this release, the eligible services include Gemini API, Agent Platform (formerly known as Vertex AI), Cloud Run, and Cloud Run functions."
+      }
+    ]
+  },
+  {
+    "id": "arch-036",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "labels",
+      "billing-export",
+      "bigquery",
+      "chargeback"
+    ],
+    "stem": "A company has 30 product teams. Some teams share projects, and each team runs development and production resources. Finance wants a monthly showback report of cost by team and by environment. Analysts want to use SQL and to see which individual resources drive cost. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add team and environment labels to each project, and group the Cloud Billing reports by those label keys."
+      },
+      {
+        "id": "B",
+        "text": "Create one budget for each team with a label filter, and collect the monthly totals from the budget alert emails."
+      },
+      {
+        "id": "C",
+        "text": "Define a standard set of labels, such as team and environment, and enforce it on every resource through Terraform."
+      },
+      {
+        "id": "D",
+        "text": "Enable the detailed usage cost export from Cloud Billing to a BigQuery dataset in a FinOps project."
+      },
+      {
+        "id": "E",
+        "text": "Create one project for each team and environment, and move all shared resources into them before the next report."
+      }
+    ],
+    "answer": [
+      "C",
+      "D"
+    ],
+    "explanation": "Labels on resources flow into Cloud Billing data, so you can split cost by team and environment even inside a shared project. The detailed usage cost export to BigQuery adds resource-level cost and supports SQL analysis. The deciding requirements are shared projects, which make project-level data too coarse, and resource-level analysis in SQL.",
+    "whyWrong": {
+      "A": "A project label can't split a shared project between teams. Also, when you group Cloud Billing reports by label keys, you don't see labels that are applied to a project.",
+      "B": "Budgets compare spend with a target and send alerts. They are not a reporting tool, and they give no resource-level data for SQL analysis.",
+      "E": "Moving all shared resources into new projects is a large and risky change. It still gives no SQL analysis or resource-level detail."
+    },
+    "sources": [
+      {
+        "title": "Labels overview",
+        "url": "https://docs.cloud.google.com/resource-manager/docs/labels-overview",
+        "evidence": "Labels are exported to BigQuery with the corresponding Google Cloud resources and their usage."
+      },
+      {
+        "title": "Export Cloud Billing data to BigQuery",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/export-data-bigquery",
+        "evidence": "The detailed export schema includes everything in the standard usage cost data plus resource-level cost data, like a virtual machine or SSD that generates service usage."
+      },
+      {
+        "title": "Analyze billing data and cost trends with Reports",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/reports",
+        "evidence": "When grouping by label keys, you don't see labels that are applied to a project."
+      }
+    ]
+  },
+  {
+    "id": "arch-037",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "billing-iam",
+      "least-privilege",
+      "finops"
+    ],
+    "stem": "A company creates a central FinOps team. The team must create and edit budgets for all projects and manage the export of cost data to BigQuery. The security policy says that the team must not link projects to billing accounts or change payment settings. Which role should you grant to follow the principle of least privilege?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Billing Account Costs Manager on the Cloud Billing account"
+      },
+      {
+        "id": "B",
+        "text": "Billing Account Administrator on the Cloud Billing account"
+      },
+      {
+        "id": "C",
+        "text": "Billing Account Viewer on the Cloud Billing account"
+      },
+      {
+        "id": "D",
+        "text": "Project Billing Manager on each project that the team supports"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Billing Account Costs Manager can create, edit, and delete budgets, view cost information, and manage the export of cost data to BigQuery. It can't link or unlink projects or manage the properties of the billing account. The deciding requirement is least privilege with rights for budgets and exports.",
+    "whyWrong": {
+      "B": "Billing Account Administrator can also link projects, manage payment methods, and manage other users. That breaks the security policy.",
+      "C": "Billing Account Viewer gives read access to cost information. It can't create budgets or manage the export.",
+      "D": "Project Billing Manager links and unlinks projects, which the policy forbids. It doesn't manage budgets or exports."
+    },
+    "sources": [
+      {
+        "title": "Cloud Billing access control and permissions",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/billing-access",
+        "evidence": "Create, edit, and delete budgets, view billing account cost information and transactions, and manage the export of billing cost data to BigQuery."
+      },
+      {
+        "title": "Cloud Billing access control and permissions",
+        "url": "https://docs.cloud.google.com/billing/docs/how-to/billing-access",
+        "evidence": "Doesn't allow the linking or unlinking of projects or otherwise managing the properties of the billing account."
+      }
+    ]
+  },
+  {
+    "id": "arch-038",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "bigquery",
+      "editions",
+      "slot-commitments",
+      "pricing-model"
+    ],
+    "stem": "A retailer runs BigQuery with on-demand pricing. Dashboards and scheduled reports create a steady query load all day, and the monthly query cost changes a lot from month to month. Finance wants a predictable monthly cost for this steady load and a discount for committing to it. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep on-demand pricing, and set a project-level custom quota on the bytes that queries can process each day."
+      },
+      {
+        "id": "B",
+        "text": "Create a Standard edition reservation with a baseline for the steady load, and buy a 3-year slot commitment for it."
+      },
+      {
+        "id": "C",
+        "text": "Create an Enterprise edition reservation with a baseline for the steady load, and buy a slot commitment for that baseline."
+      },
+      {
+        "id": "D",
+        "text": "Keep on-demand pricing, and partition and cluster the largest tables to reduce the bytes that each query scans."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Capacity pricing bills slot-hours, and baselines and commitments make the bill predictable. A slot commitment gives a discount for the baseline, and only the Enterprise and Enterprise Plus editions offer slot commitments. The deciding requirements are a predictable cost and a commitment discount.",
+    "whyWrong": {
+      "A": "A custom quota sets a daily limit on on-demand bytes. It limits spend by blocking queries, so dashboards can fail, and it gives no discount.",
+      "B": "Standard edition has no access to capacity commitments, so you can't buy a slot commitment for it.",
+      "D": "Partitioning and clustering reduce the bytes scanned, but on-demand cost still changes with usage. There is no commitment discount."
+    },
+    "sources": [
+      {
+        "title": "Estimate and control costs",
+        "url": "https://docs.cloud.google.com/bigquery/docs/best-practices-costs",
+        "evidence": "Enterprise and Enterprise Plus editions also provide optional one- or three-year slot commitments that can save money over the pay-as-you-go rate."
+      },
+      {
+        "title": "Introduction to workload management",
+        "url": "https://docs.cloud.google.com/bigquery/docs/reservations-intro",
+        "evidence": "With capacity-based billing, you allocate processing capacity for workloads with the option of automatically scaling capacity up and down when needed."
+      },
+      {
+        "title": "Understand BigQuery editions",
+        "url": "https://docs.cloud.google.com/bigquery/docs/editions-intro",
+        "evidence": "Capacity commitments are not required to purchase slots, but can reduce costs."
+      }
+    ]
+  },
+  {
+    "id": "arch-039",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "committed-use-discounts",
+      "reservations",
+      "capacity"
+    ],
+    "stem": "A bank runs a business-critical fleet of N2 VMs in the `us-east4-a` zone. The fleet size has been stable for two years and will stay stable for three more. The bank must be sure that it can recreate the VMs in that zone after a failure, and it wants the lowest price for this usage. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Purchase a 3-year compute flexible commitment that covers the hourly spend of the fleet."
+      },
+      {
+        "id": "B",
+        "text": "Purchase a 3-year resource-based N2 commitment in `us-east4`, and attach a reservation for the VMs in `us-east4-a`."
+      },
+      {
+        "id": "C",
+        "text": "Purchase a 3-year resource-based N2 commitment in `us-east4`, because the commitment holds capacity for the fleet."
+      },
+      {
+        "id": "D",
+        "text": "Create a reservation for the VMs in `us-east4-a`, and keep the VMs on on-demand pricing without a commitment."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A resource-based commitment gives a discount for stable N2 usage in the region, but it doesn't reserve capacity. A reservation holds capacity in the zone. To get both a discounted price and reserved capacity, you purchase a commitment and create a reservation. You can attach the reservation to the commitment.",
+    "whyWrong": {
+      "A": "A flexible commitment gives a discount, but it reserves no capacity in the zone. The capacity requirement is not met.",
+      "C": "A commitment is a price agreement only. It doesn't reserve capacity in a zone.",
+      "D": "The reservation holds capacity, but on-demand pricing misses the discount that a 3-year commitment gives for stable usage."
+    },
+    "sources": [
+      {
+        "title": "Resource-based committed use discounts",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/signing-up-committed-use-discounts",
+        "evidence": "A commitment provides a 1- or 3-year discounted price agreement, but it doesn't reserve capacity in a specific zone."
+      },
+      {
+        "title": "Resource-based committed use discounts",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/signing-up-committed-use-discounts",
+        "evidence": "To get zonal resources at discounted prices and also makes sure that capacity is reserved for them, you must both purchase commitments and create reservations for those zonal resources."
+      }
+    ]
+  },
+  {
+    "id": "arch-040",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "spot-vms",
+      "committed-use-discounts",
+      "sustained-use-discounts",
+      "batch"
+    ],
+    "stem": "A media company runs two workloads on Compute Engine in one region. A nightly transcoding job uses 200 N2 VMs for about 6 hours, and the job retries failed segments. A web tier of 20 E2 VMs runs all day at a steady load and will stay for at least 3 years. The company wants to cut cost without changing the application architecture. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Purchase a 3-year compute flexible commitment sized to the hourly spend of the nightly transcoding fleet."
+      },
+      {
+        "id": "B",
+        "text": "Run the transcoding VMs as Spot VMs, and let the job retry the segments of preempted VMs."
+      },
+      {
+        "id": "C",
+        "text": "Keep the web tier on demand, because sustained use discounts reduce its cost automatically."
+      },
+      {
+        "id": "D",
+        "text": "Purchase a 3-year resource-based N2 commitment for the 200 transcoding VMs."
+      },
+      {
+        "id": "E",
+        "text": "Purchase a 3-year resource-based E2 commitment in the region for the web tier."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "The transcoding job tolerates failure, so Spot VMs cut its cost: when VMs are preempted, the job slows but doesn't stop. The web tier has steady, predictable usage of one machine series in one region for 3 years, which fits a resource-based commitment. The deciding facts are the retry logic of the job and the steady usage of the web tier.",
+    "whyWrong": {
+      "A": "You pay the commitment fee every hour of the term, but the batch fleet runs only about 6 of 24 hours. Compute flexible commitments also don't apply to Spot VMs.",
+      "C": "E2 is not one of the machine series that get sustained use discounts.",
+      "D": "The N2 fleet runs about a quarter of each day. In Google's example, a commitment with a 30% discount needs more than 70% use in the month to break even."
+    },
+    "sources": [
+      {
+        "title": "Spot VMs",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+        "evidence": "If your workloads are fault-tolerant and can withstand possible VM preemption, Spot VMs can reduce your Compute Engine costs significantly."
+      },
+      {
+        "title": "Sustained use discounts",
+        "url": "https://docs.cloud.google.com/compute/docs/sustained-use-discounts",
+        "evidence": "Sustained use discounts apply only to the machine series listed in the Eligible resources and discount percentages section."
+      },
+      {
+        "title": "Get recommendations for committed use discounts (CUDs)",
+        "url": "https://docs.cloud.google.com/docs/cuds-recommender",
+        "evidence": "For example, if a commitment offers a 30% discount, then an instance needs to run for more than 70% of the month to break even."
+      }
+    ]
+  },
+  {
+    "id": "arch-041",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "bigquery",
+      "quotas",
+      "cost-control"
+    ],
+    "stem": "A company's analysts use BigQuery with on-demand pricing in one shared project. Last month, a few analysts ran very large exploratory queries that tripled the bill. The company wants a daily limit on the data that each analyst can process, so that one analyst can't use up a limit that the whole team shares. What should you configure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A budget for the project with a 100% threshold rule and email alerts to the analysts"
+      },
+      {
+        "id": "B",
+        "text": "A reservation with a maximum number of slots, assigned to the project of the analysts"
+      },
+      {
+        "id": "C",
+        "text": "A custom quota on the bytes that the whole project can process each day"
+      },
+      {
+        "id": "D",
+        "text": "A custom quota on the bytes that each user can process each day in the project"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "BigQuery custom query quotas are proactive: a query that exceeds the quota doesn't run. The `QueryUsagePerUserPerDay` quota applies separately to each user and service account in the project. The deciding requirement is a daily limit for each analyst. Custom quotas are approximate: they are a safeguard against excessive spending, not a strict limit.",
+    "whyWrong": {
+      "A": "A budget only sends alerts. It doesn't stop any query.",
+      "B": "Reservations belong to the capacity pricing model and limit slots, not bytes per analyst. The analysts use on-demand pricing.",
+      "C": "A project-level quota is one total for all users. One analyst can use it up and block the whole team."
+    },
+    "sources": [
+      {
+        "title": "Create custom query quotas",
+        "url": "https://docs.cloud.google.com/bigquery/docs/custom-quotas",
+        "evidence": "Custom quota is proactive, so you can't run an 11 TB query if you have a 10 TB quota."
+      },
+      {
+        "title": "Create custom query quotas",
+        "url": "https://docs.cloud.google.com/bigquery/docs/custom-quotas",
+        "evidence": "QueryUsagePerUserPerDay: User-level custom quota is separately applied to all users and service accounts within a project."
+      },
+      {
+        "title": "Create custom query quotas",
+        "url": "https://docs.cloud.google.com/bigquery/docs/custom-quotas",
+        "evidence": "Custom quotas are approximate. The custom quotas feature provides an additional safeguard against excessive spending, but is not designed to strictly limit bytes processed."
+      }
+    ]
+  },
+  {
+    "id": "arch-042",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "capex-opex",
+      "committed-use-discounts",
+      "budgets",
+      "autoscaling"
+    ],
+    "stem": "A manufacturer plans to move its data center workloads to Google Cloud. The CFO is used to hardware purchases that are depreciated over five years, and worries that cloud bills will be unpredictable. The workloads have a steady baseline all year and seasonal peaks in the fourth quarter. Which approach should you recommend to address the concern of the CFO and keep the elasticity of the cloud?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cover the steady baseline with committed use discounts, run the peaks on demand with autoscaling, and set budgets with forecasted-cost alerts."
+      },
+      {
+        "id": "B",
+        "text": "Size committed use discounts to the fourth-quarter peak, so that every hour of the year runs at the discounted rate."
+      },
+      {
+        "id": "C",
+        "text": "Run all workloads on sole-tenant nodes, so that the finance team can classify the spend as capital expenditure."
+      },
+      {
+        "id": "D",
+        "text": "Keep all usage on demand, and rely on sustained use discounts to lower and smooth the monthly bill."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "In the cloud, most costs are OpEx and follow consumption. A commitment adds a fixed monthly fee for its term, which makes the baseline predictable at a lower price. On-demand autoscaling handles the peaks, and forecasted-cost alerts warn early. The deciding requirements are predictability and elasticity together.",
+    "whyWrong": {
+      "B": "You pay for a commitment for its full term, whether you use it or not. A commitment sized to the peak stays mostly unused for three quarters of the year.",
+      "C": "Some services, such as sole-tenant nodes, might be classified as CapEx. But the concern of the CFO is predictability, and a change of accounting category doesn't make the bill predictable.",
+      "D": "Sustained use discounts apply only to some machine series and change with usage. They don't make the bill predictable."
+    },
+    "sources": [
+      {
+        "title": "Well-Architected Framework: Cost optimization pillar",
+        "url": "https://docs.cloud.google.com/architecture/framework/cost-optimization",
+        "evidence": "In the cloud, the costs for most cloud resources are treated as OpEx, where costs are incurred when the cloud resources are consumed."
+      },
+      {
+        "title": "Committed use discounts",
+        "url": "https://docs.cloud.google.com/docs/cuds",
+        "evidence": "This monthly fee applies to your purchased commitments for the entire duration of the commitment period."
+      }
+    ]
+  },
+  {
+    "id": "arch-043",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "adoption-framework",
+      "cloud-maturity",
+      "readiness"
+    ],
+    "stem": "A manufacturing company plans to move its data center to Google Cloud. Before the migration starts, the CIO wants to know how ready the organization is: how well teams learn new skills, how strongly leadership supports the move, how much of operations is automated, and how access is protected. The CIO also wants a target state and a way to find the gaps.\n\nWhat should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Migration Center, to discover the servers and to create a total cost of ownership report for the data center."
+      },
+      {
+        "id": "B",
+        "text": "A Well-Architected Framework review of each workload, to score its reliability, security, and cost design."
+      },
+      {
+        "id": "C",
+        "text": "Active Assist recommendations, to find idle resources and security risks in the current environment."
+      },
+      {
+        "id": "D",
+        "text": "The Google Cloud Adoption Framework, to rate the Learn, Lead, Scale, and Secure themes on the Cloud Maturity Scale."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The CIO asks about organizational readiness in four areas: learning, leadership, automation, and security. These areas match the four themes of the Google Cloud Adoption Framework: Learn, Lead, Scale, and Secure. Google recommends that you evaluate the maturity of your organization before a migration starts. The framework maps where your IT capabilities are now and where you want to be, so it shows the gaps.",
+    "whyWrong": {
+      "A": "Migration Center discovers assets and estimates cost. It does not measure skills, leadership support, or other organizational readiness.",
+      "B": "A Well-Architected Framework review checks the design of a workload against the pillars. It does not rate the maturity of the organization.",
+      "C": "Active Assist gives recommendations for Google Cloud resources. It does not assess skills or leadership, and the company has not moved yet."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "The Google Cloud Adoption Framework serves both as a map for determining where your business information technology capabilities are now, and as a guide to where you want to be."
+      },
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "Before starting your migration, you should evaluate the maturity of your organization in adopting cloud technologies."
+      },
+      {
+        "title": "Google Cloud Adoption Framework",
+        "url": "https://cloud.google.com/adoption-framework",
+        "evidence": "To build a truly cloud-first organization, there are four realms you'll need to excel in, whatever your business goals. These themes will be the foundation of your cloud readiness."
+      }
+    ]
+  },
+  {
+    "id": "arch-044",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "skills-readiness",
+      "first-mover",
+      "sponsorship"
+    ],
+    "stem": "An insurance company starts its first migration wave to Google Cloud. The architect must choose the team that migrates the first workload. The company wants the first move to build experience and patterns that later waves can reuse. It must not put the main line of business at risk.\n\nWhich team should the architect choose?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A motivated team with DevOps practices that owns a typical workload with few dependencies and has a sponsor with clear goals."
+      },
+      {
+        "id": "B",
+        "text": "The team that runs the policy-pricing engine, because a success on the most critical workload convinces leadership fastest."
+      },
+      {
+        "id": "C",
+        "text": "The team with the least cloud experience, because a first migration forces its members to learn Google Cloud quickly."
+      },
+      {
+        "id": "D",
+        "text": "The team that owns an annual reporting tool that few people use, because a failure there affects almost nobody."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The first workloads let teams build knowledge and experience on Google Cloud, so the choice of first movers is crucial. Google recommends a highly motivated team that is eager to try Google Cloud, with business leadership that sets clear goals and sponsors the team. The workload should not be business critical, should be typical of the estate so that the patterns apply later, and should have few dependencies.",
+    "whyWrong": {
+      "B": "A mistake in the most critical workload can harm the main line of business, which the stem rules out.",
+      "C": "An inexperienced team adds risk. Google recommends a motivated team with a history of modern practices for the first move.",
+      "D": "Google says to avoid rarely used workloads. They add little momentum to the migration, and problems in them are hard to detect."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "When choosing your first-movers, pay attention to the teams responsible for each workload. The team responsible for a first-mover should be highly motivated, and eager to try Google Cloud and its services."
+      },
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "if you choose a workload that's used only a few times per year by a low number of users, although it's a low risk migration, it doesn't increase the momentum of your migration"
+      }
+    ]
+  },
+  {
+    "id": "arch-045",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "skills-readiness",
+      "training",
+      "team-assessment"
+    ],
+    "stem": "A logistics company plans to move its applications from VMware to GKE Autopilot and Cloud SQL within 9 months. The operations team knows VMware and on-premises databases well, but it has no Google Cloud experience. Leadership wants the internal team to run the new platform after the migration.\n\nWhat should the architect recommend first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Hire a partner to build and run the new platform with broad administrative access, and keep it as the first point of escalation."
+      },
+      {
+        "id": "B",
+        "text": "Require every operations engineer to pass the Professional Cloud Architect exam before the team starts any migration work."
+      },
+      {
+        "id": "C",
+        "text": "Compare the team's current skills with the skills that GKE Autopilot and Cloud SQL need, then train by role in sandbox projects."
+      },
+      {
+        "id": "D",
+        "text": "Move the VMs to Compute Engine with the same design as VMware, so that the team can use its current skills without training."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding requirement is that the internal team must run the new platform. Google recommends that you first assess the team: list the skills, the level of expertise for each skill, and the people who know most. The gap between these skills and the target managed services defines the training program. A free environment to test and learn is critical to the learning experience of the staff.",
+    "whyWrong": {
+      "A": "A partner with broad privileged access as the first point of escalation keeps the knowledge outside the company. This conflicts with the goal that the internal team runs the platform.",
+      "B": "A certification for every engineer before any work delays the migration. It also does not target the gap between the current skills and GKE Autopilot and Cloud SQL.",
+      "D": "This avoids the skills gap by dropping the target design. The stem sets GKE Autopilot and Cloud SQL as the target."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Optimize your environment",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-optimizing-your-environment",
+        "evidence": "You start by listing all skills, the level of expertise for each skill, and which team members are the most knowledgeable for each skill."
+      },
+      {
+        "title": "Migrate to Google Cloud: Optimize your environment",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-optimizing-your-environment",
+        "evidence": "For example, if you start using a managed service, you need the skills to provision, configure, and interact with that service."
+      },
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "Creating a free environment for testing and learning is critical to the learning experience of your staff."
+      }
+    ]
+  },
+  {
+    "id": "arch-046",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "change-management",
+      "adoption",
+      "adkar"
+    ],
+    "stem": "A bank's platform team built a shared deployment pipeline and monitoring stack on Google Cloud. After six months, only 3 of 40 application teams use it. The other teams say that their current tools work, and that a move takes weeks of rework for no clear gain. The CIO proposes a mandate: every team must move by the end of the quarter.\n\nWhat should the architect recommend to increase adoption?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Make the move a small, mostly automated step, state the benefit for each team, and coach the teams while early adopters show results."
+      },
+      {
+        "id": "B",
+        "text": "Support the mandate, and send every exception request to a change advisory board that meets once each month."
+      },
+      {
+        "id": "C",
+        "text": "Send all developers to a week of training on the new platform, and then enforce the deadline of the mandate."
+      },
+      {
+        "id": "D",
+        "text": "Move all 37 remaining teams in one planned weekend, and have the platform team do the rework for them."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The teams resist because the cost of the move is high and the benefit is not clear. Google SRE found that the cost of migration must be small relative to the net benefits of the new common solution. Otherwise, the migration itself blocks adoption. People also need time, coaching, and training. Incremental change with early wins helps the organization buy into the change.",
+    "whyWrong": {
+      "B": "A mandate with a heavyweight approval board does not lower the cost of the move, so the teams still see no gain. DORA recommends peer review instead of heavyweight change approval.",
+      "C": "Training helps, but people also need time and coaching to close the gap between knowledge and ability. The weeks of rework also stay in place.",
+      "D": "A single large move is the opposite of incremental change. It puts 37 teams at risk at the same time."
+    },
+    "sources": [
+      {
+        "title": "Organizational Change Management in SRE",
+        "url": "https://sre.google/workbook/organizational-change/",
+        "evidence": "We have learned that to achieve success, the cost of migration (from older, fragmented but specialized solutions) needs to be small relative to the net benefits of the new common solution."
+      },
+      {
+        "title": "Organizational Change Management in SRE",
+        "url": "https://sre.google/workbook/organizational-change/",
+        "evidence": "On the human side, in order to recognize and embrace change, people need time, coaching, and training in new tools and skills."
+      },
+      {
+        "title": "Organizational Change Management in SRE",
+        "url": "https://sre.google/workbook/organizational-change/",
+        "evidence": "An iterative approach can demonstrate early wins that help an organization buy into the vision of change and justify further investment."
+      }
+    ]
+  },
+  {
+    "id": "arch-047",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "decision-making",
+      "adr",
+      "documentation"
+    ],
+    "stem": "At a retail company, architects keep reopening old design debates, such as why the checkout service uses regional GKE clusters. The reasons exist only in meeting notes and chat threads. New team members cannot find out why the team made each decision.\n\nWhat should the architects do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a change advisory board that must approve every future architecture change before teams implement it."
+      },
+      {
+        "id": "B",
+        "text": "Write architecture decision records with the options, requirements, and decision reasons, and store them with the code in version control."
+      },
+      {
+        "id": "C",
+        "text": "Publish a wiki page of the current architecture standards, and replace the old standards when the teams change them."
+      },
+      {
+        "id": "D",
+        "text": "Record every design meeting on video, and store the recordings in a shared Cloud Storage bucket for new members."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "An architecture decision record (ADR) captures the key options, the main requirements, and the decision itself. Readers can see why the team chose, for example, regional GKE clusters. Teams often store ADRs in Markdown close to the code. When a decision changes, the ADR keeps the previous decision and the reason for the change. This history helps new members and stops repeat discussions.",
+    "whyWrong": {
+      "A": "An approval board controls future changes, but it does not record why the team made past decisions.",
+      "C": "A list of the current standards drops the options, the reasons, and the history, so the debates continue.",
+      "D": "Recordings are hard to search, and they do not give a short, structured reason for each decision."
+    },
+    "sources": [
+      {
+        "title": "Architecture decision records overview",
+        "url": "https://docs.cloud.google.com/architecture/architecture-decision-records",
+        "evidence": "An ADR captures the key options available, the main requirements that drive a decision, and the design decisions themselves."
+      },
+      {
+        "title": "Architecture decision records overview",
+        "url": "https://docs.cloud.google.com/architecture/architecture-decision-records",
+        "evidence": "The ADR can help teams avoid a repeat of the same discussion points, and it can help provide historical context when teams revisit topics."
+      }
+    ]
+  },
+  {
+    "id": "arch-048",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "decision-making",
+      "error-budget",
+      "slo"
+    ],
+    "stem": "At a media company, the product team wants to release the streaming app every week. The SRE team wants to stop releases for a month after each outage. Each month, the two teams escalate the dispute to a vice president, who decides based on the latest incident. The CTO wants a repeatable and objective way to decide when releases go ahead.\n\nWhat should the architect recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a change advisory board with the SRE lead and the product lead, and have it approve each weekly release."
+      },
+      {
+        "id": "B",
+        "text": "Set an availability target of 100% for the app, and stop releases whenever any user request fails."
+      },
+      {
+        "id": "C",
+        "text": "Keep the final decision with the vice president, and send the VP a monthly report of incidents and releases."
+      },
+      {
+        "id": "D",
+        "text": "Have both teams agree on an SLO and an error budget, and release only while error budget remains."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding need is a repeatable, objective rule instead of a monthly escalation. In Google SRE practice, the two teams define an error budget from the SLO. The budget is an objective metric for how unreliable the service can be in the period, and it removes the politics from the negotiation. Releases continue while error budget remains, and they stop or slow down when the budget runs out.",
+    "whyWrong": {
+      "A": "A board still decides each release by negotiation. It adds heavyweight approval but gives no objective rule.",
+      "B": "A 100% target is probably never the right reliability target. It leaves no error budget, so releases would stop almost all the time.",
+      "C": "The decision stays political and depends on the latest incident, which is the problem that the CTO wants to fix."
+    },
+    "sources": [
+      {
+        "title": "Embracing Risk (Site Reliability Engineering)",
+        "url": "https://sre.google/sre-book/embracing-risk/",
+        "evidence": "This metric removes the politics from negotiations between the SREs and the product developers when deciding how much risk to allow."
+      },
+      {
+        "title": "Embracing Risk (Site Reliability Engineering)",
+        "url": "https://sre.google/sre-book/embracing-risk/",
+        "evidence": "As long as the uptime measured is above the SLO—in other words, as long as there is error budget remaining—new releases can be pushed."
+      },
+      {
+        "title": "Embracing Risk (Site Reliability Engineering)",
+        "url": "https://sre.google/sre-book/embracing-risk/",
+        "evidence": "100% is probably never the right reliability target: not only is it impossible to achieve, it's typically more reliability than a service's users want or notice."
+      }
+    ]
+  },
+  {
+    "id": "arch-049",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "customer-success",
+      "success-measures",
+      "dora"
+    ],
+    "stem": "A software company migrated its customer portal to Google Cloud. All services meet their SLOs, and infrastructure costs fell. However, the business sponsor calls the project a failure. The sponsor expected the move to let teams release features much faster, and release speed did not change. Nobody measured release speed during the project. The company now starts a second phase.\n\nWhat should the architect do to make sure that the business can judge the second phase a success?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Tighten the SLOs of the portal services, so that the reports show the sponsor a higher level of reliability."
+      },
+      {
+        "id": "B",
+        "text": "Buy Premium Support, so that a Technical Account Manager runs Operational Health Reviews of support and spend trends."
+      },
+      {
+        "id": "C",
+        "text": "Agree with the sponsor on measurable goals for release speed, such as DORA software delivery metrics, and review them together regularly."
+      },
+      {
+        "id": "D",
+        "text": "Hold a blameless retrospective of the first phase, and share the lessons learned with all the engineering teams."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The first phase met its technical targets but not the business objective, because nobody defined or measured that objective. Google recommends a measurable goal for each requirement. For faster and safer releases, DORA's software delivery metrics track the speed, ease, and safety of changes. Regular reviews with the sponsor use this feedback to steer the work.",
+    "whyWrong": {
+      "A": "Stricter SLOs measure reliability, which already meets its targets. They do not measure release speed, which is the sponsor's goal.",
+      "B": "Operational Health Reviews cover progress, support, and spend with Google. They do not define or measure the sponsor's release-speed goal.",
+      "D": "A retrospective helps the team learn from the first phase. It does not set a measurable goal that the sponsor agrees to for the second phase."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud Well-Architected Framework",
+        "url": "https://docs.cloud.google.com/architecture/framework",
+        "evidence": "Using DORA's software delivery metrics can help your team monitor the speed, ease, and safety of making changes to the system."
+      },
+      {
+        "title": "Migrate to Google Cloud: Optimize your environment",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-optimizing-your-environment",
+        "evidence": "After you finalize the list of requirements, define measurable goals for each requirement."
+      },
+      {
+        "title": "Continuously improve and innovate",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/continuously-improve-and-innovate",
+        "evidence": "Collect feedback from users, stakeholders, and team members. Use the feedback to identify opportunities to improve your cloud solutions."
+      }
+    ]
+  },
+  {
+    "id": "arch-050",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "stakeholder-management",
+      "vision-statement",
+      "poc"
+    ],
+    "stem": "A CIO wants to move a regional bank's workloads to Google Cloud. The CFO doubts the savings, and the head of compliance worries about the regulators. Two business unit leaders want different results: one wants lower costs, and the other wants faster product launches. The CIO asks the architect to prepare the adoption plan.\n\nWhich two actions should the architect take first? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Write a vision statement of the business objectives and drivers, and get sign-off from the leading stakeholders and sponsors."
+      },
+      {
+        "id": "B",
+        "text": "Start with the most visible customer-facing application, so that the doubtful leaders see quick results."
+      },
+      {
+        "id": "C",
+        "text": "Ask the CIO to choose between the two business unit goals alone, so that the plan has one clear objective."
+      },
+      {
+        "id": "D",
+        "text": "Choose the target Google Cloud services and publish a reference architecture before the first stakeholder meeting."
+      },
+      {
+        "id": "E",
+        "text": "Run a proof of concept with success criteria that the CFO and the compliance head agree on, and share the results."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "The stakeholders have competing visions and doubts. Google recommends that you agree on the key business and technical objectives and drivers, and get stakeholder sign-off, as the base for planning. A proof of concept with agreed success criteria then builds stakeholder confidence, because it shows tangible benefits to leadership and technical teams.",
+    "whyWrong": {
+      "B": "A critical, visible workload as the first move puts the main line of business at risk. It also skips the agreement on objectives.",
+      "C": "A decision by one person leaves the other stakeholders out. Google recommends sign-off from the stakeholders who lead and sponsor the initiative.",
+      "D": "A design before the objectives are agreed ignores the stakeholders. The architecture must follow the business objectives."
+    },
+    "sources": [
+      {
+        "title": "Plan a hybrid and multicloud strategy",
+        "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/strategy",
+        "evidence": "Agreeing on the key business and technical objectives and drivers, then obtaining relevant stakeholder sign-off can provide a foundation for the next steps in the planning process."
+      },
+      {
+        "title": "Migrate to Google Cloud: Best practices for validating a migration plan",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-best-practices",
+        "evidence": "A successful POC builds stakeholder confidence in the migration plan by demonstrating tangible benefits to your leadership and technical teams."
+      },
+      {
+        "title": "Plan a hybrid and multicloud strategy",
+        "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/strategy",
+        "evidence": "In addition, planning takes time and might lead to competing stakeholder visions."
+      }
+    ]
+  }
+]

@@ -1,0 +1,20 @@
+# Step 10 copies this file to import.tf and replaces PROJECT_ID.
+# The import block adopts a firewall rule that you created with gcloud.
+# terraform plan shows the import, and terraform apply runs it.
+
+import {
+  id = "projects/PROJECT_ID/global/firewalls/lab60-allow-icmp-internal"
+  to = google_compute_firewall.allow_icmp_internal
+}
+
+resource "google_compute_firewall" "allow_icmp_internal" {
+  name          = "lab60-allow-icmp-internal"
+  network       = module.network.network_self_link
+  direction     = "INGRESS"
+  priority      = 1000
+  source_ranges = [var.subnet_cidr]
+
+  allow {
+    protocol = "icmp"
+  }
+}

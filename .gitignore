@@ -1,0 +1,9 @@
+.cache/
+node_modules/
+.DS_Store
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+__pycache__/
+*.pyc

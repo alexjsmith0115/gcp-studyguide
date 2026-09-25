@@ -1,0 +1,4 @@
+google-cloud-pubsub>=2.41.0
+google-cloud-firestore>=2.32.0
+google-cloud-spanner>=3.71.0
+google-cloud-bigtable>=2.47.0

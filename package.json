@@ -1,0 +1,19 @@
+{
+  "name": "pca-studyguide",
+  "private": true,
+  "type": "module",
+  "description": "Google Cloud Professional Cloud Architect study guide: notes, labs, question bank, and a study app.",
+  "scripts": {
+    "build": "node app/build.mjs",
+    "test": "node --test app/test/*.test.mjs",
+    "check:questions": "python3 tools/check_questions.py --all",
+    "check:labs": "python3 tools/check_labs.py",
+    "check:links": "python3 tools/check_links.py",
+    "share": "node app/build.mjs --strict --share"
+  },
+  "devDependencies": {
+    "gray-matter": "^4.0.3",
+    "highlight.js": "^11.12.0",
+    "marked": "^18.0.14"
+  }
+}

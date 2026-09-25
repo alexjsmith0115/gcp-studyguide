@@ -1,0 +1,198 @@
+{
+  "exam": "Google Cloud Professional Cloud Architect",
+  "guideVersion": "v6.1",
+  "guideUrl": "https://services.google.com/fh/files/misc/professional_cloud_architect_exam_guide_english.pdf",
+  "certPage": "https://cloud.google.com/learn/certification/cloud-architect",
+  "sampleQuestions": "https://docs.google.com/forms/d/e/1FAIpQLSf54f7FbtSJcXUY6-DUHfBG31jZ3pujgb8-a5io_9biJsNpqg/viewform?usp=sf_link",
+  "retrieved": "2026-09-24",
+  "format": {
+    "durationMinutes": 120,
+    "questions": "50-60 multiple choice and multiple select",
+    "caseStudyShare": "20-30% of questions",
+    "caseStudiesPerExam": 2,
+    "fee": "$200 (plus tax where applicable)",
+    "languages": ["English", "Japanese"],
+    "validityYears": 2,
+    "recommendedExperience": "3+ years of industry experience including 1+ years designing and managing solutions using Google Cloud"
+  },
+  "wafPillars": ["operational excellence", "security", "reliability", "performance optimization", "cost optimization", "sustainability"],
+  "caseStudies": [
+    {"id": "altostrat", "name": "Altostrat Media", "pdf": "https://services.google.com/fh/files/misc/v6.1_pca_altostrat_media_case_study_english.pdf", "local": "sources/case-study-altostrat-media.pdf"},
+    {"id": "cymbal", "name": "Cymbal Retail", "pdf": "https://services.google.com/fh/files/misc/v6.1_pca_cymbal_retail_case_study_english.pdf", "local": "sources/case-study-cymbal-retail.pdf"},
+    {"id": "ehr", "name": "EHR Healthcare", "pdf": "https://services.google.com/fh/files/misc/v6.1_pca_ehr_healthcare_case_study_english.pdf", "local": "sources/case-study-ehr-healthcare.pdf"},
+    {"id": "knightmotives", "name": "KnightMotives Automotive", "pdf": "https://services.google.com/fh/files/misc/v6.1_pca_knightmotives_automotive_case_study_english.pdf", "local": "sources/case-study-knightmotives-automotive.pdf"}
+  ],
+  "sections": [
+    {
+      "id": "1", "weight": 25,
+      "title": "Designing and planning a cloud solution architecture",
+      "objectives": [
+        {"id": "1.1", "title": "Designing a cloud solution infrastructure that meets business requirements", "considerations": [
+          "Business use cases and product strategy",
+          "Identifying functional and non-functional requirements",
+          "Business continuity plan",
+          "Cost optimization",
+          "Supporting the application design",
+          "Integration patterns with external systems",
+          "Movement of data",
+          "Design decision trade-offs",
+          "Workload disposition strategies (e.g., build, buy, modify, or deprecate)",
+          "Success measurements (e.g., key performance indicators [KPI], return on investment [ROI], and metrics)",
+          "Security and compliance",
+          "Observability"
+        ]},
+        {"id": "1.2", "title": "Designing a cloud solution infrastructure that meets technical requirements", "considerations": [
+          "Familiarity with the Google Cloud Well-Architected Framework",
+          "High availability and fail-over design",
+          "Flexibility of cloud resources",
+          "Scalability to meet growth requirements",
+          "Performance and latency",
+          "Gemini Cloud Assist",
+          "Backup and recovery"
+        ]},
+        {"id": "1.3", "title": "Designing network, storage, and compute resources", "considerations": [
+          "Integration with on-premises/multicloud environments",
+          "Google Cloud AI and machine learning solutions (e.g., Gemini LLMs, Agent Builder, Model Garden, Gemini models, and AI Hypercomputer)",
+          "Cloud-native networking (e.g., virtual private cloud [VPC], peering, firewalls, load balancers, routing, container networking, shared VPC, and Private Service Connect)",
+          "Choosing data processing solutions",
+          "Choosing appropriate storage types (e.g., object, file, and databases)",
+          "Mapping compute needs to platform products (e.g., Google Kubernetes Engine [GKE], Cloud Run, and Cloud Run functions)",
+          "Choosing compute resources (e.g., spot VMs, custom machine types, and specialized workload)"
+        ]},
+        {"id": "1.4", "title": "Creating a migration plan (i.e., documents and architectural diagrams)", "considerations": [
+          "Integrating solutions with existing systems",
+          "Assessing and migrating systems and data to support the solution (e.g., Google Cloud Migration Center)",
+          "Using migration methodologies, workload testing, network planning, and dependency planning",
+          "Determining software license implications and financial impact"
+        ]},
+        {"id": "1.5", "title": "Envisioning future solution improvements", "considerations": [
+          "Cloud and technology improvements",
+          "Evolution of business needs",
+          "Cloud-first design approach"
+        ]}
+      ]
+    },
+    {
+      "id": "2", "weight": 17.5,
+      "title": "Managing and provisioning a cloud solution infrastructure",
+      "objectives": [
+        {"id": "2.1", "title": "Configuring network topologies", "considerations": [
+          "Extending to on-premises environments (hybrid networking)",
+          "Extending to a multicloud environment that may include Google Cloud-to-Google Cloud communication",
+          "Security protection (e.g. intrusion protection, access control, and firewalls)",
+          "VPC design and load balancing (e.g., access to cloud, internet, and cloud adjacent services)"
+        ]},
+        {"id": "2.2", "title": "Configuring individual storage systems", "considerations": [
+          "Data storage allocation",
+          "Data processing and compute provisioning",
+          "Security and access management",
+          "Configuration for data transfer and latency",
+          "Data retention and data lifecycle management",
+          "Data growth planning",
+          "Data protection (e.g., backup and recovery)"
+        ]},
+        {"id": "2.3", "title": "Configuring compute systems", "considerations": [
+          "Compute resource provisioning",
+          "Compute volatility configuration (spot vs. standard)",
+          "Cloud-native network configuration for compute resources (e.g., Compute Engine, GKE, serverless networking, and Google Cloud VMware Engine)",
+          "Infrastructure orchestration, resource configuration, and patch management",
+          "Container orchestration",
+          "Serverless computing"
+        ]},
+        {"id": "2.4", "title": "Leveraging Gemini Enterprise Agent Platform for end-to-end ML workflows", "considerations": [
+          "Using Agent Platform Pipelines to automate and orchestrate the ML lifecycle",
+          "Preparing for Agent Platform data integration",
+          "Using AI Hypercomputer (e.g., using AI Hypercomputer, Cloud Run functions, and Agent Platform for ML/AI workloads; integrating GPUs and TPUs in ML model training and serving; optimizing for different consumption models; and running large-scale AI model trainings)"
+        ]},
+        {"id": "2.5", "title": "Configuring prebuilt solutions or APIs with Agent Platform", "considerations": [
+          "Differentiating between the Google AI APIs (e.g., Search, Conversation, Vision, Image, Video, and Audio)",
+          "Integrating Gemini Enterprise features (AI Agents and NotebookLM) to enhance workflows",
+          "Integrating AI models from Model Garden into the solution"
+        ]}
+      ]
+    },
+    {
+      "id": "3", "weight": 17.5,
+      "title": "Designing for security and compliance",
+      "objectives": [
+        {"id": "3.1", "title": "Designing for security", "considerations": [
+          "Identity and Access Management (IAM)",
+          "Resource hierarchy (organizations, folders, and projects)",
+          "Data security (key management, encryption, secret management)",
+          "Separation of duties",
+          "Security controls (e.g., auditing, VPC Service Controls, context aware access, organization policy, and hierarchical firewall policy)",
+          "Managing customer-managed encryption keys with Cloud Key Management Service (Cloud KMS)",
+          "Secure remote access (e.g., Identity-Aware Proxy, service account impersonation, Chrome Enterprise Premium, and Workload Identity Federation)",
+          "Securing software supply chain",
+          "Securing AI (e.g., Model Armor, Sensitive Data Protection, and secure model deployment)"
+        ]},
+        {"id": "3.2", "title": "Designing for compliance", "considerations": [
+          "Legislation and regulation (e.g., health record privacy, children's privacy, data privacy, ownership, and data sovereignty)",
+          "Commercial (e.g., sensitive data such as credit card information handling and personally identifiable information [PII])",
+          "Industry certifications (e.g., SOC 2)",
+          "Audits (including logs)"
+        ]}
+      ]
+    },
+    {
+      "id": "4", "weight": 15,
+      "title": "Analyzing and optimizing technical and business processes",
+      "objectives": [
+        {"id": "4.1", "title": "Analyzing and defining technical processes", "considerations": [
+          "Software development lifecycle (SDLC)",
+          "Continuous integration/continuous deployment",
+          "Troubleshooting/root cause analysis best practices",
+          "Testing and validation of software and infrastructure",
+          "Service catalog and provisioning",
+          "Disaster recovery"
+        ]},
+        {"id": "4.2", "title": "Analyzing and defining business processes", "considerations": [
+          "Stakeholder management (e.g., influencing and facilitation)",
+          "Change management",
+          "Team assessment/skills readiness",
+          "Decision-making processes",
+          "Customer success management",
+          "Cost optimization/resource optimization (CapEx/OpEx)",
+          "Business continuity"
+        ]}
+      ]
+    },
+    {
+      "id": "5", "weight": 12.5,
+      "title": "Managing implementation",
+      "objectives": [
+        {"id": "5.1", "title": "Advising development and operation teams to ensure the successful deployment of the solution", "considerations": [
+          "Application and infrastructure deployment",
+          "API management best practices (e.g., Apigee)",
+          "Testing frameworks (load/unit/integration)",
+          "Data and system migration and management tooling",
+          "Gemini Cloud Assist"
+        ]},
+        {"id": "5.2", "title": "Interacting with Google Cloud programmatically", "considerations": [
+          "Cloud Shell Editor, Cloud Code, and Cloud Shell Terminal",
+          "Google Cloud SDKs (e.g., gcloud, gsutil, and bq)",
+          "Cloud Emulators (e.g., Bigtable, Spanner, Pub/Sub, and Firestore)",
+          "Infrastructure as Code (e.g., IaC and Terraform)",
+          "Accessing Google API best practices",
+          "Google API client libraries"
+        ]}
+      ]
+    },
+    {
+      "id": "6", "weight": 12.5,
+      "title": "Ensuring solution and operations excellence",
+      "objectives": [
+        {"id": "6.1", "title": "Understanding the principles and recommendations of the operational excellence pillar of the Google Cloud Well-Architected Framework", "considerations": []},
+        {"id": "6.2", "title": "Familiarity with Google Cloud Observability solutions", "considerations": [
+          "Monitoring and logging",
+          "Profiling and benchmarking",
+          "Alerting strategies"
+        ]},
+        {"id": "6.3", "title": "Deployment and release management", "considerations": []},
+        {"id": "6.4", "title": "Assisting with the support of deployed solutions", "considerations": []},
+        {"id": "6.5", "title": "Evaluating quality control measures", "considerations": []},
+        {"id": "6.6", "title": "Ensuring the reliability of solutions in production (e.g., chaos engineering, penetration testing, and load testing)", "considerations": []}
+      ]
+    }
+  ]
+}

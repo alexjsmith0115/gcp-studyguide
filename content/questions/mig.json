@@ -1,0 +1,2383 @@
+[
+  {
+    "id": "mig-001",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "migration-phases",
+      "plan",
+      "landing-zone"
+    ],
+    "stem": "A company has finished its workload inventory, dependency map, and TCO calculation for a move to Google Cloud. Next, the team sets up identity management, the organization and project structure, and networking for the workloads. Which phase of the Google migration framework is the team in now?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Assess"
+      },
+      {
+        "id": "B",
+        "text": "Plan"
+      },
+      {
+        "id": "C",
+        "text": "Deploy"
+      },
+      {
+        "id": "D",
+        "text": "Optimize"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "In the plan phase, you create the basic cloud infrastructure for the workloads and plan how to move the apps. This work includes identity management, the organization and project structure, and networking. The inventory, the dependencies, and the TCO belong to the assess phase, which the team has finished.",
+    "whyWrong": {
+      "A": "The assess phase covers the inventory, the dependencies, the TCO, and performance benchmarks. The team has finished that work.",
+      "C": "The deploy phase designs and runs the process that moves the workloads. It comes after the foundation is ready.",
+      "D": "The optimize phase starts when the workloads run in Google Cloud. It uses cloud capabilities to improve performance, scale, and cost."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "In this phase, you create the basic cloud infrastructure for your workloads to live in and plan how you will move apps."
+      }
+    ]
+  },
+  {
+    "id": "mig-002",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "migration-types",
+      "rehost",
+      "lift-and-shift"
+    ],
+    "stem": "A company must leave its data center in five months, when its hosting contract ends. It runs 200 VMs with commercial off-the-shelf software and some in-house apps whose build process nobody can reproduce. The operations team knows only its current tools. Leadership wants to modernize later. Which migration type should you recommend for the first move?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rehost (lift and shift): move the workloads with only the minimum changes that they need to run in Google Cloud."
+      },
+      {
+        "id": "B",
+        "text": "Replatform (lift and optimize): move the workloads to containers on GKE during the migration."
+      },
+      {
+        "id": "C",
+        "text": "Refactor (move and improve): change the code of each app to use cloud features before the move."
+      },
+      {
+        "id": "D",
+        "text": "Rebuild (remove and replace): write new cloud-native versions of the apps and retire the old ones."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deadline is short, the team knows only its current tools, and some apps cannot be built again from source. Rehost is the quickest migration type, and the team keeps its tools and skills. Rehost also supports ready-made software, and it is required when you cannot refactor or retire a workload. The team can modernize after the move.",
+    "whyWrong": {
+      "B": "Replatforming to containers takes more work than rehosting and needs several rounds of testing. The team has neither the skills nor the time before the contract ends.",
+      "C": "Refactoring changes the source code. Some apps cannot be built again, and the deadline is short.",
+      "D": "A rebuild needs new code, new toolchains, and new skills. The company cannot rebuild commercial software, and the deadline is short."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Get started",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+        "evidence": "Rehost migrations are the easiest to perform because your team can continue to use the same set of tools and skills that they were using before."
+      }
+    ]
+  },
+  {
+    "id": "mig-003",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "first-movers",
+      "wave-planning"
+    ],
+    "stem": "You are choosing the first workloads for a large migration. The goal is to let the teams build Google Cloud experience that applies to later workloads, with low business risk. The first movers must also build momentum for the migration and let the teams detect problems quickly. Which two workloads are the best first movers? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "The payment service that runs the main financial transactions of the e-commerce site"
+      },
+      {
+        "id": "B",
+        "text": "A stateless product-catalog microservice that needs only configuration changes and has a motivated team"
+      },
+      {
+        "id": "C",
+        "text": "A tax-reporting tool that three users run twice a year"
+      },
+      {
+        "id": "D",
+        "text": "The staging database that the e-commerce teams use for tests"
+      },
+      {
+        "id": "E",
+        "text": "A batch job that uses a technology that no other workload uses"
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Good first movers are not business critical, need little refactoring, and teach patterns that apply to later workloads. They must also build momentum, so Google advises against rarely used workloads, where problems are hard to detect. Stateless workloads are easier, because no data is split between the two environments during the move. Google names the staging database as a better first mover than the component with the main financial transactions.",
+    "whyWrong": {
+      "A": "A mistake in the main transaction logic affects the main line of business. A first mover should not be business critical.",
+      "C": "A rarely used workload is low risk, but it does not add momentum. Problems are also hard to detect when few people use the workload.",
+      "E": "An edge case does not teach patterns that apply to other workloads. A first mover should help the teams build a knowledge base."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "Choosing a workload that isn't business critical protects your main line of business, and decreases the impact on business from undiscovered risks and mistakes while your team is learning cloud technologies."
+      },
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "For example, stateless microservices are good first-mover candidates, because they don't rely on any local stateful data."
+      },
+      {
+        "title": "Migrate to Google Cloud: Assess and discover your workloads",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+        "evidence": "A better choice is the SQL database supporting your workloads, or better yet, the staging database."
+      }
+    ]
+  },
+  {
+    "id": "mig-004",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "migration-center",
+      "rvtools",
+      "discovery"
+    ],
+    "stem": "A company runs 1,200 VMs on VMware vCenter. The security team does not allow any new software in the data center this quarter. The VMware team already exports RVTools 4.5 reports every month. The CFO wants a TCO estimate for each application, based on the real VM sizes, within two weeks. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Install the Migration Center discovery client on a Windows machine in the data center, and let it scan vCenter for two weeks."
+      },
+      {
+        "id": "B",
+        "text": "Run the Migration Center discovery client CLI (mcdc) against vCenter, and export the results to Migration Center."
+      },
+      {
+        "id": "C",
+        "text": "Import the RVTools export into Migration Center, group the VMs by application, and generate a TCO report."
+      },
+      {
+        "id": "D",
+        "text": "Use the Migration Center rapid cost estimate with the total vCPUs, memory, and storage of the data center."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Manual import adds assets to Migration Center without a collector in your infrastructure. Migration Center imports tables from RVTools 4.3.1 or later, so the existing exports work. Groups then map the VMs to applications, and a TCO report prices each group.",
+    "whyWrong": {
+      "A": "The discovery client is software that you install on a Windows machine in your environment. The security team does not allow new software this quarter.",
+      "B": "The mcdc CLI is software that you download and run in your environment. The security team does not allow that.",
+      "D": "A rapid cost estimate uses totals for the whole environment, not the size of each VM. It cannot give a TCO for each application."
+    },
+    "sources": [
+      {
+        "title": "Import RVTools data",
+        "url": "https://docs.cloud.google.com/migration-center/docs/import-data-rvtools",
+        "evidence": "If you don't want to install and run an automatic data collection with discovery client in your infrastructure, you can manually upload your infrastructure data into Migration Center."
+      },
+      {
+        "title": "Start an asset discovery",
+        "url": "https://docs.cloud.google.com/migration-center/docs/start-asset-discovery",
+        "evidence": "To perform continuous collection, install the discovery client on a Windows machine and allow it to periodically scan your infrastructure and gather configuration and performance data."
+      }
+    ]
+  },
+  {
+    "id": "mig-005",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "data-migration",
+      "continuous-replication",
+      "cutover"
+    ],
+    "stem": "An order-management system writes to an on-premises database all day and night. The business accepts at most 15 minutes of downtime at cutover. The development team is fully booked for six months and cannot change the application code. Which data migration approach should you plan?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Scheduled maintenance: copy the data, stop the workloads, copy the remaining changes, and switch in one cut-over window."
+      },
+      {
+        "id": "B",
+        "text": "Y (writing and reading): change the workloads to write to both sites, and then move the reads to the new site."
+      },
+      {
+        "id": "C",
+        "text": "Data-access microservice: send all reads and writes through one service, and change that service to use the new site."
+      },
+      {
+        "id": "D",
+        "text": "Continuous replication: copy the data, replicate the changes to the new site, and switch when the sites are in sync."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Continuous replication copies the data first and then replicates the changes. At cutover, only a small amount of data must be synchronized, so the cut-over window is short. It builds on the scheduled maintenance approach and needs no application changes. Y and the data-access microservice avoid a cut-over window, but they need development work.",
+    "whyWrong": {
+      "A": "Scheduled maintenance is ideal only when the workloads can afford a cut-over window. For a busy database, the window can be longer than 15 minutes.",
+      "B": "Y shifts most of the effort to development, because every workload that uses the data must change. The team cannot change the code.",
+      "C": "The workloads must first be refactored to use the data-access microservice. The team cannot change the code."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Transfer your large datasets",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+        "evidence": "the continuous replication approach minimizes the time for the required cut-over window, because it minimizes the amount of data that you need to synchronize"
+      },
+      {
+        "title": "Database Migration Service overview",
+        "url": "https://docs.cloud.google.com/database-migration/docs/overview",
+        "evidence": "Doing the switch when the source and destination are in sync gives you minimal downtime."
+      }
+    ]
+  },
+  {
+    "id": "mig-006",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "licensing",
+      "byol",
+      "sole-tenant",
+      "windows-server"
+    ],
+    "stem": "A company wants to move 40 Windows Server 2016 VMs to Compute Engine and keep using its existing Windows Server licenses. The licenses come from an enrollment that started in 2017, and the company has no Software Assurance. What must the design include?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Standard multi-tenant VMs from Google's Windows Server images, with the license charge removed through License Mobility"
+      },
+      {
+        "id": "B",
+        "text": "Standard multi-tenant VMs that run imported images of the company's own Windows Server media"
+      },
+      {
+        "id": "C",
+        "text": "Sole-tenant nodes that run VMs from imported images of the company's own Windows Server media"
+      },
+      {
+        "id": "D",
+        "text": "Google's pay-as-you-go Windows Server images on standard VMs with a 3-year committed use discount"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "License Mobility does not cover Windows Server. These licenses can qualify for BYOL through Outsourcing Software Management Rights, because Windows Server 2016 was released before October 1, 2019, and the enrollment started before that date. That option needs dedicated hardware such as sole-tenant nodes, because Microsoft does not allow it in a multi-tenant environment. BYOL with dedicated hardware also means that you bring your own media.",
+    "whyWrong": {
+      "A": "License Mobility applies to server applications such as SQL Server, not to the Windows Server operating system. It also needs Software Assurance.",
+      "B": "Microsoft does not allow Outsourcing Software Management Rights in a multi-tenant environment. The default tenancy of Compute Engine is multi-tenant.",
+      "D": "Pay-as-you-go images charge for Google's Windows Server licenses. The company would not use its existing licenses."
+    },
+    "sources": [
+      {
+        "title": "Microsoft licensing on Google Cloud FAQ",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing-faq",
+        "evidence": "Microsoft doesn't allow the use of Outsourcing Software Management Rights in a multi-tenant environment, and therefore you cannot use the software with the default tenancy for Compute Engine instances."
+      },
+      {
+        "title": "Microsoft Licensing on Google Cloud",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing",
+        "evidence": "Windows Server licenses are typically not eligible for BYOL using License Mobility, but might be eligible for BYOL by Outsourcing Software Management Rights."
+      },
+      {
+        "title": "Bringing your own licenses",
+        "url": "https://docs.cloud.google.com/compute/docs/nodes/bringing-your-own-licenses",
+        "evidence": "requires you to bring your own media and to run that media on hardware configurations, such as sole-tenant nodes, that are compliant with your licenses"
+      }
+    ]
+  },
+  {
+    "id": "mig-007",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "licensing",
+      "sql-server",
+      "license-mobility"
+    ],
+    "stem": "A company runs SQL Server Enterprise on Windows Server on-premises. It has SQL Server licenses with active Software Assurance and License Mobility, but no Windows Server licenses that qualify for BYOL. It wants the lowest cost on Compute Engine and does not want to manage dedicated hosts. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Standard multi-tenant VMs from a pay-as-you-go Windows Server image, with the company's SQL Server licenses brought through License Mobility"
+      },
+      {
+        "id": "B",
+        "text": "Sole-tenant nodes, because every SQL Server BYOL deployment on Compute Engine needs dedicated hardware"
+      },
+      {
+        "id": "C",
+        "text": "Standard multi-tenant VMs from a SQL Server Enterprise premium image, with the existing licenses kept for later"
+      },
+      {
+        "id": "D",
+        "text": "Sole-tenant nodes with BYOL Windows Server and BYOL SQL Server, and a host maintenance policy that migrates VMs within the node group"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "With Software Assurance and License Mobility, SQL Server licenses can run on default multi-tenant instances, if the operating system does not need sole-tenant nodes. A pay-as-you-go Windows Server image does not need sole-tenant nodes. So the company pays for Windows Server on demand, brings its own SQL Server licenses, and needs no dedicated hosts.",
+    "whyWrong": {
+      "B": "Sole-tenant nodes are required for SQL Server BYOL only without License Mobility, under Outsourcing Software Management Rights. This company has License Mobility.",
+      "C": "A SQL Server premium image includes a charge for Google's SQL Server license. The company would pay twice for SQL Server.",
+      "D": "The company has no Windows Server licenses that qualify for BYOL. Sole-tenant nodes also add the dedicated hosts that the company does not want."
+    },
+    "sources": [
+      {
+        "title": "Microsoft licensing on Google Cloud FAQ",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing-faq",
+        "evidence": "If you have Software Assurance with License Mobility, your SQL Server license might be eligible to run on default multi-tenant instances as long as the underlying operating system does not require the use of sole-tenant nodes."
+      },
+      {
+        "title": "Microsoft Licensing on Google Cloud",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing",
+        "evidence": "Application server licenses like SQL Server and Sharepoint Server are typically eligible for BYOL with License Mobility."
+      }
+    ]
+  },
+  {
+    "id": "mig-008",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "migration-center",
+      "tco",
+      "committed-use-discounts"
+    ],
+    "stem": "You generated a Migration Center TCO report with the default preference set. Finance compares it with its own estimate at on-demand prices, and the report is much lower. Finance does not plan to sign any commitment in the first year. What explains the difference, and what should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Migration Center priced the VMs in the region that you selected at activation. Activate Migration Center again in the target region."
+      },
+      {
+        "id": "B",
+        "text": "The default pricing track is a 3-year resource-based committed use discount. Create a preference set with the On demand pricing track, and generate the report again."
+      },
+      {
+        "id": "C",
+        "text": "The report leaves out network costs. Set the data transfer out estimate to 100%, and generate the report again."
+      },
+      {
+        "id": "D",
+        "text": "The report counts only the servers that have performance data. Import performance data for every server, and generate the report again."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "When the product pricing track is No preference, Migration Center uses a 3-year resource-based committed use discount (CUD). That cost is lower than on-demand prices. A preference set with the On demand track matches the plan of the finance team. You can compare both preference sets in one TCO report.",
+    "whyWrong": {
+      "A": "The activation region is where Migration Center stores and processes its data, and you cannot change it later. The target region for the VMs is the Location in each preference set.",
+      "C": "The report already includes network costs through the data transfer out estimate, which is 5% by default. A value of 100% does not model the plan of the finance team.",
+      "D": "Assets without performance data are sized with utilization estimates, and the report shows how many assets use them. These assets are not left out."
+    },
+    "sources": [
+      {
+        "title": "Migration preferences for servers",
+        "url": "https://docs.cloud.google.com/migration-center/docs/server-preferences",
+        "evidence": "No preference: defaults to a 3-year resource-based committed use discount (CUD) for the lowest total cost of ownership on predictable workloads."
+      },
+      {
+        "title": "Get started with Migration Center",
+        "url": "https://docs.cloud.google.com/migration-center/docs/get-started-with-migration-center",
+        "evidence": "From the Region list, select the region where you want Migration Center to store and process the information about your migrations."
+      }
+    ]
+  },
+  {
+    "id": "mig-009",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "fallback",
+      "rollback",
+      "database-migration"
+    ],
+    "stem": "A company moved its orders database to Cloud SQL and switched all clients to it. Two weeks later, a new feature fails, and the team must move the clients back to the on-premises database until a fix is ready. No orders can be lost. What should the migration plan have included to make this possible?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A full backup of the source database, taken just before the switchover, to restore if a fallback is needed"
+      },
+      {
+        "id": "B",
+        "text": "A Migrate to Virtual Machines rollback, which copies the new data back to the source"
+      },
+      {
+        "id": "C",
+        "text": "A second Database Migration Service job in the same direction, ready to promote after a fix"
+      },
+      {
+        "id": "D",
+        "text": "A reverse migration from Cloud SQL to the source database that starts at switchover, with the source clients kept ready to use"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A fallback is a migration in reverse, from the target databases back to the source databases. It keeps the source up to date after clients start to write to the target. Before the clients switch back, all changes in the target must be drained into the source. Google says to treat a fallback as a full database migration, with tests.",
+    "whyWrong": {
+      "A": "A backup from before the switchover does not have the orders written to Cloud SQL in the last two weeks. A restore loses those orders.",
+      "B": "Migrate to Virtual Machines moves VMs, not Cloud SQL databases. Its rollback is manual, and it does not push data written on the new VM back to the source VM.",
+      "C": "A job in the same direction moves data to Cloud SQL, not back to the source. It cannot bring the last two weeks of orders to the source."
+    },
+    "sources": [
+      {
+        "title": "Database migration: Concepts and principles (Part 2)",
+        "url": "https://docs.cloud.google.com/architecture/database-migration-concepts-principles-part-2",
+        "evidence": "A fallback is like a migration but in reverse. That is, with a fallback you set up a migration from the target databases back to the source databases."
+      },
+      {
+        "title": "VM migration process",
+        "url": "https://docs.cloud.google.com/migrate/virtual-machines/docs/5.0/discover/lifecycle",
+        "evidence": "note any data written on the Compute Engine instance is not pushed back to the original source VM"
+      }
+    ]
+  },
+  {
+    "id": "mig-010",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "hybrid",
+      "tiered-hybrid",
+      "integration"
+    ],
+    "stem": "A retailer wants its web storefront on Google Cloud before the holiday season, to handle traffic spikes. The order database and the backend services must stay on-premises for 18 more months because of a regulatory audit. What should you recommend for this hybrid period?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the stateless frontend to Google Cloud behind a global load balancer with autoscaling. Keep the backend on-premises, and connect to it through Cloud Interconnect or Cloud VPN."
+      },
+      {
+        "id": "B",
+        "text": "Move the order database to Cloud SQL first, because backends change less often, and keep the frontend on-premises."
+      },
+      {
+        "id": "C",
+        "text": "Move the whole application with Migrate to Virtual Machines in one wave, and keep a copy of the database on-premises."
+      },
+      {
+        "id": "D",
+        "text": "Move the frontend and the backend services to GKE, and keep only the order database on-premises."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "This is the tiered hybrid pattern: you move the frontend to the cloud and keep the backend in the private environment. Frontends depend on backends, but backends do not depend on frontends, so frontends are easier to move first. The cloud frontend can use global load balancing and autoscaling for the traffic spikes.",
+    "whyWrong": {
+      "B": "The database must stay on-premises for the audit. Also, backends are usually harder to isolate and move than frontends.",
+      "C": "The database and the backend services must stay on-premises for 18 months. Moving the whole application breaks that requirement.",
+      "D": "The backend services must stay on-premises with the database. Only the frontend can move now."
+    },
+    "sources": [
+      {
+        "title": "Tiered hybrid pattern",
+        "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns-and-practices/tiered-hybrid-pattern",
+        "evidence": "Backend components don't depend on frontend components. Therefore, isolating and migrating frontend applications tends to be less complex than migrating backend applications."
+      }
+    ]
+  },
+  {
+    "id": "mig-011",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cutover",
+      "dns",
+      "network-planning"
+    ],
+    "stem": "During a test cutover of a web app, you changed the DNS records to point to the new Google Cloud load balancer. Many clients kept reaching the old site for hours. What should you add to the plan for the real cutover?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Raise the TTL of the DNS records before the cutover, so that clients cache the new address for longer"
+      },
+      {
+        "id": "B",
+        "text": "Create a Cloud DNS forwarding zone that sends the queries of the clients to the on-premises DNS servers"
+      },
+      {
+        "id": "C",
+        "text": "Lower the TTL of the DNS records to its minimum well before the cutover, and find clients that cache DNS and ignore the TTL"
+      },
+      {
+        "id": "D",
+        "text": "Turn off the old site at the same time as the DNS change, so that clients must use the new address"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Clients and resolvers cache DNS records for the TTL. The Google guide for validating a migration plan asks whether you can set the TTL to its minimum before the migration. It also asks whether clients and intermediaries respect the TTL, because some applications cache DNS on the client side.",
+    "whyWrong": {
+      "A": "A higher TTL makes clients keep the old address for longer before the change. It makes the problem worse.",
+      "B": "A forwarding zone changes where Cloud DNS sends queries. It does not change how long clients cache the old record.",
+      "D": "Clients that still cache the old address fail until the cache expires. That turns a slow switch into an outage."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Best practices for validating a migration plan",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-best-practices",
+        "evidence": "Can you set the DNS record TTL to its minimum value in seconds before you perform the migration?"
+      }
+    ]
+  },
+  {
+    "id": "mig-012",
+    "objective": "1.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "migration-center",
+      "data-residency"
+    ],
+    "stem": "A European company must keep all its migration assessment data in the EU. The team is about to activate Migration Center in a new project. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Activate with any region, and set the Location of each preference set to an EU region"
+      },
+      {
+        "id": "B",
+        "text": "Activate with any region, and move the data to an EU region after the assessment"
+      },
+      {
+        "id": "C",
+        "text": "Activate with any region, and create a VPC Service Controls perimeter around Migration Center"
+      },
+      {
+        "id": "D",
+        "text": "Select an EU region, such as europe-west1, during the activation"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "During activation, you select the region where Migration Center stores and processes the information about your migrations. You cannot change this region later. So the team must select an EU region during the activation.",
+    "whyWrong": {
+      "A": "The Location of a preference set is the region where the migrated VMs will run. It does not decide where Migration Center stores its data.",
+      "B": "You cannot change the region that you select during activation.",
+      "C": "A service perimeter controls data movement across the perimeter boundary. It does not select the region where Migration Center stores data."
+    },
+    "sources": [
+      {
+        "title": "Get started with Migration Center",
+        "url": "https://docs.cloud.google.com/migration-center/docs/get-started-with-migration-center",
+        "evidence": "From the Region list, select the region where you want Migration Center to store and process the information about your migrations."
+      },
+      {
+        "title": "Create and manage migration preferences",
+        "url": "https://docs.cloud.google.com/migration-center/docs/migration-preferences",
+        "evidence": "Specify the Google Cloud region where you want to run the virtual machine (VM) instances that you plan to migrate to Google Cloud."
+      }
+    ]
+  },
+  {
+    "id": "mig-013",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "transfer-appliance",
+      "data-transfer",
+      "bandwidth"
+    ],
+    "stem": "A media company must move 250 TB of archived video from its data center to Cloud Storage within five weeks. The data center has a 100 Mbps internet connection that other services also use. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run gcloud storage rsync from a server in the data center, and repeat it until all files are copied"
+      },
+      {
+        "id": "B",
+        "text": "Order Transfer Appliance, copy the data to it on-premises, and ship it back to Google"
+      },
+      {
+        "id": "C",
+        "text": "Install Storage Transfer Service agents in the data center, and set a bandwidth limit to protect other services"
+      },
+      {
+        "id": "D",
+        "text": "Create a Storage Transfer Service event-driven transfer from the data center to Cloud Storage"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "At 100 Mbps, an online transfer of 100 TB takes over 100 days, so 250 TB cannot finish in five weeks. Transfer Appliance is a good fit when an upload over the network would take more than one week. You copy the data to the appliance and ship it back, and Google uploads the data to Cloud Storage.",
+    "whyWrong": {
+      "A": "The network is the limit. At 100 Mbps, any online tool takes far longer than five weeks for 250 TB.",
+      "C": "Agents still send the data over the 100 Mbps connection. A bandwidth limit makes the transfer even slower.",
+      "D": "Event-driven transfers copy new objects from Amazon S3, Azure, or Cloud Storage. They do not read an on-premises file system."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Transfer your large datasets",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+        "evidence": "If you only have a 100 Mbps connection (or worse from a remote location), the same transfer takes over 100 days."
+      },
+      {
+        "title": "Transfer Appliance",
+        "url": "https://docs.cloud.google.com/transfer-appliance/docs/4.0/overview",
+        "evidence": "It would take more than one week to upload your data over the network."
+      },
+      {
+        "title": "Event-driven transfers",
+        "url": "https://docs.cloud.google.com/storage-transfer/docs/event-driven-transfers",
+        "evidence": "Event-driven transfers are supported from AWS S3, Azure, or Cloud Storage, and always use a Cloud Storage bucket as the destination."
+      }
+    ]
+  },
+  {
+    "id": "mig-014",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "storage-transfer-service",
+      "on-premises",
+      "agents"
+    ],
+    "stem": "An engineering firm has 400 TB of files on an on-premises NFS filer and a 10 Gbps Cloud Interconnect connection. It needs an initial copy to Cloud Storage and then incremental copies until cutover. The transfer must not use all the bandwidth during business hours. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Storage Transfer Service with agents on machines that mount the NFS share, in an agent pool with a bandwidth limit"
+      },
+      {
+        "id": "B",
+        "text": "gcloud storage rsync from one server that mounts the NFS share, run every night by cron"
+      },
+      {
+        "id": "C",
+        "text": "Transfer Appliance for the initial copy, and a new appliance for each incremental copy"
+      },
+      {
+        "id": "D",
+        "text": "BigQuery Data Transfer Service with a scheduled transfer from the NFS share"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Storage Transfer Service for on-premises data is designed for large transfers, and it supports full and incremental copies. Agents run in Docker containers on machines that mount the NFS data, and more agents give more speed. An agent pool can have a bandwidth limit that protects other workloads. The 10 Gbps connection is fast enough for an online transfer.",
+    "whyWrong": {
+      "B": "gcloud storage is the standard tool for small and medium transfers. Storage Transfer Service is designed for large transfers of up to petabytes, with full and incremental copies.",
+      "C": "Transfer Appliance fits when the network is too slow. At 10 Gbps the transfer can run online, and shipping an appliance for each incremental copy adds delay.",
+      "D": "BigQuery Data Transfer Service loads data into BigQuery. It does not copy file systems to Cloud Storage."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Transfer your large datasets",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+        "evidence": "Storage Transfer Service for on-premises data is designed for large-scale transfers (up to petabytes of data, billions of files). It supports full copies or incremental copies"
+      },
+      {
+        "title": "Manage agent pools",
+        "url": "https://docs.cloud.google.com/storage-transfer/docs/on-prem-agent-pools",
+        "evidence": "An agent pool is a collection of agents that use the same configuration, with uniform access and visibility to your source and destination. Agent pools also provide control over transfer bandwidth limits."
+      },
+      {
+        "title": "Data transfer options",
+        "url": "https://docs.cloud.google.com/storage-transfer/docs/transfer-options",
+        "evidence": "The agent runs within a Docker container and has access to your locally-mounted NFS data."
+      }
+    ]
+  },
+  {
+    "id": "mig-015",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "database-migration-service",
+      "promotion",
+      "cutover"
+    ],
+    "stem": "You run a Database Migration Service continuous migration job from an on-premises MySQL database to Cloud SQL for MySQL. The job is in the CDC phase, and the replication delay is a few seconds. The business accepts a short downtime but no data loss. Which two actions should you take before you promote the migration job? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the application to write to both the source database and Cloud SQL for one day"
+      },
+      {
+        "id": "B",
+        "text": "Delete the migration job, so that the Cloud SQL instance becomes a writable primary"
+      },
+      {
+        "id": "C",
+        "text": "Stop all writes, scripts, and client connections to the source database"
+      },
+      {
+        "id": "D",
+        "text": "Restart the Cloud SQL destination instance to apply the pending changes"
+      },
+      {
+        "id": "E",
+        "text": "Wait until the replication delay is zero"
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "To promote without data loss, first stop all writes and client connections to the source. The downtime starts here. Then wait until the replication delay is zero, which means that the job has processed all changes. Promotion then makes the destination a writable primary instance, and you cannot undo it.",
+    "whyWrong": {
+      "A": "Database Migration Service does not support a dual-write scenario.",
+      "B": "You delete the migration job after the promotion. The promotion is the step that makes the destination a writable primary.",
+      "D": "A restart does not apply pending changes. The migration job applies the changes through replication."
+    },
+    "sources": [
+      {
+        "title": "Promote a migration",
+        "url": "https://docs.cloud.google.com/database-migration/docs/mysql/promote-migration",
+        "evidence": "Stop all writes, running scripts, and client connections to the source database. The downtime period begins here."
+      },
+      {
+        "title": "Promote a migration",
+        "url": "https://docs.cloud.google.com/database-migration/docs/mysql/promote-migration",
+        "evidence": "Wait until the replication delay is at zero, which means that the migration job has processed all outstanding changes."
+      },
+      {
+        "title": "Database Migration Service overview",
+        "url": "https://docs.cloud.google.com/database-migration/docs/overview",
+        "evidence": "Database Migration Service doesn't support a dual-write scenario, that is writing to and reading from both the source and destination."
+      }
+    ]
+  },
+  {
+    "id": "mig-016",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "datastream",
+      "cdc",
+      "bigquery"
+    ],
+    "stem": "A retailer keeps its order system on an on-premises Oracle database. Analysts want the order tables in BigQuery with only minutes of delay for dashboards. Oracle stays the system of record, and the team does not want to manage servers for the replication. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Database Migration Service migration from Oracle to AlloyDB for PostgreSQL, and federated queries from BigQuery"
+      },
+      {
+        "id": "B",
+        "text": "A BigQuery Data Transfer Service transfer from Oracle that runs every day"
+      },
+      {
+        "id": "C",
+        "text": "A Datastream stream from Oracle to BigQuery through a private connectivity configuration"
+      },
+      {
+        "id": "D",
+        "text": "An hourly export of the Oracle tables to files, copied to Cloud Storage with Storage Transfer Service"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Datastream is a serverless change data capture (CDC) and replication service with minimal latency. It replicates data from operational databases such as Oracle into BigQuery, and the source stays in place. A private connectivity configuration reaches sources over VPN or Interconnect through VPC peering.",
+    "whyWrong": {
+      "A": "Database Migration Service moves a database to a new primary in Cloud SQL or AlloyDB. The business keeps Oracle as the system of record and wants the data in BigQuery.",
+      "B": "BigQuery Data Transfer Service loads data on a schedule. A daily load does not give minutes of delay.",
+      "D": "Hourly exports give up to hours of delay, and someone must run and manage the export jobs."
+    },
+    "sources": [
+      {
+        "title": "Datastream overview",
+        "url": "https://docs.cloud.google.com/datastream/docs/overview",
+        "evidence": "Datastream is a serverless and easy-to-use change data capture (CDC) and replication service that lets you synchronize data reliably, and with minimal latency."
+      },
+      {
+        "title": "Introduction to the BigQuery Data Transfer Service",
+        "url": "https://docs.cloud.google.com/bigquery/docs/dts-introduction",
+        "evidence": "The BigQuery Data Transfer Service automates data movement into BigQuery on a scheduled, managed basis."
+      }
+    ]
+  },
+  {
+    "id": "mig-017",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "migrate-to-containers",
+      "gke",
+      "modernization"
+    ],
+    "stem": "A company wants to move Linux workloads from VMware VMs into containers on GKE with little code change. Which workload is the best candidate for Migrate to Containers?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A 2 TB in-memory analytics database with strict performance requirements"
+      },
+      {
+        "id": "B",
+        "text": "A license server whose license is tied to the hardware ID of its host"
+      },
+      {
+        "id": "C",
+        "text": "A storage gateway that loads a kernel-mode NFS driver"
+      },
+      {
+        "id": "D",
+        "text": "A Tomcat application server with bursty traffic and a low duty cycle"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google lists web and application servers and business logic middleware such as Tomcat as a good fit. Low duty-cycle and bursty workloads also fit well. Large in-memory databases, special kernel drivers, and licenses tied to hardware IDs are not a good fit.",
+    "whyWrong": {
+      "A": "High-performance and large in-memory databases are not a good fit for Migrate to Containers.",
+      "B": "Software with licenses tied to hardware ID registration is not a good fit.",
+      "C": "VMs with special kernel drivers, such as kernel-mode NFS, are not a good fit."
+    },
+    "sources": [
+      {
+        "title": "Planning best practices",
+        "url": "https://docs.cloud.google.com/migrate/containers/docs/planning-best-practices",
+        "evidence": "In general, most Linux workloads are compatible with migration, except for those workloads explicitly listed below under Not a good fit."
+      }
+    ]
+  },
+  {
+    "id": "mig-018",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "vmware-engine",
+      "hcx",
+      "data-center-exit"
+    ],
+    "stem": "A company must leave its colocation data center in four months. It runs 600 VMware VMs. The operations team wants to keep vCenter, its NSX network policies, and its VMware processes. Some VMs must move with no downtime. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Google Cloud VMware Engine private cloud, connect it with Cloud Interconnect, and move the VMs with VMware HCX"
+      },
+      {
+        "id": "B",
+        "text": "Use Migrate to Virtual Machines to move the VMs to Compute Engine in waves"
+      },
+      {
+        "id": "C",
+        "text": "Export the VMs as VMDK files, and import them as Compute Engine images"
+      },
+      {
+        "id": "D",
+        "text": "Use Migrate to Containers to move the VMs to GKE Autopilot"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "VMware Engine includes vSphere, vCenter, vSAN, NSX, and HCX, so it works with the existing VMware tools, skills, and processes. HCX supports live, cold, and bulk migration over Cloud VPN or Cloud Interconnect. The VMs that need no downtime can move with live migration.",
+    "whyWrong": {
+      "B": "Migrate to Virtual Machines adapts the VMs to run on Compute Engine, and each cutover has a short downtime. The team would lose vCenter and NSX.",
+      "C": "Image import turns the disks into Compute Engine images. The VMs stop, and the team loses its VMware tools.",
+      "D": "Migrate to Containers converts workloads into containers. It changes the operations model, and not every VM is a good fit."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud VMware Engine overview",
+        "url": "https://docs.cloud.google.com/vmware-engine/docs/overview",
+        "evidence": "VMware Engine includes vSphere, vCenter, vSAN, NSX, HCX, and corresponding tools, so it's fully compatible with your existing VMware tools, skills training, and the processes used by teams already familiar with VMware."
+      },
+      {
+        "title": "Use VMware HCX to migrate VMware VMs",
+        "url": "https://docs.cloud.google.com/vmware-engine/docs/workloads/howto-migrate-vms-using-hcx",
+        "evidence": "Make sure that the VMware product versions that you use on-premises are supported by HCX for your selected migration type (live, cold, or bulk)."
+      }
+    ]
+  },
+  {
+    "id": "mig-019",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "migrate-to-virtual-machines",
+      "test-clone",
+      "isolation"
+    ],
+    "stem": "You use Migrate to Virtual Machines to move a vSphere VM that runs an order service. Before the cutover, you want to test the migrated VM in Google Cloud while the source VM keeps serving production. The test must not send duplicate orders to the production queue or database. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the cutover, test the Compute Engine VM, and roll back to the source VM if the test fails"
+      },
+      {
+        "id": "B",
+        "text": "Create a test clone in a separate target project whose VPC network has no route to the production systems"
+      },
+      {
+        "id": "C",
+        "text": "Create a test clone in the production VPC network, and stop the source VM while the test runs"
+      },
+      {
+        "id": "D",
+        "text": "Pause the replication, and create a test clone in the production VPC network from the replicated data"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A test clone runs while the source VM keeps running. So you must test in a sandbox that isolates the test VM from the source environment. Google recommends that you isolate test VMs from production VMs, for example with separate target projects and VPC networks.",
+    "whyWrong": {
+      "A": "The cutover stops the source VM and needs a maintenance window. Rollback is manual, and data written on the new VM is not copied back to the source VM.",
+      "C": "Stopping the source VM stops production. A clone in the production network can still reach the production queue and database.",
+      "D": "Pausing the replication does not isolate the clone. A clone in the production network can still send duplicate orders."
+    },
+    "sources": [
+      {
+        "title": "VM migration process",
+        "url": "https://docs.cloud.google.com/migrate/virtual-machines/docs/5.0/discover/lifecycle",
+        "evidence": "Because the source VM continues to run during the testing phase, you have to ensure that you perform your testing in a sandbox environment that isolates the testing VM from the original source VM."
+      },
+      {
+        "title": "Migrate to Virtual Machines architecture",
+        "url": "https://docs.cloud.google.com/migrate/virtual-machines/docs/5.0/discover/architecture",
+        "evidence": "For example, it is recommended to isolate a Compute Engine VM used for testing from those used for production."
+      }
+    ]
+  },
+  {
+    "id": "mig-020",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigquery-migration-service",
+      "teradata",
+      "sql-translation"
+    ],
+    "stem": "A bank is moving an 80 TB Teradata data warehouse to BigQuery. It has 30,000 SQL and BTEQ scripts to convert, and it wants a managed copy of the schema and the data. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Database Migration Service conversion workspace for the scripts, and Datastream for the schema and the data"
+      },
+      {
+        "id": "B",
+        "text": "A manual rewrite of the scripts in GoogleSQL, and Storage Transfer Service to copy the Teradata data files"
+      },
+      {
+        "id": "C",
+        "text": "The BigQuery Migration API for batch SQL translation, and BigQuery Data Transfer Service with the Teradata migration agent for the schema and the data"
+      },
+      {
+        "id": "D",
+        "text": "The interactive SQL translator for each script, and Transfer Appliance for the data"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "BigQuery Migration Service covers assessment, SQL translation, and data transfer, and it supports Teradata. For new batch translations, Google recommends the BigQuery Migration API. BigQuery Data Transfer Service works with a migration agent in your environment to copy the Teradata schema and data.",
+    "whyWrong": {
+      "A": "Conversion workspaces convert Oracle or SQL Server for Cloud SQL for PostgreSQL or AlloyDB, not for BigQuery. Datastream does not list Teradata as a source.",
+      "B": "The SQL translation services automate the conversion to GoogleSQL, so a manual rewrite is not needed. Copying files to Cloud Storage does not create the tables in BigQuery.",
+      "D": "Running the interactive translator for each of 30,000 scripts is a manual effort. Transfer Appliance moves files to Cloud Storage, not schema and data into BigQuery."
+    },
+    "sources": [
+      {
+        "title": "Migrate code with the batch SQL translator",
+        "url": "https://docs.cloud.google.com/bigquery/docs/batch-sql-translator",
+        "evidence": "For API-based translations, including new batch translations, we recommend that you use the BigQuery Migration API to translate your SQL scripts."
+      },
+      {
+        "title": "Teradata to BigQuery migration: Overview",
+        "url": "https://docs.cloud.google.com/bigquery/docs/migration/teradata-overview",
+        "evidence": "You can use the BigQuery Data Transfer Service in combination with a special migration agent to copy your schema and data from Teradata to BigQuery."
+      },
+      {
+        "title": "Introduction to BigQuery migration",
+        "url": "https://docs.cloud.google.com/bigquery/docs/migration-intro",
+        "evidence": "Translate SQL: The translation services automate the conversion of your SQL queries into GoogleSQL, including Gemini-enhanced SQL customization."
+      }
+    ]
+  },
+  {
+    "id": "mig-021",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "apigee",
+      "developer-portal",
+      "monetization",
+      "api-management"
+    ],
+    "stem": "A logistics company plans to open its shipment-tracking APIs to about 200 partner companies. Partners must register their own apps, get API keys, and read interactive documentation without help from the company. The business also wants to charge partners by usage tier. The APIs run on GKE today. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy API Gateway in front of the services. Share the API in the Google Cloud console so that each partner can generate its own API key."
+      },
+      {
+        "id": "B",
+        "text": "Deploy Apigee. Bundle the API proxies into API products for each usage tier, and publish them in a developer portal with monetization rate plans."
+      },
+      {
+        "id": "C",
+        "text": "Deploy Cloud Endpoints with ESPv2 as a sidecar on GKE. Publish the interactive documentation and key signup in the Cloud Endpoints Portal."
+      },
+      {
+        "id": "D",
+        "text": "Put an external Application Load Balancer with Cloud Armor in front of GKE. Create a restricted API key for each partner in the project."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding requirements are partner self-service (app registration, keys, interactive documentation) and charging by usage tier. Those are API productization and monetization needs. Google positions Apigee for APIs exposed to partners and third parties. API products package the APIs by tier, and the developer portal handles registration and key delivery. Monetization adds rate plans to API products.",
+    "whyWrong": {
+      "A": "API Gateway fits project-level APIs whose consumers do not need a developer portal. It has no API products, portal, or monetization, so it cannot give partners self-service tiers or usage-based charges.",
+      "C": "The Cloud Endpoints Portal has not been available since March 21, 2023. Endpoints also has no API products or monetization.",
+      "D": "A load balancer with Cloud Armor protects traffic, but it gives no developer registration, documentation portal, product tiers, or usage-based charging. Manual key creation for 200 partners does not scale."
+    },
+    "sources": [
+      {
+        "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+        "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+        "evidence": "In these use cases, Apigee’s multiple developer portal offerings, API productization and monetization capabilities streamline this process significantly."
+      },
+      {
+        "title": "Overview of Apigee monetization",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/monetization/overview",
+        "evidence": "Using Apigee's monetization feature, you can add a rate plan to an API product."
+      },
+      {
+        "title": "Cloud Endpoints release notes",
+        "url": "https://docs.cloud.google.com/endpoints/docs/release-notes",
+        "evidence": "As of March 21, 2023, the Cloud Endpoints Portal is no longer available."
+      }
+    ]
+  },
+  {
+    "id": "mig-022",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "apigee-hybrid",
+      "compliance",
+      "pricing"
+    ],
+    "stem": "A bank must process all traffic for its payment APIs inside its own data centers to meet a regulator's requirement. The API team wants Google to operate the management UI and the API analytics so that the team does not run them. Finance wants to start without an upfront commitment and has asked for Apigee Pay-as-you-go pricing. The bank already runs a supported Kubernetes platform on premises. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Provision Apigee with Pay-as-you-go pricing, and connect it to the on-premises backends through Private Service Connect and Cloud Interconnect."
+      },
+      {
+        "id": "B",
+        "text": "Install Apigee hybrid with Pay-as-you-go pricing, and run the runtime plane on the on-premises Kubernetes clusters."
+      },
+      {
+        "id": "C",
+        "text": "Deploy API Gateway in a nearby region, and reach the on-premises backends through HA VPN with private IP addresses."
+      },
+      {
+        "id": "D",
+        "text": "Install Apigee hybrid under a Subscription, and run the runtime plane on the on-premises Kubernetes clusters."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "All API traffic must stay inside the bank's data centers, and Google must operate the UI and analytics. That is Apigee hybrid. Google maintains the management plane, and the runtime plane that processes all API traffic runs on the customer's Kubernetes clusters. Pay-as-you-go pricing is not available for Apigee hybrid, so the architect must explain to finance that hybrid needs a Subscription for production use. The compliance requirement outranks the pricing preference.",
+    "whyWrong": {
+      "A": "Google-hosted Apigee processes API traffic in Google Cloud. Private Service Connect and Interconnect only connect Apigee to the backends, so the traffic still leaves the data centers.",
+      "B": "This is the right architecture with a pricing model that does not exist for it. Pay-as-you-go pricing is not available for Apigee hybrid.",
+      "C": "An API Gateway gateway runs in a Google Cloud region, so every API call is processed outside the bank's data centers."
+    },
+    "sources": [
+      {
+        "title": "What is Apigee hybrid?",
+        "url": "https://docs.cloud.google.com/apigee/docs/hybrid/v1.17/what-is-hybrid",
+        "evidence": "all API traffic is processed within the boundaries of your network and under your control, while management services such as the UI and API analytics run in the cloud"
+      },
+      {
+        "title": "Pay-as-you-go pricing FAQ",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/pay-as-you-go-updated-faq",
+        "evidence": "Pay-as-you-go pricing is not available for Apigee hybrid at this time."
+      }
+    ]
+  },
+  {
+    "id": "mig-023",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "apigee",
+      "spikearrest",
+      "quota",
+      "api-products"
+    ],
+    "stem": "A retailer exposes an inventory API to partners through Apigee. Twice last month, one partner's batch job sent thousands of requests in a few seconds, and the backend database slowed down for all partners. Separately, each partner contract allows a fixed number of calls per day, and the business wants Apigee to enforce that limit. Which two actions should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Attach a SpikeArrest policy to the API proxy to throttle sudden bursts before they reach the backend."
+      },
+      {
+        "id": "B",
+        "text": "Attach a ResponseCache policy to the API proxy so that the calls in a burst are served without the backend."
+      },
+      {
+        "id": "C",
+        "text": "Attach a Quota policy that enforces the daily call limit configured in each partner's API product."
+      },
+      {
+        "id": "D",
+        "text": "Write a JavaScript policy that counts calls per partner in a key value map and rejects extra calls."
+      },
+      {
+        "id": "E",
+        "text": "Raise the maximum number of backend instances so that the backend absorbs the bursts without throttling."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "There are two different requirements. Protecting the shared backend from sudden bursts is operational traffic management, which is the job of SpikeArrest. A daily call limit from a partner contract is a business limit. The Quota policy enforces it with the quota that the partner's API product defines. Apigee's documentation draws exactly this line between the two policies.",
+    "whyWrong": {
+      "B": "A cache helps only for repeated identical requests, and it can return stale inventory data. It does not limit the request rate, so a burst of different requests still reaches the database.",
+      "D": "Apigee recommends built-in policies before custom code. The Quota policy already counts requests, and it can keep one central counter across all nodes.",
+      "E": "The database is the bottleneck, so more backend instances can make the overload worse. It also does not enforce the contractual daily limit."
+    },
+    "sources": [
+      {
+        "title": "SpikeArrest policy",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/policies/spike-arrest-policy",
+        "evidence": "Use Quota to enforce business contracts or SLAs with developers and partners, rather than for operational traffic management. Use SpikeArrest to protect against sudden spikes in API traffic."
+      },
+      {
+        "title": "Best practices for API proxy design and development with Apigee",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/fundamentals/best-practices-api-proxy-design-and-development",
+        "evidence": "Use built-in policies first and foremost (when possible). Apigee policies are hardened, optimized, and supported."
+      }
+    ]
+  },
+  {
+    "id": "mig-024",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "api-gateway",
+      "api-config",
+      "rollback"
+    ],
+    "stem": "A team runs an API on API Gateway in front of Cloud Run. A developer added a new path to the OpenAPI document and wants the gateway to serve it. The developer asks you how to apply the change with the least risk to current clients. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Update the existing API config with the edited OpenAPI document so that the gateway picks up the new path automatically."
+      },
+      {
+        "id": "B",
+        "text": "Delete the gateway and its API config, and then re-create both from the edited OpenAPI document."
+      },
+      {
+        "id": "C",
+        "text": "Create a new API config from the edited OpenAPI document, and then update the gateway to use the new config."
+      },
+      {
+        "id": "D",
+        "text": "Redeploy the Cloud Run service with the new path so that the gateway discovers the path from the backend."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "API configs are immutable: each upload of an API definition creates a new API config, and you cannot change a config later. You then update the gateway to replace one API config with another. The previous config stays available, so rolling back is another gateway update. This gives the least risk to current clients.",
+    "whyWrong": {
+      "A": "You cannot modify an existing API config, except its labels and display name.",
+      "B": "Re-creation works but causes an outage for current clients, and it removes the old config that you would use to roll back.",
+      "D": "The gateway serves the paths in its API config. It does not discover paths from the backend, so the new path stays unavailable."
+    },
+    "sources": [
+      {
+        "title": "API Gateway Deployment Model",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/deployment-model",
+        "evidence": "Each time you upload an API definition, API Gateway creates a new API config. That is, you can create an API config but you cannot later modify it."
+      },
+      {
+        "title": "Create an API config",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/creating-api-config",
+        "evidence": "You cannot modify an existing API config other than to update its labels and its display name."
+      },
+      {
+        "title": "API Gateway Deployment Model",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/deployment-model",
+        "evidence": "However, after a gateway is created, you can update the gateway to replace one API config with another."
+      }
+    ]
+  },
+  {
+    "id": "mig-025",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "api-gateway",
+      "api-keys",
+      "authentication"
+    ],
+    "stem": "A healthcare startup exposes a patient-records API through API Gateway. The mobile app team proposes to require only an API key on every call, because API keys are simple to create and rotate. The API returns personal health data. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the API key to identify the calling project, and also require a token-based credential, such as a Google ID token or a JWT."
+      },
+      {
+        "id": "B",
+        "text": "Use only the API key, but restrict it to this API and rotate it every week so that a leaked key stops working quickly."
+      },
+      {
+        "id": "C",
+        "text": "Use only the API key, but send it in a request header instead of a query parameter so that proxies cannot log it."
+      },
+      {
+        "id": "D",
+        "text": "Replace the API key with a service account key that the mobile app stores and uses to sign each request."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding fact is that the API returns sensitive health data. A standard API key identifies a Google Cloud project for quota, billing, and monitoring. It does not identify a principal, and it travels inside the request. Google recommends against using only API keys when calls contain sensitive data. Keep the key for consumer identification and quotas, and add one of the other supported authentication methods.",
+    "whyWrong": {
+      "B": "Restriction and rotation reduce misuse, but the key still does not identify the user, so the API cannot decide whose records the caller may see.",
+      "C": "A header still carries the same key in every request. The key remains a project identifier, not proof of the user's identity.",
+      "D": "A service account key stored in a mobile app is a long-lived credential that anyone who extracts it can use. It moves the risk instead of removing it."
+    },
+    "sources": [
+      {
+        "title": "Use API Keys",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/authenticate-api-keys",
+        "evidence": "You can use API keys in addition to one of the other supported forms of authentication, but we don't recommend using only API keys when API calls contain sensitive data."
+      },
+      {
+        "title": "Manage API keys",
+        "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
+        "evidence": "When you use a standard API key (an API key that has not been bound to a service account) to access an API, the API key doesn't identify a principal."
+      }
+    ]
+  },
+  {
+    "id": "mig-026",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "load-testing",
+      "cloud-run",
+      "testing"
+    ],
+    "stem": "A media company plans to move an image-resizing API to Cloud Run. Before launch, it must confirm that the service scales to the expected peak traffic. The team plans to generate load by publishing Pub/Sub messages that trigger requests. It also plans to test a simple hello-world container, because the real service is hard to deploy in a test project. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep Pub/Sub as the load source, and add publishers until Cloud Monitoring shows the target request rate."
+      },
+      {
+        "id": "B",
+        "text": "Skip the pre-launch test, set a high maximum number of instances, and watch the dashboards on launch day."
+      },
+      {
+        "id": "C",
+        "text": "Keep the hello-world container, and send traffic from Cloud Shell with a loop of curl commands."
+      },
+      {
+        "id": "D",
+        "text": "Use a load harness such as JMeter with a controlled rate, against a service with realistic CPU use and startup time."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The goal is evidence that this service scales. Google's Cloud Run load-testing guidance says to generate load with a harness such as JMeter, whose rate and concurrency you control. Pub/Sub does not let you control the rate or the number of clients. It also warns against testing with a simple hello-world service. If the real service cannot run in a test project, simulate one with comparable CPU use and initialization time.",
+    "whyWrong": {
+      "A": "More publishers still do not let you control the rate and number of clients, so you do not know what you tested. Monitoring data is also too coarse for second-by-second analysis.",
+      "B": "Without a test, you have no evidence before launch. Bottlenecks such as database locks would appear in production.",
+      "C": "A hello-world service has no realistic CPU or startup profile, and a shell loop cannot produce controlled, concurrent load at scale."
+    },
+    "sources": [
+      {
+        "title": "Load testing best practices",
+        "url": "https://docs.cloud.google.com/run/docs/about-load-testing",
+        "evidence": "Do not generate load from tools where the rate and concurrency cannot be controlled. Pub/Sub is a poor choice of tool to generate load because you cannot control the rate of the traffic and number of clients."
+      },
+      {
+        "title": "Load testing best practices",
+        "url": "https://docs.cloud.google.com/run/docs/about-load-testing",
+        "evidence": "For example, avoid testing with a simple `hello world` service that returns received requests without any processing."
+      }
+    ]
+  },
+  {
+    "id": "mig-027",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "immutable-infrastructure",
+      "artifact-promotion",
+      "ci-cd"
+    ],
+    "stem": "A company deploys a Java service to development, QA, and production. Its pipeline rebuilds the container image separately for each environment from the same Git tag, with environment settings built into each image. Operations engineers also connect to production VMs to apply urgent fixes by hand. Last quarter, several incidents came from differences between what QA tested and what ran in production. Which two recommendations address the root cause? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a manual approval step before each production build so that a senior engineer reviews the Dockerfile and the settings."
+      },
+      {
+        "id": "B",
+        "text": "Build the image once, keep settings and secrets out of it, and promote that same image from development to QA to production."
+      },
+      {
+        "id": "C",
+        "text": "Tag each image with its environment name, and rebuild all images every night so that they stay aligned with the Git tag."
+      },
+      {
+        "id": "D",
+        "text": "Record all SSH sessions to production VMs, and require a ticket number before an engineer applies a manual fix."
+      },
+      {
+        "id": "E",
+        "text": "Change production only through IaC: update the configuration in source control, test it, and redeploy instead of editing resources."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "The root cause is drift: production runs an artifact and an infrastructure state that QA never tested. Immutable artifacts fix the first part. Inject configuration and secrets at deployment, and promote the same artifact through every environment, so production runs what QA validated. Immutable infrastructure fixes the second part: resources are never modified after deployment; changes go through source control, testing, and redeployment.",
+    "whyWrong": {
+      "A": "A review adds control, but the pipeline still builds a different image for production, so production still runs an image that QA never tested.",
+      "C": "Nightly rebuilds still produce a separate artifact for each environment. The image in production is still not the image that QA tested.",
+      "D": "Recording and tickets add traceability, but manual changes to production still create configuration drift."
+    },
+    "sources": [
+      {
+        "title": "Migrate to Google Cloud: Migrate from manual deployments to automated, containerized deployments",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-automated-containerized-deployments",
+        "evidence": "You lower the chances of issues in your production environments because the same artifact went through multiple testing and validation activities."
+      },
+      {
+        "title": "Patterns for scalable and resilient apps",
+        "url": "https://docs.cloud.google.com/architecture/scalable-and-resilient-apps",
+        "evidence": "Immutable infrastructure mandates that resources never be modified after they're deployed."
+      },
+      {
+        "title": "Migrate to Google Cloud: Migrate from manual deployments to automated, containerized deployments",
+        "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-automated-containerized-deployments",
+        "evidence": "Configuration files and secret injection are instrumental to produce immutable artifacts."
+      }
+    ]
+  },
+  {
+    "id": "mig-028",
+    "objective": "5.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "iac-pipelines",
+      "separation-of-duties",
+      "foundation-blueprint"
+    ],
+    "stem": "A holding company has four business units in one Google Cloud organization. A central platform team manages the organization policies and the shared network with Terraform. Each business unit now wants to deploy its own projects and databases with Terraform through CI/CD. Security requires that a mistake in one business unit's repository cannot change the resources of another business unit or the shared foundation. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run all Terraform code in one pipeline as one organization-level service account, and require two approvals for each pull request."
+      },
+      {
+        "id": "B",
+        "text": "Create a foundation pipeline and one infrastructure pipeline for each business unit, each with a service account limited to its own projects."
+      },
+      {
+        "id": "C",
+        "text": "Grant each business unit's engineers the Owner role on their folder, and let them run Terraform from their workstations."
+      },
+      {
+        "id": "D",
+        "text": "Keep the Terraform state for all business units in one bucket, and separate the business units with Terraform workspaces."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding requirement is blast-radius isolation between business units and the foundation. Google's enterprise foundations blueprint separates the foundation pipeline from the infrastructure pipelines. Each business unit's infrastructure pipeline has a service account that can deploy only to that unit's projects. This creates separation of duties between the privileged foundation identity and each unit's identity.",
+    "whyWrong": {
+      "A": "Approvals reduce mistakes, but one organization-level identity can still change any resource, so one bad merge can affect every unit and the foundation.",
+      "C": "Workstation runs bypass pipeline controls such as plan review and policy checks, and Owner on a folder is far more access than the task needs.",
+      "D": "Workspaces separate state files, not permissions. The identity that runs Terraform can still change any unit's resources."
+    },
+    "sources": [
+      {
+        "title": "Deployment methodology",
+        "url": "https://docs.cloud.google.com/architecture/blueprints/security-foundations/deployment-methodology",
+        "evidence": "Each of the infrastructure pipelines has a service account with permission to deploy resources only to the projects that are associated with that business unit."
+      }
+    ]
+  },
+  {
+    "id": "mig-029",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "adc",
+      "impersonation",
+      "local-development"
+    ],
+    "stem": "A team builds a Python service that will run on Cloud Run as the service account `orders-sa`. Developers must test the service on their laptops with exactly the permissions of `orders-sa`. The security team blocks service account key creation. Each developer already has the Service Account Token Creator role on `orders-sa`. What should the developers do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud auth application-default login --impersonate-service-account` with the `orders-sa` email, and let the client library find the credentials through ADC."
+      },
+      {
+        "id": "B",
+        "text": "Ask for an exception to the key policy, create a key for `orders-sa`, and set `GOOGLE_APPLICATION_CREDENTIALS` to the key file."
+      },
+      {
+        "id": "C",
+        "text": "Set the `auth/impersonate_service_account` gcloud property to the `orders-sa` email, and run the service with the current gcloud credentials."
+      },
+      {
+        "id": "D",
+        "text": "Grant each developer the same IAM roles as `orders-sa`, run `gcloud auth login`, and let the client library use those credentials."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The requirements are the exact identity of `orders-sa` and no keys. Impersonation with `gcloud auth application-default login --impersonate-service-account` writes a local ADC file with short-lived credentials for the service account. Client libraries that support impersonation, including Python, use that file automatically through Application Default Credentials.",
+    "whyWrong": {
+      "B": "A service account key is a long-lived, high-risk credential, and the organization blocks key creation. Impersonation gives the same identity without a key.",
+      "C": "The `auth/impersonate_service_account` property changes only the identity of gcloud CLI commands. The client library uses ADC, and the local ADC file does not follow the gcloud configuration.",
+      "D": "`gcloud auth login` gives credentials to the gcloud CLI, not to ADC. Also, copied user roles can drift from the service account roles, so the test does not prove the service account permissions."
+    },
+    "sources": [
+      {
+        "title": "Set up ADC for a local development environment",
+        "url": "https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment",
+        "evidence": "You can use service account impersonation to set up a local Application Default Credentials (ADC) file. Client libraries that support impersonation can use those credentials automatically."
+      },
+      {
+        "title": "Set up Application Default Credentials",
+        "url": "https://docs.cloud.google.com/docs/authentication/provide-credentials-adc",
+        "evidence": "The gcloud CLI itself doesn't use ADC to access Google Cloud resources."
+      }
+    ]
+  },
+  {
+    "id": "mig-030",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "gcloud-storage",
+      "gsutil",
+      "cloud-sdk"
+    ],
+    "stem": "An operations team maintains many Bash scripts that copy backups with gsutil. The scripts run in CI images that install the latest Google Cloud CLI package. The team now needs to manage soft-deleted objects. The scripts must also keep working after future CLI upgrades. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep gsutil for the copies, and call the Cloud Storage JSON API with curl for the soft-delete tasks."
+      },
+      {
+        "id": "B",
+        "text": "Rewrite the scripts to use `gcloud storage` commands for the copies and for the soft-delete tasks."
+      },
+      {
+        "id": "C",
+        "text": "Install gsutil as a standalone tool from PyPI in the CI images, and keep the scripts unchanged."
+      },
+      {
+        "id": "D",
+        "text": "Pin the CI images to the current Google Cloud CLI version, and keep the scripts unchanged."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "gsutil is the legacy Cloud Storage CLI. It does not support newer features such as soft delete, and after March 2027 the Google Cloud CLI package no longer includes it. `gcloud storage` is the recommended CLI, so one rewrite meets both requirements.",
+    "whyWrong": {
+      "A": "The copies still depend on gsutil, which leaves the Google Cloud CLI package after March 2027. The team must also maintain two tools.",
+      "C": "Standalone gsutil keeps the old scripts running, but it is still the legacy tool and does not support soft delete.",
+      "D": "Pinning stops CLI updates, and the pinned gsutil still does not support soft delete."
+    },
+    "sources": [
+      {
+        "title": "gsutil tool",
+        "url": "https://docs.cloud.google.com/storage/docs/gsutil",
+        "evidence": "The gsutil tool does not support working with newer Cloud Storage features, such as soft delete and managed folders."
+      },
+      {
+        "title": "gsutil tool",
+        "url": "https://docs.cloud.google.com/storage/docs/gsutil",
+        "evidence": "After March 2027, gsutil will no longer be available as part of the Google Cloud CLI installation package."
+      }
+    ]
+  },
+  {
+    "id": "mig-031",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "emulators",
+      "spanner",
+      "testing"
+    ],
+    "stem": "A payments team builds on Spanner. Before each release, the team wants fast integration tests in CI with no cloud cost. The team also wants proof that the application service account and database roles follow least privilege. Finally, it wants a latency benchmark for a new schema. Which test plan should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run all three activities against the Spanner emulator in CI, because the emulator offers the same APIs as the production service."
+      },
+      {
+        "id": "B",
+        "text": "Run all three activities against a production-sized Spanner instance in a test project, and stop using the emulator."
+      },
+      {
+        "id": "C",
+        "text": "Run the integration tests on the Spanner emulator, and run the access checks and the benchmark on a real Spanner instance in a test project."
+      },
+      {
+        "id": "D",
+        "text": "Run the integration tests and the benchmark on the Spanner emulator, and check the access control in production after the release."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The emulator gives fast functional tests at no cloud cost. It does not support IAM, permissions, or roles, and its performance does not compare to the production service. So the access checks and the benchmark need a real instance, and the CI tests can stay on the emulator.",
+    "whyWrong": {
+      "A": "The emulator offers the same APIs, but it does not support IAM, permissions, or roles, and its performance does not compare to production.",
+      "B": "This works, but every CI run then needs a billable instance, which breaks the no-cost requirement for the CI tests.",
+      "D": "Emulator latency does not predict production latency, and an access check after the release finds problems too late."
+    },
+    "sources": [
+      {
+        "title": "Emulate Spanner locally",
+        "url": "https://docs.cloud.google.com/spanner/docs/emulator",
+        "evidence": "TLS/HTTPS, authentication, Identity and Access Management (IAM), permissions, or roles."
+      },
+      {
+        "title": "Emulate Spanner locally",
+        "url": "https://docs.cloud.google.com/spanner/docs/emulator",
+        "evidence": "The emulator's performance and scalability don't compare to the production service."
+      }
+    ]
+  },
+  {
+    "id": "mig-032",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "retries",
+      "exponential-backoff",
+      "idempotency",
+      "cloud-storage"
+    ],
+    "stem": "A batch job uploads reports to Cloud Storage with the Python Cloud Client Library, and it overwrites existing objects. Two runs of the job sometimes overlap. During an incident, the job received HTTP 503 errors. A developer had wrapped each client call in an application loop that retries any error five times with no delay. The loop added load, and some retried writes replaced newer report versions. Which two changes should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the application loop, and add a fixed one-second delay between attempts."
+      },
+      {
+        "id": "B",
+        "text": "Remove the application loop, and configure the built-in client library retries with a total deadline."
+      },
+      {
+        "id": "C",
+        "text": "Retry every error code, including 400 and 403, so that more runs complete."
+      },
+      {
+        "id": "D",
+        "text": "Add a generation-match precondition to each overwrite, so that a retry cannot replace a newer version."
+      },
+      {
+        "id": "E",
+        "text": "Add a second retry layer in the scheduler that reruns the whole job after any failure."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Two problems exist. First, the application loop retries without backoff on top of the client library retries, which multiplies attempts and load. Google recommends that you use and configure the built-in retries, which use exponential backoff and a deadline. Second, an overwrite is safe to retry only with a precondition such as `ifGenerationMatch`. With it, a retried write fails instead of replacing a newer version.",
+    "whyWrong": {
+      "A": "A fixed delay has no exponential growth or jitter, and the loop still multiplies the retries that the client library already does.",
+      "C": "In Cloud Storage, 400 and 403 are permanent errors, such as invalid requests and authorization failures. Retries cannot succeed without a fix, and they waste requests.",
+      "E": "A second retry layer multiplies the attempts again and adds more load during an incident."
+    },
+    "sources": [
+      {
+        "title": "Retry strategy",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "We recommend using and configuring the built-in retry mechanisms."
+      },
+      {
+        "title": "Retry strategy",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "A subset of requests are conditionally idempotent, which means they are only idempotent if they include specific optional arguments."
+      }
+    ]
+  },
+  {
+    "id": "mig-033",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "client-libraries",
+      "grpc",
+      "rest"
+    ],
+    "stem": "A team starts a new Java service that publishes to Pub/Sub and reads from Spanner at high volume. A developer proposes hand-written REST calls with a generic HTTP client. You want idiomatic code, built-in authentication, and high throughput per CPU. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the Google API Client Libraries, because Google generates them from the definition of each API."
+      },
+      {
+        "id": "B",
+        "text": "Keep the hand-written REST calls, and authenticate them with a service account key."
+      },
+      {
+        "id": "C",
+        "text": "Generate your own gRPC clients from the protocol buffer definitions, and write your own authentication code."
+      },
+      {
+        "id": "D",
+        "text": "Use the Cloud Client Libraries, which get credentials from ADC and use gRPC where available."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Cloud Client Libraries are the recommended way to call Google Cloud APIs. They give idiomatic code, handle authentication, and in some cases use gRPC, which can increase throughput per CPU compared with the JSON REST API.",
+    "whyWrong": {
+      "A": "Google API Client Libraries are the earlier type. They support the REST interface only, and their generated code is less idiomatic.",
+      "B": "Hand-written calls must handle authentication and other low-level details that the libraries already handle. A service account key also adds a high-risk credential.",
+      "C": "This can work for gRPC-enabled APIs, but it adds code to maintain. Many Cloud Client Libraries already use gRPC internally."
+    },
+    "sources": [
+      {
+        "title": "Client libraries and Cloud APIs explained",
+        "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained",
+        "evidence": "Cloud Client Libraries are the recommended option for accessing Cloud APIs programmatically, where available."
+      },
+      {
+        "title": "Client libraries and Cloud APIs explained",
+        "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained",
+        "evidence": "Provide access to the API's REST interface only; gRPC is not supported."
+      }
+    ]
+  },
+  {
+    "id": "mig-034",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-shell",
+      "automation"
+    ],
+    "stem": "A data team uses Cloud Shell every day and reports two problems. A command-line tool that they install with `apt-get` is missing in new sessions. A three-hour export script that they start from Cloud Shell before they go home stops before it finishes. Which two actions should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add the `apt-get` installation to `$HOME/.customize_environment`, so that it runs each time the Cloud Shell VM boots."
+      },
+      {
+        "id": "B",
+        "text": "Switch Cloud Shell to ephemeral mode, so that sessions start faster and keep the installed tools."
+      },
+      {
+        "id": "C",
+        "text": "Run the export as a scheduled job on Google Cloud compute with an attached service account, not in Cloud Shell."
+      },
+      {
+        "id": "D",
+        "text": "Request a larger persistent disk for Cloud Shell, so that the installed tool fits in the home directory."
+      },
+      {
+        "id": "E",
+        "text": "Keep the export in Cloud Shell, and start it in a terminal multiplexer so that it survives the session end."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Changes outside `$HOME` are lost when the Cloud Shell VM ends, and `apt-get` installs outside `$HOME`. The `.customize_environment` script runs as root at each VM boot, so it restores the tool. Cloud Shell is for interactive use only, and non-interactive sessions end after 40 minutes. The export needs a real runtime with a service account identity.",
+    "whyWrong": {
+      "B": "Ephemeral mode removes the persistent disk, so all files that you create are lost at session end.",
+      "D": "You cannot expand Cloud Shell persistent disk storage. Disk size is also not the cause, because `apt-get` installs outside `$HOME`.",
+      "E": "Cloud Shell is for interactive use only, and the VM is discarded when the session ends. A multiplexer inside the VM does not keep the job running."
+    },
+    "sources": [
+      {
+        "title": "Cloud Shell quotas and limits",
+        "url": "https://docs.cloud.google.com/shell/docs/quotas-limits",
+        "evidence": "Cloud Shell is intended for interactive use only. Non-interactive sessions are ended automatically after 40 minutes."
+      },
+      {
+        "title": "Configure Cloud Shell",
+        "url": "https://docs.cloud.google.com/shell/docs/configuring-cloud-shell",
+        "evidence": "Cloud Shell automatically runs the script, $HOME/.customize_environment, when your instance boots up."
+      },
+      {
+        "title": "How Cloud Shell works",
+        "url": "https://docs.cloud.google.com/shell/docs/how-cloud-shell-works",
+        "evidence": "When using Cloud Shell, you cannot expand persistent disk storage space."
+      }
+    ]
+  },
+  {
+    "id": "mig-035",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "regional-endpoints",
+      "private-service-connect",
+      "data-residency"
+    ],
+    "stem": "A bank runs applications on premises and connects to Google Cloud over Cloud Interconnect. A regulator requires that all Cloud Storage API traffic from these applications is processed and TLS-terminated in `europe-west3`, and never crosses the public internet. The bank also wants to block accidental use of global API endpoints across its organization. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create Private Service Connect endpoints for the `europe-west3` regional Cloud Storage endpoint. Advertise their IP addresses through Cloud Router, and enforce the Restrict Endpoint Usage constraint."
+      },
+      {
+        "id": "B",
+        "text": "Enable Private Google Access for on-premises hosts through `private.googleapis.com`. Advertise that range through Cloud Router, and add the project to a VPC Service Controls perimeter."
+      },
+      {
+        "id": "C",
+        "text": "Keep the global Cloud Storage endpoint. Set the resource locations organization policy constraint so that buckets can exist only in `europe-west3`."
+      },
+      {
+        "id": "D",
+        "text": "Configure the client libraries to use the `eu` multi-regional Cloud Storage endpoint over the internet. Block other Google API hostnames in the on-premises firewall."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A regional endpoint processes the request and ends TLS in the named region. Private Google Access cannot reach regional endpoints, so private access needs Private Service Connect endpoints, with their IP ranges advertised to on-premises. The Restrict Endpoint Usage constraint denies the global endpoints.",
+    "whyWrong": {
+      "B": "Private Google Access cannot reach regional endpoints, and the global endpoint gives no data residency for traffic in transit. VPC Service Controls does not choose where TLS ends.",
+      "C": "The resource locations constraint controls where new resources are stored, which is data at rest. The global endpoint still ends TLS close to the client.",
+      "D": "The multi-regional endpoint keeps traffic in the EU jurisdiction, not in `europe-west3`. The internet path also breaks the private connectivity requirement."
+    },
+    "sources": [
+      {
+        "title": "Regional and multi-regional API endpoints overview",
+        "url": "https://docs.cloud.google.com/docs/security/compliance/about-regional-endpoints",
+        "evidence": "Regional and multi-regional endpoints are not accessible through Private Google Access. To connect to regional endpoints through private access, use Private Service Connect to create private endpoints."
+      },
+      {
+        "title": "Regional and multi-regional API endpoints overview",
+        "url": "https://docs.cloud.google.com/docs/security/compliance/about-regional-endpoints",
+        "evidence": "To enforce the use of regional endpoints, use the Restrict Endpoint Usage organization policy constraint to deny access to global endpoints."
+      },
+      {
+        "title": "Regional and multi-regional API endpoints overview",
+        "url": "https://docs.cloud.google.com/docs/security/compliance/about-regional-endpoints",
+        "evidence": "If you connect to regional endpoints from on-premises environments over Cloud Interconnect or Cloud VPN, you must advertise the regional endpoint private IP ranges."
+      }
+    ]
+  },
+  {
+    "id": "mig-036",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "api-keys",
+      "api-access"
+    ],
+    "stem": "A retailer's public website calls a Google Cloud API that accepts API keys, directly from the browser. A security review finds that the page contains an API key with no restrictions. The company wants to keep the browser feature and reduce the risk of key misuse with minimal changes. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace the API key with a service account key that the JavaScript code downloads when the page loads."
+      },
+      {
+        "id": "B",
+        "text": "Move the API key from the request header to the `key` query parameter, and serve the page only over HTTPS."
+      },
+      {
+        "id": "C",
+        "text": "Bind the API key to a service account that has the Editor role, so that IAM authorizes each request."
+      },
+      {
+        "id": "D",
+        "text": "Add an API restriction for the one API and a website restriction for the company domain, and rotate the key."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Unrestricted API keys are insecure. Google recommends both API restrictions, which limit the APIs a key can call, and application restrictions, which limit where the key can be used. A website restriction fits a browser app, and a rotation replaces the exposed key string.",
+    "whyWrong": {
+      "A": "A service account key in browser code gives every visitor a long-lived credential that authenticates as the service account.",
+      "B": "The `key` query parameter puts the key in the URL, which exposes it to theft through URL scans. It adds no restriction.",
+      "C": "A key bound to a service account authenticates as that service account. Google warns against such keys in production for APIs that manage resources, and the Editor role breaks least privilege."
+    },
+    "sources": [
+      {
+        "title": "Manage API keys",
+        "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
+        "evidence": "We recommend setting both API restrictions and application restrictions."
+      },
+      {
+        "title": "Manage API keys",
+        "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
+        "evidence": "Application restrictions: Limit an API key so it can only be used by specific websites, IP addresses, or applications."
+      },
+      {
+        "title": "Use API keys to access APIs",
+        "url": "https://docs.cloud.google.com/docs/authentication/api-keys-use",
+        "evidence": "However, this method includes your API key in the URL, exposing your key to theft through URL scans."
+      }
+    ]
+  },
+  {
+    "id": "mig-037",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "deployment-manager",
+      "infrastructure-manager",
+      "dm-convert"
+    ],
+    "stem": "A retailer manages 40 projects with Deployment Manager YAML configurations and Jinja templates. Google no longer supports Deployment Manager, and the platform team must keep managing these resources as code. The team wants a Google-managed IaC service and the least rewrite effort. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the Deployment Manager configurations, and open support cases for problems until Google turns the service down."
+      },
+      {
+        "id": "B",
+        "text": "Export every project with `gcloud beta resource-config bulk-export`, and manage the output with Config Connector on a new GKE cluster."
+      },
+      {
+        "id": "C",
+        "text": "Convert the configurations and templates with DM Convert, import the result into Infrastructure Manager, and abandon the Deployment Manager deployments."
+      },
+      {
+        "id": "D",
+        "text": "Rewrite the templates as Terraform by hand, and apply them from each engineer's workstation with local state files."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Support for Deployment Manager stopped on April 1, 2026. Google's migration path is DM Convert, which converts the configurations and templates to Terraform and a state file. You then import the Terraform resources into Infrastructure Manager, which is the Google-managed Terraform service. Last, you delete the Deployment Manager deployment with the abandon policy, so the resources stay. This meets both requirements: a managed service and the least rewrite effort.",
+    "whyWrong": {
+      "A": "Deployment Manager support stopped on April 1, 2026. Google rejects standard support tickets, and the service is turned down after June 30, 2027.",
+      "B": "Bulk export is a Preview tool that exports current resources, not the templates. Config Connector on your own GKE cluster adds a cluster to operate, and it is not a managed Terraform service.",
+      "D": "A manual rewrite is the most effort. Local state on workstations also breaks the Google recommendation to use a remote Cloud Storage backend and a pipeline."
+    },
+    "sources": [
+      {
+        "title": "Deployment Manager deprecation",
+        "url": "https://docs.cloud.google.com/deployment-manager/docs/deprecations",
+        "evidence": "You can migrate your deployment experience to Infra Manager using the DM Convert tool."
+      },
+      {
+        "title": "Deployment Manager deprecation",
+        "url": "https://docs.cloud.google.com/deployment-manager/docs/deprecations",
+        "evidence": "Support for Google Cloud Deployment Manager was discontinued on April 1, 2026."
+      }
+    ]
+  },
+  {
+    "id": "mig-038",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "infrastructure-manager",
+      "terraform",
+      "state"
+    ],
+    "stem": "A platform team wants to run its Terraform root modules with Infrastructure Manager instead of a self-managed Jenkins pipeline. Each root module has a `backend \"gcs\"` block that points to a team state bucket. The root modules call child modules in local subdirectories. What must the team change before the first Infrastructure Manager deployment?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the backend blocks, because Infrastructure Manager stores and manages the state for each deployment."
+      },
+      {
+        "id": "B",
+        "text": "Merge the child modules into one file, because Infrastructure Manager accepts only a single Terraform file."
+      },
+      {
+        "id": "C",
+        "text": "Add a service account key to the provider block, because Cloud Build needs credentials to call Google Cloud APIs."
+      },
+      {
+        "id": "D",
+        "text": "Grant the Infrastructure Manager service agent access to the state bucket, because it reads the backend block."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Infrastructure Manager requires that a configuration defines no backend blocks. It handles state management itself and keeps a copy of the state file for each deployment and revision. Local child modules are fine: a configuration can have many files and directories if the entry point is a root module. Credentials are not needed in the code, because Infrastructure Manager runs Terraform as the service account that you name.",
+    "whyWrong": {
+      "B": "A configuration can consist of multiple files and directories. Only the entry point must be a Terraform root module.",
+      "C": "Infrastructure Manager runs Terraform with the identity of the service account that you pass to the deployment. Keys add risk and are not needed.",
+      "D": "Infrastructure Manager does not use your backend block. Backend blocks must not be defined, and Infrastructure Manager manages the state itself."
+    },
+    "sources": [
+      {
+        "title": "Deployment Manager deprecation",
+        "url": "https://docs.cloud.google.com/deployment-manager/docs/deprecations",
+        "evidence": "Familiarize yourself with Terraform's state management (which involves managing state files and potential state locking issues). Infra Manager handles state management automatically."
+      },
+      {
+        "title": "Terraform and Infrastructure Manager",
+        "url": "https://docs.cloud.google.com/infrastructure-manager/docs/infra-manager-terraform",
+        "evidence": "These configurations can consist of multiple files and directories, but their entrypoint must be a Terraform root module."
+      },
+      {
+        "title": "Configure the service account",
+        "url": "https://docs.cloud.google.com/infrastructure-manager/docs/configure-service-account",
+        "evidence": "To use Infrastructure Manager to create, update, or delete a deployment, you must use a service account. Infra Manager executes Terraform using the identity of this service account."
+      }
+    ]
+  },
+  {
+    "id": "mig-039",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "terraform",
+      "state",
+      "cloud-storage"
+    ],
+    "stem": "Five engineers run Terraform from their laptops against the same production project. Each laptop keeps its own `terraform.tfstate` file. Last week, two engineers applied changes at the same time, and one state file no longer matched the infrastructure. The team wants the Google-recommended fix with the least operational overhead. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Commit `terraform.tfstate` to the Git repository, and require a pull request for every change to the state file."
+      },
+      {
+        "id": "B",
+        "text": "Give each engineer a separate Terraform CLI workspace in the same local directory, so that the changes do not collide."
+      },
+      {
+        "id": "C",
+        "text": "Keep the state on a shared Compute Engine VM, and require all engineers to run Terraform over SSH on that VM."
+      },
+      {
+        "id": "D",
+        "text": "Store the state in a Cloud Storage backend with Object Versioning, and give bucket admin permissions only to a few administrators."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google recommends the Cloud Storage state backend for Google Cloud customers. The backend uses state locking, so two engineers cannot change the state at the same time. It also keeps sensitive state data out of version control. Object Versioning keeps earlier versions of the state for recovery. Google also recommends admin permissions on the bucket for only a small set of administrators, and only object read and write permissions for the other developers. The backend is a configuration change, so the overhead is low.",
+    "whyWrong": {
+      "A": "Git gives no state locking, and state can contain secrets. Google recommends keeping state out of version control and adding state files to .gitignore.",
+      "B": "Local workspaces still give each laptop its own view and no shared lock. Google recommends using only the default workspace.",
+      "C": "A shared VM adds a server to patch, back up, and secure, and it forces everyone onto one machine. The Cloud Storage backend gives locking and versioned state with less work."
+    },
+    "sources": [
+      {
+        "title": "Best practices for security",
+        "url": "https://docs.cloud.google.com/docs/terraform/best-practices/security",
+        "evidence": "For Google Cloud customers, we recommend using the Cloud Storage state backend. This approach locks the state to allow for collaboration as a team."
+      },
+      {
+        "title": "Store Terraform state in a Cloud Storage bucket",
+        "url": "https://docs.cloud.google.com/docs/terraform/resource-management/store-state",
+        "evidence": "versioning is enabled to ensure that earlier versions of the state are preserved in the bucket."
+      },
+      {
+        "title": "Store Terraform state in a Cloud Storage bucket",
+        "url": "https://docs.cloud.google.com/docs/terraform/resource-management/store-state",
+        "evidence": "Only a small set of users (for example, the main cloud administrator and the person acting as the alternative or backup administrator) should have admin permissions for the bucket."
+      }
+    ]
+  },
+  {
+    "id": "mig-040",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "terraform",
+      "iam"
+    ],
+    "stem": "A team manages project IAM with one `google_project_iam_policy` resource that lists the roles for the team's groups. After an apply, Dataflow jobs and GKE node pools in the project fail with permission errors for Google-managed service accounts. The team wants to keep managing its own grants with Terraform. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace the resource with `google_project_iam_binding` resources, one for each role that the team grants."
+      },
+      {
+        "id": "B",
+        "text": "Replace the resource with `google_project_iam_member` resources, or use Google's IAM module for the grants."
+      },
+      {
+        "id": "C",
+        "text": "Keep the resource, and add a `lifecycle` block with `prevent_destroy` so that Terraform cannot remove roles."
+      },
+      {
+        "id": "D",
+        "text": "Keep the resource, and run `terraform refresh` before each apply so that the state includes the new roles."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "`google_*_iam_policy` and `google_*_iam_binding` resources are authoritative. On each run, Terraform overwrites the permissions to match the configuration, which removes roles that Google Cloud manages for its service agents. Google recommends `google_*_iam_member` resources or Google's IAM module. These resources add each grant without removing grants that other systems made.",
+    "whyWrong": {
+      "A": "`google_project_iam_binding` is also authoritative. For each role that it manages, it removes members that Terraform does not list.",
+      "C": "`prevent_destroy` blocks the destruction of the resource itself. It does not stop Terraform from overwriting the policy on an update.",
+      "D": "A refresh updates the state, but the configuration stays the source of truth. The next apply still removes the roles that the configuration does not list."
+    },
+    "sources": [
+      {
+        "title": "Best practices when working with Google Cloud resources",
+        "url": "https://docs.cloud.google.com/docs/terraform/best-practices/working-with-resources",
+        "evidence": "To prevent this, we recommend using either google_*_iam_member resources directly or the IAM module from Google."
+      },
+      {
+        "title": "Best practices when working with Google Cloud resources",
+        "url": "https://docs.cloud.google.com/docs/terraform/best-practices/working-with-resources",
+        "evidence": "If the permissions change outside of Terraform, Terraform on its next execution overwrites all permissions to represent the policy as defined in your configuration."
+      }
+    ]
+  },
+  {
+    "id": "mig-041",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "infrastructure-manager",
+      "service-accounts",
+      "iam"
+    ],
+    "stem": "A team creates an Infrastructure Manager deployment from a Terraform configuration that creates a VPC network, firewall rules, and Compute Engine VMs. The engineer who runs `gcloud infra-manager deployments apply` has the Infra Manager Admin role and the Service Account User role on the deployment's service account. The deployment fails with permission errors. The team must follow the principle of least privilege. Which two actions should the team take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Compute Admin role on the project to the engineer who runs the deployment command."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Infra Manager Agent role (`roles/config.agent`) to the service account that the deployment uses."
+      },
+      {
+        "id": "C",
+        "text": "Create a key for the deployment's service account, and pass the key file to the deployment as an input value."
+      },
+      {
+        "id": "D",
+        "text": "Grant the service account the Compute Network Admin, Compute Security Admin, and Compute Instance Admin (v1) roles."
+      },
+      {
+        "id": "E",
+        "text": "Grant the Owner role on the project to the Infrastructure Manager service agent."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Infrastructure Manager runs Terraform with the identity of the service account that you name, not with the engineer's identity. That service account needs the Infra Manager Agent role for Infrastructure Manager's own work. It also needs permissions for every resource in the configuration. Compute Network Admin does not cover firewall rules, so the firewall rules also need Compute Security Admin.",
+    "whyWrong": {
+      "A": "The engineer's permissions do not create the resources. Infrastructure Manager executes Terraform as the service account.",
+      "C": "Infrastructure Manager uses the service account identity directly. A key adds risk and is not a supported way to pass credentials.",
+      "E": "Owner breaks least privilege. The service agent is not the identity that runs Terraform, so this grant does not fix the problem either."
+    },
+    "sources": [
+      {
+        "title": "Configure the service account",
+        "url": "https://docs.cloud.google.com/infrastructure-manager/docs/configure-service-account",
+        "evidence": "To work with Infra Manager, the service account needs the Infra Manager Agent (roles/config.agent) role."
+      },
+      {
+        "title": "Configure the service account",
+        "url": "https://docs.cloud.google.com/infrastructure-manager/docs/configure-service-account",
+        "evidence": "To create and manage Google Cloud resources that are defined in the Terraform configuration, the service account needs permissions specific to these resources."
+      },
+      {
+        "title": "Compute Engine roles and permissions",
+        "url": "https://docs.cloud.google.com/iam/docs/roles-permissions/compute",
+        "evidence": "Permissions to create, modify, and delete networking resources, except for firewall rules and SSL certificates."
+      }
+    ]
+  },
+  {
+    "id": "mig-042",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "terraform",
+      "import"
+    ],
+    "stem": "An operations team created a production VPC network and six firewall rules by hand. Company policy now requires that Terraform manages all network resources. Recreating the network would cause an outage. The change process requires that reviewers see every state change in the pull request before it happens. The team uses Terraform 1.9. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `terraform import` for each resource from an engineer's workstation, and then open a pull request with the resource blocks."
+      },
+      {
+        "id": "B",
+        "text": "Delete the resources during a maintenance window, and let the pipeline recreate them from new Terraform resource blocks."
+      },
+      {
+        "id": "C",
+        "text": "Add `import` blocks and matching resource blocks, and let the pipeline show the imports in `terraform plan` before `terraform apply`."
+      },
+      {
+        "id": "D",
+        "text": "Download the state file, add the resources to it with a text editor, and upload the file to the state bucket."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Google prefers recreation, but here recreation causes an outage, so an approved import is correct. Since Terraform 1.5, an `import` block lets `terraform plan` preview the import and `terraform apply` run it. The pipeline shows the import in the pull request, which meets the review requirement. After the import, the team manages the resources only with Terraform.",
+    "whyWrong": {
+      "A": "The `terraform import` command writes to the state at once from a workstation. Reviewers do not see the change before it happens.",
+      "B": "Recreation is Google's first choice only when it is practical. Here it causes a production outage.",
+      "D": "Google says never to modify Terraform state manually, because corruption can cause major infrastructure problems."
+    },
+    "sources": [
+      {
+        "title": "Import your Google Cloud resources into Terraform state",
+        "url": "https://docs.cloud.google.com/docs/terraform/resource-management/import",
+        "evidence": "Terraform version 1.5 lets you add an import block to your Terraform configuration. This allows import operations to be previewed during the plan operation and executed using the apply operation."
+      },
+      {
+        "title": "Best practices for Terraform operations",
+        "url": "https://docs.cloud.google.com/docs/terraform/best-practices/operations",
+        "evidence": "In cases where deleting old resources would create significant toil, use the terraform import command with explicit approval. After a resource is imported into Terraform, manage it exclusively with Terraform."
+      }
+    ]
+  },
+  {
+    "id": "mig-043",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "config-controller",
+      "config-connector",
+      "gitops"
+    ],
+    "stem": "A company runs all applications on GKE and manages Kubernetes manifests with a GitOps workflow. The platform team wants application teams to request Cloud SQL instances and Pub/Sub topics as Kubernetes resources in the same Git repositories. Changes made in the console must be reverted automatically, and policy violations must be blocked before resources are created. The platform team does not want to install or upgrade the controllers. What should the platform team use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Infrastructure Manager with Cloud Build triggers that create a preview for each pull request and update the deployment on each merge."
+      },
+      {
+        "id": "B",
+        "text": "The Config Connector add-on on a GKE Standard cluster, with a scheduled script that applies all manifests again every hour."
+      },
+      {
+        "id": "C",
+        "text": "Terraform in Cloud Build with `gcloud beta terraform vet`, and a scheduled build that runs `terraform apply` every hour."
+      },
+      {
+        "id": "D",
+        "text": "Config Controller, which hosts Config Connector together with Config Sync and Policy Controller."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Config Controller is a hosted version of Config Connector, so the platform team does not install or upgrade the controllers. Teams describe Google Cloud resources as Kubernetes resources in Git. Config Sync keeps the resources equal to the source of truth, so it reverts console changes. Policy Controller blocks policy violations before the resources are deployed.",
+    "whyWrong": {
+      "A": "Infrastructure Manager runs Terraform, not Kubernetes resources, and it corrects drift only when a new revision runs.",
+      "B": "The platform team must install and upgrade the add-on itself, which it does not want. The add-on also gives no policy enforcement.",
+      "C": "Terraform is not a Kubernetes-based workflow, an hourly apply leaves drift in place between runs, and `gcloud beta terraform vet` is Preview."
+    },
+    "sources": [
+      {
+        "title": "Config Controller overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/config-controller/docs/overview",
+        "evidence": "Config Controller is a hosted version of Config Connector that simplifies installation and maintenance. Config Controller also includes Policy Controller and Config Sync."
+      },
+      {
+        "title": "Config Controller overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/config-controller/docs/overview",
+        "evidence": "Automate drift detection and repair: Continuously monitor your infrastructure for drift from the defined state and enable automatic repairs."
+      },
+      {
+        "title": "Infrastructure as Code on Google Cloud",
+        "url": "https://docs.cloud.google.com/docs/terraform/iac-overview",
+        "evidence": "To manage Google Cloud resources through Kubernetes, use Config Controller and Config Connector."
+      }
+    ]
+  },
+  {
+    "id": "mig-044",
+    "objective": "5.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "terraform",
+      "policy-validation",
+      "security"
+    ],
+    "stem": "A bank deploys all infrastructure with Terraform from a Cloud Build pipeline. The security team wants to block any change that grants IAM roles to members outside the company domain before the change reaches production. The team also wants to find deployed resources that later drift into an insecure configuration. Which two actions should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Convert each saved plan to JSON, and run `gcloud beta terraform vet` with the organization's policy library before `terraform apply`."
+      },
+      {
+        "id": "B",
+        "text": "Run `terraform validate` in the pipeline, and fail the build when the command reports an error."
+      },
+      {
+        "id": "C",
+        "text": "After each apply, run automated security checks, such as Security Health Analytics, on the deployed resources."
+      },
+      {
+        "id": "D",
+        "text": "Mark every Terraform output as sensitive, so that IAM members do not appear in the pipeline logs."
+      },
+      {
+        "id": "E",
+        "text": "Turn on Object Versioning for the state bucket, so that the security team can compare state versions after each change."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Google recommends two controls. Before apply, a tool such as `gcloud beta terraform vet` checks the plan against policies, for example a constraint that allows only members from the company domain. The tool returns exit code 2 on a violation, which fails the build. After apply, continuous audits such as Security Health Analytics find infrastructure that drifts into an insecure state.",
+    "whyWrong": {
+      "B": "`terraform validate` checks syntax and structure only. It does not evaluate IAM members against a policy.",
+      "D": "Sensitive outputs only hide values in output. They do not block a grant or detect insecure resources.",
+      "E": "Versioning keeps old state for recovery. A manual comparison is not a policy check, and it misses changes made outside Terraform."
+    },
+    "sources": [
+      {
+        "title": "Best practices for security",
+        "url": "https://docs.cloud.google.com/docs/terraform/best-practices/security",
+        "evidence": "When running Terraform in an automated pipeline, use a tool like gcloud terraform vet to check plan output against policies before it is applied. Doing so can detect security regressions before they happen."
+      },
+      {
+        "title": "Best practices for security",
+        "url": "https://docs.cloud.google.com/docs/terraform/best-practices/security",
+        "evidence": "After the terraform apply command has executed, run automated security checks. These checks can help to ensure that infrastructure doesn't drift into an insecure state."
+      },
+      {
+        "title": "Validate policies",
+        "url": "https://docs.cloud.google.com/docs/terraform/policy-validation/validate-policies",
+        "evidence": "If violations are found, gcloud beta terraform vet returns exit code 2, and displays a list of violations."
+      }
+    ]
+  }
+]

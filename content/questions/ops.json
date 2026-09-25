@@ -1,0 +1,3119 @@
+[
+  {
+    "id": "ops-001",
+    "objective": "6.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "postmortem",
+      "blameless",
+      "incident-management"
+    ],
+    "stem": "An online retailer had a two-hour checkout outage. An engineer made a manual firewall change in production and mistyped an IP range. The VP of engineering proposes to remove the engineer's production access and to require the VP's sign-off on every production change. You must recommend the next step that follows the operational excellence pillar of the Google Cloud Well-Architected Framework. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run a blameless post-incident review that builds a timeline, finds the root cause and the systemic issues, and assigns corrective actions."
+      },
+      {
+        "id": "B",
+        "text": "Remove the engineer's production access, require the VP's sign-off for each production change, and add the new rule to the runbook."
+      },
+      {
+        "id": "C",
+        "text": "Create an alert on firewall changes in Cloud Audit Logs that pages the security team each time any firewall rule changes."
+      },
+      {
+        "id": "D",
+        "text": "Write a detailed manual checklist for firewall changes and require every engineer to complete it before each production change."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The pillar says that after an incident you must conduct a post-incident review (postmortem) that finds the root cause, the contributing factors, and the systemic issues. It also says the process needs a blameless culture that focuses on learning, not on blame. The review, not a punishment, finds fixes such as automation or validation of firewall changes.",
+    "whyWrong": {
+      "B": "This assigns blame to one person and adds a manual bottleneck. The pillar requires a blameless culture so that people report incidents and the team fixes systemic issues.",
+      "C": "An alert can shorten detection, but it does not find why the change was possible or how to prevent it. It skips the review that the pillar requires.",
+      "D": "A manual checklist keeps the change manual. The pillar favors automation and a review of systemic causes over more manual steps."
+    },
+    "sources": [
+      {
+        "title": "Manage incidents and problems",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+        "evidence": "To ensure a successful PIR process, your organization must foster a blameless culture that focuses on learning and improvement rather than assigning blame."
+      }
+    ]
+  },
+  {
+    "id": "ops-002",
+    "objective": "6.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "iac",
+      "change-management",
+      "drift"
+    ],
+    "stem": "A company has development, staging, and production projects. Operators often change production resources in the Google Cloud console during incidents. Releases now fail in production because production configuration differs from staging. The CTO wants environments that are consistent and repeatable, and a record of who changed what and when. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Take a weekly export of the production configuration and compare it with staging during a manual review meeting."
+      },
+      {
+        "id": "B",
+        "text": "Define the infrastructure as Terraform code in a Git repository and apply all changes through a CI/CD pipeline."
+      },
+      {
+        "id": "C",
+        "text": "Give operators read-only roles in production and have one senior administrator make all console changes from tickets."
+      },
+      {
+        "id": "D",
+        "text": "Write a runbook for each type of change and require a second operator to watch each console change as it happens."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The pillar recommends infrastructure as code (IaC) in version control, deployed by CI/CD. IaC makes each deployment consistent and repeatable. Version control records when changes were made and by whom, and lets you roll back.",
+    "whyWrong": {
+      "A": "A weekly manual comparison finds drift late and does not prevent it. Changes stay manual.",
+      "C": "One administrator is a bottleneck, and the changes are still manual console changes that can drift.",
+      "D": "A runbook and a second person reduce errors, but the changes stay manual and are not versioned or repeatable."
+    },
+    "sources": [
+      {
+        "title": "Automate and manage change",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/automate-and-manage-change",
+        "evidence": "By storing your IaC code in a version control system, you can track changes, and identify when changes were made and by whom."
+      }
+    ]
+  },
+  {
+    "id": "ops-003",
+    "objective": "6.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "incident-response",
+      "operational-readiness",
+      "roles"
+    ],
+    "stem": "A SaaS company uses Cloud Monitoring alerts, dashboards, and runbooks for its main services. In the last three major incidents, several engineers made conflicting changes at the same time, nobody decided when to escalate, and executives received no status updates. The tooling worked as designed. Which improvement should you recommend first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a third-party observability platform with anomaly detection to find incidents earlier."
+      },
+      {
+        "id": "B",
+        "text": "Add more alerting policies with lower thresholds so that engineers learn about problems sooner."
+      },
+      {
+        "id": "C",
+        "text": "Define incident roles such as incident commander and communicator, with escalation paths, and train the team."
+      },
+      {
+        "id": "D",
+        "text": "Define SLOs for each service and publish a monthly availability report to the executives."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The failures are in coordination, escalation, and communication, which is a workforce and process gap. The pillar says to define roles such as incident commanders, investigators, communicators, and technical experts, to define escalation paths, and to train the team. More tools or alerts do not fix a coordination gap.",
+    "whyWrong": {
+      "A": "The stem says the tooling worked. A new tool does not assign roles or control conflicting changes.",
+      "B": "Detection was not the problem. Lower thresholds can add noise without fixing coordination.",
+      "D": "SLOs are useful, but a monthly report does not give executives updates during an incident or stop conflicting changes."
+    },
+    "sources": [
+      {
+        "title": "Manage incidents and problems",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+        "evidence": "To establish incident response procedures, you need to define the roles and expectations of each team member, such as incident commanders, investigators, communicators, and technical experts."
+      }
+    ]
+  },
+  {
+    "id": "ops-004",
+    "objective": "6.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "capacity-planning",
+      "dr",
+      "quotas"
+    ],
+    "stem": "A ticketing company runs in us-central1 and keeps a scaled-down standby environment in us-east1 for disaster recovery. Its capacity plan covers holiday peaks in us-central1 only. Leadership wants the capacity plan to follow the operational excellence pillar of the Well-Architected Framework. What should you add to the plan?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Committed use discounts for the us-central1 peak capacity, so that the peak costs less."
+      },
+      {
+        "id": "B",
+        "text": "A higher autoscaler maximum in us-central1, so that the primary region absorbs any peak."
+      },
+      {
+        "id": "C",
+        "text": "An immediate move to an active-active design in three regions, so that no failover is needed."
+      },
+      {
+        "id": "D",
+        "text": "Capacity and quotas in us-east1 that can take the failover load, including peak demand."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The pillar says capacity planning includes quotas and must make sure that both the primary system and the DR system can handle surges, so that failover is graceful. A plan that sizes only the primary region can fail at the moment the company needs the DR region.",
+    "whyWrong": {
+      "A": "Discounts lower cost but do not add capacity in the DR region.",
+      "B": "More capacity in the primary region does not help when that region fails.",
+      "C": "This is a large redesign. The requirement is a correct capacity plan, not a new architecture."
+    },
+    "sources": [
+      {
+        "title": "Ensure operational readiness and performance using CloudOps",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/operational-readiness-and-performance-using-cloudops",
+        "evidence": "To make sure that your primary and disaster recovery (DR) system can handle unexpected surges in demand, plan for capacity that can support graceful failover during disruptions like natural disasters and cyberattacks."
+      }
+    ]
+  },
+  {
+    "id": "ops-005",
+    "objective": "6.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "automation",
+      "incident-response",
+      "toil"
+    ],
+    "stem": "A retrospective shows that a known alert fires about once a week at night. Each time, the on-call engineer follows the same three-step runbook to restart a stuck worker and clear its queue lease. The steps never change and take five minutes, but the engineer needs 30 minutes to wake up and connect. The team wants to cut the time to resolve and reduce toil. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the alert to Pub/Sub and have a Cloud Run function run the runbook steps, then notify the on-call engineer of the result."
+      },
+      {
+        "id": "B",
+        "text": "Move the on-call rotation to a follow-the-sun model so that an awake engineer runs the runbook each time."
+      },
+      {
+        "id": "C",
+        "text": "Lower the alert threshold so that the alert fires earlier and the engineer has more time to respond."
+      },
+      {
+        "id": "D",
+        "text": "Add the runbook to the knowledge base and link the runbook from the alert documentation field."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The pillar recommends automated incident response: automated tools detect the problem and run predefined remediation. It names Cloud Run functions and Cloud Run for this. A fixed, repeatable procedure is a good candidate, and it removes the human delay.",
+    "whyWrong": {
+      "B": "More staff can run the steps faster, but the work stays manual toil. Automation removes it.",
+      "C": "The delay is the human response time, not detection. An earlier alert still needs a person to wake up.",
+      "D": "Better documentation helps a person, but the person is still the slow step."
+    },
+    "sources": [
+      {
+        "title": "Manage incidents and problems",
+        "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+        "evidence": "By using Google Cloud products like Cloud Run functions or Cloud Run, you can automate various tasks that are typically manual and time-consuming."
+      }
+    ]
+  },
+  {
+    "id": "ops-006",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "metrics-scope",
+      "multi-project",
+      "cloud-monitoring"
+    ],
+    "stem": "A company has 30 production projects and 20 non-production projects. The SRE team needs one place to build dashboards and alerting policies across all production projects. Each development team must see only the metrics of its own projects. You want to follow Google-recommended practices. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the largest production project as the scoping project, add the other 29 production projects to its metrics scope, and add filters to each chart."
+      },
+      {
+        "id": "B",
+        "text": "Create a new project with no resources as the scoping project, add the 30 production projects to its metrics scope, and grant the SRE team Monitoring Editor on it."
+      },
+      {
+        "id": "C",
+        "text": "Create an aggregated log sink at the organization that routes all production logs to one log bucket, and build log-based metrics for the SRE dashboards."
+      },
+      {
+        "id": "D",
+        "text": "Export the metrics of all 30 production projects to BigQuery each hour and build the SRE dashboards and threshold checks on the BigQuery tables."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A metrics scope lets one scoping project chart and alert on metrics from many projects. Google recommends a new project, or one without resources, as the scoping project, so that charts and alerts do not need filters to separate its own data. Monitoring Editor on the scoping project lets the SRE team view the metrics of all monitored projects and create dashboards and alerting policies. Each development team keeps access only to its own projects.",
+    "whyWrong": {
+      "A": "This works, but charts and alerts for the scoping project's own resources then need filters to exclude the monitored projects. The docs say that these filters add complexity and the risk of configuration errors.",
+      "C": "Log sinks centralize logs, not metrics. Rebuilding metrics from logs adds cost and misses the built-in metrics.",
+      "D": "An hourly export adds a custom pipeline and delay, and it gives up Cloud Monitoring alerting."
+    },
+    "sources": [
+      {
+        "title": "Metrics scopes overview",
+        "url": "https://docs.cloud.google.com/monitoring/settings",
+        "evidence": "we recommend that you use a new Google Cloud project or one without resources as the scoping project, because these projects don't store any time-series data."
+      },
+      {
+        "title": "Control access with IAM",
+        "url": "https://docs.cloud.google.com/monitoring/access-control",
+        "evidence": "View Monitoring data, and create and edit configurations. For example, principals with this role can create custom dashboards and alerting policies."
+      }
+    ]
+  },
+  {
+    "id": "ops-007",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-logging",
+      "exclusion-filter",
+      "log-based-metrics",
+      "cost"
+    ],
+    "stem": "A GKE platform writes about 4 TB of logs each month to the `_Default` log bucket. About 70% of the entries are successful health-check requests that nobody reads. The SRE team still needs a chart of failed health checks over time. You must reduce the Cloud Logging bill with the least effort. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add an exclusion filter to the `_Default` sink that matches the health-check entries."
+      },
+      {
+        "id": "B",
+        "text": "Reduce the retention period of the `_Default` bucket from 30 days to 1 day."
+      },
+      {
+        "id": "C",
+        "text": "Create a project-scoped counter log-based metric that counts failed health checks."
+      },
+      {
+        "id": "D",
+        "text": "Disable the `_Required` sink so that audit logs no longer use log storage."
+      },
+      {
+        "id": "E",
+        "text": "Route all entries to a Pub/Sub topic and delete the `_Default` log bucket."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Excluded entries are not stored in log buckets and do not count against storage, so an exclusion filter on the `_Default` sink removes most of the cost. User-defined log-based metrics are calculated from both included and excluded entries. A project-scoped metric evaluates the entries that pass through the sinks of the project, so it still charts failed health checks after the exclusion. A bucket-scoped metric evaluates only the entries that are routed to its bucket.",
+    "whyWrong": {
+      "B": "Logging storage is a one-time charge when entries stream into a bucket, and it already includes up to 30 days of storage. Shorter retention does not reduce it.",
+      "D": "You cannot disable or modify the `_Required` sink, and the `_Required` bucket has no retention charge.",
+      "E": "You cannot delete the system-created `_Default` bucket. Routing all entries to Pub/Sub also removes Logs Explorer, Observability Analytics, and Error Reporting for all logs. It is a large change, not the least effort."
+    },
+    "sources": [
+      {
+        "title": "Log-based metrics overview",
+        "url": "https://docs.cloud.google.com/logging/docs/logs-based-metrics",
+        "evidence": "User-defined log-based metrics are calculated from both included and excluded logs."
+      },
+      {
+        "title": "Optimize and monitor Google Cloud Observability costs",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/observability/pricing-optimize-and-monitor",
+        "evidence": "Excluded log entries aren't streamed to your log buckets and they don't count against your storage allotment."
+      },
+      {
+        "title": "Google Cloud Observability pricing",
+        "url": "https://cloud.google.com/products/observability/pricing",
+        "evidence": "One-time charge for streaming logs into log bucket storage for indexing, querying, and analysis; includes up to 30 days of storage in log buckets."
+      }
+    ]
+  },
+  {
+    "id": "ops-008",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "slo",
+      "burn-rate",
+      "alerting"
+    ],
+    "stem": "A payments API has a 99.9% availability SLO over a rolling 30 days in Cloud Monitoring. The only alert fires when less than 10% of the error budget remains. Last month, a bad release used 40% of the budget in two hours before anyone was paged. The team wants fast pages for severe problems and no pages for small, slow problems. What should you configure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "One burn-rate alerting policy with a 30-day lookback period and a threshold of 1, sent to the pager."
+      },
+      {
+        "id": "B",
+        "text": "A metric-threshold policy that pages when the 5xx count exceeds 100 in any one-minute window."
+      },
+      {
+        "id": "C",
+        "text": "A policy that pages when the error budget remaining drops below 50%, and a second one below 25%."
+      },
+      {
+        "id": "D",
+        "text": "A fast-burn policy at 10x with a 1-hour lookback that pages, and a slow-burn policy at 2x with a 24-hour lookback that opens a ticket."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google recommends two burn-rate policies. A fast-burn policy with a short lookback (a starting point of 10x the baseline over 1 or 2 hours) finds a severe outage quickly. A slow-burn policy (a starting point of 2x over 24 hours) finds sustained small problems that are less urgent, so it suits a ticket.",
+    "whyWrong": {
+      "A": "Cloud Monitoring cannot base burn-rate alerts on a lookback longer than 24 hours, and one slow window detects severe outages late.",
+      "B": "A raw error count ignores traffic volume and the SLO. It pages on small spikes and does not measure budget use.",
+      "C": "Alerts on remaining budget still fire late for a fast burn and page for slow burns, which is the current problem."
+    },
+    "sources": [
+      {
+        "title": "Alerting on your burn rate",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/solutions/slo-monitoring/alerting-on-budget-burn-rate",
+        "evidence": "A good starting point for a fast-burn threshold policy is 10x the baseline with a short (1- or 2-hour) lookback period."
+      },
+      {
+        "title": "Alerting on your burn rate",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/solutions/slo-monitoring/alerting-on-budget-burn-rate",
+        "evidence": "A good starting point for a slow-burn threshold is 2x the baseline with a 24-hour lookback period."
+      }
+    ]
+  },
+  {
+    "id": "ops-009",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "notification-channels",
+      "alerting",
+      "automation"
+    ],
+    "stem": "The on-call team receives Cloud Monitoring alerts only in Slack. During a recent incident, no Slack notifications arrived and the team found out late. The team also wants its ticketing system to create a ticket automatically from each alert. You want to follow Google recommendations. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a PagerDuty channel as the backup channel, and parse the Slack messages with a bot to create tickets."
+      },
+      {
+        "id": "B",
+        "text": "Add an SMS channel as the backup channel, and forward the Slack messages by email to the ticketing system."
+      },
+      {
+        "id": "C",
+        "text": "Add an email channel as the backup channel, and add a Pub/Sub channel that feeds the ticket automation."
+      },
+      {
+        "id": "D",
+        "text": "Add a Mobile App channel as the backup channel, and send the Mobile App notifications to the ticketing system."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Mobile App, PagerDuty, webhook, and Slack notifications use the same internal Google Cloud service, so they share a single point of failure. Google recommends email or Pub/Sub as the redundant channel. For automation that reads or acts on notifications, Google recommends Pub/Sub or webhook channels, because the format of other channels can change.",
+    "whyWrong": {
+      "A": "PagerDuty shares the same delivery service as Slack, and parsing Slack messages depends on a format that can change.",
+      "B": "SMS is not a fully reliable channel type, and email forwarding of Slack messages is not a supported automation path.",
+      "D": "The Mobile App shares the same delivery service as Slack, so it is not a redundant path."
+    },
+    "sources": [
+      {
+        "title": "Create and manage notification channels",
+        "url": "https://docs.cloud.google.com/monitoring/support/notification-options",
+        "evidence": "powered by the same Google Cloud internal service and therefore share a single point of failure. If you use one of these notification channels, then use email or Pub/Sub as the redundant channel."
+      },
+      {
+        "title": "Create and manage notification channels",
+        "url": "https://docs.cloud.google.com/monitoring/support/notification-options",
+        "evidence": "If you plan to use automation tools to read, reroute, transform, or otherwise act on notifications, then use the webhook or Pub/Sub channels."
+      }
+    ]
+  },
+  {
+    "id": "ops-010",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "ops-agent",
+      "compute-engine",
+      "metrics"
+    ],
+    "stem": "A team wants to right-size a fleet of Compute Engine VMs. The Cloud Monitoring VM dashboards show CPU utilization and network traffic, but the memory utilization charts show no data. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Install the Ops Agent on the VMs, for example through the instance template."
+      },
+      {
+        "id": "B",
+        "text": "Enable the Cloud Monitoring API in the project and wait for data to appear."
+      },
+      {
+        "id": "C",
+        "text": "Add the project to a new metrics scope in a dedicated scoping project."
+      },
+      {
+        "id": "D",
+        "text": "Create a log-based metric from the VM serial console output."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Basic VM metrics such as CPU and network traffic are available without an agent. Memory and process metrics are available only after you install the Ops Agent, the primary agent for Compute Engine telemetry.",
+    "whyWrong": {
+      "B": "The CPU data shows that Cloud Monitoring already works. The missing data comes from inside the guest OS.",
+      "C": "A metrics scope changes which projects you can view. It does not collect new metrics.",
+      "D": "Serial console output does not report memory use in a reliable form, and this is a custom workaround for a supported feature."
+    },
+    "sources": [
+      {
+        "title": "Observe and monitor VMs",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/observe-monitor-vms",
+        "evidence": "Metrics for memory and process utilization are only available with the installation of the Ops Agent, which is the primary agent for collecting telemetry from your Compute Engine instances."
+      }
+    ]
+  },
+  {
+    "id": "ops-011",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-profiler",
+      "performance",
+      "cloud-trace"
+    ],
+    "stem": "After a release, a Java service on GKE uses 40% more CPU, and the cluster autoscaler adds nodes. Request latency and error rates did not change. The team wants to find which methods use the extra CPU under real production load, with minimal overhead. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Cloud Trace with a 100% sample rate and compare span durations between versions."
+      },
+      {
+        "id": "B",
+        "text": "Enable Cloud Profiler in the service and compare CPU time profiles before and after the release."
+      },
+      {
+        "id": "C",
+        "text": "Check Error Reporting for new exception groups that the release introduced."
+      },
+      {
+        "id": "D",
+        "text": "Add debug logging with method timings and query the entries in Observability Analytics."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Cloud Profiler is a statistical, low-overhead profiler that continuously collects CPU and memory-allocation data from production and maps it to source code. It shows which methods use CPU. Latency did not change, so a tracing tool that measures request latency across services is the wrong tool.",
+    "whyWrong": {
+      "A": "Trace measures latency between services, not CPU use inside methods, and a 100% sample rate adds cost.",
+      "C": "Error rates did not change, and Error Reporting groups errors. It does not measure CPU.",
+      "D": "Timing logs for each method add overhead and cost and still do not show CPU time."
+    },
+    "sources": [
+      {
+        "title": "Cloud Profiler overview",
+        "url": "https://docs.cloud.google.com/profiler/docs/about-profiler",
+        "evidence": "Cloud Profiler is a statistical, low-overhead profiler that continuously gathers CPU usage and memory-allocation information from your production applications."
+      }
+    ]
+  },
+  {
+    "id": "ops-012",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "log-sink",
+      "aggregated-sink",
+      "retention",
+      "audit-logs"
+    ],
+    "stem": "A bank has an organization with 60 projects, and teams add new projects every month. Regulators require that all Cloud Audit Logs from every project are kept for seven years. Auditors query the logs a few times a year. You must meet the requirement at the lowest cost and with the least ongoing administration. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the retention of the `_Required` log bucket in each project to seven years."
+      },
+      {
+        "id": "B",
+        "text": "Increase the `_Default` bucket retention in each project to 2,555 days as part of project creation."
+      },
+      {
+        "id": "C",
+        "text": "Create a sink in each project that routes audit logs to a central BigQuery dataset."
+      },
+      {
+        "id": "D",
+        "text": "Create an aggregated sink at the organization that routes audit logs to a Cloud Storage bucket."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "An aggregated sink at the organization routes log entries of the organization and all child resources, so new projects are included automatically. Cloud Storage is the sink destination for long-term, low-cost storage. You can then set a retention policy on the bucket to meet the seven-year rule.",
+    "whyWrong": {
+      "A": "The `_Required` bucket has a fixed 400-day retention that you cannot configure.",
+      "B": "Retention past 30 days in log buckets costs extra, and the setting must be applied to each new project.",
+      "C": "Per-project sinks need work for each new project, and BigQuery storage for rarely queried data costs more than Cloud Storage."
+    },
+    "sources": [
+      {
+        "title": "Route log entries",
+        "url": "https://docs.cloud.google.com/logging/docs/routing/overview",
+        "evidence": "You can create aggregated sinks, which route log entries for an organization or folder and their children, to the destination specified by the sink."
+      },
+      {
+        "title": "Route log entries",
+        "url": "https://docs.cloud.google.com/logging/docs/routing/overview",
+        "evidence": "Select this destination when you want long-term storage of your log data."
+      }
+    ]
+  },
+  {
+    "id": "ops-013",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "observability-analytics",
+      "log-analytics",
+      "logs-explorer"
+    ],
+    "stem": "An application writes structured JSON logs with a `customer_id` field to a log bucket. The bucket was upgraded to use Observability Analytics (formerly Log Analytics) last year. A product manager needs the number of HTTP 5xx errors per customer per hour for the last 14 days, today, for a one-time analysis. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a sink that routes the application logs to a BigQuery dataset, and query the dataset."
+      },
+      {
+        "id": "B",
+        "text": "Create a counter log-based metric with a `customer_id` label, and chart it in Metrics Explorer."
+      },
+      {
+        "id": "C",
+        "text": "Run a SQL query that groups and counts the entries in Observability Analytics."
+      },
+      {
+        "id": "D",
+        "text": "Run a query in the Logs Explorer and read the counts from the histogram."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Observability Analytics runs SQL that groups and aggregates log data in an upgraded log bucket, including data that is already stored. The other options fail on the time constraint: sinks and log-based metrics are not retroactive, and the Logs Explorer does not support aggregate operations.",
+    "whyWrong": {
+      "A": "A sink routes only entries that arrive after you create it, so the dataset has no data for the last 14 days.",
+      "B": "A new log-based metric counts only entries that arrive after you create it, and a customer label can create high cardinality.",
+      "D": "The Logs Explorer does not support aggregate operations such as counts per customer per hour."
+    },
+    "sources": [
+      {
+        "title": "Analyze logs using Logs Explorer and Observability Analytics",
+        "url": "https://docs.cloud.google.com/logging/docs/log-analytics",
+        "evidence": "The Logs Explorer doesn't support aggregate operations, like counting the number of log entries that contain a specific pattern. To perform aggregate operations, enable analytics on the log bucket and then use Observability Analytics."
+      },
+      {
+        "title": "Route log entries",
+        "url": "https://docs.cloud.google.com/logging/docs/routing/overview",
+        "evidence": "Log sinks can't retroactively route log entries. That is, a log sink can't route a log entry that was received before the sink was created."
+      }
+    ]
+  },
+  {
+    "id": "ops-014",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "synthetic-monitoring",
+      "uptime-checks"
+    ],
+    "stem": "An online store had a four-hour outage of its checkout flow. The home page returned HTTP 200 during the whole outage, so the existing uptime check stayed green. The store wants to detect a broken login, add-to-cart, and test-payment sequence within minutes, from outside its network, without real customer traffic. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Mocha-based synthetic monitor that runs the checkout steps on a schedule, and alert on failures."
+      },
+      {
+        "id": "B",
+        "text": "Add a second public uptime check that requests the checkout page URL and checks for HTTP 200."
+      },
+      {
+        "id": "C",
+        "text": "Create a private uptime check that tests the internal payment service from inside the VPC."
+      },
+      {
+        "id": "D",
+        "text": "Create a log-based alerting policy that fires when payment errors appear in the application logs."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Synthetic monitors run a sequence of tests, such as a login page or the checkout process of an online store, on a schedule. They run as a Cloud Run function that uses the Mocha or custom framework, so they test a multi-step user journey without real customer traffic.",
+    "whyWrong": {
+      "B": "An uptime check sends a single request. The checkout page can return HTTP 200 while the flow behind it is broken.",
+      "C": "A private check tests one internal endpoint, not the user journey from outside the network.",
+      "D": "A log-based alert needs real customers to fail first, and it misses failures that write no error log."
+    },
+    "sources": [
+      {
+        "title": "Synthetic monitoring overview",
+        "url": "https://docs.cloud.google.com/monitoring/uptime-checks/introduction",
+        "evidence": "Synthetic monitors let you define what you are going to test and a sequence of tests. For example, you can test the login page of your application, the checkout process of your ecommerce store"
+      }
+    ]
+  },
+  {
+    "id": "ops-015",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "alert-fatigue",
+      "symptom-based-alerting",
+      "slo"
+    ],
+    "stem": "An on-call team receives about 40 pages each week. The alerting policies page on CPU above 80% on single VMs in an autoscaled MIG, on memory above 90% on single pods, and on any HTTP 5xx response. Most pages need no action, and users rarely notice a problem. Engineers have started to ignore pages. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Raise the CPU and memory thresholds to 95% and require each condition to last 15 minutes."
+      },
+      {
+        "id": "B",
+        "text": "Snooze all alerting policies at night and review the open alerts each morning."
+      },
+      {
+        "id": "C",
+        "text": "Add a second on-call engineer so that each engineer handles half of the pages."
+      },
+      {
+        "id": "D",
+        "text": "Page on SLO burn rate for user-facing availability and latency, and send cause-based alerts to tickets or dashboards."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The SRE book says that pages should be based on symptoms users feel, and that every page should be actionable. CPU and memory on single instances are causes, not symptoms. Burn-rate alerts on SLOs page only when users are affected enough to threaten the error budget, and cause-based signals stay available for diagnosis.",
+    "whyWrong": {
+      "A": "Higher thresholds reduce volume but still page on causes that often need no action.",
+      "B": "Snoozing hides real incidents at night and does not make the remaining pages actionable.",
+      "C": "More people share the noise but do not reduce it, and fatigue continues."
+    },
+    "sources": [
+      {
+        "title": "Monitoring Distributed Systems",
+        "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+        "evidence": "Does this rule detect an otherwise undetected condition that is urgent, actionable, and actively or imminently user-visible?"
+      },
+      {
+        "title": "Alerting on SLOs",
+        "url": "https://sre.google/workbook/alerting-on-slos/",
+        "evidence": "Your goal is to be notified for a significant event: an event that consumes a large fraction of the error budget."
+      }
+    ]
+  },
+  {
+    "id": "ops-016",
+    "objective": "6.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "managed-prometheus",
+      "gke",
+      "promql"
+    ],
+    "stem": "A company runs self-managed Prometheus servers in 12 GKE clusters. Operating the servers, scaling storage, and keeping long-term data take a lot of engineering time. Teams want to keep their PromQL alerts and Grafana dashboards, and query metrics across all clusters. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace the Prometheus metrics with log-based metrics and rebuild the dashboards in Cloud Monitoring."
+      },
+      {
+        "id": "B",
+        "text": "Use Google Cloud Managed Service for Prometheus with managed collection in each cluster."
+      },
+      {
+        "id": "C",
+        "text": "Move the Prometheus servers to larger Compute Engine VMs with bigger persistent disks."
+      },
+      {
+        "id": "D",
+        "text": "Export the Prometheus data to BigQuery each night and point Grafana at BigQuery."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Managed Service for Prometheus keeps PromQL and Grafana compatibility and stores the data in the global Cloud Monitoring datastore. Google recommends managed collection for Kubernetes, because it removes the work of deploying, scaling, sharding, configuring, and maintaining Prometheus servers.",
+    "whyWrong": {
+      "A": "Log-based metrics lose PromQL compatibility and add logging cost.",
+      "C": "Bigger servers keep all the operations work that the team wants to remove.",
+      "D": "A nightly export adds a pipeline and delay, and it breaks real-time PromQL alerting."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud Managed Service for Prometheus",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/managed-prometheus",
+        "evidence": "We recommend that you use managed collection; using it eliminates the complexity of deploying, scaling, sharding, configuring, and maintaining Prometheus servers."
+      }
+    ]
+  },
+  {
+    "id": "ops-017",
+    "objective": "6.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "revision-tags",
+      "gradual-rollout"
+    ],
+    "stem": "A team runs a public API on Cloud Run. Before any customer request reaches a new revision, the team wants to run its end-to-end tests against that revision in production, with the production database and secrets. After the tests pass, the team wants to move traffic to the revision in small steps. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy the revision normally, then immediately run `gcloud run services update-traffic` to send 99% of the traffic back to the previous revision."
+      },
+      {
+        "id": "B",
+        "text": "Deploy the revision with `--no-traffic` and a tag, run the tests against the tag URL, then increase the revision's share in steps with `gcloud run services update-traffic`."
+      },
+      {
+        "id": "C",
+        "text": "Deploy the revision to a staging project that uses a copy of the production database, run the tests there, then deploy normally to production."
+      },
+      {
+        "id": "D",
+        "text": "Put an Application Load Balancer in front of the service, mirror all requests to the new revision, then switch the URL map to the new revision."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A tag gives the new revision its own URL while it serves no traffic. Google describes this sequence: deploy to production without traffic, test against the tagged revision, then migrate traffic. `update-traffic --to-revisions` then moves traffic to the revision in steps.",
+    "whyWrong": {
+      "A": "The revision receives the traffic first, so customers reach it before the tests run.",
+      "C": "A staging test is useful, but it does not test the real production revision with the production dependencies, which is the requirement.",
+      "D": "A load balancer reaches Cloud Run through a serverless NEG, and request mirroring does not support serverless NEGs. Mirroring also discards the mirror's responses, so it does not run the team's tests. The final URL map switch moves all traffic at once, not in steps."
+    },
+    "sources": [
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "Deploy it to production, without serving traffic, and test against a tagged revision in production."
+      },
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "The tag lets you directly test the new revision at a specific URL, without serving traffic."
+      }
+    ]
+  },
+  {
+    "id": "ops-018",
+    "objective": "6.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "rollback",
+      "traffic-splitting"
+    ],
+    "stem": "During an incident, an on-call engineer rolled back a Cloud Run service with `gcloud run services update-traffic checkout --to-revisions=checkout-00041-abc=100`. The next day, the team deployed a fixed revision with `gcloud run deploy`. The deployment succeeded, but monitoring shows that all requests still go to `checkout-00041-abc`. What is the cause, and what should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The new revision failed its startup probe. Increase the startup probe timeout and deploy again."
+      },
+      {
+        "id": "B",
+        "text": "Cloud Run sends traffic to a new revision only after its minimum instances start. Set minimum instances on the new revision."
+      },
+      {
+        "id": "C",
+        "text": "The traffic assignment from the rollback still applies to later deployments. Run `gcloud run services update-traffic checkout --to-latest`."
+      },
+      {
+        "id": "D",
+        "text": "A revision that received a rollback stays pinned until you delete it. Delete `checkout-00041-abc` so that traffic moves to the newest revision."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "When you assign traffic to a previous revision, all later deployments keep that traffic pattern. The fixed revision is ready but gets no traffic. Sending all traffic to the latest revision returns the service to the normal behavior, where each new revision serves 100%.",
+    "whyWrong": {
+      "A": "The deployment succeeded, so the revision is ready. The cause is the traffic assignment that the rollback created.",
+      "B": "Minimum instances keep idle capacity. They do not decide which revision receives traffic.",
+      "D": "Cloud Run has no pinning rule for rolled-back revisions. Deleting the last good revision also removes your rollback target, and it is not needed: `--to-latest` fixes the traffic."
+    },
+    "sources": [
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "If you split traffic between multiple revisions or assigned traffic to a previous revision, all subsequent deployments use that traffic split pattern going forward."
+      },
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "When you deploy a new revision, you can make this revision and all future ones serve 100% of the traffic as soon as possible, overriding any established traffic split"
+      }
+    ]
+  },
+  {
+    "id": "ops-019",
+    "objective": "6.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-deploy",
+      "approvals",
+      "deploy-policy",
+      "change-freeze"
+    ],
+    "stem": "A company uses Cloud Deploy to release services to GKE and Cloud Run. Two new rules apply to production. A release manager must approve each production deployment in the company's ServiceNow workflow. No production deployment may start between November 20 and December 2. What should you do? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a manual approval step to the Cloud Build trigger that builds the container images."
+      },
+      {
+        "id": "B",
+        "text": "Remove the `roles/clouddeploy.releaser` role from all developers on November 20, and grant it again on December 2."
+      },
+      {
+        "id": "C",
+        "text": "Set `requireApproval: true` on the production target. Have ServiceNow consume the approval Pub/Sub messages and approve through the Cloud Deploy API with an account that has `roles/clouddeploy.approver`."
+      },
+      {
+        "id": "D",
+        "text": "Create a second delivery pipeline without a production target, and tell teams to use it during the freeze."
+      },
+      {
+        "id": "E",
+        "text": "Create a Cloud Deploy deploy policy with a rollout restriction on the production target for the freeze window."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "`requireApproval` makes every rollout to the production target wait for an approval. Cloud Deploy publishes a Pub/Sub message that a ticketing system can consume, and any account with `roles/clouddeploy.approver` can approve. A deploy policy with a time window blocks rollout creation during a seasonal freeze.",
+    "whyWrong": {
+      "A": "A Cloud Build approval gates the build, not the rollout to production. An approved image can still reach production without a release manager's decision.",
+      "B": "Manual IAM changes for a date range are error-prone and easy to forget. Deploy policies block rollouts during a time window, which is the built-in control for a freeze.",
+      "D": "Teams can still use the original pipeline, so nothing enforces the freeze."
+    },
+    "sources": [
+      {
+        "title": "Overview of Cloud Deploy",
+        "url": "https://docs.cloud.google.com/deploy/docs/overview",
+        "evidence": "When a target requires approval, Cloud Deploy generates a Pub/Sub message that can be consumed by an integrated system. For example, a ticketing system could subscribe to the message to kick off an approval workflow."
+      },
+      {
+        "title": "Restrict deploy behavior using policies",
+        "url": "https://docs.cloud.google.com/deploy/docs/deploy-policy",
+        "evidence": "For example, a policy can prevent rollout creation for a given delivery pipeline during a specified time period. You might use this for seasonal restrictions, for example."
+      },
+      {
+        "title": "Promote your release and manage approvals",
+        "url": "https://docs.cloud.google.com/deploy/docs/promote-release",
+        "evidence": "Any user or service account with the role roles/clouddeploy.approver can approve a Cloud Deploy rollout to a target that requires approval."
+      }
+    ]
+  },
+  {
+    "id": "ops-020",
+    "objective": "6.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "schema-change",
+      "spanner",
+      "canary",
+      "rollback"
+    ],
+    "stem": "An order service on GKE stores its data in Spanner. The team releases with a Cloud Deploy canary (25%, 50%, then stable) and must be able to roll back the application at any time. The next release renames the `customer_name` column to `full_name`. How should the team change the schema?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rename the column in a Cloud Deploy `predeploy` hook of the same release, so that the schema and the code change together."
+      },
+      {
+        "id": "B",
+        "text": "Add `full_name` in one release, deploy code that writes both columns and reads `full_name` with a fallback, backfill the data, and drop `customer_name` in a later release when no version uses it."
+      },
+      {
+        "id": "C",
+        "text": "Schedule a maintenance window, stop the service, rename the column, and then deploy the new version to all Pods."
+      },
+      {
+        "id": "D",
+        "text": "Use a migration tool that runs the full series of upgrade and downgrade migrations on every deployment, so that an application rollback also downgrades the schema."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "During a canary, the old and new versions run at the same time, and a rollback runs the old version again. An expand-and-contract change keeps the schema compatible with both versions at every step. Drop the old column only when no version still writes to it or reads from it.",
+    "whyWrong": {
+      "A": "During the canary, part of the Pods still run the old version, which reads `customer_name`. A rollback would also run the old code against the renamed column.",
+      "C": "This causes downtime, and a later application rollback would still fail against the renamed column.",
+      "D": "Google does not recommend processes that run long series of upgrade and downgrade schema updates on every deployment for Spanner."
+    },
+    "sources": [
+      {
+        "title": "Schema update best practices",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-updates-best-practices",
+        "evidence": "If you're dropping a column, table, or index, make sure you are not still writing to or reading from it."
+      },
+      {
+        "title": "Schema update best practices",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-updates-best-practices",
+        "evidence": "For some relational database management systems, there are software packages that make a long series of upgrade and downgrade schema updates to the database on every production deployment. These types of processes are not recommended for Spanner."
+      },
+      {
+        "title": "Canary-deploy an application to a target",
+        "url": "https://docs.cloud.google.com/deploy/docs/deploy-app-canary",
+        "evidence": "This means that the application is now deployed to 50%. For serviceNetworking-based GKE, it's deployed to half of your pods."
+      }
+    ]
+  },
+  {
+    "id": "ops-021",
+    "objective": "6.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "deployment-strategy",
+      "blue-green"
+    ],
+    "stem": "A payments team must be able to move all users back to the previous version within seconds, without deploying anything again. Finance accepts the cost of two full production environments during each release. Which deployment strategy meets these requirements?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rolling update"
+      },
+      {
+        "id": "B",
+        "text": "Canary deployment in 5% steps"
+      },
+      {
+        "id": "C",
+        "text": "Blue/green deployment"
+      },
+      {
+        "id": "D",
+        "text": "All-at-once (recreate) deployment"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Blue/green keeps two environments. Moving traffic to the new environment, and back again, is a router change with no downtime. The cost is twice the resources, which finance accepts here.",
+    "whyWrong": {
+      "A": "A rollback is a new rolling update to the old version. It replaces instances in batches, which takes time.",
+      "B": "A canary limits how many users see a defect, but it does not keep a full, idle copy of the previous version for an instant switch of all users.",
+      "D": "All at once replaces every instance, so a rollback means deploying the old version again."
+    },
+    "sources": [
+      {
+        "title": "Canarying Releases (SRE workbook)",
+        "url": "https://sre.google/workbook/canarying-releases/",
+        "evidence": "After deploying a new release in the blue environment, you can then move traffic to it. The cutover doesn't require downtime, and rollback is a trivial reversal of the router change."
+      },
+      {
+        "title": "Canarying Releases (SRE workbook)",
+        "url": "https://sre.google/workbook/canarying-releases/",
+        "evidence": "One downside is that this setup uses twice as many resources as a more \"traditional\" deployment."
+      }
+    ]
+  },
+  {
+    "id": "ops-022",
+    "objective": "6.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "compute-engine",
+      "mig",
+      "canary",
+      "rollback"
+    ],
+    "stem": "A regional managed instance group (MIG) of 20 VMs serves an application behind an Application Load Balancer. The team wants 10% of the VMs to run a new instance template for one day. Then the team will either complete the update or return to the old template. The team wants the least operational effort. Which two actions should the team take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the MIG update type to opportunistic, so that the VMs that autoscaling creates use the new template."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud compute instance-groups managed rolling-action start-update` with `--version=template=OLD_TEMPLATE` and `--canary-version=template=NEW_TEMPLATE,target-size=10%`."
+      },
+      {
+        "id": "C",
+        "text": "Update all VMs to the new template with `--max-unavailable=100%`, and watch the error rate for one day."
+      },
+      {
+        "id": "D",
+        "text": "To return to the old template, start a new update that specifies only the old instance template."
+      },
+      {
+        "id": "E",
+        "text": "To test a hotfix during the day, start a second canary update on top of the running canary."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "A MIG canary update runs two instance templates, with a target size for the canary template. There is no separate rollback command. You roll back, from a canary or from a full update, with a new update request that names the template that you want to return to.",
+    "whyWrong": {
+      "A": "An opportunistic update applies only to VMs that you update by hand or that the group creates. It does not give a controlled 10% share.",
+      "C": "This changes every VM at once, so every user sees a defect in the new template.",
+      "E": "Google strongly recommends that you roll back a canary fully before you canary another version."
+    },
+    "sources": [
+      {
+        "title": "Automatically apply VM configuration updates in a MIG",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/rolling-out-updates-to-managed-instance-groups",
+        "evidence": "For example, you can specify that 20% of your instances be created based on NEW_INSTANCE_TEMPLATE while the rest of the instances continue to run on the OLD_INSTANCE_TEMPLATE."
+      },
+      {
+        "title": "Automatically apply VM configuration updates in a MIG",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/rolling-out-updates-to-managed-instance-groups",
+        "evidence": "you can do so by making a new update request and passing in the instance template that you want to roll back to"
+      },
+      {
+        "title": "Automatically apply VM configuration updates in a MIG",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/rolling-out-updates-to-managed-instance-groups",
+        "evidence": "The MIG applies an opportunistic update only when you manually initiate the update on selected instances or when new instances are created."
+      }
+    ]
+  },
+  {
+    "id": "ops-023",
+    "objective": "6.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "shadow-testing",
+      "request-mirroring",
+      "load-balancing"
+    ],
+    "stem": "A team rewrote a read-only product search backend. Before any user sees results from the new backend, the team wants to measure its latency and errors under real production traffic. Both versions run on managed instance groups as backend services behind a global external Application Load Balancer. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a `requestMirrorPolicy` to the URL map route, so that the load balancer sends copies of the requests to the new backend service."
+      },
+      {
+        "id": "B",
+        "text": "Use `weightedBackendServices` in the URL map to send 5% of the requests to the new backend service."
+      },
+      {
+        "id": "C",
+        "text": "Run a synthetic load test against the new backend service from a separate project."
+      },
+      {
+        "id": "D",
+        "text": "Create a Cloud Deploy canary for the new backend with a first phase of 1%."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Request mirroring sends an identical copy of each request to the mirror backend service on a fire-and-forget basis. Users get only the response from the primary backend. Google lists testing a new version of a backend service as a use, and a read-only service has no shared state for the copies to change. Mirroring does not support serverless NEG backends. The load balancer creates no logs or metrics for mirrored requests, so measure latency and errors in the new backend itself.",
+    "whyWrong": {
+      "B": "Users receive the new backend's results for 5% of the requests, which the requirement does not allow.",
+      "C": "Synthetic load is not real production traffic, and it can miss traffic patterns that only a real system has.",
+      "D": "A canary sends real users to the new version, so some users see its results."
+    },
+    "sources": [
+      {
+        "title": "Set up traffic management for global external Application Load Balancers",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/setting-up-global-traffic-mgmt",
+        "evidence": "In addition to forwarding the request to the selected backend service, you can send an identical request to the configured mirror backend service on a fire and forget basis."
+      },
+      {
+        "title": "Set up traffic management for global external Application Load Balancers",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/setting-up-global-traffic-mgmt",
+        "evidence": "Request mirroring is useful for testing a new version of a backend service."
+      },
+      {
+        "title": "Traffic management overview for global external Application Load Balancers",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/traffic-management-global",
+        "evidence": "It is not supported for internet NEGs, serverless NEGs, and Private Service Connect backends. Requests to the mirrored backend service do not generate any logs or metrics for Cloud Logging and Cloud Monitoring."
+      }
+    ]
+  },
+  {
+    "id": "ops-024",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "secure-source-manager",
+      "cloud-source-repositories",
+      "cloud-build"
+    ],
+    "stem": "A retail company created its Google Cloud organization in 2026 and has never used Cloud Source Repositories. The security team requires that all source code stay in a single-tenant Git service that Google Cloud hosts in one chosen region. Developers need pull requests, and commits must start Cloud Build builds. Which service should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cloud Source Repositories, with one repository for each development team"
+      },
+      {
+        "id": "B",
+        "text": "GitHub Enterprise Cloud, connected to Cloud Build through Developer Connect"
+      },
+      {
+        "id": "C",
+        "text": "Secure Source Manager, with an instance in the required region"
+      },
+      {
+        "id": "D",
+        "text": "An Artifact Registry generic repository, with one version for each commit"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Secure Source Manager is a regional, single-tenant, managed Git repository service that Google Cloud hosts. It has built-in pull requests, and a triggers file starts Cloud Build builds. The requirement for a single-tenant Git service that Google Cloud hosts in one region decides the answer.",
+    "whyWrong": {
+      "A": "Cloud Source Repositories is not available to new customers since June 17, 2024. An organization that never used it cannot enable the API.",
+      "B": "Developer Connect can connect GitHub to Cloud Build, but GitHub Enterprise Cloud is not a Git service that Google Cloud hosts in a region that you choose.",
+      "D": "Artifact Registry stores build artifacts and packages. It is not a Git service, and it has no pull requests."
+    },
+    "sources": [
+      {
+        "title": "Secure Source Manager overview",
+        "url": "https://docs.cloud.google.com/secure-source-manager/docs/overview",
+        "evidence": "Secure Source Manager is a regionally deployed, single-tenant managed source code repository hosted on Google Cloud."
+      },
+      {
+        "title": "Cloud Build triggers",
+        "url": "https://docs.cloud.google.com/build/docs/triggers",
+        "evidence": "Effective June 17, 2024, Cloud Source Repositories isn't available to new customers. If your organization hasn't previously used Cloud Source Repositories, you can't enable the API or use Cloud Source Repositories."
+      }
+    ]
+  },
+  {
+    "id": "ops-025",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-build",
+      "private-pools",
+      "organization-policy"
+    ],
+    "stem": "Your company runs Cloud Build in a project inside its organization. A new build must download packages from an internal artifact server that has only a private IP address in a Shared VPC network. The security team also requires that no build anywhere in the organization runs on the Cloud Build default pool. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a private pool, and peer its service producer network with the Shared VPC network."
+      },
+      {
+        "id": "B",
+        "text": "Keep the default pool, and add a Cloud NAT gateway with a static IP address to the Shared VPC network."
+      },
+      {
+        "id": "C",
+        "text": "Enforce the `constraints/cloudbuild.allowedIntegrations` organization policy constraint for the organization."
+      },
+      {
+        "id": "D",
+        "text": "Enforce the `constraints/cloudbuild.allowedWorkerPools` organization policy constraint for the organization."
+      },
+      {
+        "id": "E",
+        "text": "Create a Serverless VPC Access connector, and attach it to the build trigger."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "A private pool reaches resources in a private network through a VPC peering connection between your network and the service producer network. The `constraints/cloudbuild.allowedWorkerPools` constraint makes builds in the organization use private pools instead of the default pool. The two actions together meet the private access requirement and the no-default-pool requirement.",
+    "whyWrong": {
+      "B": "The default pool runs in a Google-hosted environment with limited private network access. Cloud NAT handles outbound traffic from your VPC network. It does not give default pool workers a path to private IP addresses in your network.",
+      "C": "This constraint controls which external services, such as GitHub, can invoke build triggers. It does not stop builds from using the default pool.",
+      "E": "Serverless VPC Access is not a Cloud Build feature. Builds reach private networks through private pools."
+    },
+    "sources": [
+      {
+        "title": "Private pools overview",
+        "url": "https://docs.cloud.google.com/build/docs/private-pools/private-pools-overview",
+        "evidence": "For your builds to access resources in your private network, you can create a private VPC peering connection between your VPC network and the service producer network."
+      },
+      {
+        "title": "Using Cloud Build in a private network",
+        "url": "https://docs.cloud.google.com/build/docs/private-pools/use-in-private-network",
+        "evidence": "Cloud Build provides a `constraints/cloudbuild.allowedWorkerPools` organization policy constraint that you can enforce to mandate the builds in your organization to not use the default pool and only use the private pool."
+      },
+      {
+        "title": "Gate builds on organization policy",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/gate-builds-organization-policy",
+        "evidence": "Cloud Build enables you to define an organization policy (`constraints/cloudbuild.allowedIntegrations`) to control which external services can invoke build triggers."
+      }
+    ]
+  },
+  {
+    "id": "ops-026",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-build",
+      "secret-manager",
+      "service-accounts"
+    ],
+    "stem": "A new project runs a Cloud Build trigger that calls a partner API with an access token. Security requires that the token is never stored in source control or in build configuration. Only the identity of this pipeline may read the token. Other teams run their own triggers in the same project. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Store the token in Secret Manager. Grant the Secret Manager Secret Accessor role on the secret to the trigger's user-specified service account, and reference the secret with `availableSecrets`."
+      },
+      {
+        "id": "B",
+        "text": "Encrypt the token with a Cloud KMS key. Commit the ciphertext to the repository, and decrypt it in a build step that has access to the key."
+      },
+      {
+        "id": "C",
+        "text": "Save the token as a user-defined substitution variable on the trigger. Allow only the pipeline owners to view the trigger configuration."
+      },
+      {
+        "id": "D",
+        "text": "Store the token in Secret Manager. Grant the Secret Manager Secret Accessor role on the secret to the Cloud Build legacy service account, and reference the secret with `availableSecrets`."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Secret Manager is the recommended way to give a build a secret. `availableSecrets` and `secretEnv` expose the secret to one build step. Access on the secret goes to a user-specified service account that only this trigger uses, so only this pipeline's identity can read the token.",
+    "whyWrong": {
+      "B": "Cloud KMS encrypted credentials still work in existing projects, but Google says to use Secret Manager for new projects. The ciphertext also stays in source control.",
+      "C": "A substitution variable is part of the trigger and build configuration, so the token is stored in build configuration.",
+      "D": "Any user who can run a trigger that uses the legacy Cloud Build service account gets the secret at build time. Other teams could read the token through their builds."
+    },
+    "sources": [
+      {
+        "title": "Use encrypted credentials from Cloud KMS",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/use-encrypted-credentials",
+        "evidence": "Secret Manager is the recommended technique for managing sensitive data with Cloud Build. For existing projects, you can continue using Cloud KMS, but for new projects, use Secret Manager."
+      },
+      {
+        "title": "Use secrets from Secret Manager",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/use-secrets",
+        "evidence": "This allows users without the Secret Accessor role to use build triggers to perform a build that accesses the secret."
+      }
+    ]
+  },
+  {
+    "id": "ops-027",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-build",
+      "service-accounts",
+      "least-privilege"
+    ],
+    "stem": "Your company enabled Cloud Build in several new projects in 2026. Developers run `gcloud builds submit`, and repository triggers also start builds. The security team wants every build, manual or triggered, to follow the principle of least privilege. No build may run as a shared default identity. Which approach should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enforce `constraints/cloudbuild.useBuildServiceAccount` so that builds use the Cloud Build legacy service account, and remove its extra roles."
+      },
+      {
+        "id": "B",
+        "text": "Keep the Compute Engine default service account for builds, and replace its Editor role with the roles that the builds need."
+      },
+      {
+        "id": "C",
+        "text": "Grant developers the Cloud Build Editor role so that each build runs with the permissions of the developer who starts it."
+      },
+      {
+        "id": "D",
+        "text": "Create a service account with only the needed roles for each pipeline, and specify it for manual and triggered builds."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google calls a user-specified service account for both manually submitted and triggered builds the most secure option. One service account for each pipeline, with only the roles that the pipeline needs, follows least privilege and avoids a shared default identity.",
+    "whyWrong": {
+      "A": "This opts out of the change and keeps one shared legacy service account for all builds. It does not give each pipeline its own least-privilege identity.",
+      "B": "The Compute Engine default service account is still a shared default identity, which the security team does not allow.",
+      "C": "Cloud Build runs a build as a service account, not as the user who starts the build."
+    },
+    "sources": [
+      {
+        "title": "Cloud Build default service account change",
+        "url": "https://docs.cloud.google.com/build/docs/cloud-build-service-account-updates",
+        "evidence": "Most secure option: Use a user-specified service account for both manually submitted builds and triggered builds."
+      },
+      {
+        "title": "Configure user-specified service accounts",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/configure-user-specified-service-accounts",
+        "evidence": "To follow the principle of least privilege in Cloud Build, you can configure Cloud Build to use a service account with just enough privileges to execute a build."
+      }
+    ]
+  },
+  {
+    "id": "ops-028",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-build",
+      "github",
+      "triggers"
+    ],
+    "stem": "An open-source project keeps its code on GitHub and uses a Cloud Build pull request trigger. The build runs integration tests with a service account that can reach a test project. Pull requests from repository owners and collaborators must build automatically. Pull requests from external contributors must not build until a maintainer reviews them. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure the trigger to require approval, and grant the Cloud Build Approver role to the maintainers."
+      },
+      {
+        "id": "B",
+        "text": "Set the trigger's comment control to require a comment, except for owners and collaborators."
+      },
+      {
+        "id": "C",
+        "text": "Add the test directories to the trigger's ignored files so that external changes do not start builds."
+      },
+      {
+        "id": "D",
+        "text": "Replace the pull request trigger with a Pub/Sub trigger that receives the GitHub events."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "With the comment control setting \"Required except for owners and collaborators\", pull requests from owners and collaborators build automatically. For an external contributor, the build runs only after an owner or collaborator comments `/gcbrun`. This setting meets both requirements.",
+    "whyWrong": {
+      "A": "Approval holds every build of the trigger as pending, including builds for owners and collaborators. Their pull requests no longer build automatically.",
+      "C": "Included and ignored files work only for push and tag events. They filter by file path, not by the author of the change.",
+      "D": "A Pub/Sub trigger starts on topic messages and gives no control over which pull request authors can start a build. The pull request trigger already has comment control."
+    },
+    "sources": [
+      {
+        "title": "Building repositories from GitHub",
+        "url": "https://docs.cloud.google.com/build/docs/automating-builds/github/build-repos-from-github",
+        "evidence": "If an external contributor initiates the action, builds are executed only after an owner or collaborator comments `/gcbrun` on the pull request."
+      },
+      {
+        "title": "Create and manage build triggers",
+        "url": "https://docs.cloud.google.com/build/docs/automating-builds/create-manage-triggers",
+        "evidence": "Included files and Ignored files can only be specified if you select Push to a branch or Push new tag as your Event."
+      }
+    ]
+  },
+  {
+    "id": "ops-029",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "artifact-registry",
+      "business-continuity",
+      "ci-cd"
+    ],
+    "stem": "Your company builds with Cloud Build and deploys to GKE in `us-central1`. Last month, a Docker Hub outage stopped all builds for six hours. A review also showed that GKE cannot scale out when it cannot pull images from the regional Artifact Registry repository. You must make the delivery toolchain more resilient with little operational overhead. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the builds to a Cloud Build private pool in a second region."
+      },
+      {
+        "id": "B",
+        "text": "Create Artifact Registry remote repositories for the upstream sources, and point the builds at them."
+      },
+      {
+        "id": "C",
+        "text": "Turn on automatic vulnerability scanning in Artifact Analysis for all repositories."
+      },
+      {
+        "id": "D",
+        "text": "Add a manual approval to every trigger that deploys to production."
+      },
+      {
+        "id": "E",
+        "text": "Store the application images in an Artifact Registry repository in a multi-region location."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "Remote repositories cache upstream artifacts, such as Docker Hub images, so builds depend less on the upstream source. Google's business continuity guidance for CI/CD recommends multi-region Artifact Registry storage, because a registry outage stops deployments and autoscaling.",
+    "whyWrong": {
+      "A": "A private pool in another region does not remove the build dependency on Docker Hub, and it does not change where GKE pulls images from.",
+      "C": "Vulnerability scanning improves security. It does not make dependencies or images more available.",
+      "D": "An approval adds a governance gate. It does not improve dependency or registry availability."
+    },
+    "sources": [
+      {
+        "title": "Business continuity with CI/CD on Google Cloud",
+        "url": "https://docs.cloud.google.com/architecture/business-continuity-with-cicd-on-google-cloud",
+        "evidence": "Global and multi-region deployments: where possible, use global and multi-region deployments instead of regional deployment. For example, you can configure Artifact Registry for multi-region storage."
+      },
+      {
+        "title": "Repository overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories",
+        "evidence": "Remote repositories reduce latency and improve availability for builds and deployments on Google Cloud."
+      }
+    ]
+  },
+  {
+    "id": "ops-030",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "application-design-center",
+      "app-hub",
+      "service-catalog"
+    ],
+    "stem": "A platform team supports 40 development teams. It wants developers to deploy new three-tier web applications by themselves from approved designs that already include the company's security standards. Each deployed application must appear automatically as an application in App Hub, so that operations teams get an application-level view. What should the platform team use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Service Catalog solutions built from Terraform configurations, shared with the development folders"
+      },
+      {
+        "id": "B",
+        "text": "App Hub applications that group the resources of a sample application for teams to copy"
+      },
+      {
+        "id": "C",
+        "text": "Application Design Center templates, shared with the development teams through a catalog"
+      },
+      {
+        "id": "D",
+        "text": "Cloud Deploy delivery pipelines with one target for each environment of each application"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Application Design Center lets a platform team build organizational standards into templates and share them in a catalog. Developers deploy from the templates, and App Hub registers each deployed application automatically. The App Hub requirement decides between Application Design Center and Service Catalog.",
+    "whyWrong": {
+      "A": "Service Catalog can share Terraform configurations for self-service deployment. The automatic App Hub registration that the requirement needs is a documented feature of Application Design Center deployments.",
+      "B": "App Hub organizes existing resources into applications. It does not deploy new applications from approved templates.",
+      "D": "Cloud Deploy delivers application releases to targets. It does not give developers governed infrastructure templates."
+    },
+    "sources": [
+      {
+        "title": "Deploy applications",
+        "url": "https://docs.cloud.google.com/application-design-center/docs/deploy-applications",
+        "evidence": "When you deploy an application using App Design Center, your application is automatically registered in App Hub."
+      },
+      {
+        "title": "Application Design Center overview",
+        "url": "https://docs.cloud.google.com/application-design-center/docs/overview",
+        "evidence": "Ensure governance: build organizational standards into templates so every deployment follows security and compliance rules from the start."
+      },
+      {
+        "title": "Application-centric Google Cloud",
+        "url": "https://docs.cloud.google.com/application-design-center/docs/application-centric-google-cloud",
+        "evidence": "Use Application Design Center to design templates and deploy applications. Use App Hub to organize existing resources into applications."
+      }
+    ]
+  },
+  {
+    "id": "ops-031",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "dora",
+      "trunk-based-development",
+      "sdlc"
+    ],
+    "stem": "A development team works on long-lived feature branches and merges them once a month. Each monthly release goes to a weekly change advisory board for approval. Merges often conflict, and failed releases are hard to troubleshoot because each release holds many changes. Which change should you recommend, based on DORA and Google SRE guidance?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a two-week stabilization phase with manual regression tests before each monthly release."
+      },
+      {
+        "id": "B",
+        "text": "Give each developer a personal release branch, and merge all branches on release day."
+      },
+      {
+        "id": "C",
+        "text": "Add more senior reviewers to the weekly change advisory board for each release."
+      },
+      {
+        "id": "D",
+        "text": "Merge small changes to the main branch often, test every change automatically, and use peer review."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Trunk-based development prevents merge conflicts, and peer review replaces heavyweight change approval without a loss of speed. Frequent releases have fewer changes between versions, which makes testing and troubleshooting easier.",
+    "whyWrong": {
+      "A": "A longer stabilization phase keeps large batches and slow feedback. It does not fix merge conflicts or large releases.",
+      "B": "Branches that merge only on release day cause the merge conflicts that trunk-based development prevents.",
+      "C": "DORA recommends peer review instead of heavyweight change approval. More board reviewers add delay and do not make releases smaller."
+    },
+    "sources": [
+      {
+        "title": "DevOps capabilities",
+        "url": "https://docs.cloud.google.com/architecture/devops",
+        "evidence": "Replace heavyweight change-approval processes with peer review, to get the benefits of a more reliable, compliant release process without sacrificing speed."
+      },
+      {
+        "title": "Release Engineering (SRE book)",
+        "url": "https://sre.google/sre-book/release-engineering/",
+        "evidence": "We have embraced the philosophy that frequent releases result in fewer changes between versions. This approach makes testing and troubleshooting easier."
+      }
+    ]
+  },
+  {
+    "id": "ops-032",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "incident-response",
+      "root-cause-analysis",
+      "rollback"
+    ],
+    "stem": "An online retailer deploys a new version of its checkout service to all regions at 14:00. By 14:10, 30% of checkout requests fail and revenue drops. The on-call engineer suspects a missing database index in the new release but is not sure. The previous version ran without errors for two weeks. What should the engineer do first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Roll back to the previous version, and keep the logs and metrics of the failed release for later analysis."
+      },
+      {
+        "id": "B",
+        "text": "Start a root-cause analysis with Cloud Trace and Cloud Profiler, and change nothing until the index problem is confirmed."
+      },
+      {
+        "id": "C",
+        "text": "Start a blameless postmortem document now, so that the incident timeline is accurate while the outage continues."
+      },
+      {
+        "id": "D",
+        "text": "Add the suspected index directly to the production database, and then watch whether the error rate drops."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding facts are a major user-visible outage and a known good previous version. Google SRE practice is to stop the bleeding first: make the system work as well as it can, for example with a rollback. Rapid mitigation does not prevent root-cause analysis, so keep the logs and metrics as evidence for later.",
+    "whyWrong": {
+      "B": "Root-cause work before mitigation keeps 30% of checkouts failing. The SRE guidance is to ignore the instinct to find the root cause first.",
+      "C": "A postmortem comes after the incident is mitigated. Writing it now does not reduce user impact.",
+      "D": "This is an untested production change based on an unconfirmed hypothesis. A rollback to the known good version is faster and safer."
+    },
+    "sources": [
+      {
+        "title": "Effective Troubleshooting (SRE book)",
+        "url": "https://sre.google/sre-book/effective-troubleshooting/",
+        "evidence": "Stopping the bleeding should be your first priority; you aren't helping your users if the system dies while you're root-causing."
+      }
+    ]
+  },
+  {
+    "id": "ops-033",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "canary",
+      "release-validation",
+      "sli"
+    ],
+    "stem": "A media company runs an automated canary analysis for each release of its API on GKE. The analysis compares the canary's host CPU utilization and request count with the values from the same service on the previous day. Operators now ignore the results, because the analysis often fails good releases and passes bad ones. You must make the canary decision reliable. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add more metrics, such as memory, disk I/O, and network bytes, so that the analysis has more signals to evaluate."
+      },
+      {
+        "id": "B",
+        "text": "Replace the canary with a full rollout at an off-peak hour, and compare the error rate before and after the change."
+      },
+      {
+        "id": "C",
+        "text": "Compare the canary with a control group at the same time, and use SLI metrics such as 5xx ratio and latency."
+      },
+      {
+        "id": "D",
+        "text": "Lengthen the comparison window to one week of history, so that daily traffic patterns average out in the baseline."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Two faults make this canary unreliable. It compares with the previous day, which is a before/after evaluation, and time is one of the biggest sources of change in metrics. It also uses host CPU, which is noisy and not tied to user impact. The SRE workbook recommends a control population at the same time and metrics based on SLIs, such as HTTP errors and latency.",
+    "whyWrong": {
+      "A": "More metrics bring diminishing returns and more false results. The problem is the choice of metrics and baseline, not their number.",
+      "B": "A full rollout exposes all users, a before/after comparison is still noisy, and performance defects often do not show at off-peak load.",
+      "D": "A longer history is still a before/after comparison with a time-based baseline. It also delays the release decision."
+    },
+    "sources": [
+      {
+        "title": "Canarying Releases (SRE workbook)",
+        "url": "https://sre.google/workbook/canarying-releases/",
+        "evidence": "We typically recommend using SLIs as a place to start thinking about canary metrics."
+      },
+      {
+        "title": "Canarying Releases (SRE workbook)",
+        "url": "https://sre.google/workbook/canarying-releases/",
+        "evidence": "Because time is one of the biggest sources of change in observed metrics, it is difficult to assess degradation of performance with before/after evaluation."
+      }
+    ]
+  },
+  {
+    "id": "ops-034",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "terraform",
+      "iac-testing",
+      "policy-validation"
+    ],
+    "stem": "A platform team manages all Google Cloud infrastructure with Terraform, and a Cloud Build pipeline runs every change. Last month, one change with a syntax error reached the apply step. Another change created a resource in a region that the security team does not allow. The team wants to catch both kinds of problem before any resource is created, at the lowest cost. Which two steps should the team add to the pipeline? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `terraform validate` as a static analysis step before the plan step."
+      },
+      {
+        "id": "B",
+        "text": "Run end-to-end tests that deploy every module into the production project before each apply."
+      },
+      {
+        "id": "C",
+        "text": "Enable Security Command Center, and delete noncompliant resources after each apply."
+      },
+      {
+        "id": "D",
+        "text": "Convert the saved plan to JSON, and check it with `gcloud beta terraform vet` against a policy library."
+      },
+      {
+        "id": "E",
+        "text": "Replace the pipeline with manual `terraform apply` runs by a senior engineer who reviews each change."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "The requirements are to catch errors before any resource exists and at the lowest cost. Static analysis with `terraform validate` checks syntax and structure without deploying anything, so it is the least expensive test. Policy validation with `gcloud beta terraform vet` (Preview) checks the plan JSON against your constraints in the CI/CD pipeline and can halt the deployment before it reaches production.",
+    "whyWrong": {
+      "B": "End-to-end tests deploy real resources, so they are the most expensive tests. They belong in a separate, fresh test environment, never in production.",
+      "C": "Detection after apply lets the noncompliant resource exist. The requirement is to stop it before creation.",
+      "E": "Google recommends running Terraform through automated tooling for a consistent execution context. A manual review does not reliably catch syntax or policy errors."
+    },
+    "sources": [
+      {
+        "title": "Best practices for testing",
+        "url": "https://docs.cloud.google.com/docs/terraform/best-practices/testing",
+        "evidence": "Static analysis: Testing the syntax and structure of your configuration without deploying any resources, using tools such as compilers, linters, and dry runs."
+      },
+      {
+        "title": "Policy validation",
+        "url": "https://docs.cloud.google.com/docs/terraform/policy-validation",
+        "evidence": "You can use `gcloud beta terraform vet` to detect policy violations and provide warnings or halt deployments before they reach production."
+      }
+    ]
+  },
+  {
+    "id": "ops-035",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "connectivity-tests",
+      "network-validation"
+    ],
+    "stem": "A network team will replace several VPC firewall rules with a hierarchical firewall policy this weekend. Before and after the change, the team must prove that GKE nodes in a production subnet can still reach a Cloud SQL instance on its private IP address. The team does not want to wait for application traffic or user reports. Which tool should the team use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Firewall Insights, to list the firewall rules that had no hits during the last week."
+      },
+      {
+        "id": "B",
+        "text": "Connectivity Tests, to analyze the configured path from the GKE nodes to the Cloud SQL private IP."
+      },
+      {
+        "id": "C",
+        "text": "VPC Flow Logs with Flow Analyzer, to review the flows that the GKE nodes sent to Cloud SQL."
+      },
+      {
+        "id": "D",
+        "text": "Cloud Trace, to measure the latency of requests from the application to the database."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The team needs to validate reachability of one specific path without real traffic. Connectivity Tests simulates the expected forwarding path of a packet through the VPC configuration, including firewall rules and routes, and reports whether the packet is delivered or dropped.",
+    "whyWrong": {
+      "A": "Firewall Insights shows how rules are used and which rules are overly permissive. It does not test whether a specific path is allowed.",
+      "C": "Flow logs record traffic that already happened. They need real traffic and cannot check the new policy before it carries traffic.",
+      "D": "Cloud Trace measures request latency in instrumented code. It does not evaluate firewall rules or routes."
+    },
+    "sources": [
+      {
+        "title": "Connectivity Tests overview",
+        "url": "https://docs.cloud.google.com/network-intelligence-center/docs/connectivity-tests/concepts/overview",
+        "evidence": "To analyze network configurations, Connectivity Tests simulates the expected forwarding path of a packet through your Virtual Private Cloud (VPC) network, Cloud VPN tunnels, or VLAN attachments."
+      },
+      {
+        "title": "Network Intelligence Center overview",
+        "url": "https://docs.cloud.google.com/network-intelligence-center/docs/overview",
+        "evidence": "Firewall Insights helps you understand and optimize your firewall rules. It provides insights, recommendations, and metrics about how your firewall rules are being used."
+      }
+    ]
+  },
+  {
+    "id": "ops-036",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "audit-logs",
+      "root-cause-analysis"
+    ],
+    "stem": "Users report that an internal web application became unreachable at 02:14. The on-call engineer suspects that someone changed a firewall rule or an IAM binding during the night. The company uses the default Cloud Audit Logs settings. Which log source should the engineer query first to find who made the change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Data Access audit logs, because they record the API calls that touch each resource."
+      },
+      {
+        "id": "B",
+        "text": "VPC Flow Logs, because they record the source of each connection to the application."
+      },
+      {
+        "id": "C",
+        "text": "Error Reporting, because it groups the errors that the change caused by root cause."
+      },
+      {
+        "id": "D",
+        "text": "Admin Activity audit logs, because they record API calls that modify resource configuration."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The question is who changed a configuration, and recent changes are a productive place to start a diagnosis. Admin Activity audit logs record user-driven API calls that modify resource configuration or metadata, such as IAM changes. They are always written, so the default settings are enough.",
+    "whyWrong": {
+      "A": "Data Access audit logs record reads and access to user data. They are disabled by default for all services except BigQuery.",
+      "B": "Flow logs describe network traffic. They do not record which identity changed a firewall rule or IAM binding.",
+      "C": "Error Reporting groups application errors. It does not record configuration changes or the identity that made them."
+    },
+    "sources": [
+      {
+        "title": "Cloud Audit Logs overview",
+        "url": "https://docs.cloud.google.com/logging/docs/audit",
+        "evidence": "Admin Activity audit logs are log entries written by user-driven API calls or other actions that modify the configuration or metadata of resources."
+      },
+      {
+        "title": "Effective Troubleshooting (SRE book)",
+        "url": "https://sre.google/sre-book/effective-troubleshooting/",
+        "evidence": "Recent changes to a system can be a productive place to start identifying what's going wrong."
+      }
+    ]
+  },
+  {
+    "id": "ops-037",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "rpo",
+      "backups",
+      "disaster-recovery"
+    ],
+    "stem": "A company runs a self-managed PostgreSQL database on Compute Engine. After a business impact analysis, the business sets an RPO of 15 minutes and an RTO of 4 hours for this database. The current design takes one backup each night. What should the architect change to meet the RPO?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Take backups every 4 hours, so that the backup interval matches the RTO."
+      },
+      {
+        "id": "B",
+        "text": "Keep the nightly backup, and add a restore test every quarter."
+      },
+      {
+        "id": "C",
+        "text": "Back up at least every 15 minutes, and alert when an interval is longer."
+      },
+      {
+        "id": "D",
+        "text": "Keep the nightly backup, and copy it to a bucket in a second region."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The RPO sets the backup frequency. With an RPO of 15 minutes, backups must run at least every 15 minutes. Google also recommends a Cloud Monitoring alert when a backup interval exceeds the RPO. A nightly backup can lose up to 24 hours of data.",
+    "whyWrong": {
+      "A": "The backup interval follows the RPO, not the RTO. A 4-hour interval can lose up to 4 hours of data.",
+      "B": "Restore tests are good practice, but they do not change the 24-hour data-loss window.",
+      "D": "A copy in a second region protects the backup from a regional loss. It does not shorten the data-loss window."
+    },
+    "sources": [
+      {
+        "title": "Perform testing for recovery from data loss",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/perform-testing-for-recovery-from-data-loss",
+        "evidence": "Establish a backup frequency that aligns with your RPO. For example, if your RPO is 15 minutes, schedule backups to run at least every 15 minutes."
+      },
+      {
+        "title": "Perform testing for recovery from data loss",
+        "url": "https://docs.cloud.google.com/architecture/framework/reliability/perform-testing-for-recovery-from-data-loss",
+        "evidence": "Set a clear RPO based on your business needs, and monitor adherence to the RPO. If backup intervals exceed the defined RPO, use Cloud Monitoring to set up alerts."
+      }
+    ]
+  },
+  {
+    "id": "ops-038",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "dr-patterns",
+      "cold-pattern",
+      "cost"
+    ],
+    "stem": "A company runs an internal expense-reporting application on Compute Engine and Cloud SQL in one region. If the whole region fails, the business accepts an RTO of 3 days and an RPO of 24 hours. Leadership wants the lowest ongoing cost for regional DR. What should the architect recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Store daily database backups in a multi-region bucket, and keep Terraform code to re-create the application in another region."
+      },
+      {
+        "id": "B",
+        "text": "Run a second full-size copy of the application in another region behind a global load balancer, with a cross-region database replica."
+      },
+      {
+        "id": "C",
+        "text": "Keep a small database replica running in another region, and scale out application servers from snapshots when the primary region fails."
+      },
+      {
+        "id": "D",
+        "text": "Rely on the Cloud SQL high availability configuration and a regional managed instance group in the current region."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "An RTO of days and an RPO of a day fit a cold pattern. Services with an RTO over a day can often be recovered from a backup or recreated from scratch. Backups in a multi-region bucket survive the regional outage, and infrastructure as code rebuilds the environment only when it is needed, so nothing runs in the DR region.",
+    "whyWrong": {
+      "B": "A hot pattern meets the targets but has the highest cost. Only a small fraction of critical services warrant it.",
+      "C": "A warm pattern keeps resources running all the time. That cost is not needed for a 3-day RTO.",
+      "D": "Cloud SQL HA and a regional MIG protect against a zone outage. A regional outage stops both."
+    },
+    "sources": [
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "Services with an RTO over a day are the lowest criticality and can often be recovered from a backup or recreated from scratch."
+      },
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "Multi-regional Cloud Storage is used to store these backups. This provides automatic zone and regional resilience within the RTO and RPO."
+      }
+    ]
+  },
+  {
+    "id": "ops-039",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "dr-patterns",
+      "warm-standby",
+      "hybrid"
+    ],
+    "stem": "A manufacturer runs a three-tier ERP application in its own data center and wants Google Cloud as the DR site. The requirements are an RTO of 4 hours and an RPO of a few minutes. The budget does not allow a second full production environment. Which approach should the architect recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Copy nightly database backups to Cloud Storage, and create the full environment from custom images only after a disaster."
+      },
+      {
+        "id": "B",
+        "text": "Run a small database VM on Google Cloud that receives continuous replication, and create web and application servers from snapshots during failover."
+      },
+      {
+        "id": "C",
+        "text": "Run the full application in both locations at all times, and use weighted DNS to send production traffic to both environments."
+      },
+      {
+        "id": "D",
+        "text": "Ship the database files to Google Cloud each week on a Transfer Appliance, and restore them when the data center fails."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "An RPO of minutes needs continuous replication, and an RTO of hours allows the rest of the stack to start at failover. That is a warm standby: a database instance that runs all the time on the smallest machine type that can accept replication, plus web and application servers created from snapshots when needed. It avoids the cost of a fully HA configuration, which the budget rules out.",
+    "whyWrong": {
+      "A": "This is a cold pattern. Nightly backups give an RPO of up to 24 hours.",
+      "C": "This hot pattern meets the targets, but it is a second full production environment, which the budget does not allow.",
+      "D": "Weekly shipments give an RPO of days. Transfer Appliance moves bulk data; it does not provide continuous DR."
+    },
+    "sources": [
+      {
+        "title": "Disaster recovery scenarios for applications",
+        "url": "https://docs.cloud.google.com/architecture/dr-scenarios-for-applications",
+        "evidence": "A warm pattern is typically implemented to keep RTO and RPO values as small as possible without the effort and expense of a fully HA configuration."
+      },
+      {
+        "title": "Disaster recovery scenarios for applications",
+        "url": "https://docs.cloud.google.com/architecture/dr-scenarios-for-applications",
+        "evidence": "This instance must run at all times so that it can receive replicated transactions through asynchronous or semisynchronous replication techniques."
+      }
+    ]
+  },
+  {
+    "id": "ops-040",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "dr-design",
+      "data-plane",
+      "zonal-outage"
+    ],
+    "stem": "A payments company must keep its tier-1 authorization service running during a zone outage, with an RTO near zero. The service runs on VMs in one zone. A runbook script detects a zone failure, calls the Compute Engine API to create replacement VMs in another zone, and then updates IAM bindings for them. Which change best meets the RTO?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the script, and add Compute Engine reservations in the second zone so that VM creation always succeeds."
+      },
+      {
+        "id": "B",
+        "text": "Keep the script, and run it from a Cloud Run job in another region so that it survives the zone outage."
+      },
+      {
+        "id": "C",
+        "text": "Replace the script with daily snapshots copied to another region, and restore from them after a failure."
+      },
+      {
+        "id": "D",
+        "text": "Run the service in a regional managed instance group behind a load balancer, with capacity already serving in each zone."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google advises that business-critical operations with an RTO target must depend only on data plane components. They must not depend on management plane operations such as a VM-creation API call or an IAM update. An RTO near zero also needs recovery without human steps. A regional MIG with capacity in every zone, behind a load balancer with health checks, moves traffic away from the failed zone automatically.",
+    "whyWrong": {
+      "A": "Reservations secure capacity, but recovery still waits for VM creation and IAM updates through the management plane. That cannot give an RTO near zero.",
+      "B": "Moving the script does not remove its dependency on management plane operations during the outage.",
+      "C": "Restore from snapshots is a cold pattern, with an RTO of hours and an RPO of up to one day."
+    },
+    "sources": [
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "For example, Google Cloud customers who intend to achieve RTO for business-critical operations should not depend on a VM-creation API or on the update of an IAM permission."
+      },
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "Routing your traffic quickly to virtual machines in another zone using Cloud Load Balancing when a health check determines that a zone is experiencing issues."
+      }
+    ]
+  },
+  {
+    "id": "ops-041",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "disaster-recovery",
+      "cloud-build",
+      "cloud-deploy"
+    ],
+    "stem": "A company deploys all services through Cloud Build triggers and Cloud Deploy delivery pipelines in `us-central1`. The DR plan says that the team must be able to deploy fixes from another region within 4 hours if `us-central1` has an outage. Engineers created the triggers and pipelines by hand in the Google Cloud console. Which two actions should the architect recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rely on Cloud Deploy to replicate releases to another region, and continue promotions there after the outage starts."
+      },
+      {
+        "id": "B",
+        "text": "Store the delivery pipeline and target definitions in source control, so that the team can re-create them in a healthy region."
+      },
+      {
+        "id": "C",
+        "text": "Run Cloud Build in the global region, so that builds move to another region automatically during an outage."
+      },
+      {
+        "id": "D",
+        "text": "Export the Cloud Build build history every day, so that the team can replay old builds in another region."
+      },
+      {
+        "id": "E",
+        "text": "Prepare disabled Cloud Build triggers and worker pools in a second region before an outage, and enable the triggers only during a failover."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "The DR plan requires deployments from another region during a regional outage. Cloud Build triggers, worker pools, and build data are never replicated across regions, so Google recommends preparing triggers and worker pools in multiple regions. Keep the standby triggers disabled so that they do not start duplicate builds. A disabled trigger is not deleted, and you can enable it during a failover. Cloud Deploy data is unavailable in a regional outage, so Google recommends keeping pipeline and target definitions in source control to re-create them in a working region.",
+    "whyWrong": {
+      "A": "Cloud Deploy does not replicate releases across regions. During a regional outage, data about existing releases is lost, and you create a new release.",
+      "C": "Google recommends specific regions instead of the global region for Cloud Build. Triggers and worker pools are still not replicated across regions.",
+      "D": "Build history does not let the team deploy. The team needs triggers, worker pools, and pipeline definitions ready in another region."
+    },
+    "sources": [
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "Triggers, worker pools, and build data are never replicated across regions. We recommend that you prepare triggers and worker pools in multiple regions to make mitigation of an outage easier."
+      },
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "To help make it easier to restore service in the event of a regional outage, we recommend that you store your delivery pipeline and target definitions in source control."
+      },
+      {
+        "title": "Create and manage build triggers",
+        "url": "https://docs.cloud.google.com/build/docs/automating-builds/create-manage-triggers",
+        "evidence": "Disabling a trigger does not delete the trigger. To delete a trigger, see Deleting a build trigger. A trigger can be re-enabled by changing the status to Enabled."
+      }
+    ]
+  },
+  {
+    "id": "ops-042",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "dr-plan",
+      "dr-security",
+      "dr-testing"
+    ],
+    "stem": "A bank is building a DR environment in a second Google Cloud region for its loan-processing application. During planning, the operations lead proposes several shortcuts to reduce effort. Which two practices should the architect require? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Allow broader firewall rules in the DR environment, so that network controls cannot block recovery."
+      },
+      {
+        "id": "B",
+        "text": "Grant access to the DR environment only after a disaster is declared, so that nobody can reach it before."
+      },
+      {
+        "id": "C",
+        "text": "Bind IAM policies in the DR environment with the same infrastructure as code tools that manage production."
+      },
+      {
+        "id": "D",
+        "text": "Keep logs from the DR environment separate from the production log archive, so that audits stay simple."
+      },
+      {
+        "id": "E",
+        "text": "Have users sign in to the DR environment during regular DR tests, and fix any access problems they find."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "The DR environment becomes production during a disaster, so it needs the same controls and working access. Google recommends deploying IAM policies with IaC tools such as Terraform and using the same tools to bind them in the DR environment. Google also recommends that users sign in to the DR environment as part of regular DR tests, so that access problems appear before a real disaster.",
+    "whyWrong": {
+      "A": "The DR environment needs the same network separation and blocking as production. Weaker controls create a security gap.",
+      "B": "Google advises not to wait for a disaster before checking that users can access the DR environment.",
+      "D": "Logs collected while the DR environment is in service must be backfilled into the production log archive."
+    },
+    "sources": [
+      {
+        "title": "Disaster recovery planning guide",
+        "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+        "evidence": "You then use the same tools to bind the policies to corresponding resources in the DR environment as part of the process of standing up your DR environment."
+      },
+      {
+        "title": "Disaster recovery planning guide",
+        "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+        "evidence": "Incorporate users who are logging in to the DR environment as part of the regular DR tests that you implement."
+      }
+    ]
+  },
+  {
+    "id": "ops-043",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigquery",
+      "regional-outage",
+      "disaster-recovery"
+    ],
+    "stem": "An analytics team stores its reporting datasets in the BigQuery `US` multi-region. The DR requirement for a regional outage is an RPO of 4 hours and an RTO of 24 hours. The team lead says that no DR work is needed, because a multi-region location already replicates data across regions. What should the architect recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Accept the current design, because the `US` multi-region keeps copies of the data in several US regions."
+      },
+      {
+        "id": "B",
+        "text": "Replicate the datasets to a second region, because the `US` multi-region stores the data in a single region."
+      },
+      {
+        "id": "C",
+        "text": "Rely on BigQuery time travel, because it can restore any table to a point in time within the last 7 days."
+      },
+      {
+        "id": "D",
+        "text": "Move the datasets to a single US region, because regional datasets replicate synchronously to a second region."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The team lead's assumption is wrong. In BigQuery, a multi-region location does not provide cross-region replication, and the data is stored in a single region within the location. To survive a regional outage, replicate the data to another region. Cross-region dataset replication copies the data continuously, which meets the 4-hour RPO. The secondary replica is read-only, and you cannot promote it during a total outage of the primary region. If the team must also write during the outage, use managed disaster recovery (Enterprise Plus edition). It provisions slots in the second region and controls failover. Do not choose a region within the scope of the multi-region, such as `us-central1` for `US`, because Google warns of correlated failure.",
+    "whyWrong": {
+      "A": "A BigQuery multi-region stores the data in two zones of a single region. A regional outage makes it unavailable.",
+      "C": "Time travel helps with corruption or deletion, but the data stays in the same location. It does not protect against a regional outage.",
+      "D": "A regional dataset is stored in two zones of that region. It has no cross-region copy."
+    },
+    "sources": [
+      {
+        "title": "Understand reliability (BigQuery)",
+        "url": "https://docs.cloud.google.com/bigquery/docs/reliability-intro",
+        "evidence": "Selecting a multi-region location does not provide cross-region replication nor regional redundancy. Data will be stored in a single region within the geographic location."
+      },
+      {
+        "title": "Understand reliability (BigQuery)",
+        "url": "https://docs.cloud.google.com/bigquery/docs/reliability-intro",
+        "evidence": "In the case of BigQuery multi-regions, you should avoid backing up to regions within the scope of the multi-region."
+      },
+      {
+        "title": "Understand reliability (BigQuery)",
+        "url": "https://docs.cloud.google.com/bigquery/docs/reliability-intro",
+        "evidence": "To avoid data loss in the face of destructive regional loss, you need to back up data to another geographic location. For example, you could use cross-region dataset replication to continuously replicate your data to a geographically distinct region."
+      },
+      {
+        "title": "Cross-region dataset replication (BigQuery)",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-replication",
+        "evidence": "In the case of a total region outage in the primary replica's region, you cannot promote the secondary replica."
+      }
+    ]
+  },
+  {
+    "id": "ops-044",
+    "objective": "6.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "customer-care",
+      "support-plans",
+      "tam"
+    ],
+    "stem": "A retailer runs its production e-commerce platform on Google Cloud. After a costly outage, leadership sets two support requirements: a first response within 15 minutes for critical production cases, and an assigned Google technical contact who learns the company's architecture and gives proactive guidance. Which Cloud Customer Care service should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enhanced Support"
+      },
+      {
+        "id": "B",
+        "text": "Premium Support"
+      },
+      {
+        "id": "C",
+        "text": "Standard Support"
+      },
+      {
+        "id": "D",
+        "text": "Enhanced Support with Planned Event Support"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Premium Support is the only service with a 15-minute target for the first meaningful response to P1 cases. It also assigns a Technical Account Manager (TAM). The two requirements in the stem, a 15-minute response and an assigned technical contact, decide the answer.",
+    "whyWrong": {
+      "A": "Enhanced Support targets a first response within 1 hour for P1 cases, and it does not include a TAM.",
+      "C": "Standard Support has no P1 response target. It supports P2 to P4 cases during Hours of Operation only.",
+      "D": "Planned Event Support gives a 15-minute P1 response only during a short event of up to 5 days. It does not give continuous 15-minute coverage or a TAM."
+    },
+    "sources": [
+      {
+        "title": "Premium Support overview",
+        "url": "https://docs.cloud.google.com/support/docs/premium",
+        "evidence": "P1 response SLO: For Priority 1 (P1) support cases, receive the first meaningful response within 15 minutes."
+      },
+      {
+        "title": "Get support with Cloud Customer Care",
+        "url": "https://docs.cloud.google.com/support/docs/overview",
+        "evidence": "You also have Customer Aware Support and are assigned a Technical Account Manager."
+      },
+      {
+        "title": "Enhanced Support overview",
+        "url": "https://docs.cloud.google.com/support/docs/enhanced",
+        "evidence": "P1 response SLO: For Priority 1 (P1) support cases, receive the first meaningful response within 1 hour."
+      }
+    ]
+  },
+  {
+    "id": "ops-045",
+    "objective": "6.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "customer-care",
+      "case-priority",
+      "escalation"
+    ],
+    "stem": "Your company has Enhanced Support. The production checkout service now returns errors to a large share of users, and the company loses revenue every minute. No workaround exists. Thirty minutes ago, a junior engineer opened a support case for this issue at priority P3. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Escalate the case, so that an Escalation Manager takes ownership of it."
+      },
+      {
+        "id": "B",
+        "text": "Open a second case at priority P1 for the same issue, so that it gets a faster response."
+      },
+      {
+        "id": "C",
+        "text": "Ask your Technical Account Manager to raise the priority of the case."
+      },
+      {
+        "id": "D",
+        "text": "Change the case priority to P1, and describe how the business impact has changed."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The issue makes the service unusable in production with critical business impact, so it meets the P1 definition. You can increase an existing P2 to P4 case to P1 when production is affected, and you describe how the business impact changed. For a high-impact issue, the correct priority, not an escalation, gets the fast response.",
+    "whyWrong": {
+      "A": "Escalation flags a broken support process. It does not generally make a high-impact case move faster, and an escalation shortly after a priority change can even slow the resolution.",
+      "B": "Customer Care wants one case per issue and closes duplicate cases.",
+      "C": "A Technical Account Manager comes with Premium Support, not Enhanced Support. You can change the priority yourself."
+    },
+    "sources": [
+      {
+        "title": "Best practices for working with Customer Care",
+        "url": "https://docs.cloud.google.com/support/docs/best-practices",
+        "evidence": "If the issue has started impacting your production environment, or is about to, you may increase the priority of an existing P2 - P4 case to P1."
+      },
+      {
+        "title": "Create and manage support cases",
+        "url": "https://docs.cloud.google.com/support/docs/customer-care-procedures",
+        "evidence": "When you're experiencing a high-impact issue, the best solution might be to set the case to the appropriate priority for an adequate amount of time, rather than escalating."
+      },
+      {
+        "title": "Best practices for working with Customer Care",
+        "url": "https://docs.cloud.google.com/support/docs/best-practices",
+        "evidence": "create one support case per issue. Any duplicate cases that are created are closed."
+      }
+    ]
+  },
+  {
+    "id": "ops-046",
+    "objective": "6.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "service-health",
+      "personalized-service-health",
+      "incident-response"
+    ],
+    "stem": "An on-call engineer sees connection errors from a Cloud SQL instance in one zone. The public Google Cloud Service Health page at status.cloud.google.com shows no incidents. The engineer must find out quickly if a Google Cloud incident affects the project. What should the engineer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Check the Personalized Service Health dashboard in the Google Cloud console for the affected project."
+      },
+      {
+        "id": "B",
+        "text": "Conclude that no Google Cloud incident exists, because the public page lists all confirmed incidents."
+      },
+      {
+        "id": "C",
+        "text": "Subscribe to the RSS feed of the public Google Cloud Service Health page, and wait for an update."
+      },
+      {
+        "id": "D",
+        "text": "Open a P4 support case, and ask Customer Care to confirm whether an incident exists."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Google communicates limited-scope incidents, such as incidents in a single zone or location, only through Personalized Service Health. The public page shows broad, severe incidents. Personalized Service Health is the primary source for disruptions that are relevant to your projects.",
+    "whyWrong": {
+      "B": "The public page shows broad, severe incidents. An incident in one zone can appear only in Personalized Service Health.",
+      "C": "The RSS feed has the same scope as the public page, so it does not show limited-scope incidents. It is a fallback for automation when Personalized Service Health is not available.",
+      "D": "P4 is for issues with little or no impact and for consultative questions. Personalized Service Health answers the question directly and faster."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud incident communication",
+        "url": "https://docs.cloud.google.com/service-health/docs/incident-communication",
+        "evidence": "For issues with a more limited scope, such as those impacting a single location, zone, or a smaller subset of projects, we will communicate relevant incidents to customers using Personalized Service Health."
+      },
+      {
+        "title": "Google Cloud incident communication",
+        "url": "https://docs.cloud.google.com/service-health/docs/incident-communication",
+        "evidence": "Personalized Service Health (PSH): This is your primary source for service disruptions relevant to you."
+      }
+    ]
+  },
+  {
+    "id": "ops-047",
+    "objective": "6.4",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "service-health",
+      "personalized-service-health",
+      "runbooks",
+      "alerting"
+    ],
+    "stem": "A company runs production workloads in 30 projects. The SRE team wants Google Cloud incident information in its incident response process. On-call engineers must not get a page for every Google Cloud event. The process must also work during a widespread disruption that makes Personalized Service Health unavailable. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Show Personalized Service Health incidents on the team's dashboards, and send alerts only for events with a relevance of Related or Impacted."
+      },
+      {
+        "id": "B",
+        "text": "Page the on-call engineer for every new Personalized Service Health event in every product and location, so that no Google Cloud incident is missed."
+      },
+      {
+        "id": "C",
+        "text": "Use the public Google Cloud Service Health page as the primary source of incident data, because it needs no sign-in and has an RSS feed."
+      },
+      {
+        "id": "D",
+        "text": "Add a runbook step that sends operators to status.cloud.google.com, and make automation use the public RSS feed when the Status API resource of the Service Health API reports Personalized Service Health issues."
+      },
+      {
+        "id": "E",
+        "text": "Create a P1 support case automatically for each new Personalized Service Health event, so that Customer Care engages at once."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Google recommends that you show Personalized Service Health incidents on dashboards instead of paging for every event, and that you filter alerts to critical services or to Related and Impacted events. Personalized Service Health depends on core services such as IAM. The fallback for operators is the public page. For automation, the Status API resource of the Service Health API detects a Personalized Service Health problem, and the systems then read the public RSS feed.",
+    "whyWrong": {
+      "B": "A page for every event causes alert fatigue. Google recommends dashboards and filtered alerts instead.",
+      "C": "The public page shows only broad, severe incidents. Personalized Service Health is the primary source, and the public page is the fallback.",
+      "E": "A P1 case is for critical impact on your production. Automatic cases for known Google incidents only duplicate the known issue, and Customer Care asks you to review known issues before you create a case."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud incident communication",
+        "url": "https://docs.cloud.google.com/service-health/docs/incident-communication",
+        "evidence": "To avoid paging an on-call engineer for every Personalized Service Health event, integrate Personalized Service Health incident visibility into your team's dashboards and tools."
+      },
+      {
+        "title": "Google Cloud incident communication",
+        "url": "https://docs.cloud.google.com/service-health/docs/incident-communication",
+        "evidence": "Use the Service Health Status API to programmatically detect if Personalized Service Health is having a problem. If it is, your systems can then fall back to ingesting the public CSH RSS Feed for continued programmatic updates."
+      },
+      {
+        "title": "Check for disruptions with Personalized Service Health",
+        "url": "https://docs.cloud.google.com/service-health/docs/service-health-disruption",
+        "evidence": "The Status API resource of the Service Health API tells you if specific Service Health features are experiencing issues."
+      }
+    ]
+  },
+  {
+    "id": "ops-048",
+    "objective": "6.4",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "incident-management",
+      "sre",
+      "incident-roles"
+    ],
+    "stem": "During a major outage, engineers from three teams change production settings at the same time, and some changes undo others. Executives also call the engineers directly to ask for status. The engineer who declared the incident acts as the incident commander. What should the incident commander do next?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Take over all debugging personally, so that one person controls every production change and every status update."
+      },
+      {
+        "id": "B",
+        "text": "Let each team change its own components, and ask each team to post its status in the incident document."
+      },
+      {
+        "id": "C",
+        "text": "Assign an operations lead whose team is the only group that changes production, and a communications lead who sends periodic updates to stakeholders."
+      },
+      {
+        "id": "D",
+        "text": "Stop all changes to production until a postmortem finds the root cause of the outage and the correct fix."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The problems are uncoordinated changes and interruptions. Google's incident roles solve both. The operations team is the only group that modifies the system, and the communications lead is the public face of the response and sends periodic updates. The incident commander keeps the high-level state and delegates.",
+    "whyWrong": {
+      "A": "The incident commander holds the high-level state and delegates work. If the commander also debugs, nobody coordinates the response.",
+      "B": "Parallel changes by several teams cause the conflicts in the stem. Only the operations team should change the system during an incident.",
+      "D": "Incident response puts mitigation first: stop the bleeding and restore service. The postmortem comes after the incident."
+    },
+    "sources": [
+      {
+        "title": "Managing Incidents",
+        "url": "https://sre.google/sre-book/managing-incidents/",
+        "evidence": "The operations team should be the only group modifying the system during an incident."
+      },
+      {
+        "title": "Incident Response",
+        "url": "https://sre.google/workbook/incident-response/",
+        "evidence": "While the IC and OL work on mitigating and resolving the incident, the CL is the public face of the incident response team."
+      }
+    ]
+  },
+  {
+    "id": "ops-049",
+    "objective": "6.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "slo",
+      "error-budget",
+      "error-budget-policy"
+    ],
+    "stem": "A product team ships new features every day. The service missed its availability SLO in each of the last three months, and the SREs spend most of their time on incidents. The product manager says that features are the priority, and the SREs want to stop releases. Each release decision becomes an argument. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Require a change advisory board to approve every release until the service meets its SLO for a full quarter."
+      },
+      {
+        "id": "B",
+        "text": "Write an error budget policy that the product manager, the developers, and the SREs approve, which stops non-critical releases when the error budget is spent."
+      },
+      {
+        "id": "C",
+        "text": "Raise the SLO target, so that the developers see a larger gap between the target and the measured availability."
+      },
+      {
+        "id": "D",
+        "text": "Let the SRE team decide alone which releases to block, based on its judgment of the risk of each change."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The problem is a repeated conflict about release decisions. The error budget is an objective metric, and a written error budget policy states the actions to take when the budget is spent and who takes them. The product manager, the development team, and the SREs must all approve the policy, so the decision is agreed before the next release.",
+    "whyWrong": {
+      "A": "DORA research recommends peer review instead of heavyweight change-approval processes. A board adds delay and does not create an agreed reliability rule.",
+      "C": "A higher target only makes the error budget smaller. Without an agreed policy, nothing changes when the service misses the target.",
+      "D": "A decision by one team brings back the politics that the error budget removes. All key stakeholders must approve the policy."
+    },
+    "sources": [
+      {
+        "title": "Implementing SLOs",
+        "url": "https://sre.google/workbook/implementing-slos/",
+        "evidence": "Getting the error budget policy approved by all key stakeholders—the product manager, the development team, and the SREs—is a good test for whether the SLOs are fit for purpose"
+      },
+      {
+        "title": "Implementing SLOs",
+        "url": "https://sre.google/workbook/implementing-slos/",
+        "evidence": "This policy should cover the specific actions that must be taken when a service has consumed its entire error budget for a given period of time, and specify who will take them."
+      },
+      {
+        "title": "Embracing Risk",
+        "url": "https://sre.google/sre-book/embracing-risk/",
+        "evidence": "The error budget provides a clear, objective metric that determines how unreliable the service is allowed to be within a single quarter."
+      }
+    ]
+  },
+  {
+    "id": "ops-050",
+    "objective": "6.5",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "quality-gates",
+      "dora",
+      "code-review",
+      "vulnerability-scanning"
+    ],
+    "stem": "A team deploys a containerized service once a month. A weekly change advisory board (CAB) meeting approves each release. A separate team scans the container images for vulnerabilities after the images reach production. Releases often cause incidents, and the lead time for changes is long. Leadership wants fewer failed changes and faster delivery. Which two changes should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a second CAB review for each change that the first CAB marks as high risk."
+      },
+      {
+        "id": "B",
+        "text": "Combine the monthly releases into quarterly releases, so that each release gets more testing."
+      },
+      {
+        "id": "C",
+        "text": "Replace the CAB with peer code review and automated tests that run on every pull request."
+      },
+      {
+        "id": "D",
+        "text": "Set `allowFailure: true` on the test steps in Cloud Build, so that flaky tests do not block releases."
+      },
+      {
+        "id": "E",
+        "text": "Add On-Demand Scanning to the Cloud Build pipeline, and block the build when an image has vulnerabilities at or above a set severity."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "DORA research recommends peer review instead of heavyweight change approval, and automated tests on each pull request catch defects before merge. On-Demand Scanning in the Cloud Build pipeline moves the vulnerability check before deployment, and the build stops when the severity matches the threshold. Both changes improve stability without slowing delivery.",
+    "whyWrong": {
+      "A": "More approval steps add delay. DORA recommends peer review instead of heavyweight change-approval processes.",
+      "B": "Bigger batches increase lead time and delay feedback. DORA recommends small batches for shorter lead times and faster feedback.",
+      "D": "With `allowFailure: true`, the build succeeds even when the test step fails, so the tests stop being a quality gate."
+    },
+    "sources": [
+      {
+        "title": "DevOps capabilities",
+        "url": "https://docs.cloud.google.com/architecture/devops",
+        "evidence": "Replace heavyweight change-approval processes with peer review, to get the benefits of a more reliable, compliant release process without sacrificing speed."
+      },
+      {
+        "title": "Use On-Demand Scanning in your Cloud Build pipeline",
+        "url": "https://docs.cloud.google.com/artifact-analysis/docs/ods-cloudbuild",
+        "evidence": "Using On-Demand Scanning as part of your Cloud Build pipeline allows you to block builds if the container image has vulnerabilities with a severity matching a predefined level."
+      },
+      {
+        "title": "DevOps capabilities",
+        "url": "https://docs.cloud.google.com/architecture/devops",
+        "evidence": "Create shorter lead times and faster feedback loops by working in small batches."
+      }
+    ]
+  },
+  {
+    "id": "ops-051",
+    "objective": "6.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "dora",
+      "delivery-performance",
+      "metrics"
+    ],
+    "stem": "A CTO wants to compare the software delivery performance of 12 product teams with industry research. The measures must cover both the speed and the stability of software changes. Which metrics should the teams report?",
+    "options": [
+      {
+        "id": "A",
+        "text": "CPU utilization, request latency, error rate, and saturation of each service"
+      },
+      {
+        "id": "B",
+        "text": "Lines of code, story points, commits per engineer, and code coverage"
+      },
+      {
+        "id": "C",
+        "text": "Number of CAB approvals, number of test cases, open bugs, and SLO targets"
+      },
+      {
+        "id": "D",
+        "text": "Change lead time, deployment frequency, change failure rate, and failed deployment recovery time"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "DORA research uses change lead time and deployment frequency to measure throughput, and change failure rate and failed deployment recovery time to measure stability. The 2023 DORA report used these four measures to place teams in its performance levels.",
+    "whyWrong": {
+      "A": "These are runtime health metrics of a service. They do not measure how changes move through the delivery process.",
+      "B": "These are activity and output counts. They do not measure delivery speed or stability, and they are not DORA metrics.",
+      "C": "These counts describe process inputs, not outcomes. They do not measure the throughput or the stability of software changes."
+    },
+    "sources": [
+      {
+        "title": "Announcing the 2023 State of DevOps Report",
+        "url": "https://cloud.google.com/blog/products/devops-sre/announcing-the-2023-state-of-devops-report",
+        "evidence": "we use the following measures to understand the throughput and stability of software changes"
+      },
+      {
+        "title": "Announcing the 2023 State of DevOps Report",
+        "url": "https://cloud.google.com/blog/products/devops-sre/announcing-the-2023-state-of-devops-report",
+        "evidence": "Failed deployment recovery time: how long it takes to recover from a failed deployment"
+      },
+      {
+        "title": "Use Four Keys metrics like change failure rate to measure your DevOps performance",
+        "url": "https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance",
+        "evidence": "At a high level, Deployment Frequency and Lead Time for Changes measure velocity, while Change Failure Rate and Time to Restore Service measure stability."
+      }
+    ]
+  },
+  {
+    "id": "ops-052",
+    "objective": "6.5",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "postmortem",
+      "action-items",
+      "error-budget-policy"
+    ],
+    "stem": "A payments service had three similar outages this quarter. Each outage used more than 20% of the four-week error budget. Each postmortem produced action items with one owner and a tracking bug, but most items are still open because the team always gives feature work a higher priority. The team's error budget policy covers only SLO misses. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add an outage rule to the error budget policy: an incident that uses over 20% of the four-week budget needs a P0 action item. Track closure."
+      },
+      {
+        "id": "B",
+        "text": "Reward engineers based on the number of postmortems that they write and publish each quarter, so that postmortems get more attention."
+      },
+      {
+        "id": "C",
+        "text": "Assign each action item to several owners from different teams, so that more people can work on it at the same time."
+      },
+      {
+        "id": "D",
+        "text": "Replace the open action items with one broad item, \"Improve the reliability of the payments service\", and give it to the team lead."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The action items exist and are tracked, but feature work always wins. The SRE workbook example policy says that an incident that uses more than 20% of the four-week budget needs a postmortem with at least one P0 action item for the root cause. A P0 item goes before feature work, and monitoring the closure of action items shows when items slip.",
+    "whyWrong": {
+      "B": "If you reward the writing of postmortems but not the closure of action items, you get unclosed postmortems.",
+      "C": "The workbook recommends a single owner with several collaborators. Several owners weaken accountability.",
+      "D": "Action items need a verifiable end state. A broad item such as \"improve reliability\" cannot be measured or closed."
+    },
+    "sources": [
+      {
+        "title": "Example Error Budget Policy",
+        "url": "https://sre.google/workbook/error-budget-policy/",
+        "evidence": "If a single incident consumes more than 20% of error budget over four weeks, then the team must conduct a postmortem. The postmortem must contain at least one P0 action item to address the root cause."
+      },
+      {
+        "title": "Postmortem Culture: Learning from Failure",
+        "url": "https://sre.google/workbook/postmortem-culture/",
+        "evidence": "If you reward engineers for writing postmortems, but not for closing the associated action items, you risk an unvirtuous cycle of unclosed postmortems."
+      },
+      {
+        "title": "Postmortem Culture: Learning from Failure",
+        "url": "https://sre.google/workbook/postmortem-culture/",
+        "evidence": "Consequently, we can monitor the closure of action items from each postmortem."
+      }
+    ]
+  },
+  {
+    "id": "ops-053",
+    "objective": "6.6",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "penetration-testing",
+      "acceptable-use-policy",
+      "security-testing"
+    ],
+    "stem": "A retail company runs its checkout app on Compute Engine and Cloud Run in its own Google Cloud projects. The security team hired an outside firm to run a penetration test against the app next week. The CISO asks what the company must do with respect to Google before the test starts. What should you tell the CISO?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Open a support case two weeks before the test, and wait for Google to approve the test window."
+      },
+      {
+        "id": "B",
+        "text": "Ask the account team for a signed letter from Google that authorizes the outside firm to test."
+      },
+      {
+        "id": "C",
+        "text": "Start without notice to Google. Follow the Acceptable Use Policy and Terms of Service, and affect only your projects."
+      },
+      {
+        "id": "D",
+        "text": "Send Google the source IP addresses of the outside firm, so that Google does not block the test traffic."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Google does not require notice before you penetration test your own projects. The company must follow the Acceptable Use Policy and the Terms of Service, and the tests must affect only its own projects. If the testers find a vulnerability in Google Cloud, report it through the Vulnerability Reward Program.",
+    "whyWrong": {
+      "A": "No support case or approval is necessary for a penetration test of your own projects. The wait only delays the test.",
+      "B": "No authorization from Google is necessary. The company, not Google, authorizes the testers to test its own projects.",
+      "D": "The policy does not require any notice to Google, and that includes the IP addresses of the testers."
+    },
+    "sources": [
+      {
+        "title": "Cloud Security FAQ",
+        "url": "https://support.google.com/cloud/answer/6262505?hl=en",
+        "evidence": "If you plan to evaluate the security of your Cloud Platform infrastructure with penetration testing, you are not required to contact us."
+      }
+    ]
+  },
+  {
+    "id": "ops-054",
+    "objective": "6.6",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "web-security-scanner",
+      "security-command-center",
+      "vulnerability-scanning"
+    ],
+    "stem": "A company runs a customer portal on App Engine. Signed-in users can post public comments and change their email settings. Before a major release, the security team wants Web Security Scanner to crawl the signed-in pages and find cross-site scripting issues. The scan must not change production data or send email to real customers. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run a custom scan in a separate test project, with a test account that cannot reach sensitive data."
+      },
+      {
+        "id": "B",
+        "text": "Use the weekly managed scans in production, because they crawl the signed-in pages without submitting any forms."
+      },
+      {
+        "id": "C",
+        "text": "Run a custom scan against production with an administrator account, so that the scanner can reach every page."
+      },
+      {
+        "id": "D",
+        "text": "Run a custom scan against production at night, and delete the test comments and test emails after the scan."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A custom scan tries to activate every control and input that it finds, so it can post comments and send emails. Google recommends that you scan a test environment in a separate project. Use a test account that has no access to sensitive data or harmful operations. A custom scan can also sign in to the app, which the signed-in pages need.",
+    "whyWrong": {
+      "B": "Managed scans do not use authentication, so they cannot reach the signed-in pages. They send only GET requests.",
+      "C": "An administrator account lets the scanner activate harmful operations, and the scanner can post test strings as public comments in production.",
+      "D": "A night scan still posts comments and sends emails to real customers. You cannot delete an email after it is sent."
+    },
+    "sources": [
+      {
+        "title": "Overview of Web Security Scanner",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+        "evidence": "Run scans in a test environment. Set up a test environment by creating a separate App Engine project and loading your application and data there."
+      },
+      {
+        "title": "Overview of Web Security Scanner",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+        "evidence": "Create a user account that doesn't have access to sensitive data or harmful operations, and use it when scanning your app."
+      }
+    ]
+  },
+  {
+    "id": "ops-055",
+    "objective": "6.6",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "capacity-planning",
+      "reservations",
+      "quotas",
+      "disaster-recovery"
+    ],
+    "stem": "A logistics company runs its dispatch app on 40 Compute Engine VMs in `us-east4`. Its DR plan fails over to `us-central1`, where the project has enough quota for 40 VMs of the same machine type. During the last failover drill, VM creation failed in two zones because those zones had no capacity for that machine type. The business requires high assurance that the DR VMs can start during a real failover. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Request a quota increase for the machine type in `us-central1`, so that the project can create more VMs than it needs."
+      },
+      {
+        "id": "B",
+        "text": "Buy a three-year compute flexible committed use discount for `us-central1` to secure the capacity for the DR VMs."
+      },
+      {
+        "id": "C",
+        "text": "Create a regional MIG in `us-central1` that autoscales from 0 to 40 VMs, and configure autohealing for it."
+      },
+      {
+        "id": "D",
+        "text": "Create Compute Engine reservations for the needed VMs in the `us-central1` zones that the DR plan uses."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The drill failed because the zones had no capacity, not because of quota. A quota sets the maximum number of resources that you can create, but it does not guarantee that the resources are available. A reservation gives a high level of assurance of capacity for the VMs that you specify. Google lists disaster recovery as a use for reservations. You pay for the reserved resources at the on-demand rate while the reservation exists.",
+    "whyWrong": {
+      "A": "The project already has enough quota. More quota does not make zonal capacity available.",
+      "B": "A compute flexible commitment lowers the price of eligible usage. It does not support attached reservations, so it gives no assured capacity.",
+      "C": "A MIG that scales out from 0 VMs still needs zonal capacity at failover time. Autohealing recreates VMs that fail their health check, but it does not reserve capacity."
+    },
+    "sources": [
+      {
+        "title": "Allocation quotas",
+        "url": "https://docs.cloud.google.com/compute/resource-usage",
+        "evidence": "Allocation quotas are the maximum number of resources you can create of that resource type, if those resources are available. Quotas don't guarantee that resources are always available."
+      },
+      {
+        "title": "About reservations",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/reservations-overview",
+        "evidence": "A reservation provides a high level of assurance of capacity for one or more VMs with the configuration the user specifies."
+      },
+      {
+        "title": "Committed use discounts (CUDs) for Compute Engine",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/committed-use-discounts-overview",
+        "evidence": "Unlike resource-based commitments, compute flexible commitments don't support attached reservations and don't offer the assured capacity that comes with attached reservations."
+      }
+    ]
+  },
+  {
+    "id": "ops-056",
+    "objective": "6.6",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "retries",
+      "exponential-backoff",
+      "cascading-failures",
+      "overload"
+    ],
+    "stem": "An online travel company runs three service layers on GKE: a web frontend, a booking API, and an inventory service that uses Cloud SQL. Each layer retries a failed call 3 times with no wait. During a short Cloud SQL failover, the database received many times its normal request rate, and the recovery took 40 minutes instead of 2. The team wants the Google-recommended fix for the cause of the slow recovery. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep 3 retries at each layer, and add a fixed 1-second wait between the attempts."
+      },
+      {
+        "id": "B",
+        "text": "Retry at one layer only, with a retry limit and randomized exponential backoff."
+      },
+      {
+        "id": "C",
+        "text": "Add exponential backoff without jitter at each layer, so that retries follow a fixed schedule."
+      },
+      {
+        "id": "D",
+        "text": "Increase the Cloud SQL machine size and connection limit to absorb the retry traffic."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Retries at every layer multiply. Four attempts at each of three layers can create 64 attempts on the database for one user action. The SRE book recommends that you retry at one level only, limit the retries for each request, and always use randomized exponential backoff. Without randomness, a small outage causes retries that arrive at the same time and amplify the overload.",
+    "whyWrong": {
+      "A": "A fixed wait keeps the retries of all clients in step, so they arrive in waves. The layers still multiply the attempts.",
+      "C": "Without jitter, the retries from many clients arrive at the same time. Retries at each layer still multiply the load.",
+      "D": "A larger database costs more and leaves the cause in place, because the layers still multiply the retries."
+    },
+    "sources": [
+      {
+        "title": "Addressing Cascading Failures (SRE book)",
+        "url": "https://sre.google/sre-book/addressing-cascading-failures/",
+        "evidence": "avoid amplifying retries by issuing retries at multiple levels: a single request at the highest layer may produce a number of attempts as large as the product of the number of attempts at each layer"
+      },
+      {
+        "title": "Addressing Cascading Failures (SRE book)",
+        "url": "https://sre.google/sre-book/addressing-cascading-failures/",
+        "evidence": "If retries aren't randomly distributed over the retry window, a small perturbation (e.g., a network blip) can cause retry ripples to schedule at the same time, which can then amplify themselves"
+      }
+    ]
+  },
+  {
+    "id": "ops-057",
+    "objective": "6.6",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "load-testing",
+      "cloud-run",
+      "cloud-monitoring"
+    ],
+    "stem": "A media company expects 10 times its normal traffic on a Cloud Run service during a live event. The team plans a load test. The draft plan publishes messages to a Pub/Sub push subscription that targets the service. It judges success from the `request_count` and latency charts of the service in Cloud Monitoring. Which two changes should you recommend? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Generate the load with a test harness, such as JMeter, that controls the request rate and the concurrency."
+      },
+      {
+        "id": "B",
+        "text": "Set the maximum instances of the service to 1 during the test, so that each test run gives the same result."
+      },
+      {
+        "id": "C",
+        "text": "Keep Pub/Sub as the load source, and raise the publish rate until the service starts to return errors."
+      },
+      {
+        "id": "D",
+        "text": "Measure the latency and the errors at the load generator, and compare them with the server-side charts."
+      },
+      {
+        "id": "E",
+        "text": "Generate the load with Cloud Monitoring uptime checks that send requests from all regions each minute."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Google recommends a test harness, such as JMeter, because you must control the rate and the concurrency to know what you test. Pub/Sub cannot control the rate of the traffic or the number of clients. Also measure the results at the client. The Cloud Run `request_count` metric excludes requests that do not reach an instance, such as requests that fail at the maximum number of instances. So the server charts can look healthy during an overload.",
+    "whyWrong": {
+      "B": "One instance stops the service from scaling out, so the test cannot show whether the service scales out linearly with the load.",
+      "C": "Pub/Sub cannot control the rate of the traffic or the number of clients, so the team does not know what load it tests.",
+      "E": "Uptime checks send a small number of periodic requests to check availability. They cannot generate a controlled high load."
+    },
+    "sources": [
+      {
+        "title": "Load testing best practices",
+        "url": "https://docs.cloud.google.com/run/docs/about-load-testing",
+        "evidence": "Pub/Sub is a poor choice of tool to generate load because you cannot control the rate of the traffic and number of clients."
+      },
+      {
+        "title": "Load testing best practices",
+        "url": "https://docs.cloud.google.com/run/docs/about-load-testing",
+        "evidence": "You can query logs captured by JMeter, where the logs include latencies measured at the client."
+      },
+      {
+        "title": "Google Cloud metrics: P through Z",
+        "url": "https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z",
+        "evidence": "Excludes requests that are not reaching your container instances (for example, unauthorized requests or when maximum number of instances is reached)."
+      }
+    ]
+  },
+  {
+    "id": "ops-058",
+    "objective": "6.6",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "regional-mig",
+      "zone-failure",
+      "overprovisioning",
+      "failure-drill"
+    ],
+    "stem": "A company serves a stateless web app from a regional MIG behind a global external Application Load Balancer. The MIG has 6 VMs, 2 in each of three zones. Load tests show that the app needs 6 VMs at peak. Each new VM needs 12 minutes to warm up before it can serve. In a zone failure drill at peak, latency and errors rose until the zone came back. You must survive the loss of one zone at peak at the lowest cost. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable autohealing with an application health check, so that the MIG recreates the VMs of the failed zone."
+      },
+      {
+        "id": "B",
+        "text": "Enable autoscaling on CPU utilization with a 12-minute initialization period and a minimum of 6 VMs."
+      },
+      {
+        "id": "C",
+        "text": "Increase the target size of the MIG to 9 VMs, so that two zones can carry the peak traffic alone."
+      },
+      {
+        "id": "D",
+        "text": "Add a second regional MIG with 6 VMs in another region as a second backend of the load balancer."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Google recommends that you overprovision a regional MIG in three zones by at least 50%. With 9 VMs, 3 in each zone, the two remaining zones still run 6 VMs when one zone fails. After a zone failure, the MIG adds no VMs in the other zones unless autoscaling is on. Autoscaling is too slow here, because each new VM needs 12 minutes before it can serve.",
+    "whyWrong": {
+      "A": "During a zone failure, the MIG does not add VMs in the remaining zones unless autoscaling is on. Autohealing does not restore the lost capacity.",
+      "B": "New VMs need 12 minutes before they can serve, so users see errors for the first minutes of a zone failure at peak.",
+      "D": "A second region runs 12 VMs, or 200% of the need. It protects against more failures, but it costs more than the 9 VMs that one zone loss requires."
+    },
+    "sources": [
+      {
+        "title": "About regional MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+        "evidence": "By overprovisioning to 150%, you can ensure that if 1/3 of the capacity is lost, 100% of traffic is supported by the remaining zones."
+      },
+      {
+        "title": "About regional MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+        "evidence": "The number of instances that are part of the regional MIG in the remaining zones continue to serve traffic. No new instances are added and no instances are redistributed (unless you set up autoscaling)."
+      }
+    ]
+  }
+]

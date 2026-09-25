@@ -1,0 +1,24 @@
+# Lab 63, API config version 1: no API key requirement.
+# Step 5 of the README replaces BACKEND_URL with the Cloud Run service URL.
+swagger: "2.0"
+info:
+  title: lab63-api
+  description: Lab 63 API on API Gateway with a private Cloud Run backend
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+# Top-level backend: API Gateway appends the request path (/hello) to this address.
+x-google-backend:
+  address: BACKEND_URL
+paths:
+  /hello:
+    get:
+      summary: Call the Cloud Run sample service
+      operationId: hello
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: string

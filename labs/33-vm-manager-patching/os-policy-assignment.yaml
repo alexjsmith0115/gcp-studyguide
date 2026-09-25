@@ -1,0 +1,24 @@
+# OS policy assignment for lab 33.
+# It keeps the "tree" package installed on Debian VMs that have the label env=dev.
+# ENFORCEMENT mode installs the package again if it is missing at a later check.
+# Field reference: https://docs.cloud.google.com/compute/docs/osconfig/rest/Shared.Types/OSPolicyAssignment
+osPolicies:
+  - id: lab33-install-tree
+    mode: ENFORCEMENT
+    resourceGroups:
+      - resources:
+          - id: tree-package
+            pkg:
+              desiredState: INSTALLED
+              apt:
+                name: tree
+instanceFilter:
+  inclusionLabels:
+    - labels:
+        env: dev
+  inventories:
+    - osShortName: debian
+rollout:
+  disruptionBudget:
+    fixed: 1
+  minWaitDuration: 60s

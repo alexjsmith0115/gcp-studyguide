@@ -1,0 +1,16 @@
+# One Skaffold profile per target. The pipeline stage selects the profile.
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: lab71-app
+profiles:
+- name: staging
+  manifests:
+    rawYaml:
+    - run-staging.yaml
+- name: prod
+  manifests:
+    rawYaml:
+    - run-prod.yaml
+deploy:
+  cloudrun: {}

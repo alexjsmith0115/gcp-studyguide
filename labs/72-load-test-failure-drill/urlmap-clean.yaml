@@ -1,0 +1,4 @@
+# URL map for lab 72 without faults: all requests go to lab72-bs.
+# Step 22 replaces PROJECT_ID with your project ID before import.
+name: lab72-urlmap
+defaultService: projects/PROJECT_ID/global/backendServices/lab72-bs

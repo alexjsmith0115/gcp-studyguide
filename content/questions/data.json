@@ -1,0 +1,1594 @@
+[
+  {
+    "id": "data-001",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "spanner",
+      "database-choice",
+      "global"
+    ],
+    "stem": "A payments company builds a new ledger service for customers in North America, Europe, and Asia. The ledger needs relational schemas, SQL, and ACID transactions. Every read must return the latest committed balance from any region. The service must stay available if a whole region fails, and the company wants to add write capacity without sharding the application. Which database should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cloud SQL for PostgreSQL Enterprise Plus edition, with a cross-region read replica on each continent"
+      },
+      {
+        "id": "B",
+        "text": "Bigtable, with one cluster on each continent and an app profile with multi-cluster routing"
+      },
+      {
+        "id": "C",
+        "text": "Spanner, with a multi-region instance configuration that covers the three continents"
+      },
+      {
+        "id": "D",
+        "text": "Firestore in Native mode, with a multi-region location and transactions in the client code"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding needs are relational SQL with ACID transactions, strongly consistent reads from any region, survival of a region failure, and more write capacity without sharding. A Spanner multi-region configuration gives 99.999% availability and replicates data between regions with strong consistency. You add compute capacity to the instance instead of sharding the application.",
+    "whyWrong": {
+      "A": "Cross-region read replicas are asynchronous and read-only. A read from a replica can return an old balance, and all writes still go to one primary instance in one region.",
+      "B": "Bigtable is a NoSQL wide-column database without relational schemas or multi-row ACID transactions. Replication between its clusters is eventually consistent by default.",
+      "D": "Firestore is a NoSQL document database. It does not give the relational schemas and SQL that the ledger needs."
+    },
+    "sources": [
+      {
+        "title": "Regional, dual-region, and multi-region configurations",
+        "url": "https://docs.cloud.google.com/spanner/docs/instance-configurations",
+        "evidence": "99.999% availability, which is greater than the 99.99% availability that Spanner regional configurations provide."
+      },
+      {
+        "title": "Replication overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/replication-overview",
+        "evidence": "By default, replication for Bigtable is eventually consistent."
+      }
+    ]
+  },
+  {
+    "id": "data-002",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "bigtable",
+      "hbase",
+      "database-choice"
+    ],
+    "stem": "An ad-tech company runs a self-managed Apache HBase cluster on premises. It stores 400 TB of user events with row keys built from the user ID and a timestamp. The application uses the HBase Java API for single-row reads and writes at more than one million operations per second, with single-digit millisecond latency. The company wants a managed service and minimal code changes. Which service should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bigtable, with the Bigtable HBase client for Java in the application"
+      },
+      {
+        "id": "B",
+        "text": "Spanner, with the HBase tables redesigned as interleaved relational tables"
+      },
+      {
+        "id": "C",
+        "text": "BigQuery, with the events loaded into tables partitioned by timestamp"
+      },
+      {
+        "id": "D",
+        "text": "Firestore in Native mode, with one document for each user event"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding constraints are the HBase Java API, very high single-row throughput at low latency, and minimal code changes. Bigtable offers a supported extension to the Apache HBase library for Java, and it is built for key-based access at this scale.",
+    "whyWrong": {
+      "B": "Spanner scales, but it is a relational database with a different API. The team must redesign the schema and rewrite the data access code.",
+      "C": "BigQuery is an analytics data warehouse. It is not built to serve more than one million single-row reads and writes each second at millisecond latency.",
+      "D": "Firestore is a document database with its own API. The HBase code needs a rewrite, which breaks the minimal-change requirement."
+    },
+    "sources": [
+      {
+        "title": "Bigtable overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/overview",
+        "evidence": "Bigtable is exposed to applications through multiple client libraries, including a supported extension to the Apache HBase library for Java."
+      }
+    ]
+  },
+  {
+    "id": "data-003",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "filestore",
+      "nfs",
+      "file-storage"
+    ],
+    "stem": "A company moves a legacy content-management application to Compute Engine. Six VMs in a regional managed instance group must read and write the same files over NFSv4.1 with POSIX file locking. The shared file system must stay available if one zone fails. The company wants a fully managed service. What should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Cloud Storage bucket that each VM mounts with Cloud Storage FUSE"
+      },
+      {
+        "id": "B",
+        "text": "A Filestore instance in the Regional service tier"
+      },
+      {
+        "id": "C",
+        "text": "A regional Persistent Disk on one VM that exports an NFS share to the others"
+      },
+      {
+        "id": "D",
+        "text": "A Filestore instance in the Zonal service tier"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The application needs a managed NFS share for many VMs that survives a zone failure. The Filestore Regional tier is designed for regional availability and resilience against zone outages, and it supports NFSv4.1.",
+    "whyWrong": {
+      "A": "Cloud Storage FUSE is not POSIX compliant and is not an NFS file system, so it does not give the file locking that the application needs.",
+      "C": "A self-managed NFS server is not a fully managed service, and the share stops if that one VM fails.",
+      "D": "A Zonal tier instance is in one zone, so a failure of that zone makes the share unavailable."
+    },
+    "sources": [
+      {
+        "title": "About service tiers",
+        "url": "https://docs.cloud.google.com/filestore/docs/service-tiers",
+        "evidence": "Regional: Designed for regional availability and resilience against zone outages."
+      },
+      {
+        "title": "Cloud Storage FUSE",
+        "url": "https://docs.cloud.google.com/storage/docs/cloud-storage-fuse/overview",
+        "evidence": "Cloud Storage FUSE, a FUSE adapter that lets you mount and access Cloud Storage buckets as local file systems"
+      }
+    ]
+  },
+  {
+    "id": "data-004",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "managed-lustre",
+      "hpc",
+      "file-storage"
+    ],
+    "stem": "A research institute moves an HPC simulation from its on-premises Lustre cluster to Compute Engine. Thousands of VMs in one zone read and write the same scratch files in parallel. The jobs need very high aggregate throughput, low latency, and POSIX semantics. The institute wants a fully managed service. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Filestore instance in the Regional service tier, mounted over NFS"
+      },
+      {
+        "id": "B",
+        "text": "A Cloud Storage bucket with Rapid Cache, mounted with Cloud Storage FUSE"
+      },
+      {
+        "id": "C",
+        "text": "A NetApp Volumes storage pool with the Extreme service level"
+      },
+      {
+        "id": "D",
+        "text": "A Google Cloud Managed Lustre instance in the zone of the VMs"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Thousands of clients that read and write the same files in parallel need a parallel file system with POSIX semantics. Managed Lustre is a fully managed parallel file system optimized for AI and HPC, with very high throughput and low latency.",
+    "whyWrong": {
+      "A": "Filestore is a managed NFS service. The Google storage guidance names Managed Lustre, not Filestore, for a parallel file system for HPC.",
+      "B": "Cloud Storage FUSE is not POSIX compliant, and Rapid Cache is a read cache. The scratch files need parallel POSIX reads and writes.",
+      "C": "NetApp Volumes is a file service for NFS and SMB. It is not the parallel file system that the guidance recommends for HPC scratch data."
+    },
+    "sources": [
+      {
+        "title": "Managed Lustre",
+        "url": "https://docs.cloud.google.com/managed-lustre/docs/overview",
+        "evidence": "Google Cloud Managed Lustre delivers a high-performance, fully managed parallel file system optimized for AI and HPC applications."
+      }
+    ]
+  },
+  {
+    "id": "data-005",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "hyperdisk",
+      "block-storage",
+      "n4"
+    ],
+    "stem": "A company deploys a self-managed PostgreSQL database on a new N4 VM for better price-performance. The data disk needs about 20,000 IOPS, and the team wants to set IOPS and throughput separately from capacity. The data must survive when the VM stops or is re-created. Which disk should you attach?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Persistent Disk SSD (pd-ssd) volume that is large enough for the IOPS target"
+      },
+      {
+        "id": "B",
+        "text": "Local SSD disks in a software RAID 0 array"
+      },
+      {
+        "id": "C",
+        "text": "A Hyperdisk Balanced volume with provisioned IOPS and throughput"
+      },
+      {
+        "id": "D",
+        "text": "A Hyperdisk Throughput volume with provisioned throughput"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "N4 VMs do not support Persistent Disk or Local SSD, so the disk must be a Hyperdisk type. Hyperdisk Balanced is the recommended type for most workloads, including PostgreSQL, and you provision its IOPS and throughput. Its data is independent of the VM lifecycle.",
+    "whyWrong": {
+      "A": "N4 does not support Persistent Disk. Also, Persistent Disk performance grows with disk size instead of separate settings.",
+      "B": "N4 does not support Local SSD, and Local SSD data is not durable through all VM stop and re-create events.",
+      "D": "Hyperdisk Throughput is for throughput-heavy work that does not need high IOPS, such as Hadoop or Kafka. You cannot set its IOPS level."
+    },
+    "sources": [
+      {
+        "title": "General-purpose machine family for Compute Engine",
+        "url": "https://docs.cloud.google.com/compute/docs/general-purpose-machines",
+        "evidence": "N4 doesn't support Persistent Disk or Local SSD. Read Move your workload from an existing VM to a new VM to migrate your Persistent Disk resources to a newer machine series."
+      },
+      {
+        "title": "Google Cloud Hyperdisk overview",
+        "url": "https://docs.cloud.google.com/compute/docs/disks/hyperdisks",
+        "evidence": "You can't specify an IOPS level for Hyperdisk Throughput and Hyperdisk ML volumes."
+      }
+    ]
+  },
+  {
+    "id": "data-006",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "firestore",
+      "mobile",
+      "offline"
+    ],
+    "stem": "A startup builds a mobile app for field inspectors, who often work where there is no network. The app must let them read and edit their inspections offline and sync the changes when the network returns. Other users' screens must update in real time when an inspection changes. The team wants a serverless database with no capacity planning. Which database should you choose?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cloud SQL for MySQL, with a read replica for the mobile clients"
+      },
+      {
+        "id": "B",
+        "text": "Firestore in Native mode, with the Firestore client libraries"
+      },
+      {
+        "id": "C",
+        "text": "Bigtable, with a separate app profile for the mobile clients"
+      },
+      {
+        "id": "D",
+        "text": "Memorystore for Valkey, with persistence turned on"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Offline edits, later sync, and real-time updates on other devices are features of Firestore in Native mode through its client libraries. Firestore is serverless and scales without capacity planning.",
+    "whyWrong": {
+      "A": "Cloud SQL needs instance sizing, and it has no client-side offline cache or real-time listeners for mobile apps.",
+      "C": "Bigtable is a wide-column database for high-throughput server workloads. It has no mobile client with offline caching and real-time sync.",
+      "D": "Memorystore is an in-memory data store that you size. It does not give mobile offline sync or real-time listeners."
+    },
+    "sources": [
+      {
+        "title": "Firestore editions overview",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/editions-overview",
+        "evidence": "Firestore in Native mode: this interface supports all of the latest and most innovative capabilities of Firestore, including real-time synchronization and offline caching in the Firestore client libraries."
+      },
+      {
+        "title": "Enable offline data",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/manage-data/enable-offline",
+        "evidence": "This feature caches a copy of the Firestore data that your app is actively using, so your app can access the data when the device is offline."
+      }
+    ]
+  },
+  {
+    "id": "data-007",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "alloydb",
+      "htap",
+      "columnar-engine"
+    ],
+    "stem": "A logistics company runs its order system on a self-managed PostgreSQL database. Managers want dashboards that run complex analytical queries on live order data. Today these queries slow down transactions, and a nightly export to a separate warehouse makes the dashboards a day old. The company wants a managed PostgreSQL-compatible database, with no application rewrite and no separate data pipeline. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move to AlloyDB for PostgreSQL, and use the columnar engine for the dashboard queries"
+      },
+      {
+        "id": "B",
+        "text": "Move to Cloud SQL for PostgreSQL Enterprise Plus edition, and turn on the data cache"
+      },
+      {
+        "id": "C",
+        "text": "Move to Spanner with the PostgreSQL interface, and add read-only replicas"
+      },
+      {
+        "id": "D",
+        "text": "Replicate the order tables to BigQuery with Datastream, and build the dashboards there"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The company needs analytics on live transactional data in a managed PostgreSQL-compatible database, with no rewrite and no pipeline. AlloyDB supports hybrid transactional and analytical processing (HTAP), and its columnar engine speeds up analytical queries.",
+    "whyWrong": {
+      "B": "The data cache speeds up reads of often-used pages. The analytical queries still run in the row store and compete with transactions on the same instance.",
+      "C": "A move to Spanner needs schema and application changes, which the company wants to avoid.",
+      "D": "Datastream and BigQuery add a separate replication pipeline and a second system, which the company wants to avoid."
+    },
+    "sources": [
+      {
+        "title": "AlloyDB overview",
+        "url": "https://docs.cloud.google.com/alloydb/docs/overview",
+        "evidence": "Hybrid Transactional and Analytical Processing (HTAP): run complex analytical queries against your live transactional data without impacting performance or availability."
+      },
+      {
+        "title": "AlloyDB overview",
+        "url": "https://docs.cloud.google.com/alloydb/docs/overview",
+        "evidence": "A columnar engine can accelerate the performance of analytical queries by storing data in memory using a columnar format."
+      }
+    ]
+  },
+  {
+    "id": "data-008",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "bigquery-subscription",
+      "streaming"
+    ],
+    "stem": "A retailer publishes clickstream events as JSON to a Pub/Sub topic. The messages already match the schema of a BigQuery table, and they need no transformation or aggregation. Analysts want the events in BigQuery within seconds. The team wants the least operational overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the Pub/Sub to BigQuery Dataflow template to read the topic and write to the table"
+      },
+      {
+        "id": "B",
+        "text": "Create a Cloud Storage subscription, and load the new files into BigQuery each hour"
+      },
+      {
+        "id": "C",
+        "text": "Create a BigQuery subscription on the topic that writes to the table with its schema"
+      },
+      {
+        "id": "D",
+        "text": "Deploy a Cloud Run service with a push subscription that writes rows to the table"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The messages need no processing, and the team wants the least overhead. A BigQuery subscription writes messages to an existing table as they arrive, with no separate subscriber client. The docs say that a Dataflow job is not necessary in this case.",
+    "whyWrong": {
+      "A": "The template works, but it adds a Dataflow job to run and pay for, although the messages need no processing.",
+      "B": "Hourly load jobs do not deliver the events within seconds, and they add a second step to manage.",
+      "D": "A custom Cloud Run service is more code and operations work than a built-in export subscription."
+    },
+    "sources": [
+      {
+        "title": "BigQuery subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/bigquery",
+        "evidence": "The overhead of running a Dataflow job is not necessary when messages don't require additional processing before storing them in a BigQuery table; you can use a BigQuery subscription instead."
+      }
+    ]
+  },
+  {
+    "id": "data-009",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "dataflow",
+      "windowing",
+      "streaming"
+    ],
+    "stem": "A ride-sharing company streams trip events through Pub/Sub. It must count trips per city in 5-minute windows, based on the time when each trip event happened. Events from phones can arrive several minutes late, and the counts must include them. The team wants a managed service that scales automatically. What should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A BigQuery subscription with a single message transform that adds the city to each row"
+      },
+      {
+        "id": "B",
+        "text": "A Dataflow streaming pipeline that uses event-time windows, watermarks, and triggers"
+      },
+      {
+        "id": "C",
+        "text": "Cloud Run functions that update a counter row in Cloud SQL for each Pub/Sub message"
+      },
+      {
+        "id": "D",
+        "text": "A Managed Airflow DAG that runs a BigQuery aggregation query every 5 minutes"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The counts need aggregation across messages in event-time windows, with late data. Pub/Sub recommends a Dataflow pipeline when you must window or aggregate across messages. Dataflow uses windows, watermarks, and triggers to aggregate unbounded data.",
+    "whyWrong": {
+      "A": "A single message transform changes one message at a time. It cannot window or aggregate across messages.",
+      "C": "Per-message functions do not group events by event time. Late events, retries, and contention on counter rows all need custom code.",
+      "D": "Managed Airflow is for batch orchestration, not stream processing. A query every 5 minutes is a batch workaround that must handle late events itself."
+    },
+    "sources": [
+      {
+        "title": "BigQuery subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/bigquery",
+        "evidence": "However, a Dataflow pipeline is recommended for Pub/Sub systems where more complex data transformation is required before the data is stored in a BigQuery table, especially if you want to window or aggregate across messages."
+      },
+      {
+        "title": "Streaming pipelines",
+        "url": "https://docs.cloud.google.com/dataflow/docs/concepts/streaming-pipelines",
+        "evidence": "You can use windows, watermarks, and triggers to aggregate elements in unbounded collections."
+      }
+    ]
+  },
+  {
+    "id": "data-010",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "managed-spark",
+      "serverless",
+      "batch"
+    ],
+    "stem": "A bank runs 40 nightly PySpark batch jobs on a Hadoop cluster that it plans to shut down. The jobs use only Spark, and they read and write Parquet files. The data team wants to run the same code on Google Cloud, pay only while jobs run, and not manage clusters. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Managed Service for Apache Spark (formerly Dataproc) cluster deployment with autoscaling"
+      },
+      {
+        "id": "B",
+        "text": "A rewrite of the jobs in Apache Beam, and Dataflow to run them"
+      },
+      {
+        "id": "C",
+        "text": "A conversion of the jobs to BigQuery SQL, scheduled with Dataform"
+      },
+      {
+        "id": "D",
+        "text": "Managed Service for Apache Spark serverless deployment (formerly Dataproc Serverless) batch workloads"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The team wants the same Spark code, no clusters to manage, and payment only for job runtime. The serverless deployment of Managed Service for Apache Spark runs Spark jobs on fully managed infrastructure, and you pay for job runtime. Its former names are Google Cloud Serverless for Apache Spark and Dataproc Serverless.",
+    "whyWrong": {
+      "A": "In a cluster deployment, you provision and manage clusters, and you pay for cluster uptime.",
+      "B": "Dataflow is managed, but a rewrite in Apache Beam breaks the requirement to run the same code.",
+      "C": "A move to SQL is a rewrite of the PySpark jobs, which the team wants to avoid."
+    },
+    "sources": [
+      {
+        "title": "Compare Managed Service for Apache Spark serverless and cluster deployments",
+        "url": "https://docs.cloud.google.com/managed-spark/docs/concepts/serverless-spark-compare",
+        "evidence": "serverless deployment: Managed Service for Apache Spark offers Spark-jobs-as-a-service, running Spark on fully managed Google Cloud infrastructure. You pay for job runtime."
+      }
+    ]
+  },
+  {
+    "id": "data-011",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "managed-airflow",
+      "orchestration",
+      "etl"
+    ],
+    "stem": "A media company has 300 Apache Airflow DAGs that run ETL steps in BigQuery, Dataflow, and Managed Service for Apache Spark. The team runs Airflow itself on VMs and spends many hours on upgrades and scaling. The team wants to keep the DAGs in Python with few changes. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Managed Service for Apache Airflow (formerly Cloud Composer)"
+      },
+      {
+        "id": "B",
+        "text": "Workflows, with one workflow definition for each DAG"
+      },
+      {
+        "id": "C",
+        "text": "Cloud Scheduler jobs that call a Cloud Run function for each step"
+      },
+      {
+        "id": "D",
+        "text": "BigQuery scheduled queries, with one query for each ETL step"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The team wants to keep its Airflow DAGs and stop managing Airflow. Managed Airflow is built on Apache Airflow, is fully managed, and is designed to orchestrate ETL and ELT workflows.",
+    "whyWrong": {
+      "B": "Workflows uses its own YAML or JSON syntax, so the team must rewrite every DAG.",
+      "C": "The team must rebuild the dependencies, retries, and schedules that the DAGs already define.",
+      "D": "Scheduled queries run only BigQuery SQL. They cannot run the Dataflow and Spark steps or the dependencies between steps."
+    },
+    "sources": [
+      {
+        "title": "Choose Workflows or Managed Airflow for service orchestration",
+        "url": "https://docs.cloud.google.com/workflows/docs/choose-orchestration",
+        "evidence": "Managed Airflow is designed to orchestrate data driven workflows (particularly ETL/ELT). It's built on the Apache Airflow project, but Managed Airflow is fully managed."
+      }
+    ]
+  },
+  {
+    "id": "data-012",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "dataform",
+      "elt",
+      "bigquery"
+    ],
+    "stem": "Data analysts at an insurer build about 200 BigQuery tables from raw data with SQL. The tables depend on each other, and the analysts run the SQL scripts by hand in the correct order. They want dependency management, data quality tests, and version control in Git. They know SQL but not Python. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Managed Service for Apache Airflow, with a Python DAG that runs the SQL scripts"
+      },
+      {
+        "id": "B",
+        "text": "Dataform, with the SQL workflows stored in a Git repository"
+      },
+      {
+        "id": "C",
+        "text": "Cloud Data Fusion, with a visual pipeline for each table"
+      },
+      {
+        "id": "D",
+        "text": "BigQuery scheduled queries, with one scheduled query for each table"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The analysts need SQL-based transformations in BigQuery with dependencies, tests, and Git. Dataform is a service for data analysts to develop, test, version, and schedule SQL transformation workflows in BigQuery.",
+    "whyWrong": {
+      "A": "Managed Airflow needs DAGs in Python, which the analysts do not know, and it does not manage table dependencies from the SQL.",
+      "C": "Data Fusion builds visual ETL pipelines. The analysts would rebuild their SQL logic in a different tool.",
+      "D": "Scheduled queries run at fixed times. They do not manage dependencies between tables, tests, or Git versions."
+    },
+    "sources": [
+      {
+        "title": "Dataform overview",
+        "url": "https://docs.cloud.google.com/dataform/docs/overview",
+        "evidence": "Dataform is a service for data analysts to develop, test, control versions, and schedule complex workflows for data transformation in BigQuery."
+      }
+    ]
+  },
+  {
+    "id": "data-013",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "ordering",
+      "replay"
+    ],
+    "stem": "An online store publishes order events to a Pub/Sub topic. The fulfillment service must process all events for the same order in the order in which they were published. Last month, a bug in the service acknowledged events without processing them, and the team could not process them again. After a similar bug, the team wants to process the last 3 days of events again. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish each event with the order ID as its ordering key, and create a subscription with message ordering enabled."
+      },
+      {
+        "id": "B",
+        "text": "Enable exactly-once delivery on the subscription that the fulfillment service uses."
+      },
+      {
+        "id": "C",
+        "text": "Configure message retention on the topic, and seek the subscription to a time before the bug."
+      },
+      {
+        "id": "D",
+        "text": "Add a dead-letter topic to the subscription with a maximum of five delivery attempts."
+      },
+      {
+        "id": "E",
+        "text": "Move the topic to Pub/Sub Lite, and buy a throughput reservation for it."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Ordering needs the same ordering key on related messages and message ordering on the subscription. Replay of acknowledged messages needs message retention on the topic (or retention of acknowledged messages on the subscription), and then a seek to a past time.",
+    "whyWrong": {
+      "B": "Exactly-once delivery stops redelivery of messages after a successful acknowledgment. It does not order messages or replay them.",
+      "D": "A dead-letter topic gets messages that subscribers fail to acknowledge. The bug acknowledged the messages, so they never reach it.",
+      "E": "Pub/Sub Lite is being turned down. A move does not by itself give ordering or replay of acknowledged messages."
+    },
+    "sources": [
+      {
+        "title": "Order messages",
+        "url": "https://docs.cloud.google.com/pubsub/docs/ordering",
+        "evidence": "To achieve message ordering, set the same ordering key on all related messages that should be received in order."
+      },
+      {
+        "title": "Replay and purge messages with seek",
+        "url": "https://docs.cloud.google.com/pubsub/docs/replay-overview",
+        "evidence": "To seek to a time in the past and replay previously-acknowledged messages, you must configure message retention on the topic, or configure the subscription to retain acknowledged messages."
+      }
+    ]
+  },
+  {
+    "id": "data-014",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "rapid-cache",
+      "cloud-storage-fuse",
+      "ai-training"
+    ],
+    "stem": "An AI team trains models on a GKE cluster in one zone of `us-central1`. The 150 TB training dataset is in a bucket in the `us` multi-region, and it rarely changes. Each training epoch reads the whole dataset again from many nodes, and the training code reads files from a file system path. The team wants higher read throughput and lower multi-region data transfer fees, and the data must stay in Cloud Storage. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Copy the dataset to a Filestore Zonal instance, and mount the share in the training pods."
+      },
+      {
+        "id": "B",
+        "text": "Create a Rapid Cache for the bucket in the zone of the GKE nodes."
+      },
+      {
+        "id": "C",
+        "text": "Enable Autoclass on the bucket that holds the training dataset."
+      },
+      {
+        "id": "D",
+        "text": "Mount the bucket in the training pods with the Cloud Storage FUSE CSI driver."
+      },
+      {
+        "id": "E",
+        "text": "Enable turbo replication on the bucket that holds the training dataset."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Rapid Cache (formerly Anywhere Cache) is a zonal SSD read cache for data that changes rarely and is read often, such as training data. Reads from the cache also cost less in data transfer fees than reads from a multi-region bucket. Cloud Storage FUSE lets the training code read the objects through a file system path.",
+    "whyWrong": {
+      "A": "Filestore moves the data out of Cloud Storage, which breaks a stated constraint, and adds a second copy to manage.",
+      "C": "Autoclass changes storage classes based on access. The data is read every epoch, so it stays in Standard storage, and read throughput does not change.",
+      "E": "Turbo replication is only for dual-region buckets. It controls replication time between regions, not read throughput."
+    },
+    "sources": [
+      {
+        "title": "Rapid Cache",
+        "url": "https://docs.cloud.google.com/storage/docs/rapid/rapid-cache",
+        "evidence": "Use Rapid Cache for data that's infrequently changed and frequently read to accelerate data reads for analytics workloads and AI/ML model training and loading."
+      },
+      {
+        "title": "Rapid Cache",
+        "url": "https://docs.cloud.google.com/storage/docs/rapid/rapid-cache",
+        "evidence": "Data that's read from the cache is charged reduced data transfer fees compared to data that's read directly from a multi-region bucket."
+      },
+      {
+        "title": "Cloud Storage FUSE",
+        "url": "https://docs.cloud.google.com/storage/docs/cloud-storage-fuse/overview",
+        "evidence": "a FUSE adapter that lets you mount and access Cloud Storage buckets as local file systems, so applications can read and write objects in your bucket using standard file system semantics."
+      }
+    ]
+  },
+  {
+    "id": "data-015",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "lifecycle",
+      "storage-class"
+    ],
+    "stem": "A company writes application logs to a bucket in Standard storage. Engineers read the logs often during the first 30 days and almost never after that. A policy requires the company to delete each log 400 days after it is written. The access pattern is the same for all logs and is well known. What is the most cost-effective configuration that needs no ongoing work?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Autoclass on the bucket, and add a lifecycle rule that deletes objects at 400 days"
+      },
+      {
+        "id": "B",
+        "text": "Set a retention policy of 400 days on the bucket"
+      },
+      {
+        "id": "C",
+        "text": "Change the default storage class of the bucket to Coldline"
+      },
+      {
+        "id": "D",
+        "text": "Add lifecycle rules that move objects to Coldline at 30 days and delete them at 400 days"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The access pattern is known and fixed, so lifecycle rules can move and delete objects by age. A SetStorageClass rule moves the logs to a colder class after the busy period, and a Delete rule removes them at 400 days.",
+    "whyWrong": {
+      "A": "Autoclass fits access patterns that are unknown or unpredictable, and it adds a management fee. With a known pattern, fixed lifecycle rules cost less.",
+      "B": "A retention policy only prevents deletion before 400 days. It does not delete objects or change their storage class.",
+      "C": "Coldline adds retrieval fees for the frequent reads in the first 30 days, and nothing deletes the logs."
+    },
+    "sources": [
+      {
+        "title": "Object Lifecycle Management",
+        "url": "https://docs.cloud.google.com/storage/docs/lifecycle",
+        "evidence": "Downgrade the storage class of objects older than 365 days to Coldline storage."
+      },
+      {
+        "title": "Autoclass",
+        "url": "https://docs.cloud.google.com/storage/docs/autoclass",
+        "evidence": "The access patterns for your data are unknown or unpredictable."
+      }
+    ]
+  },
+  {
+    "id": "data-016",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "soft-delete",
+      "data-protection"
+    ],
+    "stem": "A company keeps project files in a Cloud Storage bucket. Last month, an administrator deleted the wrong bucket, and the data was lost. The company wants to recover deleted objects, and deleted buckets, for up to 30 days after the deletion. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the soft delete retention duration of the bucket to 30 days"
+      },
+      {
+        "id": "B",
+        "text": "Enable Object Versioning, and delete noncurrent versions after 30 days with a lifecycle rule"
+      },
+      {
+        "id": "C",
+        "text": "Set a retention policy of 30 days on the bucket"
+      },
+      {
+        "id": "D",
+        "text": "Enable Object Versioning, and put a temporary hold on each object"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The company must recover deleted objects and a deleted bucket. Only soft delete can recover objects from a deleted bucket, and Google recommends soft delete over Object Versioning to protect against accidental or malicious deletion.",
+    "whyWrong": {
+      "B": "Object Versioning keeps noncurrent versions, but it does not protect against the deletion of the bucket.",
+      "C": "A retention policy only blocks the deletion of objects that are younger than 30 days. It does not let you recover data after an allowed deletion.",
+      "D": "Holds block all deletions, including the ones that users need, and versioning does not protect the bucket itself."
+    },
+    "sources": [
+      {
+        "title": "Object Versioning",
+        "url": "https://docs.cloud.google.com/storage/docs/object-versioning",
+        "evidence": "Objects can only be recovered from a deleted bucket when soft delete is enabled. Object Versioning does not provide protection against bucket deletions."
+      },
+      {
+        "title": "Object Versioning",
+        "url": "https://docs.cloud.google.com/storage/docs/object-versioning",
+        "evidence": "We recommend that you use soft delete instead of Object Versioning to protect against permanent data loss from accidental or malicious deletions."
+      }
+    ]
+  },
+  {
+    "id": "data-017",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-storage",
+      "bucket-lock",
+      "compliance"
+    ],
+    "stem": "A brokerage must store trade confirmations in Cloud Storage for 7 years in a WORM (write once, read many) state. Regulators require that no one, including project owners, can delete the files or shorten the retention period during that time. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable soft delete on the bucket with the maximum retention duration"
+      },
+      {
+        "id": "B",
+        "text": "Enable Object Versioning, and deny the delete permission with an IAM deny policy"
+      },
+      {
+        "id": "C",
+        "text": "Set a retention policy of 7 years on the bucket, and lock the policy"
+      },
+      {
+        "id": "D",
+        "text": "Put an event-based hold on each object when it is uploaded"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The requirement is a retention period that no one can shorten or remove. A locked bucket retention policy permanently prevents the policy from being reduced or removed, and objects cannot be deleted before they reach the retention period.",
+    "whyWrong": {
+      "A": "Soft delete keeps deleted objects for at most 90 days, and it does not stop deletion.",
+      "B": "An administrator can change or remove the deny policy, so it does not give a permanent guarantee.",
+      "D": "A user with permission to update objects can release a hold, so holds alone do not meet the requirement."
+    },
+    "sources": [
+      {
+        "title": "Bucket Lock",
+        "url": "https://docs.cloud.google.com/storage/docs/bucket-lock",
+        "evidence": "The feature also lets you lock the bucket's retention policy, permanently preventing the policy from being reduced or removed."
+      }
+    ]
+  },
+  {
+    "id": "data-018",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-sql",
+      "high-availability",
+      "read-replica"
+    ],
+    "stem": "A retailer runs its order database on a Cloud SQL for MySQL instance in one zone. The instance has a read replica in a second zone for reports. During a recent zone outage, the order application was down until the zone recovered. The retailer wants automatic failover inside the region for future zone outages. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable high availability (HA) on the primary instance"
+      },
+      {
+        "id": "B",
+        "text": "Promote the read replica when the primary zone fails, and point the application to it"
+      },
+      {
+        "id": "C",
+        "text": "Add a second read replica in a third zone of the region"
+      },
+      {
+        "id": "D",
+        "text": "Enable point-in-time recovery on the primary instance"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The retailer needs automatic failover after a zone failure. Read replicas do not give failover capability, so the fix is an HA configuration with a standby in a second zone.",
+    "whyWrong": {
+      "B": "Promotion is a manual step, and it stops replication for good. The requirement is automatic failover.",
+      "C": "Read replicas cannot fail over, so more replicas do not add automatic failover.",
+      "D": "PITR restores data to a new instance after a data error. It does not fail over during a zone outage."
+    },
+    "sources": [
+      {
+        "title": "About replication in Cloud SQL",
+        "url": "https://docs.cloud.google.com/sql/docs/mysql/replication",
+        "evidence": "Read replicas don't provide failover capability. To provide failover capability for an instance, see Configuring an instance for high availability."
+      }
+    ]
+  },
+  {
+    "id": "data-019",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-sql",
+      "pitr",
+      "recovery"
+    ],
+    "stem": "A developer ran a faulty DELETE statement on a production Cloud SQL for PostgreSQL instance at 14:05. The instance has automated backups and point-in-time recovery enabled. The team must recover the deleted rows as they were at 14:04. The production instance must keep serving traffic and keep all writes made after 14:05. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Restore the most recent automated backup to the production instance"
+      },
+      {
+        "id": "B",
+        "text": "Perform a point-in-time recovery of the production instance in place to 14:04"
+      },
+      {
+        "id": "C",
+        "text": "Fail over the instance to its HA standby, and read the rows from the old primary"
+      },
+      {
+        "id": "D",
+        "text": "Create a new instance with point-in-time recovery to 14:04, and copy the rows back"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A point-in-time recovery always creates a new instance. The team recovers to 14:04 in a new instance and copies only the deleted rows back, so production keeps running and keeps its later writes.",
+    "whyWrong": {
+      "A": "A restore overwrites the production instance, so it loses all writes made after the backup.",
+      "B": "Cloud SQL cannot perform a PITR to an existing instance.",
+      "C": "HA uses synchronous replication, so the standby and the old primary also have the DELETE."
+    },
+    "sources": [
+      {
+        "title": "Perform point-in-time recovery (PITR)",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/backup-recovery/pitr",
+        "evidence": "A point-in-time recovery always creates a new instance; you cannot perform a PITR to an existing instance."
+      }
+    ]
+  },
+  {
+    "id": "data-020",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-sql",
+      "final-backup",
+      "retention"
+    ],
+    "stem": "A company shuts down a Cloud SQL for PostgreSQL instance that uses the standard backups option. The instance has automated backups and several on-demand backups. The team did not enable backup retention after instance deletion. Auditors require that the company can restore the last state of the database for one year after the instance is deleted. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the automated backup retention to 365 days, and then delete the instance"
+      },
+      {
+        "id": "B",
+        "text": "Take an on-demand backup, and then delete the instance"
+      },
+      {
+        "id": "C",
+        "text": "Delete the instance with a final backup that has a retention of 365 days"
+      },
+      {
+        "id": "D",
+        "text": "Delete the instance, and ask Cloud Customer Care to restore it when auditors need it"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "With standard backups, Cloud SQL deletes all instance backups at deletion unless you retain them or take a final backup. A final backup captures the last state, and you can keep it from 1 to 365 days.",
+    "whyWrong": {
+      "A": "Without backup retention or a final backup, Cloud SQL deletes the automated backups with the instance. The last automated backup also misses later changes.",
+      "B": "With standard backups, Cloud SQL deletes on-demand backups with the instance unless you retain the backups.",
+      "D": "Cloud SQL keeps the backups of a deleted instance for recovery through Customer Care for only four days."
+    },
+    "sources": [
+      {
+        "title": "Cloud SQL backups overview",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/backup-recovery/backups",
+        "evidence": "However, you can customize how long Cloud SQL retains the backup. This can range from 1 day to 365 days for standard backups, or 1 day to 10 years for enhanced backups."
+      },
+      {
+        "title": "Choose your backup option",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/backup-recovery/backup-options",
+        "evidence": "However, if you don't retain backups or take a final backup prior to deleting your instance, then Cloud SQL deletes all instance backups automatically."
+      }
+    ]
+  },
+  {
+    "id": "data-021",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "spanner",
+      "pitr",
+      "deletion-protection"
+    ],
+    "stem": "A game studio stores player inventories in a Spanner database. Last week, a faulty release corrupted items for many players, and the team found the problem 2 days later. In another incident, an operator almost dropped the production database. The team wants to recover data to any minute in the last 3 days and to prevent accidental deletion of the database. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the instance to a multi-region instance configuration."
+      },
+      {
+        "id": "B",
+        "text": "Create a full backup schedule that runs every 12 hours with 3-day retention."
+      },
+      {
+        "id": "C",
+        "text": "Set the `version_retention_period` of the database to 3 days."
+      },
+      {
+        "id": "D",
+        "text": "Keep the default PITR window, and export the database each week."
+      },
+      {
+        "id": "E",
+        "text": "Enable deletion protection on the database."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Spanner PITR recovers data from a past point in time within the version retention period, which is 1 hour by default and can be up to 7 days. PITR does not protect against a dropped database, and deletion protection is off by default, so the team must turn it on.",
+    "whyWrong": {
+      "A": "A multi-region configuration protects against region outages. It replicates the corruption and does not block a drop.",
+      "B": "A backup every 12 hours cannot restore to any minute, and backups do not prevent a drop of the database.",
+      "D": "The default window is 1 hour, so a problem found 2 days later is outside it. A weekly export can also miss a week of changes."
+    },
+    "sources": [
+      {
+        "title": "Point-in-time recovery (PITR) overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/pitr",
+        "evidence": "By default, your database retains all versions of its data and schema for one hour. You can increase this time limit to as long as seven days through the `version_retention_period` option."
+      },
+      {
+        "title": "Prevent accidental database deletion",
+        "url": "https://docs.cloud.google.com/spanner/docs/prevent-database-deletion",
+        "evidence": "By default, the deletion protection setting is disabled when you create your new database."
+      }
+    ]
+  },
+  {
+    "id": "data-022",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigtable",
+      "replication",
+      "app-profiles"
+    ],
+    "stem": "A payments company uses a Bigtable instance with two clusters in different zones of `us-east1`. The fraud service writes a flag to a row and must then read the same row back without ever getting an older value. The company also wants the second cluster ready for a manual failover if the first cluster's zone fails. Which app profile configuration should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Multi-cluster routing to both clusters, so that each request goes to the nearest available cluster"
+      },
+      {
+        "id": "B",
+        "text": "Single-cluster routing to the first cluster in all app profiles, changed to the second cluster during a failover"
+      },
+      {
+        "id": "C",
+        "text": "Multi-cluster routing with row-affinity routing, so that the requests for each row go to one cluster"
+      },
+      {
+        "id": "D",
+        "text": "Single-cluster routing for writes to the first cluster, and a separate app profile that reads from the second cluster"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The service needs read-your-writes consistency. Bigtable gives it with single-cluster routing, when all app profiles route to the same cluster. The other cluster stays ready, and you change the routing during a manual failover.",
+    "whyWrong": {
+      "A": "With both clusters in one region, multi-cluster routing can send a read to a cluster that did not get the write yet. Replication is eventually consistent.",
+      "C": "Row-affinity routing raises the rate of read-your-writes consistency, but it does not guarantee it, because requests can still fail over.",
+      "D": "Reads and writes to different clusters are eventually consistent, so the read can return an older value."
+    },
+    "sources": [
+      {
+        "title": "Replication overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/replication-overview",
+        "evidence": "If you use single-cluster routing, Bigtable can provide read-your-writes consistency when replication is enabled."
+      },
+      {
+        "title": "Replication overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/replication-overview",
+        "evidence": "The consistency isn't guaranteed because requests might still fail over for various reasons, including when a cluster is unhealthy, network issues are present, or the cluster has received too many requests."
+      }
+    ]
+  },
+  {
+    "id": "data-023",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "spanner",
+      "autoscaling",
+      "capacity"
+    ],
+    "stem": "A gaming company runs a regional Spanner Enterprise edition instance with a fixed number of nodes. Traffic peaks each evening and drops at night. During the peak, high-priority CPU utilization goes above the recommended maximum, and latency rises. The company wants low latency, payment for extra capacity only when it is needed, and no manual work. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable the Spanner managed autoscaler with minimum and maximum limits and a CPU utilization target"
+      },
+      {
+        "id": "B",
+        "text": "Set a low priority on all requests that the game servers send to the database"
+      },
+      {
+        "id": "C",
+        "text": "Add read-only replicas to the instance configuration in a second region"
+      },
+      {
+        "id": "D",
+        "text": "Add nodes so that the evening peak stays below the recommended maximum at all times"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The load changes during the day, and the company wants to pay for capacity only when needed without manual work. The managed autoscaler adds compute capacity when the load increases and removes it when the load decreases.",
+    "whyWrong": {
+      "B": "Low priority is for batch, maintenance, or analytical work without strict SLOs. The game requests would wait behind other work and get slower.",
+      "C": "Read-only replicas serve reads near users in other regions. They do not add capacity for the regional peak at the lowest cost.",
+      "D": "A larger fixed size keeps latency low, but the company pays for peak capacity all day and night."
+    },
+    "sources": [
+      {
+        "title": "Managed autoscaler",
+        "url": "https://docs.cloud.google.com/spanner/docs/managed-autoscaler",
+        "evidence": "Managed autoscaler either scales up, adding compute capacity to the instance, or it scales down, removing compute capacity from the instance."
+      }
+    ]
+  },
+  {
+    "id": "data-024",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "bigquery",
+      "partitioning",
+      "clustering"
+    ],
+    "stem": "A retailer stores 5 years of sales events in one BigQuery table of 40 TB that is not partitioned. Most queries filter on the `event_date` column for the last 30 days and on `store_id`, which has 4,000 values. The queries use on-demand pricing and cost too much. Which two changes reduce the bytes that these queries scan? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Partition the table by the `event_date` column."
+      },
+      {
+        "id": "B",
+        "text": "Split the data into daily tables named `sales_YYYYMMDD`, and query them with a wildcard."
+      },
+      {
+        "id": "C",
+        "text": "Add a `LIMIT 1000` clause to each query."
+      },
+      {
+        "id": "D",
+        "text": "Cluster the table by the `store_id` column."
+      },
+      {
+        "id": "E",
+        "text": "Buy a slot reservation for the analytics project."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "A date filter on the partitioning column lets BigQuery prune partitions and read fewer bytes. Clustering by `store_id` sorts storage blocks, so a filter on `store_id` scans only the relevant blocks.",
+    "whyWrong": {
+      "B": "Google recommends partitioning over table sharding. Sharded tables add schema, metadata, and permission overhead for each table.",
+      "C": "A LIMIT clause does not change the amount of data that BigQuery reads.",
+      "E": "A reservation changes how you pay for compute. It does not reduce the bytes that queries scan."
+    },
+    "sources": [
+      {
+        "title": "Introduction to partitioned tables",
+        "url": "https://docs.cloud.google.com/bigquery/docs/partitioned-tables",
+        "evidence": "By dividing a large table into smaller partitions, you can improve query performance and control costs by reducing the number of bytes read by a query."
+      },
+      {
+        "title": "Introduction to clustered tables",
+        "url": "https://docs.cloud.google.com/bigquery/docs/clustered-tables",
+        "evidence": "Queries that filter or aggregate by the clustered columns only scan the relevant blocks based on the clustered columns, instead of the entire table or table partition."
+      }
+    ]
+  },
+  {
+    "id": "data-025",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "bigquery",
+      "time-travel",
+      "recovery"
+    ],
+    "stem": "An analyst deleted a BigQuery table by mistake 3 days ago. The dataset uses the default time travel window, and there is no table snapshot or backup. The team must get the table back with its data. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask Cloud Customer Care to recover the table from fail-safe storage"
+      },
+      {
+        "id": "B",
+        "text": "Copy the table as it was before the deletion into a new table with `bq cp`"
+      },
+      {
+        "id": "C",
+        "text": "Restore the dataset with the `UNDROP SCHEMA` statement"
+      },
+      {
+        "id": "D",
+        "text": "Re-create the table from the data in the Cloud Audit Logs entries"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The table was deleted 3 days ago, which is inside the default 7-day time travel window. You can restore a deleted table yourself by copying its data from a point in time before the deletion.",
+    "whyWrong": {
+      "A": "Fail-safe starts only after the time travel window ends. The table is still inside the window, so you restore it yourself.",
+      "C": "`UNDROP SCHEMA` restores a deleted dataset. Only a table was deleted.",
+      "D": "Audit logs record the operations that users ran. They do not contain the table data."
+    },
+    "sources": [
+      {
+        "title": "Restore deleted tables",
+        "url": "https://docs.cloud.google.com/bigquery/docs/restore-deleted-tables",
+        "evidence": "You can restore a deleted table within the time travel window specified for the dataset, including explicit deletions and implicit deletions due to table expiration."
+      },
+      {
+        "title": "Data retention with time travel and fail-safe",
+        "url": "https://docs.cloud.google.com/bigquery/docs/time-travel",
+        "evidence": "You can access changed or deleted data from any point within the time travel window, which covers the past seven days by default."
+      }
+    ]
+  },
+  {
+    "id": "data-026",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigquery",
+      "managed-dr",
+      "disaster-recovery"
+    ],
+    "stem": "A bank keeps its reporting data in BigQuery datasets in `europe-west3`. A regulator requires that the bank can produce reports, including new writes to the tables, within one hour if the whole `europe-west3` region is lost. The bank accepts the loss of up to 30 minutes of recent data. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the datasets to the `EU` multi-region location"
+      },
+      {
+        "id": "B",
+        "text": "Configure cross-region dataset replication to `europe-west4`, and promote the replica during an outage"
+      },
+      {
+        "id": "C",
+        "text": "Use managed disaster recovery with an Enterprise Plus failover reservation and datasets replicated to `europe-west4`"
+      },
+      {
+        "id": "D",
+        "text": "Schedule daily copy jobs of the tables to a dataset in `europe-west4`"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The bank must write in another region during a total outage of the primary region. Managed disaster recovery (Enterprise Plus) gives a five-minute RTO after you start a failover and aims to keep the secondary replica within 15 minutes of the primary.",
+    "whyWrong": {
+      "A": "A multi-region location does not provide cross-region replication or regional redundancy, so a regional outage still stops the data.",
+      "B": "You cannot promote the secondary replica during a total outage of the primary region.",
+      "D": "Daily copies can lose up to a day of data, which is more than the 30 minutes that the bank accepts."
+    },
+    "sources": [
+      {
+        "title": "Cross-region dataset replication",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-replication",
+        "evidence": "Cross-region replication is not intended for use as a disaster recovery plan during a total-region outage. In the case of a total region outage in the primary replica's region, you cannot promote the secondary replica."
+      },
+      {
+        "title": "Managed disaster recovery",
+        "url": "https://docs.cloud.google.com/bigquery/docs/managed-disaster-recovery",
+        "evidence": "Managed disaster recovery has a five-minute RTO after you initiate a failover."
+      }
+    ]
+  },
+  {
+    "id": "data-027",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "compute-engine",
+      "snapshots",
+      "instant-snapshots"
+    ],
+    "stem": "A company runs a stateful application on a Compute Engine VM with a Hyperdisk Balanced boot disk and one Hyperdisk Balanced data disk in `us-central1-a`. The company must recover from data corruption or deletion with an RPO of 1 hour, even if `us-central1` is unavailable. Before each monthly OS patch, the team also wants a restore point that it can restore in minutes if the patch fails. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Asynchronous Replication of the data disk to a secondary disk in `us-east1`."
+      },
+      {
+        "id": "B",
+        "text": "Attach a snapshot schedule that creates standard snapshots every hour in the `us` multi-region."
+      },
+      {
+        "id": "C",
+        "text": "Create a machine image of the VM every day."
+      },
+      {
+        "id": "D",
+        "text": "Create instant snapshots of the boot disk and the data disk before each patch."
+      },
+      {
+        "id": "E",
+        "text": "Change the data disk to Hyperdisk Balanced High Availability."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Hourly standard snapshots give a 1-hour RPO, and a multi-region storage location keeps them available if the region fails. An OS patch changes the boot disk. Instant snapshots of the boot and data disks are in-place restore points for fast rollback after failed software upgrades, which fits the patch requirement.",
+    "whyWrong": {
+      "A": "Replication copies corruption and deletions to the secondary disk, so it does not protect against them.",
+      "C": "A daily machine image gives an RPO of up to 24 hours, which misses the 1-hour RPO.",
+      "E": "A regional disk protects only against a zone outage, and it replicates corruption to both zones."
+    },
+    "sources": [
+      {
+        "title": "Data protection options for disks and instances",
+        "url": "https://docs.cloud.google.com/compute/docs/disks/data-protection",
+        "evidence": "We recommend scheduling hourly standard snapshots. If you require daily snapshots, consider scheduling snapshots every 6 hours."
+      },
+      {
+        "title": "About instant snapshots",
+        "url": "https://docs.cloud.google.com/compute/docs/disks/instant-snapshots",
+        "evidence": "You can back up both boot and non-boot disks with instant snapshots."
+      },
+      {
+        "title": "Data protection options for disks and instances",
+        "url": "https://docs.cloud.google.com/compute/docs/disks/data-protection",
+        "evidence": "However, replication doesn't protect against data corruption, user error, or malicious attacks."
+      }
+    ]
+  },
+  {
+    "id": "data-028",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "backup-and-dr",
+      "backup-vault",
+      "ransomware"
+    ],
+    "stem": "A hospital's security team is worried that an attacker with stolen project owner credentials could delete its Compute Engine VMs and their backups. The hospital must keep backups of its VMs and Cloud SQL instances that no one, including project owners, can delete for 30 days. The team wants a managed service with central management of backup policies. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create snapshot schedules in each project, and remove the delete permission from most users"
+      },
+      {
+        "id": "B",
+        "text": "Use Backup and DR Service backup plans that store backups in a backup vault with a locked 30-day enforced retention"
+      },
+      {
+        "id": "C",
+        "text": "Export the backups to a Cloud Storage bucket with Object Versioning, and restrict the bucket with IAM"
+      },
+      {
+        "id": "D",
+        "text": "Set the Cloud SQL automated backup retention to 30 days, and enable deletion protection on the instances"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The backups must be indelible, even for project owners. A backup vault with an enforced retention period makes backups immutable until the period ends. After the lock takes effect, no one, not even a project owner, can decrease the retention period.",
+    "whyWrong": {
+      "A": "A project owner can grant the permission again and delete the snapshots, so IAM alone does not make them indelible.",
+      "C": "A project owner can delete object versions or change the bucket settings, so versioning does not make the backups indelible.",
+      "D": "A project owner can turn off deletion protection. Also, with standard backups, Cloud SQL deletes the backups with the instance unless they are retained."
+    },
+    "sources": [
+      {
+        "title": "Backup vaults for immutable and indelible backups",
+        "url": "https://docs.cloud.google.com/backup-disaster-recovery/docs/concepts/backup-vault",
+        "evidence": "After the effective date, no one (not even a Project Owner) can decrease the retention period."
+      },
+      {
+        "title": "Backup vaults for immutable and indelible backups",
+        "url": "https://docs.cloud.google.com/backup-disaster-recovery/docs/concepts/backup-vault",
+        "evidence": "Once configured, backups are completely immutable—they cannot be manually deleted by you, any other user, or Google until your specified duration has passed."
+      }
+    ]
+  },
+  {
+    "id": "data-029",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "firestore",
+      "pitr",
+      "recovery"
+    ],
+    "stem": "A retail app uses a Firestore database with point-in-time recovery (PITR) enabled and a daily backup schedule. At 10:30, a faulty deployment started to overwrite product prices with wrong values. The team found the problem at 12:00. The team needs the product data as it was at 10:29, with as little data loss as possible. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Restore the most recent daily backup to a new database"
+      },
+      {
+        "id": "B",
+        "text": "Run a managed export to Cloud Storage now, and import it into a new database"
+      },
+      {
+        "id": "C",
+        "text": "Add a TTL policy that deletes the documents written after 10:30"
+      },
+      {
+        "id": "D",
+        "text": "Clone the database to a new database from the PITR data at 10:29"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "PITR keeps one version per minute for the last 7 days. You can clone or export PITR data at a whole-minute timestamp, so 10:29 is available with no extra data loss.",
+    "whyWrong": {
+      "A": "A daily backup can be almost a day old, so it loses more data than PITR, which keeps a version for each minute.",
+      "B": "An export now copies the wrong prices that are already in the database.",
+      "C": "A TTL policy deletes documents after an expiry time. It does not restore the earlier values of documents."
+    },
+    "sources": [
+      {
+        "title": "Point-in-time recovery (PITR) overview",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/pitr",
+        "evidence": "You can clone or export PITR data where the timestamp is a whole minute timestamp within the past seven days, but not earlier than the `earliestVersionTime`."
+      }
+    ]
+  },
+  {
+    "id": "data-030",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "signed-url",
+      "access"
+    ],
+    "stem": "A photo-printing company stores customer orders in a private Cloud Storage bucket with uniform bucket-level access. An external print partner must download specific order files. The partner's staff do not have Google accounts, and each file must be available for only 2 hours. The bucket must stay private. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Storage Object Viewer role on the bucket to `allUsers` for 2 hours"
+      },
+      {
+        "id": "B",
+        "text": "Create HMAC keys for a service account, and give the keys to the partner"
+      },
+      {
+        "id": "C",
+        "text": "Create a signed URL with a 2-hour expiration for each file, and send the URLs to the partner"
+      },
+      {
+        "id": "D",
+        "text": "Create a Google group for the partner, and grant it the Storage Object Viewer role"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The partner has no Google accounts, and access must be limited to specific files for 2 hours. A signed URL gives time-limited access to a specific resource, and anyone who has the URL can use it until it expires.",
+    "whyWrong": {
+      "A": "A grant to `allUsers` makes the files public, which breaks the requirement to keep the bucket private.",
+      "B": "HMAC keys are long-lived credentials. They give access beyond specific files and beyond 2 hours.",
+      "D": "The partner's staff have no Google accounts to add to a group, and the role gives access to every object without a time limit."
+    },
+    "sources": [
+      {
+        "title": "Signed URLs",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+        "evidence": "In some scenarios, you might not want to require your users to have their own account in order to access Cloud Storage, but you still want to control access using your application-specific logic."
+      },
+      {
+        "title": "Signed URLs",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+        "evidence": "A signed URL is a URL that provides limited permission and time to make a request."
+      }
+    ]
+  },
+  {
+    "id": "data-031",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-storage",
+      "turbo-replication",
+      "dual-region"
+    ],
+    "stem": "A broadcaster stores new video uploads in Cloud Storage. The data must be in two specific EU regions. If one region fails, applications must keep reading the data through the same bucket name with no changes. The broadcaster needs an RPO of 15 minutes for newly written objects of any size. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a bucket in the `EU` multi-region with default replication"
+      },
+      {
+        "id": "B",
+        "text": "Create a regional bucket in each region, and enable cross-bucket replication between them"
+      },
+      {
+        "id": "C",
+        "text": "Create a dual-region bucket in the two regions with default replication, and add Rapid Cache in each region"
+      },
+      {
+        "id": "D",
+        "text": "Create a dual-region bucket in the two regions, and enable turbo replication"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The data must be in two chosen regions behind one bucket name, with a 15-minute RPO for objects of any size. A dual-region bucket serves data from the available region, and turbo replication is designed to replicate 100% of new objects within 15 minutes.",
+    "whyWrong": {
+      "A": "You cannot choose the regions of a multi-region, and default replication targets 99.9% of new objects within one hour, not 15 minutes.",
+      "B": "Two buckets have different names, so applications must switch buckets. Cross-bucket replication also has no supported upper bound on delay.",
+      "C": "Rapid Cache is a read cache. It does not change the default replication target of one hour."
+    },
+    "sources": [
+      {
+        "title": "Data availability and durability",
+        "url": "https://docs.cloud.google.com/storage/docs/availability-durability",
+        "evidence": "When enabled, turbo replication is designed to replicate 100% of newly written objects to the two regions that constitute a dual-region within the recovery point objective of 15 minutes, regardless of object size."
+      },
+      {
+        "title": "Data availability and durability",
+        "url": "https://docs.cloud.google.com/storage/docs/availability-durability",
+        "evidence": "Default replication in Cloud Storage is designed to provide redundancy across regions for 99.9% of newly written objects within a target of one hour and 100% of newly written objects within a target of 12 hours."
+      }
+    ]
+  }
+]

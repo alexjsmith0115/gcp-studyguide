@@ -1,0 +1,9 @@
+MachineId,DiskLabel,SizeInGib,UsedInGib,StorageTypeLabel
+vm-101,/dev/sda,100,40,GPT
+vm-102,/dev/sda,100,38,GPT
+vm-201,/dev/sda,200,90,GPT
+vm-301,/dev/sda,100,30,GPT
+vm-301,/dev/sdb,1900,1370,GPT
+vm-401,C:,100,45,GPT
+vm-401,D:,3900,3055,GPT
+vm-501,/dev/sda,500,120,GPT
