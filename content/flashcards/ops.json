@@ -238,12 +238,12 @@
     "note": "4.1-testing-and-troubleshooting",
     "kind": "term",
     "front": "Error Reporting",
-    "back": "A service that groups application error events by their root cause, so that you can identify, prioritize, and triage issues. It does not analyze log entries that are stored in log buckets with CMEK enabled.",
+    "back": "A service that aggregates application error events by their root cause, so that you can identify, prioritize, and triage issues. It does not analyze log entries that are stored in log buckets with CMEK enabled.",
     "aws": null,
     "source": {
       "title": "Error Reporting overview",
       "url": "https://docs.cloud.google.com/error-reporting/docs/grouping-errors",
-      "evidence": "Error Reporting aggregates and groups application error events by their root cause, helping you identify, prioritize, and triage issues across your cloud services."
+      "evidence": "Error Reporting lets you identify, prioritize, and triage issues across your cloud services by aggregating application error events by their root cause."
     }
   },
   {
