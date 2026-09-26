@@ -575,7 +575,7 @@
     "id": "ops-f046",
     "note": "6.2-observability",
     "kind": "concept",
-    "front": "What must a Compute Engine VM have to report memory and process metrics?",
+    "front": "What must a Compute Engine VM have to report memory metrics?",
     "back": "The Ops Agent, the primary agent for Compute Engine telemetry. Without it, you get only basic VM metrics, such as CPU utilization and network traffic.",
     "aws": null,
     "source": {

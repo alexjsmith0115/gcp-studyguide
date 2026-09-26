@@ -771,7 +771,7 @@
   {
     "term": "Cloud NGFW",
     "expansion": "Cloud Next Generation Firewall",
-    "def": "The distributed, stateful firewall service for VMs and supported load balancers (formerly Cloud Firewall). It has Essentials, Standard, and Enterprise tiers. Google Cloud bills traffic at the tier of the features that the rule uses.",
+    "def": "The distributed, stateful firewall service for VMs and supported load balancers. It has Essentials, Standard, and Enterprise tiers. Google Cloud bills traffic at the tier of the features that the rule uses.",
     "aws": "AWS Network Firewall",
     "match": [
       "Cloud NGFW",
@@ -1410,7 +1410,7 @@
   },
   {
     "term": "Gemini Enterprise",
-    "def": "An intranet search, AI assistant, and agentic platform for employees, not a developer platform. Search results follow each user's permissions, and prebuilt connectors reach systems such as Jira and SharePoint. Formerly Google Agentspace.",
+    "def": "An intranet search, AI assistant, and agentic platform for employees. Search results follow each user's permissions, and prebuilt connectors reach systems such as Jira and SharePoint. Formerly Google Agentspace.",
     "match": [
       "Gemini Enterprise",
       "Google Agentspace",
@@ -1816,7 +1816,7 @@
   },
   {
     "term": "Local SSD",
-    "def": "The fastest block storage, for scratch data and caches only. Data is lost on preemption or a forced stop, and you cannot back it up with snapshots, clones, or machine images.",
+    "def": "The fastest block storage, for scratch data and caches only. By default, a stop, suspend, or preemption discards the data, and you cannot back it up with snapshots, clones, or machine images.",
     "aws": "Amazon EC2 instance store",
     "match": [
       "Local SSD"
@@ -2226,7 +2226,7 @@
   },
   {
     "term": "Ops Agent",
-    "def": "The primary agent for Compute Engine VMs. Without it, you get only basic VM metrics such as CPU and network, but no memory or process metrics. It can also scrape Prometheus metrics.",
+    "def": "The primary agent for Compute Engine VMs. Without it, you get only basic VM metrics such as CPU and network, and no memory metrics. It can also scrape Prometheus metrics.",
     "aws": "CloudWatch agent",
     "match": [
       "Ops Agent"
@@ -2272,7 +2272,7 @@
   },
   {
     "term": "Partner Interconnect",
-    "def": "A connection to Google through a service provider, with 50 Mbps to 50 Gbps for each VLAN attachment. Use it without colocation presence. Its SLA covers only Google to the provider. Add IPsec for compliance requirements.",
+    "def": "A connection to Google through a service provider, with VLAN attachments that start at 50 Mbps. Use it without colocation presence. Its SLA covers only Google to the provider. Add IPsec for compliance requirements.",
     "match": [
       "Partner Interconnect"
     ],
@@ -2760,7 +2760,7 @@
   },
   {
     "term": "serverless NEG",
-    "def": "A NEG that connects an Application Load Balancer to Cloud Run, Cloud Run functions, or App Engine. It does not support health checks; use outlier detection. With NEGs in several regions, traffic goes to the closest region.",
+    "def": "A NEG that connects an Application Load Balancer to Cloud Run, Cloud Run functions, or App Engine. It does not support health checks. Some load balancers offer outlier detection instead. With NEGs in several regions, traffic goes to the closest region.",
     "match": [
       "serverless NEG",
       "serverless NEGs"
@@ -2873,7 +2873,7 @@
   {
     "term": "SLSA",
     "expansion": "Supply-chain Levels for Software Artifacts",
-    "def": "A framework that describes software supply chain threats from source to deployment. Cloud Build can generate SLSA level 3 build provenance for artifacts that it stores in Artifact Registry.",
+    "def": "A framework that describes threats to source code, builds, and dependencies in the software supply chain. Cloud Build can generate SLSA level 3 build provenance for artifacts that it stores in Artifact Registry.",
     "match": [
       "SLSA"
     ],

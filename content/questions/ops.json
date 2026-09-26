@@ -486,7 +486,7 @@
     "answer": [
       "A"
     ],
-    "explanation": "Basic VM metrics such as CPU and network traffic are available without an agent. Memory and process metrics are available only after you install the Ops Agent, the primary agent for Compute Engine telemetry.",
+    "explanation": "Basic VM metrics such as CPU and network traffic are available without an agent. Memory metrics are available only after you install the Ops Agent, the primary agent for Compute Engine telemetry.",
     "whyWrong": {
       "B": "The CPU data shows that Cloud Monitoring already works. The missing data comes from inside the guest OS.",
       "C": "A metrics scope changes which projects you can view. It does not collect new metrics.",

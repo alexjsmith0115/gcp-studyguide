@@ -1150,7 +1150,7 @@
       },
       {
         "id": "B",
-        "text": "Set the ingress setting of the service to Internal and Cloud Load Balancing."
+        "text": "Set the ingress setting of the service to Internal and Cloud Load Balancers."
       },
       {
         "id": "C",
@@ -1164,7 +1164,7 @@
     "answer": [
       "B"
     ],
-    "explanation": "The Internal and Cloud Load Balancing setting accepts internet requests only through the external Application Load Balancer. Direct internet requests to the `run.app` URL are not allowed, so all internet traffic passes **Cloud Armor**, and the app **stays public** through the load balancer.",
+    "explanation": "The Internal and Cloud Load Balancers setting accepts internet requests only through the external Application Load Balancer. Direct internet requests to the `run.app` URL are not allowed, so all internet traffic passes **Cloud Armor**, and the app **stays public** through the load balancer.",
     "whyWrong": {
       "A": "Internal allows internal Application Load Balancers but not the external Application Load Balancer, so the public app stops working.",
       "C": "IAM authentication applies on every ingress path. Without public invoker access, anonymous requests through the load balancer also fail, so the public app breaks.",
@@ -1266,7 +1266,7 @@
       },
       {
         "id": "E",
-        "text": "Set the ingress setting of the service to Internal and Cloud Load Balancing."
+        "text": "Set the ingress setting of the service to Internal and Cloud Load Balancers."
       }
     ],
     "answer": [

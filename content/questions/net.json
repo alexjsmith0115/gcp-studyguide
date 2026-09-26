@@ -858,7 +858,7 @@
     "answer": [
       "D"
     ],
-    "explanation": "Two requirements decide the answer: the data center cannot reach a colocation facility, and the company needs less than a full 10-Gbps connection. Partner Interconnect meets both. Its VLAN attachments go from 50 Mbps to 50 Gbps, and the traffic does not cross the public internet.",
+    "explanation": "Two requirements decide the answer: the data center cannot reach a colocation facility, and the company needs less than a full 10-Gbps connection. Partner Interconnect meets both. Its VLAN attachments start at 50 Mbps, and the traffic does not cross the public internet.",
     "whyWrong": {
       "A": "Dedicated Interconnect needs your routers to meet Google in a colocation facility. A 10-Gbps circuit also gives more capacity than the company needs.",
       "B": "HA VPN sends its encrypted traffic over the public internet, which the requirement does not allow.",
