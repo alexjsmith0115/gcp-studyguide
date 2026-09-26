@@ -203,6 +203,9 @@ code, kbd, pre { font-family: var(--font-mono); }
 .crumbs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-3); }
 .crumbs a { color: var(--ink-2); text-decoration: none; }
 .crumbs a:hover { color: var(--accent-text); text-decoration: underline; }
+.crumbs .return-link { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--accent-text); }
+.crumbs .return-link:only-child { margin-left: 0; }
+.crumbs .return-link .ic { width: 15px; height: 15px; }
 
 .titleblock {
   display: grid;

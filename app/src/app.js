@@ -116,7 +116,7 @@ function derived() {
 
 // ---------- routing ----------
 const ui = {
-  routeStr: "home", route: { name: "home", id: null }, stack: [],
+  routeStr: "home", route: { name: "home", id: null }, stack: [], origin: null,
   quiz: null, exam: null, flash: null, caseTab: {}, practiceCount: 10, cardCount: 20, browseQ: "", labNoOrg: false, resetStep: 0, importMsg: "",
 };
 const VIEWS = {};
@@ -124,14 +124,23 @@ function parseRoute(str) {
   const [name, ...rest] = String(str || "home").replace(/^#?\/?/, "").split("/");
   return { name: name || "home", id: rest.length ? decodeURIComponent(rest.join("/")) : null };
 }
+// A quiz, flashcard session, lab, or card list opened from a study page remembers that page,
+// so those views can link back to it and the reader lands at the same scroll position.
+const STUDY_ROUTES = new Set(["note", "objective", "ref", "glossary"]);
+const AID_ROUTES = new Set(["quiz", "flash", "lab", "browse"]);
 function go(path, { replace = false, keepScroll = false } = {}) {
+  const to = parseRoute(path).name;
+  let restoreY = null;
+  if (STUDY_ROUTES.has(ui.route.name) && AID_ROUTES.has(to) && ui.routeStr) ui.origin = { route: ui.routeStr, y: Math.round(window.scrollY) };
+  else if (!AID_ROUTES.has(to)) { if (ui.origin?.route === path) restoreY = ui.origin.y; ui.origin = null; }
   if (!replace && ui.routeStr && ui.routeStr !== path) ui.stack.push(ui.routeStr);
   if (ui.stack.length > 50) ui.stack.shift();
   ui.routeStr = path;
   ui.route = parseRoute(path);
   lsSetStr("pca-route", path);
   render();
-  if (!keepScroll) window.scrollTo(0, 0);
+  if (restoreY != null) window.scrollTo(0, restoreY);
+  else if (!keepScroll) window.scrollTo(0, 0);
 }
 function back(fallback = "home") {
   const prev = ui.stack.pop();
@@ -192,7 +201,21 @@ function titleBlock({ sheet, title, cells }) {
   </div>`;
 }
 function crumbs(parts) {
-  return `<nav class="crumbs" aria-label="Breadcrumb">${parts.map(([label, route], i) => (route ? `<a href="#/${route}" data-route="${route}">${esc(label)}</a>` : `<span>${esc(label)}</span>`) + (i < parts.length - 1 ? '<span aria-hidden="true">/</span>' : "")).join("")}</nav>`;
+  return `<nav class="crumbs" aria-label="Breadcrumb">${parts.map(([label, route], i) => (route ? `<a href="#/${route}" data-route="${route}">${esc(label)}</a>` : `<span>${esc(label)}</span>`) + (i < parts.length - 1 ? '<span aria-hidden="true">/</span>' : "")).join("")}${returnLink()}</nav>`;
+}
+function originLabel() {
+  if (!ui.origin) return "";
+  const { name, id } = parseRoute(ui.origin.route);
+  if (name === "note") return NOTE[id] ? shortTitle(NOTE[id].title) : "";
+  if (name === "objective") return OBJ[id] ? `${id} ${shortTitle(OBJ[id].title)}` : "";
+  if (name === "ref") return REF[id]?.title || "";
+  if (name === "glossary") return "the glossary";
+  return "";
+}
+// The link back to the study page this view was opened from; empty when there is none.
+function returnLink(cls = "return-link") {
+  const label = originLabel();
+  return label ? `<a class="${cls}" href="#/${ui.origin.route}" data-route="${ui.origin.route}">${icon("back")}Back to ${esc(label)}</a>` : "";
 }
 function meter(frac) { return `<div class="meter" role="img" aria-label="${Math.round(frac * 100)} percent"><i style="width:${Math.max(0, Math.min(1, frac)) * 100}%"></i></div>`; }
 function objMinutes(id) { return (NOTES_BY_OBJ[id] || []).reduce((s, n) => s + n.minutes, 0); }
@@ -695,6 +718,7 @@ VIEWS.quiz = function () {
   const flagged = !!qstats()[qid]?.fl;
   const showCase = q.caseStudy && z.showCase;
   return `<div class="page quiz${showCase ? "" : " narrow"}">
+    ${ui.origin ? `<nav class="crumbs">${returnLink()}</nav>` : ""}
     <div class="quiz-bar">
       <span class="pos">${z.i + 1} / ${z.qids.length}</span>
       <div class="progress-line" aria-hidden="true"><i style="width:${(answered / z.qids.length) * 100}%"></i></div>
@@ -732,7 +756,7 @@ function quizSummary(z) {
     ${ids.length ? `<section class="panel"><h2>By objective</h2><div class="scroll-x"><table class="data-table"><thead><tr><th>Objective</th><th class="n">Right</th><th></th></tr></thead><tbody>${Object.entries(byObj).sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })).map(([o, v]) => `<tr><td><span class="objid">${o}</span> ${esc(OBJ[o].title)}</td><td class="n">${v.r}/${v.t}</td><td class="n"><a href="#/objective/${o}" data-route="objective/${o}">Study</a></td></tr>`).join("")}</tbody></table></div></section>` : ""}
     ${wrong.length ? `<section class="panel"><h2>Missed</h2><div class="page-list">${wrong.map((id) => `<div class="page-item"><span class="unread">${icon("x")}</span><span class="t">${esc(stemText(Q[id]))}</span><span class="objid">${Q[id].objective}</span></div>`).join("")}</div>
       <div class="row"><button type="button" class="btn primary" data-action="retry-missed">Try the missed questions again</button></div></section>` : ""}
-    <div class="row"><a class="btn" href="#/practice" data-route="practice">Back to practice</a><a class="btn ghost" href="#/home" data-route="home">Dashboard</a></div>
+    <div class="row">${returnLink("btn primary")}<a class="btn" href="#/practice" data-route="practice">Back to practice</a><a class="btn ghost" href="#/home" data-route="home">Dashboard</a></div>
   </div>`;
 }
 function stemText(q) {
@@ -803,6 +827,7 @@ VIEWS.flash = function () {
   const now = Date.now();
   const nextIn = (ok) => { const days = Math.round((applyAnswer(st, ok, now).d - now) / DAY); return days ? `Next in ${plural(days, "day")}` : "Due again now"; };
   return `<div class="page narrow quiz">
+    ${ui.origin ? `<nav class="crumbs">${returnLink()}</nav>` : ""}
     <div class="quiz-bar">
       <span class="pos">${f.i + 1} / ${f.ids.length}</span>
       <div class="progress-line" aria-hidden="true"><i style="width:${(graded / f.ids.length) * 100}%"></i></div>
@@ -843,7 +868,7 @@ function flashSummary(f) {
     <div class="page-head"><div><div class="eyebrow">${esc(f.label)}</div><h1>${ids.length ? `${known} of ${plural(ids.length, "card")} known` : "No cards graded"}</h1><p>${!ids.length ? "" : missed.length ? "The cards you missed are due again now. They stay in spaced review until you know them." : "You knew every card. Each one comes back after a longer interval."}</p></div></div>
     ${missed.length ? `<section class="panel"><h2>Missed</h2><div class="fc-list">${missed.map((id) => cardItem(CARD[id])).join("")}</div>
       <div class="row"><button type="button" class="btn primary" data-action="retry-cards">Review the missed cards again</button></div></section>` : ""}
-    <div class="row"><a class="btn" href="#/cards" data-route="cards">Back to flashcards</a><a class="btn ghost" href="#/home" data-route="home">Dashboard</a></div>
+    <div class="row">${returnLink("btn primary")}<a class="btn" href="#/cards" data-route="cards">Back to flashcards</a><a class="btn ghost" href="#/home" data-route="home">Dashboard</a></div>
   </div>`;
 }
 
@@ -1167,7 +1192,7 @@ VIEWS.lab = function ({ id }) {
       <article class="prose">${l.html}${l.files.length ? `<h2>Files in this lab</h2>${l.files.map((f) => `<details><summary>${esc(f.name)}</summary>${f.html}</details>`).join("")}` : ""}</article>
       ${l.toc.length ? `<nav class="toc" aria-label="On this page"><span class="eyebrow">On this page</span>${l.toc.map((t) => `<a href="#${esc(t.id)}">${esc(t.text)}</a>`).join("")}</nav>` : ""}
     </div>
-    <div class="reader-foot panel"><label class="check"><input type="checkbox" data-action="lab-done" data-id="${id}"${done ? " checked" : ""}>I finished this lab and ran the cleanup</label><a class="btn ghost" href="#/labs" data-route="labs">All labs</a></div>
+    <div class="reader-foot panel"><label class="check"><input type="checkbox" data-action="lab-done" data-id="${id}"${done ? " checked" : ""}>I finished this lab and ran the cleanup</label><div class="row">${returnLink("btn")}<a class="btn ghost" href="#/labs" data-route="labs">All labs</a></div></div>
   </div>`;
 };
 
@@ -1542,12 +1567,12 @@ Store.onChange((kind) => {
 // ---------- boot ----------
 // The open quiz or mock exam survives a reload (a republish reloads the page).
 function saveSession() {
-  lsSetStr("pca-session", JSON.stringify({ quiz: ui.quiz, exam: ui.exam, flash: ui.flash, caseTab: ui.caseTab, practiceCount: ui.practiceCount, cardCount: ui.cardCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter }));
+  lsSetStr("pca-session", JSON.stringify({ quiz: ui.quiz, exam: ui.exam, flash: ui.flash, origin: ui.origin, caseTab: ui.caseTab, practiceCount: ui.practiceCount, cardCount: ui.cardCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter }));
 }
 function start() {
   let saved = {};
   try { saved = JSON.parse(lsGetStr("pca-session") || "{}") || {}; } catch { saved = {}; }
-  for (const k of ["quiz", "exam", "flash", "caseTab", "practiceCount", "cardCount", "labNoOrg", "resultFilter"]) if (saved[k] != null) ui[k] = saved[k];
+  for (const k of ["quiz", "exam", "flash", "origin", "caseTab", "practiceCount", "cardCount", "labNoOrg", "resultFilter"]) if (saved[k] != null) ui[k] = saved[k];
   if (ui.flash && !(ui.flash.ids || []).every((id) => CARD[id])) ui.flash = null; // a card left the deck in a new build
   let initial = lsGetStr("pca-route") || "home";
   const r = parseRoute(initial);
