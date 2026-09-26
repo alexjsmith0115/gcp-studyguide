@@ -28,6 +28,8 @@ const CARDS = DATA.cards || [];
 const CARD = Object.fromEntries(CARDS.map((c) => [c.id, c]));
 const CARDS_BY_OBJ = groupBy(CARDS, (c) => c.objective);
 const CARDS_BY_NOTE = groupBy(CARDS, (c) => c.note);
+const GLOSSARY = DATA.glossary || [];
+const GLOSS = Object.fromEntries(GLOSSARY.map((g) => [g.id, g]));
 
 // ---------- helpers ----------
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -142,7 +144,7 @@ const NAV = [
   ["home", "Dashboard", "home"], ["study", "Study guide", "book"], ["practice", "Practice", "target"], ["cards", "Flashcards", "cards"],
   ["mock", "Mock exam", "timer"], ["cases", "Case studies", "case"], ["labs", "Labs", "flask"], ["progress", "Progress", "chart"],
 ];
-const NAV_OF = { objective: "study", note: "study", ref: "study", quiz: "practice", flash: "cards", browse: "cards", exam: "mock", result: "mock", case: "cases", lab: "labs" };
+const NAV_OF = { objective: "study", note: "study", ref: "study", glossary: "study", quiz: "practice", flash: "cards", browse: "cards", exam: "mock", result: "mock", case: "cases", lab: "labs" };
 const NAV_COUNT_TITLE = { practice: "Questions due for review", cards: "Flashcards due for review", mock: "Mock exam in progress" };
 function renderNav() {
   const d = derived();
@@ -172,6 +174,8 @@ function toast(msg) {
 function render() {
   const view = VIEWS[ui.route.name] || VIEWS.home;
   stopExamTimer();
+  hideGloss();
+  applyPrefs();
   $("#main").innerHTML = view(ui.route) || "";
   renderNav();
   renderSaveState();
@@ -423,10 +427,14 @@ VIEWS.study = function () {
         }).join("")}</div>
       </section>`;
     }).join("")}
-    ${REFS.length ? `<section class="section-block" aria-labelledby="sec-ref">
-      <div class="section-head"><span class="n">${icon("book")}</span><h2 id="sec-ref">Reference</h2><span class="w">${plural(REFS.length, "page")}</span></div>
+    ${REFS.length || GLOSSARY.length ? `<section class="section-block" aria-labelledby="sec-ref">
+      <div class="section-head"><span class="n">${icon("book")}</span><h2 id="sec-ref">Reference</h2><span class="w">${plural(REFS.length + (GLOSSARY.length ? 1 : 0), "page")}</span></div>
       <p class="hint">Product names change often, and exam questions can use the old names.</p>
-      <div class="obj-list">${REFS.map((r) => `<a class="obj-row" href="#/ref/${r.id}" data-route="ref/${r.id}">
+      <div class="obj-list">${GLOSSARY.length ? `<a class="obj-row" href="#/glossary" data-route="glossary">
+        <span class="id">Ref</span>
+        <span><span class="title">Glossary</span><span class="meta"><span>${plural(GLOSSARY.length, "term")}</span><span>Acronyms and key terms, with AWS equivalents</span></span></span>
+        <span class="end">${icon("arrow")}</span>
+      </a>` : ""}${REFS.map((r) => `<a class="obj-row" href="#/ref/${r.id}" data-route="ref/${r.id}">
         <span class="id">Ref</span>
         <span><span class="title">${esc(r.title)}</span><span class="meta"><span>${Math.max(2, Math.round(r.words / 200))} min</span></span></span>
         <span class="end">${icon("arrow")}</span>
@@ -448,6 +456,48 @@ VIEWS.ref = function ({ id }) {
     <div class="reader-foot panel"><a class="btn ghost" href="#/study" data-route="study">Back to the study guide</a></div>
   </div>`;
 };
+
+// ---------- glossary ----------
+const glossLetter = (g) => (/^[a-z]/i.test(g.term) ? g.term[0].toUpperCase() : "#");
+function awsLine(g) { return g.aws ? `<div class="gcard-aws"><span class="aws-tag">AWS</span><span>${esc(g.aws)}</span></div>` : ""; }
+
+VIEWS.glossary = function () {
+  const groups = groupBy(GLOSSARY, glossLetter);
+  const letters = Object.keys(groups).sort((a, b) => (a === "#") - (b === "#") || a.localeCompare(b));
+  return `<div class="page narrow">
+    ${crumbs([["Study guide", "study"], ["Reference", null], ["Glossary", null]])}
+    <div class="page-head"><div><h1>Glossary</h1><p>${plural(GLOSSARY.length, "acronym and key term", "acronyms and key terms")} from the notes, with AWS equivalents. In the guide, a dotted underline marks a term. Point at it, or tap it, to see its definition.</p></div></div>
+    <div class="gloss-tools">
+      <div class="field"><label for="gloss-filter" class="sr-only">Filter terms</label><input type="search" id="gloss-filter" data-input="gloss-filter" placeholder="Filter: type a term, an acronym, or an AWS service" autocomplete="off" spellcheck="false"></div>
+      <nav class="gloss-letters" aria-label="Jump to letter">${letters.map((l) => `<a href="#gl-${l === "#" ? "num" : l}">${l}</a>`).join("")}</nav>
+    </div>
+    ${letters.map((l) => `<section class="gloss-group" id="gl-${l === "#" ? "num" : l}" aria-label="${l}">
+      <h2>${l}</h2>
+      <dl class="gloss-list">${groups[l].map((g) => `<div class="gloss-item" data-find="${esc([g.term, g.expansion, g.def, g.aws].join(" ").toLowerCase())}">
+        <dt><b>${esc(g.term)}</b>${g.expansion ? `<span>${esc(g.expansion)}</span>` : ""}</dt>
+        <dd><span>${esc(g.def)}</span>${awsLine(g)}${g.note && NOTE[g.note] ? `<a class="note-link" href="#/note/${g.note}" data-route="note/${g.note}">Notes: ${esc(NOTE[g.note].title)}</a>` : ""}</dd>
+      </div>`).join("")}</dl>
+    </section>`).join("")}
+    <p class="empty" id="gloss-none" hidden>No term matches this filter.</p>
+  </div>`;
+};
+
+function filterGlossary(text) {
+  const q = text.trim().toLowerCase();
+  let shown = 0;
+  for (const group of document.querySelectorAll(".gloss-group")) {
+    let n = 0;
+    for (const item of group.querySelectorAll(".gloss-item")) {
+      const hit = !q || item.dataset.find.includes(q);
+      item.hidden = !hit;
+      if (hit) n++;
+    }
+    group.hidden = n === 0;
+    shown += n;
+  }
+  const none = document.getElementById("gloss-none");
+  if (none) none.hidden = shown > 0;
+}
 
 VIEWS.objective = function ({ id }) {
   const o = OBJ[id];
@@ -476,7 +526,7 @@ VIEWS.objective = function ({ id }) {
     </section>
     <section class="panel">
       <h2>What the exam guide lists</h2>
-      ${o.considerations.length ? `<ul class="guide-list">${o.considerations.map((c) => `<li><span>${esc(c)}</span></li>`).join("")}</ul>` : `<p class="muted">The exam guide lists this objective without sub-bullets.</p>`}
+      ${o.considerations.length ? `<ul class="guide-list">${o.considerations.map((c, i) => `<li><span>${o.considerationsHtml?.[i] ?? esc(c)}</span></li>`).join("")}</ul>` : `<p class="muted">The exam guide lists this objective without sub-bullets.</p>`}
       <p class="hint">Verbatim from the <a class="ext" href="${esc(EXAM.guideUrl)}" target="_blank" rel="noopener">official exam guide</a>.</p>
     </section>
     <section class="panel">
@@ -917,7 +967,7 @@ VIEWS.exam = function () {
   const showCase = q.caseStudy && ui.exam.showCase;
   const remaining = m.minutes ? m.minutes * 60 - ui.exam.elapsed : null;
   const unanswered = m.qids.length - answered;
-  return `<div class="page quiz${showCase ? "" : " narrow"}">
+  return `<div class="page quiz no-gloss${showCase ? "" : " narrow"}">
     <div class="quiz-bar">
       <span class="pos">${i + 1} / ${m.qids.length}</span>
       <span class="timer${remaining != null && remaining < 600 ? " low" : ""}" id="timer" aria-label="Time">${remaining != null ? fmtDur(remaining) : fmtDur(ui.exam.elapsed)}</span>
@@ -1143,6 +1193,7 @@ VIEWS.progress = function () {
     <section class="panel" id="settings">
       <h2>Settings</h2>
       <div class="field" style="max-width:280px"><label for="exam-date">Exam date</label><input type="date" id="exam-date" data-change="exam-date" value="${esc(set.examDate || "")}"><span class="hint">Used for the countdown and weekly pace.</span></div>
+      <div class="field"><label class="check"><input type="checkbox" data-change="hints"${hintsOn() ? " checked" : ""}>Explain terms on hover</label><span class="hint">A dotted underline marks an acronym or key term. Point at it (or tap it) to see what it means. Mock exams never show them, as in the real exam. All terms are in the <a href="#/glossary" data-route="glossary">glossary</a>.</span></div>
     </section>
     <section class="panel">
       <h2>How the predicted score works</h2>
@@ -1315,6 +1366,14 @@ function fallbackCopy(text, msg) {
 
 // ---------- events ----------
 document.addEventListener("click", (e) => {
+  // A tap on a marked term opens its card (a mouse uses hover instead).
+  const term = e.target.closest(".gl");
+  if (term && lastPointer === "touch" && glossActive(term)) {
+    e.preventDefault();
+    if (glossAnchor === term && !gcardEl.hidden) hideGloss(); else showGloss(term);
+    return;
+  }
+  if (!e.target.closest("#gcard")) hideGloss();
   const routeEl = e.target.closest("[data-route]");
   if (routeEl && routeEl.tagName === "A") { e.preventDefault(); go(routeEl.dataset.route); return; }
   const svgRoute = e.target.closest("[data-route-click]");
@@ -1332,10 +1391,14 @@ document.addEventListener("click", (e) => {
     if (fn && !act.disabled) { e.preventDefault(); fn(act.dataset, act, e); }
   }
 });
+document.addEventListener("input", (e) => {
+  if (e.target.dataset?.input === "gloss-filter") filterGlossary(e.target.value);
+});
 document.addEventListener("change", (e) => {
   const el = e.target;
   if (el.matches('input[type="checkbox"][data-action]')) { const fn = ACTIONS[el.dataset.action]; if (fn) fn(el.dataset, el, e); }
   if (el.dataset.change === "browse-obj") go(el.value ? `browse/${el.value}` : "browse", { replace: true });
+  if (el.dataset.change === "hints") { Store.patch("state", { settings: { hints: el.checked } }); applyPrefs(); toast(el.checked ? "Term definitions on" : "Term definitions off"); }
   if (el.dataset.change === "exam-date") { Store.patch("state", { settings: { examDate: el.value || null } }); toast(el.value ? "Exam date saved" : "Exam date cleared"); }
 });
 document.addEventListener("input", (e) => {
@@ -1393,9 +1456,78 @@ document.addEventListener("focusin", (e) => {
 });
 document.addEventListener("scroll", () => { tipEl.hidden = true; }, { passive: true });
 
+// Glossary cards. The build marks terms as <span class="gl" data-g="id">.
+// A mouse shows the card on hover; the card stays while the pointer moves
+// onto it, so its link works. A touch screen shows it on tap.
+const gcardEl = document.getElementById("gcard");
+let lastPointer = "mouse";
+document.addEventListener("pointerdown", (e) => { lastPointer = e.pointerType || "mouse"; }, { capture: true, passive: true });
+let glossAnchor = null, glossShowTimer = 0, glossHideTimer = 0;
+const hintsOn = () => Store.data.state.settings?.hints !== false;
+function applyPrefs() { document.documentElement.dataset.hints = hintsOn() ? "on" : "off"; }
+const glossActive = (el) => hintsOn() && !el.closest(".no-gloss") && !!GLOSS[el.dataset.g];
+
+function glossCard(g) {
+  const here = ui.route.name === "note" && ui.route.id === g.note;
+  const note = g.note && NOTE[g.note];
+  return `<div class="gcard-head"><span class="gcard-term">${esc(g.term)}</span>${g.expansion ? `<span class="gcard-exp">${esc(g.expansion)}</span>` : ""}</div>
+    <p class="gcard-def">${esc(g.def)}</p>
+    ${awsLine(g)}
+    <div class="gcard-foot">${note ? (here ? `<span class="here">Explained on this page</span>` : `<a href="#/note/${g.note}" data-route="note/${g.note}">Read: ${esc(shortTitle(note.title))}</a>`) : ""}<a href="#/glossary" data-route="glossary">Glossary</a></div>`;
+}
+function showGloss(el) {
+  clearTimeout(glossShowTimer); clearTimeout(glossHideTimer);
+  if (glossAnchor === el && !gcardEl.hidden) return;
+  glossAnchor?.classList.remove("on");
+  glossAnchor = el;
+  el.classList.add("on");
+  gcardEl.innerHTML = glossCard(GLOSS[el.dataset.g]);
+  gcardEl.hidden = false;
+  // Place the card under the line of text that holds the term, or above it
+  // when there is no room below. Keep it inside the window.
+  const rects = [...el.getClientRects()];
+  const r = rects[rects.length - 1] || el.getBoundingClientRect();
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+  const w = gcardEl.offsetWidth, h = gcardEl.offsetHeight;
+  const left = Math.min(vw - w - 8, Math.max(8, r.left + r.width / 2 - w / 2));
+  const below = r.bottom + 8, above = rects[0] ? rects[0].top - h - 8 : r.top - h - 8;
+  const top = below + h <= vh - 8 || above < 8 ? below : above;
+  gcardEl.style.left = `${Math.round(left)}px`;
+  gcardEl.style.top = `${Math.round(Math.max(8, top))}px`;
+}
+function hideGloss() {
+  clearTimeout(glossShowTimer); clearTimeout(glossHideTimer);
+  if (!gcardEl || gcardEl.hidden) return;
+  gcardEl.hidden = true;
+  glossAnchor?.classList.remove("on");
+  glossAnchor = null;
+}
+document.addEventListener("pointerover", (e) => {
+  if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+  if (gcardEl.contains(e.target)) { clearTimeout(glossHideTimer); return; }
+  const el = e.target.closest?.(".gl");
+  if (!el || !glossActive(el)) return;
+  clearTimeout(glossHideTimer);
+  clearTimeout(glossShowTimer);
+  glossShowTimer = setTimeout(() => showGloss(el), gcardEl.hidden ? 200 : 60);
+});
+document.addEventListener("pointerout", (e) => {
+  if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+  const from = e.target.closest?.(".gl, #gcard");
+  if (!from) return;
+  const to = e.relatedTarget;
+  if (to && (from.contains(to) || gcardEl.contains(to) || (glossAnchor && glossAnchor.contains(to)))) return;
+  clearTimeout(glossShowTimer);
+  if (!gcardEl.hidden) glossHideTimer = setTimeout(hideGloss, 220);
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideGloss(); });
+window.addEventListener("resize", hideGloss);
+document.addEventListener("scroll", hideGloss, { capture: true, passive: true }); // also scrolls inside the case-study pane
+
 // Re-render passive views when data arrives; keep active sessions stable.
 Store.onChange((kind) => {
   if (kind === "data") dataVersion++;
+  applyPrefs();
   renderSaveState();
   renderNav();
   const passive = ["home", "study", "objective", "practice", "cards", "browse", "mock", "cases", "labs", "progress"];

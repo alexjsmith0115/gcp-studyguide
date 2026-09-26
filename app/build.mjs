@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import { Marked } from "marked";
 import hljs from "highlight.js";
+import { buildMatcher, glossify, checkGlossary, glossaryId } from "./glossary.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const P = (...p) => path.join(ROOT, ...p);
@@ -19,6 +20,19 @@ const read = (f) => fs.readFileSync(f, "utf8");
 const strict = process.argv.includes("--strict");
 const problems = [];
 const warn = (m) => problems.push(m);
+
+// ---------- glossary ----------
+// content/glossary.json: terms that the app explains in a hover card.
+const glossaryFile = P("content", "glossary.json");
+let glossary = [];
+if (fs.existsSync(glossaryFile)) {
+  try { glossary = JSON.parse(read(glossaryFile)); } catch (e) { warn(`content/glossary.json: invalid JSON (${e.message})`); }
+}
+glossary = glossary.filter((e) => e && e.term).map((e) => ({ ...e, id: e.id || glossaryId(e.term) }));
+const glossMatcher = buildMatcher(glossary);
+for (const c of glossMatcher.clashes) warn(`content/glossary.json: ${c}`);
+const glossUsed = new Map();
+const gloss = (html) => glossify(html, glossMatcher, glossUsed);
 
 // ---------- markdown ----------
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -81,12 +95,13 @@ function sanitize(html) {
 
 function renderMd(src, source, prefix = "") {
   const ctx = { ids: new Set(), toc: [], source, prefix };
-  const html = sanitize(makeMarked(ctx).parse(src));
+  const html = gloss(sanitize(makeMarked(ctx).parse(src)));
   return { html, toc: ctx.toc };
 }
-function renderInline(src, source) {
+function renderInline(src, source, { terms = true } = {}) {
   const ctx = { ids: new Set(), toc: [], source, prefix: "" };
-  return sanitize(makeMarked(ctx).parseInline(String(src ?? "")));
+  const html = sanitize(makeMarked(ctx).parseInline(String(src ?? "")));
+  return terms ? gloss(html) : html;
 }
 function renderBlock(src, source) {
   return renderMd(String(src ?? ""), source).html;
@@ -110,6 +125,7 @@ const asList = (v) => (Array.isArray(v) ? v.map(String) : v == null || v === "" 
 
 // Notes
 const notes = [];
+const noteText = {};
 for (const f of listFiles(P("content", "notes"), /\.md$/)) {
   const { data, body } = fm(f);
   const id = path.basename(f, ".md");
@@ -117,6 +133,7 @@ for (const f of listFiles(P("content", "notes"), /\.md$/)) {
   const objective = String(data.objective ?? id.split("-")[0]);
   if (!objectiveIds.has(objective)) warn(`${f}: unknown objective ${objective}`);
   const { html, toc } = renderMd(body, `note:${id}`);
+  noteText[id] = body;
   notes.push({
     id, title: String(data.title || id), objective, also: asList(data.also).filter((o) => objectiveIds.has(o)),
     order: Number(data.order ?? 50), minutes: Number(data.minutes ?? Math.max(5, Math.round(words(body) / 200))),
@@ -218,7 +235,8 @@ for (const f of listFiles(P("content", "flashcards"), /\.json$/)) {
     const src = `card:${c.id}`;
     cards.push({
       id: c.id, note: n.id, objective: n.objective, kind: c.kind === "concept" ? "concept" : "term",
-      front: renderInline(c.front, src), back: renderInline(c.back, src), aws: c.aws ? renderInline(c.aws, src) : null,
+      // No glossary marks on the front: a definition there gives away the answer.
+      front: renderInline(c.front, src, { terms: false }), back: renderInline(c.back, src), aws: c.aws ? renderInline(c.aws, src, { terms: false }) : null,
       source: c.source ? { title: String(c.source.title || c.source.url), url: String(c.source.url), evidence: c.source.evidence ? String(c.source.evidence) : "" } : null,
     });
   }
@@ -240,10 +258,26 @@ for (const [from, kind, id] of internalRefs) {
 }
 for (const n of notes) for (const l of n.labs) if (!labIds.has(l)) warn(`note:${n.id}: frontmatter lab ${l} not found`);
 
+// ---------- glossary checks ----------
+for (const p of checkGlossary(glossary, noteText)) warn(p);
+const glossUnused = glossary.filter((e) => !glossUsed.has(e.id)).map((e) => e.term);
+// Not a problem: a term that appears only in code is still on the Glossary page.
+if (glossUnused.length) console.log(`  glossary terms marked nowhere (only in code or headings): ${glossUnused.join(", ")}`);
+const noteTitle = Object.fromEntries(notes.map((n) => [n.id, n.title]));
+
 // ---------- assemble ----------
 const data = {
   builtAt: new Date().toISOString(),
-  exam,
+  exam: {
+    ...exam,
+    sections: exam.sections.map((s) => ({
+      ...s,
+      objectives: s.objectives.map((o) => ({ ...o, considerationsHtml: (o.considerations || []).map((c) => gloss(esc(c))) })),
+    })),
+  },
+  glossary: glossary
+    .map((e) => ({ id: e.id, term: String(e.term), expansion: e.expansion ? String(e.expansion) : "", def: String(e.def || ""), aws: e.aws ? String(e.aws) : "", note: noteTitle[e.note] ? e.note : "" }))
+    .sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: "base" })),
   notes, cases, labs, questions, refs, cards,
 };
 const json = JSON.stringify(data).replace(/</g, "\\u003c");
@@ -284,6 +318,7 @@ console.log(`  notes: ${notes.length} pages, ${notes.reduce((a, n) => a + n.word
 console.log(`  case studies: ${cases.filter((c) => c.textHtml).length} texts, ${cases.filter((c) => c.analysisHtml).length} analyses`);
 console.log(`  labs: ${labs.length}`);
 console.log(`  reference pages: ${refs.length}`);
+console.log(`  glossary: ${glossary.length} terms, ${[...glossUsed.values()].reduce((a, b) => a + b, 0).toLocaleString()} marked uses`);
 console.log(`  questions: ${questions.length} (${questions.filter((q) => q.caseStudy).length} case study)`);
 console.log(`  flashcards: ${cards.length} (${cards.filter((c) => c.kind === "term").length} term, ${cards.filter((c) => c.kind === "concept").length} concept)`);
 console.log(`  per objective: ${Object.entries(byObj).sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })).map(([k, v]) => `${k}:${v}`).join(" ")}`);

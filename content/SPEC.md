@@ -256,7 +256,35 @@ python3 tools/check_flashcards.py content/flashcards/<domain>.json
 
 Fix every error. The check confirms the schema, the note, that the note cites the source, and the evidence quote (from the docs cache).
 
-## 9. Definition of done (per author)
+## 9. Glossary (`content/glossary.json`)
+
+The glossary is a JSON array of terms. The build marks each term in the notes, questions, labs, case studies, and exam guide text. The app shows the definition in a box when the reader points at a marked term (or taps it). The **Glossary** page lists all terms.
+
+```json
+{
+  "term": "CMEK",
+  "expansion": "Customer-managed encryption keys",
+  "def": "Encryption keys that you create and control in Cloud KMS. Supported Google Cloud services use them to protect your data at rest.",
+  "aws": "AWS KMS customer managed keys",
+  "match": ["CMEK", "customer-managed encryption keys"],
+  "note": "3.1-data-protection-kms"
+}
+```
+
+Field rules:
+
+- `term`: the display name, as the notes write it.
+- `expansion`: the spelled-out form of an acronym. Omit it for product names.
+- `def`: 1 or 2 sentences, 45 words or fewer, plain text. Say what the term is and the one fact an architect must remember. Do not start with the term.
+- `aws`: the AWS equivalent, only when the notes name one. Omit it for concepts.
+- `match`: the strings that the build marks. Matching is case-sensitive and whole-word. An ALL-CAPS string also matches with a plural "s". A lowercase string also matches with a capital first letter. Add former product names that the content uses. Do not add generic English words.
+- `note`: the ID of the notes page that explains the term. That page must contain the term or a `match` string.
+
+Grounding: every fact in `def` and `aws` comes from the linked notes page, which carries the citations. Skip basic terms (API, VM, VPC, DNS, TLS, and similar).
+
+The build marks only the first use of a term in each section of a page. It skips links, code, headings, AWS product names, and the front of flashcards. `node app/build.mjs` reports a missing note, a note that does not mention the term, a string that two terms claim, and a term that no page uses.
+
+## 10. Definition of done (per author)
 
 - [ ] Every notes page has valid frontmatter and the required sections.
 - [ ] Every fact has a citation to a page you fetched.

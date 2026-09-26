@@ -1,0 +1,3326 @@
+[
+  {
+    "term": "_Required",
+    "def": "The log bucket that keeps Admin Activity, System Event, and Access Transparency logs for 400 days. You cannot change its retention, and you cannot modify or delete its sink.",
+    "match": [
+      "_Required"
+    ],
+    "note": "6.2-observability"
+  },
+  {
+    "term": "Access Approval",
+    "def": "Makes Google personnel get approval from your administrator before they access Customer Data. It needs Access Transparency, and it makes support responses slower.",
+    "match": [
+      "Access Approval"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "Access Context Manager",
+    "def": "Defines access levels: conditions on IP ranges, device policy, regions, or identities. VPC Service Controls, IAP, Context-Aware Access for Google Workspace, and IAM Conditions enforce them.",
+    "match": [
+      "Access Context Manager"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "access level",
+    "def": "A set of conditions on a request, such as IP range, device, region, or identity, that Access Context Manager defines. Basic levels combine conditions, and custom levels use CEL.",
+    "match": [
+      "access level"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "Access Transparency",
+    "def": "Logs the actions of Google personnel on your Customer Data, with the reason and the accessor's location. It is on by default for every organization at no extra charge.",
+    "match": [
+      "Access Transparency"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "Active Assist",
+    "def": "The portfolio of Google Cloud tools, including Recommender, that give recommendations and insights in value categories such as cost, security, performance, reliability, and manageability. A qualified reviewer must assess a recommendation before you apply it.",
+    "aws": "AWS Compute Optimizer",
+    "match": [
+      "Active Assist",
+      "Recommender"
+    ],
+    "note": "1.5-future-improvements"
+  },
+  {
+    "term": "Adaptive Protection",
+    "def": "A Cloud Armor feature that uses machine-learning models to detect Layer 7 DDoS attacks and suggest WAF rules. A model trains for at least one hour, and a new security policy discards the baseline.",
+    "match": [
+      "Adaptive Protection"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "ADC",
+    "expansion": "Application Default Credentials",
+    "def": "The strategy that client libraries use to find credentials: GOOGLE_APPLICATION_CREDENTIALS, then the local ADC file, then the attached service account. The gcloud CLI itself does not use ADC.",
+    "aws": "SDK default credential chain",
+    "match": [
+      "ADC",
+      "Application Default Credentials"
+    ],
+    "note": "5.2-programmatic-access"
+  },
+  {
+    "term": "ADK",
+    "expansion": "Agent Development Kit",
+    "def": "An open-source, model-agnostic framework to write agents and multi-agent systems in Python, TypeScript, Go, and Java. The agents run on Agent Runtime, Cloud Run, or GKE.",
+    "match": [
+      "ADK",
+      "Agent Development Kit"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Admin Activity audit logs",
+    "def": "Audit logs of configuration changes and other admin actions. They are always written, you cannot turn them off, and the _Required bucket keeps them for 400 days with no log charge.",
+    "match": [
+      "Admin Activity audit log",
+      "Admin Activity audit logs",
+      "Admin Activity log",
+      "Admin Activity logs"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "ADR",
+    "expansion": "Architecture decision record",
+    "def": "A record of one design decision: the options, the main requirements, and the decision with its reasons. When a decision changes, keep the old one and the reason. Store it near the code.",
+    "match": [
+      "ADR",
+      "architecture decision record",
+      "architecture decision records"
+    ],
+    "note": "4.2-business-processes"
+  },
+  {
+    "term": "Agent Builder",
+    "def": "The exam guide name for a suite of products to build, scale, and govern AI agents. It is now part of Agent Platform, and older questions can also use it to mean Agent Search.",
+    "match": [
+      "Agent Builder"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Agent Platform Pipelines",
+    "def": "A serverless service that runs ML workflows as a graph of container steps, with no cluster to manage. It records lineage in ML Metadata and has no gcloud commands. Formerly Vertex AI Pipelines.",
+    "match": [
+      "Agent Platform Pipelines",
+      "Vertex AI Pipelines"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "Agent Retrieval",
+    "def": "A fully managed, self-tuning store of data objects with built-in embeddings. Use it when you want vector search without managing indexes, VMs, or replicas.",
+    "match": [
+      "Agent Retrieval",
+      "Vector Search 2.0",
+      "Vertex AI Vector Search 2.0"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Agent Runtime",
+    "def": "A fully managed runtime that runs agents in production. It deploys any framework that runs in a container. Sessions keep one conversation, and Memory Bank keeps memory across sessions.",
+    "match": [
+      "Agent Runtime",
+      "Vertex AI Agent Engine",
+      "Agent Engine"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Agent Search",
+    "def": "A search engine over your data for search, recommendation, and RAG apps. It gives AI answers grounded in your data, with citations, and it uses the Discovery Engine API. Formerly Vertex AI Search.",
+    "aws": "Amazon Kendra",
+    "match": [
+      "Agent Search",
+      "Vertex AI Search"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "Agent Studio",
+    "def": "A low-code workspace in Agent Platform to prototype prompts and simple agents without code. It compares prompts and models, and it adds grounding with Google Search, RAG Engine, or Agent Search.",
+    "match": [
+      "Agent Studio",
+      "Vertex AI Studio"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "AI Commerce Search",
+    "def": "Product search and recommendations for retailers, in Gemini Enterprise for Customer Experience (GECX). Formerly Vertex AI Search for commerce. Map the Discovery AI need in the Cymbal case study to it.",
+    "match": [
+      "AI Commerce Search",
+      "Vertex AI Search for commerce",
+      "Vertex AI Search for Commerce"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "AI Hypercomputer",
+    "def": "Google Cloud's integrated system for AI and ML: GPUs, TPUs, networking, and storage, plus open software and flexible consumption options. You do not buy it as one product; you use its parts through Compute Engine, GKE, and Agent Platform.",
+    "match": [
+      "AI Hypercomputer"
+    ],
+    "note": "2.4-ai-hypercomputer"
+  },
+  {
+    "term": "AlloyDB",
+    "def": "A PostgreSQL-compatible managed database for demanding OLTP. Its columnar engine runs analytics on live transactional data (HTAP), HA failover loses no data, and read pools scale reads.",
+    "aws": "Amazon Aurora",
+    "match": [
+      "AlloyDB"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "API Gateway",
+    "def": "A fully managed, pay-per-use gateway for project-level APIs with serverless backends. Each upload of an API definition creates a new API config that you cannot modify. It cannot proxy to Google APIs such as BigQuery.",
+    "aws": "Amazon API Gateway",
+    "match": [
+      "API Gateway"
+    ],
+    "note": "5.1-deployment-and-apis"
+  },
+  {
+    "term": "Apigee",
+    "def": "Google's full API management platform. Its proxy layer adds security, rate limiting, and mediation through policies, plus API products, a developer portal, and monetization. Choose it for partner-facing or high-scale API programs.",
+    "match": [
+      "Apigee"
+    ],
+    "note": "5.1-deployment-and-apis"
+  },
+  {
+    "term": "Apigee hybrid",
+    "def": "An Apigee deployment model where Google runs the management plane and you run the runtime plane on your own Kubernetes clusters. All API traffic stays inside your network, and Pay-as-you-go pricing is not available.",
+    "match": [
+      "Apigee hybrid"
+    ],
+    "note": "5.1-deployment-and-apis"
+  },
+  {
+    "term": "App Engine",
+    "def": "An older serverless platform with a standard environment (language sandbox, scales to zero) and a flexible environment (containers on VMs). Google recommends Cloud Run for new projects.",
+    "aws": "AWS Elastic Beanstalk",
+    "match": [
+      "App Engine"
+    ],
+    "note": "1.3-compute-choice"
+  },
+  {
+    "term": "App Hub",
+    "def": "A registry that groups existing services and workloads from many projects into applications, with owners, criticality, and environment. It organizes resources that already exist; Application Design Center deploys new ones.",
+    "match": [
+      "App Hub"
+    ],
+    "note": "4.1-sdlc-cicd"
+  },
+  {
+    "term": "app profile",
+    "def": "A Bigtable setting for how an app routes traffic. Single-cluster routing gives read-your-writes consistency and single-row transactions. Multi-cluster routing gives automatic failover with eventual consistency.",
+    "match": [
+      "app profile",
+      "app profiles"
+    ],
+    "note": "2.2-database-config"
+  },
+  {
+    "term": "Application Design Center",
+    "def": "A GA service where platform teams publish approved templates in catalogs, and developers customize and deploy them. It produces Terraform, and App Hub registers each deployed application automatically.",
+    "aws": "AWS Service Catalog",
+    "match": [
+      "Application Design Center"
+    ],
+    "note": "4.1-sdlc-cicd"
+  },
+  {
+    "term": "Application Integration",
+    "def": "An iPaaS with a drag-and-drop editor and Integration Connectors. Use it to connect, map, and transform data between business systems such as Salesforce, ServiceNow, or Cloud SQL.",
+    "aws": "Amazon AppFlow",
+    "match": [
+      "Application Integration"
+    ],
+    "note": "1.1-integration-and-data-movement"
+  },
+  {
+    "term": "Application Load Balancer",
+    "def": "A Layer 7 proxy load balancer for HTTP(S). The global external mode gives one anycast IP address for backends in many regions. Only external load balancers are global; internal multi-region designs use the cross-region internal mode.",
+    "aws": "Application Load Balancer (one per region in AWS)",
+    "match": [
+      "Application Load Balancer",
+      "Application Load Balancers"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "Archive storage",
+    "def": "The lowest-cost Cloud Storage class, for data that you keep at least 365 days, such as regulatory archives. Data is available within milliseconds, but retrieval fees apply.",
+    "aws": "S3 Glacier Deep Archive",
+    "match": [
+      "Archive storage"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "Artifact Analysis",
+    "def": "Scans each image for vulnerabilities when you push it to Artifact Registry, then keeps checking images pulled in the last 30 days. Automatic scanning only reports; Binary Authorization blocks a deploy, and On-Demand Scanning can block a build.",
+    "aws": "Amazon ECR image scanning",
+    "match": [
+      "Artifact Analysis",
+      "Container Analysis"
+    ],
+    "note": "3.1-supply-chain"
+  },
+  {
+    "term": "ASN",
+    "expansion": "Autonomous system number",
+    "def": "The BGP identifier of a Cloud Router or a peer router. Use a private ASN for HA VPN. You cannot change the ASN of a Cloud Router later. Partner Interconnect needs ASN 16550.",
+    "match": [
+      "ASN"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Assured Workloads",
+    "def": "Applies a control package, such as EU Data Boundary or FedRAMP High, to a folder. Organization policy constraints and other features then enforce data location, personnel access, and key management controls.",
+    "aws": "AWS GovCloud",
+    "match": [
+      "Assured Workloads"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "attestation",
+    "def": "A signed statement that an image finished a required stage, such as a CI build or a QA approval. At deploy time, a Binary Authorization attestor verifies the signature on the image digest.",
+    "match": [
+      "attestations",
+      "attestor",
+      "attestors"
+    ],
+    "note": "3.1-supply-chain"
+  },
+  {
+    "term": "attribute condition",
+    "def": "A CEL expression on a Workload Identity Federation provider. The provider rejects every credential for which it is false. For GitHub or GitLab SaaS, it must accept only your organization's tokens.",
+    "match": [
+      "attribute condition"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Autoclass",
+    "def": "A Cloud Storage bucket feature that moves unread objects to colder classes, and back to Standard when read. By default, objects stop at Nearline after 30 days; set the terminal class to Archive to also use Coldline and Archive.",
+    "aws": "S3 Intelligent-Tiering",
+    "match": [
+      "Autoclass"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "autohealing",
+    "def": "A MIG feature that recreates VMs whose application fails a health check. Use a more conservative health check for autohealing than for load balancing, and allow the probe ranges in the firewall.",
+    "match": [
+      "autohealing"
+    ],
+    "note": "2.3-compute-engine-ops"
+  },
+  {
+    "term": "Autokey",
+    "def": "Creates Cloud HSM keys on demand when developers create resources, and grants the service agent access. Google recommends it if its keys meet your requirements. You cannot delete keys that it created.",
+    "match": [
+      "Autokey"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "AutoML",
+    "def": "Agent Platform model training with little code, for image and tabular data only. AutoML Text and AutoML Video are shut down, and AutoML requires a managed dataset.",
+    "match": [
+      "AutoML"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "BAA",
+    "expansion": "Business Associate Agreement",
+    "def": "The HIPAA contract that Google signs with you. Accept it before you store PHI. Use only the products that it covers, and do not use Pre-GA offerings unless their terms allow it.",
+    "match": [
+      "BAA",
+      "Business Associate Agreement"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "backend security policy",
+    "def": "A Cloud Armor policy on a backend service that checks only requests that go to the origin. With Cloud CDN, cache hits never reach it. Put WAF rules and rate limits here.",
+    "match": [
+      "backend security policy",
+      "backend security policies"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "backend service",
+    "def": "The load balancer resource that holds the backends, either instance groups or NEGs. Cloud CDN and most Cloud Armor policies attach to backend services, not to forwarding rules.",
+    "match": [
+      "backend service"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "Backup and DR Service",
+    "def": "A managed backup service for Compute Engine instances and disks, Filestore, Cloud SQL, and AlloyDB. Its backup vaults keep backups immutable and indelible until the enforced retention ends.",
+    "aws": "AWS Backup",
+    "match": [
+      "Backup and DR Service",
+      "Backup and DR",
+      "backup vault",
+      "backup vaults"
+    ],
+    "note": "2.2-data-protection"
+  },
+  {
+    "term": "Bare Metal Solution",
+    "def": "Dedicated bare-metal servers for specialized workloads such as Oracle, under a BYOL model. You manage the OS, database, backups, patches, and licenses, so it is not a managed database.",
+    "match": [
+      "Bare Metal Solution"
+    ],
+    "note": "1.3-compute-choice"
+  },
+  {
+    "term": "Batch inference",
+    "def": "Predictions for accumulated data that needs no immediate response. The model needs no endpoint, and the job reads from and writes to Cloud Storage or BigQuery. For Gemini, it is a discounted per-token option.",
+    "match": [
+      "batch inference",
+      "batch prediction"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "BGP",
+    "expansion": "Border Gateway Protocol",
+    "def": "The dynamic routing protocol that Cloud Router uses to exchange routes with your routers. HA VPN supports only BGP routing. You cannot create new Classic VPN tunnels that use BGP.",
+    "match": [
+      "BGP"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "BigQuery Data Transfer Service",
+    "def": "A service that loads data into BigQuery on a schedule, for example from Teradata with a migration agent. It cannot move data out of BigQuery.",
+    "match": [
+      "BigQuery Data Transfer Service"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "BigQuery sharing",
+    "def": "A BigQuery feature that shares data across organizations without copies of the data. Its former name, Analytics Hub, can still appear in exam questions.",
+    "match": [
+      "BigQuery sharing",
+      "Analytics Hub"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "BigQuery subscription",
+    "def": "A Pub/Sub subscription that writes messages to a BigQuery table with no subscriber code. Use Dataflow instead when you must window, aggregate, or deduplicate across messages.",
+    "match": [
+      "BigQuery subscription",
+      "BigQuery subscriptions"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Bigtable",
+    "def": "A key-value NoSQL database for large amounts of single-keyed data with low latency and high throughput, such as time series and IoT data. It is not relational, so design the row key with care.",
+    "match": [
+      "Bigtable"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Binary Authorization",
+    "def": "Enforces a deploy-time policy on GKE and Cloud Run, so that only images with the required attestations deploy. On Cloud Run, an organization policy must require it, or developers can turn it off.",
+    "match": [
+      "Binary Authorization"
+    ],
+    "note": "3.1-supply-chain"
+  },
+  {
+    "term": "Bucket Lock",
+    "def": "A Cloud Storage retention policy that stops deletion or replacement of objects before a set age. Locking the policy is irreversible: after the lock, you can only increase it, and the project gets a lien.",
+    "aws": "S3 Object Lock",
+    "match": [
+      "Bucket Lock",
+      "retention policy",
+      "retention policies"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "build provenance",
+    "def": "Verifiable data about a build: image digests, source locations, build arguments, and duration. Cloud Build does not generate it when a build step runs docker push.",
+    "match": [
+      "build provenance"
+    ],
+    "note": "3.1-supply-chain"
+  },
+  {
+    "term": "burn rate",
+    "def": "How fast a service uses its error budget. A rate above 1 uses up the budget before the compliance period ends. Cloud Monitoring starting points: fast burn 10x over 1 or 2 hours, slow burn 2x over 24 hours.",
+    "match": [
+      "burn rate",
+      "burn-rate"
+    ],
+    "note": "6.2-observability"
+  },
+  {
+    "term": "BYOL",
+    "expansion": "Bring your own license",
+    "def": "You use licenses that you already own and pay Google only for the infrastructure, and you stay responsible for compliance. Windows Server BYOL needs a version released before October 1, 2019, and sole-tenant nodes.",
+    "match": [
+      "BYOL",
+      "bring-your-own-license"
+    ],
+    "note": "1.4-licensing-and-financials"
+  },
+  {
+    "term": "BYOS",
+    "expansion": "Bring your own subscription",
+    "def": "Use of an existing RHEL or SLES subscription on Compute Engine. For RHEL, use the Red Hat Cloud Access feature. Unlike Windows Server BYOL, it does not need sole-tenant nodes.",
+    "match": [
+      "BYOS"
+    ],
+    "note": "1.4-licensing-and-financials"
+  },
+  {
+    "term": "CAB",
+    "expansion": "Change advisory board",
+    "def": "A group that reviews and approves changes by hand before release. DORA recommends peer review instead of this heavyweight change approval, and the Adoption Framework calls it a tactical practice.",
+    "match": [
+      "CAB",
+      "change advisory board"
+    ],
+    "note": "4.2-business-processes"
+  },
+  {
+    "term": "Calendar mode",
+    "def": "A future reservation of GPUs or TPUs from a date that you choose, for 1 to 90 days. You pay for the full period, and GPU requests start at least 87 hours after you submit them.",
+    "match": [
+      "calendar mode"
+    ],
+    "note": "2.4-ai-hypercomputer"
+  },
+  {
+    "term": "CapEx/OpEx",
+    "expansion": "Capital expenditure / operating expenditure",
+    "def": "On premises, you buy assets up front (CapEx) and depreciate them. In the cloud, most costs are OpEx: you pay when you consume. Some services, such as sole-tenant nodes, can be classified as CapEx.",
+    "match": [
+      "CapEx",
+      "OpEx"
+    ],
+    "note": "4.2-cost-optimization"
+  },
+  {
+    "term": "Carrier Peering",
+    "def": "A peering option outside Google Cloud, like Direct Peering. It gives no access to internal IP addresses and has no SLA, so do not use it to reach VPC networks.",
+    "match": [
+      "Carrier Peering"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "CDC",
+    "expansion": "Change data capture",
+    "def": "Capture of ongoing changes from an operational database, to stream them to another system. Datastream is a serverless CDC service for analytics, and Database Migration Service uses CDC replication until you switch.",
+    "match": [
+      "CDC",
+      "change data capture"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "CDE",
+    "expansion": "Cardholder data environment",
+    "def": "The systems that handle cardholder data under PCI DSS. Put it in a dedicated VPC network with VPC Service Controls, because a system in the same subnet stays in scope.",
+    "match": [
+      "CDE",
+      "cardholder data environment"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "CEL",
+    "expansion": "Common Expression Language",
+    "def": "The expression language for Workload Identity Federation attribute conditions, custom access levels in Access Context Manager, and custom organization policy constraints.",
+    "match": [
+      "CEL",
+      "Common Expression Language"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "chaos engineering",
+    "def": "Injecting failures on purpose to find weak points before users do. Prefer staging, add load during the test, measure recovery against the RTO and the RPO, write a postmortem, and repeat on a schedule.",
+    "match": [
+      "chaos engineering"
+    ],
+    "note": "6.6-production-reliability"
+  },
+  {
+    "term": "Chirp 3",
+    "def": "A Speech-to-Text transcription model that works only in the Speech-to-Text V2 API. Google recommends it for voice transcription in Agent Assist, and it or the telephony model fits phone call audio.",
+    "match": [
+      "Chirp 3"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "choreography",
+    "def": "An integration style in which each service reacts to events and no service controls the flow. Pub/Sub and Eventarc suit it. It is hard to monitor, so a process that the business must track needs orchestration.",
+    "match": [
+      "choreography"
+    ],
+    "note": "1.1-integration-and-data-movement"
+  },
+  {
+    "term": "Chrome Enterprise Premium",
+    "def": "Google's zero trust access product. It adds access levels by device posture and time, access to apps outside Google Cloud, and data loss prevention and threat protection in Chrome.",
+    "match": [
+      "Chrome Enterprise Premium",
+      "BeyondCorp Enterprise",
+      "BeyondCorp"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Classic VPN",
+    "def": "A Cloud VPN gateway with one interface, static routing only, and a 99.9% SLA. You cannot create new Classic VPN tunnels that use BGP. Use it only when the peer device cannot run BGP.",
+    "match": [
+      "Classic VPN"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Cloud Armor",
+    "def": "Security policies on load balancer backend services that add WAF rules, rate limiting, geography rules, and DDoS protection. Edge policies act before the Cloud CDN cache; backend policies see only cache misses.",
+    "aws": "AWS WAF, AWS Shield",
+    "match": [
+      "Cloud Armor",
+      "Google Cloud Armor"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Cloud Armor Enterprise",
+    "def": "The Cloud Armor subscription tier (formerly Managed Protection Plus), Paygo or Annual. It adds full Adaptive Protection, threat intelligence, and advanced network DDoS protection. DDoS response support needs the Annual plan.",
+    "aws": "AWS Shield Advanced",
+    "match": [
+      "Cloud Armor Enterprise",
+      "Managed Protection Plus"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Cloud Audit Logs",
+    "def": "Records the actions of your own principals on Google Cloud. Admin Activity logs are always on. Data Access logs are off by default for most services. Access Transparency covers Google personnel.",
+    "aws": "AWS CloudTrail",
+    "match": [
+      "Cloud Audit Logs"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "Cloud Billing budgets",
+    "def": "Track actual spend against planned spend and alert at thresholds of actual or forecasted cost. An alerts-only budget never stops spend. To act on spend, send budget notifications to Pub/Sub and run code.",
+    "aws": "AWS Budgets",
+    "match": [
+      "Cloud Billing budgets",
+      "Cloud Billing budget",
+      "alerts-only budget",
+      "alerts-only budgets",
+      "budget alert",
+      "budget alerts"
+    ],
+    "note": "4.2-cost-optimization"
+  },
+  {
+    "term": "Cloud Billing export",
+    "def": "Writes usage, cost, and pricing data to a BigQuery dataset throughout the day. Enable it early: a regional dataset gets data only from the day you enable it, and a multi-region dataset also gets the previous month.",
+    "aws": "AWS Cost and Usage Report",
+    "match": [
+      "Cloud Billing export",
+      "billing export"
+    ],
+    "note": "4.2-cost-optimization"
+  },
+  {
+    "term": "Cloud CDN",
+    "def": "Caching for the global external and classic Application Load Balancers, set on a backend service or backend bucket. It always uses Premium Tier. You cannot enable it with IAP on the same backend service.",
+    "aws": "CloudFront",
+    "match": [
+      "Cloud CDN"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "Cloud Customer Care",
+    "def": "Google Cloud's support offering, with four services: Basic, Standard, Enhanced, and Premium. The service applies to all projects in the organization, and only an Organization Administrator can change it.",
+    "aws": "AWS Support plans",
+    "match": [
+      "Cloud Customer Care",
+      "Customer Care"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "Cloud Data Fusion",
+    "def": "A code-free, visual service for ETL and ELT pipelines with prebuilt connectors. At run time, it runs each pipeline on an ephemeral Managed Service for Apache Spark cluster.",
+    "aws": "AWS Glue",
+    "match": [
+      "Cloud Data Fusion",
+      "Data Fusion"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Cloud Deploy",
+    "def": "A managed continuous delivery service that promotes one release through a sequence of GKE or Cloud Run targets. It adds approvals, canary rollouts, verification, analysis, and rollback. It has only standard and canary strategies.",
+    "aws": "AWS CodeDeploy",
+    "match": [
+      "Cloud Deploy"
+    ],
+    "note": "6.3-release-management"
+  },
+  {
+    "term": "Cloud EKM",
+    "def": "Keeps key material in a supported external key manager outside Google Cloud. Google does not store or cache the keys, so data is unavailable when the external key manager is unavailable.",
+    "aws": "AWS KMS External Key Store (XKS)",
+    "match": [
+      "Cloud EKM",
+      "EKM",
+      "Cloud External Key Manager"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "Cloud HSM",
+    "def": "Cloud KMS keys in FIPS 140-2 Level 3 HSMs that Google manages. They use the same Cloud KMS API as software keys but cost more. Choose them when a requirement names hardware protection.",
+    "match": [
+      "Cloud HSM",
+      "HSM"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "Cloud Identity",
+    "def": "Google's identity as a service product that manages users and groups, without Google Workspace applications. An organization resource requires a Cloud Identity or Google Workspace account.",
+    "aws": "AWS IAM Identity Center",
+    "match": [
+      "Cloud Identity"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "Cloud IDS",
+    "def": "A managed intrusion detection service that inspects a mirrored copy of the traffic through Packet Mirroring. It detects threats and alerts, but does not block them. Use Cloud NGFW Enterprise to block.",
+    "aws": "Traffic mirroring with a third-party IDS",
+    "match": [
+      "Cloud IDS"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Cloud Interconnect",
+    "def": "Private connections from your network to Google Cloud through Dedicated Interconnect or Partner Interconnect. Traffic stays off the public internet, but it is not encrypted by default. Add MACsec or HA VPN over Cloud Interconnect.",
+    "aws": "AWS Direct Connect",
+    "match": [
+      "Cloud Interconnect"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Cloud KMS",
+    "def": "Google's managed key service. You cannot view or export its key material. Key rotation creates a new key version but does not re-encrypt existing data.",
+    "aws": "AWS Key Management Service (KMS)",
+    "match": [
+      "Cloud KMS"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "Cloud NAT",
+    "def": "Software-defined address translation for outbound traffic from VMs without external IP addresses. It is not a proxy VM, and it allows no unsolicited inbound connections. A gateway serves one VPC network and region.",
+    "aws": "NAT gateway",
+    "match": [
+      "Cloud NAT"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "Cloud NGFW",
+    "expansion": "Cloud Next Generation Firewall",
+    "def": "The distributed, stateful firewall service for VMs and supported load balancers (formerly Cloud Firewall). It has Essentials, Standard, and Enterprise tiers. Google Cloud bills traffic at the tier of the features that the rule uses.",
+    "aws": "AWS Network Firewall",
+    "match": [
+      "Cloud NGFW",
+      "Cloud Next Generation Firewall",
+      "Cloud Firewall"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Cloud NGFW Enterprise",
+    "def": "The Cloud NGFW tier that adds intrusion prevention, URL filtering, and TLS inspection. Firewall policy rules send traffic to zonal firewall endpoints, which block threats inline. It works only through firewall policies.",
+    "aws": "AWS Network Firewall with Suricata",
+    "match": [
+      "Cloud NGFW Enterprise"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Cloud Router",
+    "def": "The managed service that runs the BGP sessions for HA VPN tunnels, VLAN attachments, and Router appliance. The dynamic routing mode decides if its routes cover one region or all regions. You cannot change its ASN.",
+    "match": [
+      "Cloud Router"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Cloud Run",
+    "def": "A serverless platform that runs containers as services, jobs, and worker pools. Services scale to zero, and a request can run for up to 60 minutes. Google recommends serverless first.",
+    "aws": "AWS Fargate, AWS App Runner",
+    "match": [
+      "Cloud Run"
+    ],
+    "note": "1.3-compute-choice"
+  },
+  {
+    "term": "Cloud Run functions",
+    "def": "Cloud Run services that Cloud Run builds from your source code. HTTP functions run up to 60 minutes with up to 1,000 concurrent requests per instance, and event-driven functions use Eventarc triggers.",
+    "aws": "AWS Lambda",
+    "match": [
+      "Cloud Run functions",
+      "Cloud Run function",
+      "Cloud Functions"
+    ],
+    "note": "1.3-compute-choice"
+  },
+  {
+    "term": "Cloud SQL HA",
+    "def": "A Cloud SQL regional instance with a primary and a standby in two zones, with synchronous writes. Failover is automatic, in about 60 seconds. The standby serves no reads and does not survive a region outage.",
+    "aws": "RDS Multi-AZ",
+    "match": [
+      "Cloud SQL HA"
+    ],
+    "note": "2.2-database-config"
+  },
+  {
+    "term": "Cloud Storage FUSE",
+    "def": "A tool that mounts a Cloud Storage bucket as a file system. It is not POSIX compliant and is not an NFS file system, so do not use it as a POSIX file system or a database disk.",
+    "match": [
+      "Cloud Storage FUSE"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Cloud Tasks",
+    "def": "A queue service in which the sender names one handler and controls rate limits, scheduled delivery, retries, and deduplication. Use it for calls to a rate-limited partner API, not for fan-out.",
+    "aws": "Amazon SQS",
+    "match": [
+      "Cloud Tasks"
+    ],
+    "note": "1.1-integration-and-data-movement"
+  },
+  {
+    "term": "Cloud Translation",
+    "def": "A pre-trained translation API with two editions. Basic accepts API keys. Advanced adds glossaries and regional endpoints, such as the EU, but does not accept API keys.",
+    "aws": "Amazon Translate",
+    "match": [
+      "Cloud Translation",
+      "Translation - Advanced",
+      "Translation - Basic"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "Cloud VPN",
+    "def": "IPsec tunnels between your network and a VPC network, or between VPC networks. Choose it for lower cost, lower bandwidth, or migration tests. By itself, it does not reduce egress costs.",
+    "aws": "AWS VPN",
+    "match": [
+      "Cloud VPN"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "cluster autoscaler",
+    "def": "A GKE Standard feature that adds and removes nodes in a node pool. It reacts to Pods that cannot be scheduled and to resource requests, not to actual node utilization.",
+    "aws": "Cluster Autoscaler or Karpenter",
+    "match": [
+      "cluster autoscaler"
+    ],
+    "note": "2.3-gke"
+  },
+  {
+    "term": "CMEK",
+    "expansion": "Customer-managed encryption key",
+    "def": "Encryption keys that you create and control in Cloud KMS. The service agent of the service uses the key, and the key must be in the same location as the resource that it protects.",
+    "aws": "AWS KMS customer managed keys",
+    "match": [
+      "CMEK",
+      "customer-managed encryption key",
+      "customer-managed encryption keys",
+      "Customer-managed encryption keys"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "Cold, warm, and hot patterns",
+    "def": "Google's three DR patterns. Cold keeps only backups, images, and IaC templates (RTO over a day). Warm runs part of the stack (RTO an hour to a day). Hot serves production from both sides (RTO minutes).",
+    "match": [
+      "cold pattern",
+      "warm pattern",
+      "hot pattern"
+    ],
+    "note": "4.1-disaster-recovery"
+  },
+  {
+    "term": "Coldline",
+    "def": "A Cloud Storage class for infrequent access to data that you keep at least 90 days, such as disaster recovery data. It has a 90-day minimum storage duration and retrieval fees.",
+    "match": [
+      "Coldline"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "Communications Lead",
+    "def": "The incident role that is the public face of the response. It sends periodic updates to responders and stakeholders and can keep the incident document current. It reports to the Incident Commander.",
+    "match": [
+      "Communications Lead",
+      "CL"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "Compliance Reports Manager",
+    "def": "Gives you Google Cloud ISO/IEC certificates and SOC reports at no additional cost, and also PCI DSS reports. To share confidential reports outside your organization, you need permission from your sales representative.",
+    "match": [
+      "Compliance Reports Manager"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "Confidential Computing",
+    "def": "Protects data in use, in memory, with a hardware trusted execution environment. Confidential VM protects a whole VM, and Confidential Space lets parties process shared sensitive data that the operator cannot access.",
+    "aws": "AWS Nitro Enclaves",
+    "match": [
+      "Confidential Computing",
+      "Confidential VM",
+      "Confidential Space"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "Config Connector",
+    "def": "An open source Kubernetes add-on whose custom resources and controllers create and manage Google Cloud resources. Its controllers reconcile continuously and correct drift, while Terraform finds drift only when you run it.",
+    "aws": "AWS Controllers for Kubernetes (ACK)",
+    "match": [
+      "Config Connector"
+    ],
+    "note": "5.2-infrastructure-as-code"
+  },
+  {
+    "term": "Connectivity Tests",
+    "def": "A Network Intelligence Center tool that simulates the packet path between two endpoints from the configuration. It shows the rule or route that drops a packet. A could-be-delivered result does not guarantee delivery.",
+    "match": [
+      "Connectivity Tests"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "COPPA",
+    "expansion": "Children's Online Privacy Protection Act",
+    "def": "A US law for online services for children under 13. The Google Cloud COPPA page covers only Google Workspace for Education, so you meet COPPA as the operator of your own service.",
+    "match": [
+      "COPPA"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "CREMA",
+    "def": "An autoscaler that you deploy as a Cloud Run service to scale Cloud Run worker pools, which have no built-in autoscaling. It reads external metrics, such as Pub/Sub backlog, and updates the instance count.",
+    "match": [
+      "CREMA"
+    ],
+    "note": "1.3-compute-choice"
+  },
+  {
+    "term": "Cross-Cloud Interconnect",
+    "def": "Dedicated physical connections from Google Cloud to AWS, Microsoft Azure, OCI, and Alibaba Cloud, at 10 or 100 Gbps, and 400 Gbps for AWS and OCI. It supports MACsec.",
+    "match": [
+      "Cross-Cloud Interconnect"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "CSEK",
+    "expansion": "Customer-supplied encryption key",
+    "def": "Raw key material that you send with each request. Google does not store it, so you must back up each key. Use it only for Cloud Storage, because CSEK for Compute Engine is deprecated.",
+    "match": [
+      "CSEK",
+      "customer-supplied encryption key",
+      "customer-supplied encryption keys"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "CUD",
+    "expansion": "Committed use discount",
+    "def": "A lower price for a 1-year or 3-year commitment. Resource-based CUDs commit to Compute Engine resources in one region and cannot be canceled. Flexible CUDs commit to an hourly spend. A CUD does not reserve capacity.",
+    "aws": "EC2 Reserved Instances (resource-based) and Compute Savings Plans (flexible)",
+    "match": [
+      "CUD",
+      "committed use discount",
+      "committed use discounts"
+    ],
+    "note": "4.2-cost-optimization"
+  },
+  {
+    "term": "custom advertisement",
+    "def": "A Cloud Router mode that advertises ranges you choose, with or instead of the subnets. You need it for the Private Google Access VIPs, the Cloud DNS range 35.199.192.0/19, and peered subnet ranges.",
+    "match": [
+      "custom advertisement",
+      "custom advertisements"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "custom machine type",
+    "def": "A Compute Engine machine shape with the vCPU count and memory that you choose. Only the N and E series and G2 support it, and it costs 5% more than a predefined type.",
+    "match": [
+      "custom machine type",
+      "custom machine types"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "CX Agent Studio",
+    "def": "A minimal-code builder for conversational agents, built on ADK and part of GECX. It is the evolution of Dialogflow CX. Agents use generative playbooks, deterministic flows, or both.",
+    "match": [
+      "CX Agent Studio"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "DAG",
+    "expansion": "Directed acyclic graph",
+    "def": "A workflow in Managed Service for Apache Airflow, which you define in a Python file. Airflow DAGs suit batch ETL and ELT pipelines, and they support backfills and re-runs.",
+    "match": [
+      "DAG"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Data Access audit logs",
+    "def": "Audit logs that record who read data, such as Cloud KMS decrypt calls or Secret Manager AccessSecretVersion calls. They are off by default, except for some BigQuery services, and they have log charges.",
+    "match": [
+      "Data Access audit log",
+      "Data Access audit logs",
+      "Data Access log",
+      "Data Access logs"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "data residency",
+    "def": "A requirement to keep data in a country or region. Enforce it with the gcp.resourceLocations constraint or Assured Workloads. Commitments cover Customer Data at rest, not resource names or labels.",
+    "match": [
+      "data residency"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "Dataflow",
+    "def": "A managed service that runs Apache Beam pipelines for batch and streaming data, with exactly-once processing by default. Use it for new pipelines that need windows, aggregations, or enrichment.",
+    "aws": "Amazon Managed Service for Apache Flink",
+    "match": [
+      "Dataflow"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Datastream",
+    "def": "A serverless CDC service that streams changes from databases such as MySQL, Oracle, SQL Server, and PostgreSQL into BigQuery, Cloud Storage, or Iceberg tables. It does not move a database to a new primary.",
+    "aws": "AWS Database Migration Service (CDC)",
+    "match": [
+      "Datastream"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "de-identification",
+    "def": "Transforms sensitive values so that people and systems do not see the originals. Sensitive Data Protection methods include redaction, masking, hashing, bucketing, date shifting, and tokens that are reversible with the key (AES-SIV, FPE).",
+    "match": [
+      "de-identification",
+      "de-identify",
+      "de-identified"
+    ],
+    "note": "3.1-securing-ai"
+  },
+  {
+    "term": "Dedicated Interconnect",
+    "def": "Your own 10-Gbps, 100-Gbps, or 400-Gbps circuits to Google in a colocation facility. The multi-region 99.99% SLA needs four connections in two metros, VLAN attachments in two regions, and global dynamic routing.",
+    "match": [
+      "Dedicated Interconnect"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "deny policy",
+    "def": "An IAM policy that stops principals from using listed permissions, whatever their allow policies grant. You attach it to an organization, folder, or project, and IAM checks it before allow policies.",
+    "match": [
+      "deny policy",
+      "deny policies",
+      "IAM deny policy"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "Deployment Manager",
+    "def": "Google's former IaC service, with YAML configurations and Jinja or Python templates. Support stopped on April 1, 2026, and Google turns it down after June 30, 2027. Use Terraform or Infrastructure Manager instead.",
+    "match": [
+      "Deployment Manager"
+    ],
+    "note": "5.2-infrastructure-as-code"
+  },
+  {
+    "term": "Dialogflow",
+    "def": "Google's earlier conversational agent products, Dialogflow CX and Dialogflow ES. The docs call both legacy. For new designs, use CX Agent Studio, the evolution of Dialogflow CX.",
+    "aws": "Amazon Lex",
+    "match": [
+      "Dialogflow"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "Direct Peering",
+    "def": "A connection to Google that exists outside Google Cloud. It gives no access to internal IP addresses and has no SLA, so do not use it to reach VPC networks.",
+    "match": [
+      "Direct Peering"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Direct VPC egress",
+    "def": "The recommended way for Cloud Run to send traffic into a VPC network. Compared with a connector, it has lower latency, higher throughput, and no VM charges. Plan about two subnet addresses per instance.",
+    "aws": "Lambda function attached to a VPC",
+    "match": [
+      "Direct VPC egress"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "DM Convert",
+    "def": "A Preview tool that converts Deployment Manager configurations and templates to Terraform or Kubernetes Resource Model (KRM) files, for a move to Infrastructure Manager. It does not convert composite types.",
+    "match": [
+      "DM Convert"
+    ],
+    "note": "5.2-infrastructure-as-code"
+  },
+  {
+    "term": "DMS",
+    "expansion": "Database Migration Service",
+    "def": "A service that migrates MySQL, PostgreSQL, SQL Server, and Oracle into Cloud SQL or AlloyDB for PostgreSQL. Continuous migrations replicate changes for minimal downtime. You cannot undo the cutover (promotion).",
+    "match": [
+      "DMS",
+      "Database Migration Service"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "Document AI",
+    "def": "A service for document processing pipelines and scanned documents. Its processors extract text, form tables, and RAG chunks, and they extract fields from known document types or your own document types.",
+    "aws": "Amazon Textract",
+    "match": [
+      "Document AI"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "DORA",
+    "def": "A research program that measures software delivery performance. Its four delivery metrics are change lead time, deployment frequency, change failure rate, and failed deployment recovery time. It recommends peer review instead of heavyweight change approval.",
+    "match": [
+      "DORA"
+    ],
+    "note": "6.5-quality-control"
+  },
+  {
+    "term": "dry-run mode",
+    "def": "A mode that logs what a new policy would deny, but does not deny it. Organization policies, VPC Service Controls perimeters, and Binary Authorization support it. Test in it before you enforce.",
+    "match": [
+      "dry-run mode",
+      "dry run mode"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "dual-region bucket",
+    "def": "A Cloud Storage bucket in two regions with asynchronous replication and automatic failover, with an RTO of zero. Default replication copies 99.9% of new objects within one hour.",
+    "match": [
+      "dual-region bucket",
+      "dual-region buckets"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "dynamic routing mode",
+    "def": "A VPC network setting for Cloud Router routes. In regional mode, the gcloud default, learned routes apply only in the region of the router. Multi-region hybrid designs need global mode.",
+    "match": [
+      "dynamic routing mode",
+      "global dynamic routing",
+      "regional dynamic routing"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "E2",
+    "def": "The lowest-cost general-purpose machine series. It offers shared-core types, such as e2-micro, for small low-load apps. It supports custom machine types but not extended memory.",
+    "match": [
+      "E2"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "edge availability domain",
+    "def": "A section of a Cloud Interconnect metro. SLA topologies put connections in different edge availability domains. Google coordinates maintenance between the domains of one metro, but not between metros.",
+    "match": [
+      "edge availability domain",
+      "edge availability domains"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "edge security policy",
+    "def": "A Cloud Armor policy for global external and classic Application Load Balancers. It runs at the edge, before the Cloud CDN cache and IAP, and can only allow or deny. Put geography and IP blocks for cached content here.",
+    "match": [
+      "edge security policy",
+      "edge security policies"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "ELT",
+    "expansion": "Extract, load, transform",
+    "def": "Loading raw data into BigQuery first, then transforming it with SQL. Google recommends this approach for most customers. Dataform or BigQuery pipelines can schedule the SQL work.",
+    "match": [
+      "ELT"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Enhanced Support",
+    "def": "The Customer Care service for production workloads. P1 cases get a 1-hour initial response target, 24/7. It has no TAM; the Technical Account Advisor Service is a paid Value-Add Service.",
+    "match": [
+      "Enhanced Support"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "error budget",
+    "def": "The allowed unreliability: 100% minus the SLO. While budget remains, releases continue. A written error budget policy, approved by product, developers, and SREs, states what happens when the budget is used up.",
+    "match": [
+      "error budget",
+      "error budgets"
+    ],
+    "note": "6.5-quality-control"
+  },
+  {
+    "term": "ETL",
+    "expansion": "Extract, transform, load",
+    "def": "A pipeline that transforms data before it loads the data into the target. Google recommends ELT for most customers. Teams that want visual, code-free ETL pipelines can use Cloud Data Fusion.",
+    "match": [
+      "ETL"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Eventarc",
+    "def": "A service that routes events, such as Cloud Storage changes or audit log entries, to targets such as Cloud Run and Workflows. Eventarc Advanced adds a central bus, many-to-many routing, and event transformation.",
+    "aws": "Amazon EventBridge",
+    "match": [
+      "Eventarc"
+    ],
+    "note": "1.1-integration-and-data-movement"
+  },
+  {
+    "term": "exactly-once delivery",
+    "def": "A Pub/Sub subscription option that works only for pull subscriptions, with subscribers in the same region. Push and export subscriptions do not support it, and publish-side duplicates can still occur.",
+    "match": [
+      "exactly-once delivery"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Fault Injection Testing",
+    "def": "A Preview service that fails Compute Engine and GKE resources, degrades traffic through a layer 7 load balancer, and fails over Cloud SQL. Its faults stay inside one project and one region.",
+    "aws": "AWS Fault Injection Service",
+    "match": [
+      "Fault Injection Testing"
+    ],
+    "note": "6.6-production-reliability"
+  },
+  {
+    "term": "Feature Store",
+    "def": "A store that gives the same features to experimentation, training, and online serving, which avoids training-serving skew. BigQuery tables form the offline store, and Bigtable online serving is the online option that is not deprecated.",
+    "match": [
+      "Feature Store",
+      "Vertex AI Feature Store"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "FHIR",
+    "expansion": "Fast Healthcare Interoperability Resources",
+    "def": "A standard format for healthcare records. Agent Search for healthcare searches healthcare records in FHIR data stores.",
+    "match": [
+      "FHIR"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "Filestore",
+    "def": "Managed NFS file storage. Use the Regional tier for resilience to a zone outage; Basic is a legacy tier. Filestore does not serve SMB shares, so use NetApp Volumes for them.",
+    "aws": "Amazon EFS",
+    "match": [
+      "Filestore"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "FinOps",
+    "def": "A cost practice that the cost pillar says to adopt, to align cloud spending with business value. The FinOps hub shows savings and optimization opportunities from Cloud Billing and Recommender data.",
+    "match": [
+      "FinOps"
+    ],
+    "note": "4.2-cost-optimization"
+  },
+  {
+    "term": "FIPS 140-2",
+    "expansion": "Federal Information Processing Standard 140-2",
+    "def": "A US standard for cryptographic modules. Cloud HSM keys use FIPS 140-2 Level 3 HSMs, so choose Cloud HSM when a requirement names that level.",
+    "match": [
+      "FIPS 140-2"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "Firestore",
+    "def": "A serverless document NoSQL database with ACID transactions and a MongoDB-compatible API. You cannot change its location or its data access mode after you create the database.",
+    "match": [
+      "Firestore"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "First mover",
+    "def": "An early workload in a migration that lets the team learn with low risk. Choose one that people use but that is not business critical, with few dependencies and little refactoring.",
+    "match": [
+      "first mover",
+      "first movers"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "Flex-start",
+    "def": "A Dynamic Workload Scheduler mode that gives GPUs or TPUs for up to 7 days to jobs that can wait for capacity. It uses preemptible quota, but Google does not preempt the VMs.",
+    "match": [
+      "flex-start"
+    ],
+    "note": "2.4-ai-hypercomputer"
+  },
+  {
+    "term": "floor settings",
+    "def": "Minimum Model Armor filters at the organization, folder, or project level. You cannot create a template that is less strict than the floor settings. When floor settings conflict, the lower level wins.",
+    "match": [
+      "floor setting",
+      "floor settings"
+    ],
+    "note": "3.1-securing-ai"
+  },
+  {
+    "term": "forwarding zone",
+    "def": "A Cloud DNS zone that sends queries for a domain to other name servers, such as on-premises DNS. The queries come from 35.199.192.0/19, so Cloud Router must advertise that range to on-premises.",
+    "match": [
+      "forwarding zone",
+      "forwarding zones"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "GCDS",
+    "expansion": "Google Cloud Directory Sync",
+    "def": "A free Google tool that provisions users and groups in one direction, from Active Directory to Google. It does not sync passwords. Users authenticate to Active Directory through SAML SSO.",
+    "match": [
+      "GCDS",
+      "Google Cloud Directory Sync"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "GDPR",
+    "expansion": "General Data Protection Regulation",
+    "def": "The EU personal data law. Google commits in its contracts to process your data only on your instructions. You act as the data controller and answer data subject requests.",
+    "match": [
+      "GDPR"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "GECX",
+    "expansion": "Gemini Enterprise for Customer Experience",
+    "def": "Google's product that brings shopping and customer service together. It includes CX Agent Studio and AI Commerce Search. Customer Engagement Suite and Contact Center AI became GECX on March 17, 2026.",
+    "aws": "Amazon Connect",
+    "match": [
+      "GECX",
+      "Gemini Enterprise for Customer Experience",
+      "Customer Engagement Suite",
+      "Contact Center AI"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "Gemini Cloud Assist",
+    "def": "An AI assistant (Preview) for design, operations, troubleshooting, and cost work in Google Cloud. It has the same permissions as the user. Do not enable it for projects with data residency or CMEK requirements.",
+    "aws": "Amazon Q Developer in the AWS console",
+    "match": [
+      "Gemini Cloud Assist"
+    ],
+    "note": "1.2-gemini-cloud-assist"
+  },
+  {
+    "term": "Gemini Enterprise",
+    "def": "An intranet search, AI assistant, and agentic platform for employees, not a developer platform. Search results follow each user's permissions, and prebuilt connectors reach systems such as Jira and SharePoint. Formerly Google Agentspace.",
+    "match": [
+      "Gemini Enterprise",
+      "Google Agentspace",
+      "Agentspace"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "Gemini Enterprise Agent Platform",
+    "def": "Google Cloud's platform to build, deploy, govern, and optimize agents and model-based solutions, with more than 200 foundation models. Google renamed it from Vertex AI in April 2026; the API is still aiplatform.googleapis.com.",
+    "aws": "Amazon SageMaker",
+    "match": [
+      "Gemini Enterprise Agent Platform",
+      "Agent Platform",
+      "Vertex AI"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Gemini Notebook Enterprise",
+    "def": "A highly compliant, enterprise version of Gemini Notebook that builds a reference point from known, trusted sources. You share notebooks only through IAM roles, never publicly. Formerly NotebookLM Enterprise.",
+    "match": [
+      "Gemini Notebook Enterprise",
+      "NotebookLM Enterprise"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "GFE",
+    "expansion": "Google Front End",
+    "def": "The Google proxies of the global external and classic Application Load Balancers. Instance group and zonal NEG backends must allow ingress from 130.211.0.0/22 and 35.191.0.0/16, and Cloud Armor, not firewall rules, blocks clients at GFEs.",
+    "match": [
+      "GFE",
+      "Google Front End",
+      "Google Front Ends"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "GKE Autopilot",
+    "def": "The recommended GKE mode. GKE creates and manages the nodes, clusters are always regional, and privileged Pods are not allowed. General-purpose Pods are billed by their resource requests.",
+    "match": [
+      "GKE Autopilot",
+      "Autopilot"
+    ],
+    "note": "2.3-gke"
+  },
+  {
+    "term": "GKE Standard",
+    "def": "The GKE mode in which you create and manage node pools and pay for the node VMs. Use it only when workloads need privileged Pods or node-level control that Autopilot does not allow.",
+    "match": [
+      "GKE Standard",
+      "Standard cluster",
+      "Standard clusters"
+    ],
+    "note": "1.3-compute-choice"
+  },
+  {
+    "term": "global endpoint",
+    "def": "An API endpoint with no regional isolation, so requests to it can run in any Google Cloud location. It gives no data residency guarantee, so use a regional or US/EU multi-region endpoint for residency.",
+    "match": [
+      "global endpoint"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Google Cloud Adoption Framework",
+    "def": "Google's model to assess cloud maturity in four themes (Learn, Lead, Scale, Secure) and three phases (tactical, strategic, transformational). Use it to evaluate the organization before a migration starts.",
+    "aws": "AWS Cloud Adoption Framework",
+    "match": [
+      "Cloud Adoption Framework",
+      "Adoption Framework"
+    ],
+    "note": "4.2-business-processes"
+  },
+  {
+    "term": "Google Cloud NetApp Volumes",
+    "def": "A managed file service that supports NFS, SMB, iSCSI, and NVMe/TCP. It is the answer for SMB (Windows) file shares on Google Cloud.",
+    "aws": "Amazon FSx for NetApp ONTAP",
+    "match": [
+      "Google Cloud NetApp Volumes",
+      "NetApp Volumes"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Google Cloud Observability",
+    "def": "Google Cloud's suite of Cloud Monitoring, Cloud Logging, Cloud Trace, Cloud Profiler, and Error Reporting. Monitoring, Logging, and Trace are on by default in each project and collect telemetry for most services automatically.",
+    "match": [
+      "Google Cloud Observability",
+      "Stackdriver",
+      "Cloud operations suite"
+    ],
+    "note": "6.2-observability"
+  },
+  {
+    "term": "Google Cloud VMware Engine",
+    "def": "The VMware platform (vSphere, vCenter, vSAN, NSX, and HCX) on Google Cloud bare-metal infrastructure. Teams keep their VMware tools, skills, and processes, so it fits a fast data center exit.",
+    "aws": "VMware Cloud on AWS",
+    "match": [
+      "Google Cloud VMware Engine",
+      "VMware Engine"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "Grounding",
+    "def": "Connecting model output to verifiable sources, such as Google Search, Agent Search, RAG Engine, or your own search API. It reduces hallucinations. Use it for facts that change; use tuning to teach a skill.",
+    "match": [
+      "grounding"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "HA VPN",
+    "def": "The Cloud VPN gateway with two interfaces and dynamic (BGP) routing only. It gives a 99.99% SLA only with a tunnel on each interface. Each tunnel carries 1 to 3 Gbps.",
+    "aws": "AWS VPN",
+    "match": [
+      "HA VPN"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "HCX",
+    "def": "A VMware migration tool that VMware Engine deploys with each private cloud. It moves VMware VMs from on-premises with live, cold, or bulk migration, and the VMs stay unchanged.",
+    "match": [
+      "HCX"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "hierarchical firewall policy",
+    "def": "A Cloud NGFW firewall policy on an organization or a folder. By default, it is evaluated first, and lower levels cannot override it. The goto_next action delegates the decision to lower levels.",
+    "match": [
+      "hierarchical firewall policy",
+      "hierarchical firewall policies"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "HIPAA",
+    "expansion": "Health Insurance Portability and Accountability Act",
+    "def": "A US law for health records. HHS recognizes no HIPAA certification, so accept the Google Cloud BAA and store PHI only in the products that it covers.",
+    "match": [
+      "HIPAA"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "HITL",
+    "expansion": "Human in the loop",
+    "def": "A human review step in an AI workflow. Google says that specialized uses that can affect individual rights need meaningful human supervision, and a human-in-the-loop step satisfies this.",
+    "match": [
+      "HITL",
+      "human-in-the-loop"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "HNS",
+    "expansion": "Hierarchical namespace",
+    "def": "A Cloud Storage bucket setting that adds folders and atomic folder operations for AI, ML, and analytics, with up to 8 times higher initial QPS. You enable it only when you create the bucket.",
+    "match": [
+      "HNS",
+      "hierarchical namespace"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "HPA",
+    "expansion": "Horizontal Pod Autoscaler",
+    "def": "A GKE autoscaler that changes the number of Pods based on CPU, memory, custom metrics, or external metrics such as a Pub/Sub queue size. Do not use it with the VPA on CPU or memory.",
+    "match": [
+      "HPA",
+      "Horizontal Pod Autoscaler"
+    ],
+    "note": "2.3-gke"
+  },
+  {
+    "term": "HTAP",
+    "expansion": "Hybrid transactional and analytical processing",
+    "def": "Analytical queries on live transactional data in the same database. AlloyDB supports it with its columnar engine, which uses 30% of instance memory by default.",
+    "match": [
+      "HTAP"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Hyperdisk",
+    "def": "The recommended block storage for Compute Engine. You set performance separately from size. Types include Balanced, Extreme, Throughput, ML, and Balanced High Availability.",
+    "aws": "Amazon EBS",
+    "match": [
+      "Hyperdisk"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Hyperdisk Balanced High Availability",
+    "def": "A Hyperdisk type that replicates synchronously across two zones in one region, for an RPO of zero in a zone outage. A force-attach to a standby VM takes less than one minute.",
+    "match": [
+      "Hyperdisk Balanced High Availability"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "IaC",
+    "expansion": "Infrastructure as code",
+    "def": "Infrastructure defined in declarative, version-controlled files and applied by a pipeline. It gives consistency, repeatability, and easy rollback, and Google recommends Terraform, which finds drift only when you run it.",
+    "match": [
+      "IaC",
+      "infrastructure as code",
+      "Infrastructure as Code"
+    ],
+    "note": "5.2-infrastructure-as-code"
+  },
+  {
+    "term": "IAM Conditions",
+    "def": "Rules on a role binding that grant access only when attributes match, such as the request time or a resource tag. You cannot use them with legacy basic roles or with allUsers.",
+    "match": [
+      "IAM Conditions",
+      "IAM conditions",
+      "IAM condition"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "IAP",
+    "expansion": "Identity-Aware Proxy",
+    "def": "A central authorization layer that authenticates the user and checks an IAM role before a request reaches an HTTPS app, so users need no VPN. IAP TCP forwarding also gives SSH and RDP to VMs with no external IP address.",
+    "aws": "Application Load Balancer with Cognito, AWS Verified Access",
+    "match": [
+      "IAP",
+      "Identity-Aware Proxy"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "inbound server policy",
+    "def": "A Cloud DNS policy that gives on-premises DNS servers entry points to resolve Google Cloud names. Put it in the VPC network that connects to on-premises; peered and NCC networks cannot reach the entry points.",
+    "match": [
+      "inbound server policy",
+      "inbound server policies"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Incident Commander",
+    "def": "The incident role that holds the high-level state of the incident, assigns roles, and holds every role that is not delegated. The Communications Lead and the Operations Lead report to this role.",
+    "match": [
+      "Incident Commander",
+      "incident commander",
+      "incident commanders",
+      "IC"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "infoType",
+    "def": "A type of sensitive data that Sensitive Data Protection detects, such as a credit card number. An inspect template lists the infoTypes to look for.",
+    "match": [
+      "infoType"
+    ],
+    "note": "3.1-securing-ai"
+  },
+  {
+    "term": "Infrastructure Manager",
+    "def": "A managed service that runs Terraform in an ephemeral Cloud Build environment and stores the state, logs, and configuration of each revision. Remove backend blocks from its configurations. It does not deploy applications.",
+    "aws": "AWS CloudFormation",
+    "match": [
+      "Infrastructure Manager",
+      "Infra Manager"
+    ],
+    "note": "5.2-infrastructure-as-code"
+  },
+  {
+    "term": "instance template",
+    "def": "The configuration for every VM in a MIG: machine type, image, disks, network, metadata, and provisioning model. You cannot edit a template, so you create a new one and roll it out.",
+    "aws": "EC2 launch template",
+    "match": [
+      "instance template",
+      "instance templates"
+    ],
+    "note": "2.3-compute-engine-ops"
+  },
+  {
+    "term": "ISO/IEC 27001",
+    "def": "The certification of the information security management system of Google Cloud. Get the certificate from Compliance Reports Manager. It covers Google's part of the stack, not your workload.",
+    "match": [
+      "ISO/IEC 27001",
+      "ISO 27001"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "IVR",
+    "expansion": "Interactive voice response",
+    "def": "An automated phone system that talks with callers. To transcribe IVR call audio, use the Speech-to-Text telephony model or Chirp 3.",
+    "match": [
+      "IVR"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "JWKS",
+    "expansion": "JSON Web Key Set",
+    "def": "The public signing keys of a token issuer. If the IdP has no public OIDC endpoint, upload the JWKS to the Workload Identity Federation provider, up to 8 keys.",
+    "match": [
+      "JWKS"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "JWT",
+    "expansion": "JSON Web Token",
+    "def": "A signed token. IAP sends one in the x-goog-iap-jwt-assertion header, and the app must verify it in case someone bypasses IAP.",
+    "match": [
+      "JWT"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Key Access Justifications",
+    "def": "A control that adds a reason code to each request to use an enrolled key. In some control packages, a policy can approve or deny the request by reason code. It works only with Assured Workloads.",
+    "match": [
+      "Key Access Justifications",
+      "KAJ"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "KFP",
+    "expansion": "Kubeflow Pipelines",
+    "def": "The SDK to use for most Agent Platform Pipelines workflows. Choose TFX instead only when you process terabytes of structured or text data with TensorFlow Extended.",
+    "match": [
+      "KFP",
+      "Kubeflow Pipelines"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "Knowledge Catalog",
+    "def": "The Google Cloud catalog for data discovery, data lineage, data quality scans, and business glossaries. Google renamed it from Dataplex Universal Catalog in 2026.",
+    "match": [
+      "Knowledge Catalog",
+      "Dataplex Universal Catalog",
+      "Dataplex"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Lakehouse",
+    "def": "The Google Cloud service for open lakehouse data. For most workloads, Google recommends Apache Iceberg tables in the Lakehouse runtime catalog, and BigLake tables let users query an external store without access to it.",
+    "match": [
+      "Lakehouse",
+      "BigLake"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "License Mobility",
+    "def": "A Microsoft Software Assurance benefit that lets you bring server applications, such as SQL Server and SharePoint Server, to Google Cloud. It does not cover Windows Server. A deployed license stays in its region for 90 days.",
+    "match": [
+      "License Mobility"
+    ],
+    "note": "1.4-licensing-and-financials"
+  },
+  {
+    "term": "live migration",
+    "def": "Compute Engine moves a running VM to another host during host maintenance, and Local SSD data stays. VMs with GPUs and Spot VMs cannot live migrate, so they stop for host events.",
+    "match": [
+      "live migration",
+      "live migrate"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "LLM",
+    "expansion": "Large language model",
+    "def": "A generative model for text, such as Gemini. In CX Agent Studio, generative playbooks let the LLM drive the conversation, and Model Armor screens LLM prompts and responses.",
+    "match": [
+      "LLM"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "LOA-CFA",
+    "expansion": "Letter of Authorization and Connecting Facility Assignment",
+    "def": "The document that you give to your vendor after you order Dedicated Interconnect. Then you test the connection. Partner Interconnect uses a pairing key instead.",
+    "match": [
+      "LOA-CFA"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "load testing",
+    "def": "Testing that simulates realistic traffic. Control the rate and the concurrency, confirm that the service scales out linearly, and measure performance at the client. Stress testing pushes the system to its limits to find bottlenecks.",
+    "match": [
+      "load testing",
+      "load test",
+      "load tests"
+    ],
+    "note": "6.6-production-reliability"
+  },
+  {
+    "term": "Local SSD",
+    "def": "The fastest block storage, for scratch data and caches only. Data is lost on preemption or a forced stop, and you cannot back it up with snapshots, clones, or machine images.",
+    "aws": "Amazon EC2 instance store",
+    "match": [
+      "Local SSD"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Log Router",
+    "def": "The Cloud Logging layer that every log entry passes. Its sinks route entries to log buckets, BigQuery, Cloud Storage, Pub/Sub, or another project. A new sink routes only entries that arrive after you create it.",
+    "match": [
+      "Log Router",
+      "log sink",
+      "log sinks"
+    ],
+    "note": "6.2-observability"
+  },
+  {
+    "term": "MaaS",
+    "expansion": "Model as a Service",
+    "def": "A serverless way to use Model Garden models: you provision nothing and pay per token or with Provisioned Throughput. Self-deploy instead for custom weights, predictable high volume, or a rule against multi-tenant services.",
+    "match": [
+      "MaaS",
+      "Model as a Service"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "machine image",
+    "def": "A Compute Engine backup of a whole instance: its configuration, metadata, permissions, and crash-consistent data from all attached Persistent Disk and Hyperdisk volumes. Local SSD data is not included.",
+    "match": [
+      "machine image",
+      "machine images"
+    ],
+    "note": "2.2-data-protection"
+  },
+  {
+    "term": "MACsec",
+    "expansion": "Media Access Control security",
+    "def": "Layer 2 encryption between your router and the Google edge router, on Dedicated Interconnect or Cross-Cloud Interconnect. It does not encrypt traffic inside Google, so Google recommends IPsec and TLS as extra layers.",
+    "match": [
+      "MACsec"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Managed Lustre",
+    "def": "A managed parallel file system for AI, ML, and HPC with up to 10 TBps of throughput. An instance is zonal. Google makes it the primary choice for AI training checkpoints.",
+    "aws": "Amazon FSx for Lustre",
+    "match": [
+      "Managed Lustre"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Managed Service for Apache Airflow",
+    "def": "Managed Apache Airflow for batch ETL and ELT workflows written as Python DAGs. It has seconds of latency between tasks, so use Workflows to chain low-latency HTTP calls.",
+    "aws": "Amazon MWAA",
+    "match": [
+      "Managed Service for Apache Airflow",
+      "Managed Airflow",
+      "Cloud Composer"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Managed Service for Apache Kafka",
+    "def": "Managed Kafka clusters for existing Kafka workloads. You manage the cluster size and the partitions of each topic. For new streaming workloads, Google recommends Pub/Sub.",
+    "aws": "Amazon MSK",
+    "match": [
+      "Managed Service for Apache Kafka"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "Managed Service for Apache Spark",
+    "def": "Managed Spark and Hadoop with cluster and serverless deployments. Use clusters to migrate existing Hadoop or Spark jobs, and serverless for intermittent Spark jobs. Delete idle clusters instead of scaling them down.",
+    "aws": "Amazon EMR",
+    "match": [
+      "Managed Service for Apache Spark",
+      "Managed Spark",
+      "Dataproc",
+      "Serverless for Apache Spark"
+    ],
+    "note": "1.3-data-processing"
+  },
+  {
+    "term": "MCP",
+    "expansion": "Model Context Protocol",
+    "def": "A protocol for agent tool calls. Model Armor can screen tool calls and responses on Google Cloud MCP servers, and Agent Registry lists the approved MCP servers.",
+    "match": [
+      "MCP",
+      "Model Context Protocol"
+    ],
+    "note": "3.1-securing-ai"
+  },
+  {
+    "term": "Media CDN",
+    "def": "The Google Cloud content delivery service for streaming video and large file downloads. It complements Cloud CDN.",
+    "aws": "CloudFront",
+    "match": [
+      "Media CDN"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "Memory Bank",
+    "def": "An Agent Runtime feature that keeps an agent's memory across sessions. Sessions, in contrast, keep only one conversation.",
+    "match": [
+      "Memory Bank"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Memorystore",
+    "def": "A managed in-memory key-value service for Valkey, Redis Cluster, and Redis. Replication is asynchronous, so a failover can lose acknowledged writes. Memorystore for Memcached is deprecated.",
+    "aws": "Amazon ElastiCache",
+    "match": [
+      "Memorystore"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "metrics scope",
+    "def": "The list of projects whose metrics one scoping project can chart and alert on. Use a project without resources as the scoping project. Scopes do not move data; metrics stay in their own project.",
+    "match": [
+      "metrics scope",
+      "metrics scopes",
+      "scoping project"
+    ],
+    "note": "6.2-observability"
+  },
+  {
+    "term": "MIG",
+    "expansion": "Managed instance group",
+    "def": "A group of identical VMs that Compute Engine creates from one instance template, with autohealing, autoscaling, and rolling updates. Google recommends regional MIGs, which spread VMs across three zones by default.",
+    "aws": "EC2 Auto Scaling group",
+    "match": [
+      "MIG",
+      "managed instance group",
+      "managed instance groups"
+    ],
+    "note": "2.3-compute-engine-ops"
+  },
+  {
+    "term": "Migrate to Containers",
+    "def": "A tool that moves workloads from VMs into containers on GKE, GKE Autopilot, or Cloud Run. It fits web and application servers, not large in-memory databases or licenses tied to hardware.",
+    "aws": "AWS App2Container",
+    "match": [
+      "Migrate to Containers",
+      "Migrate for Anthos"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "Migrate to Virtual Machines",
+    "def": "A lift-and-shift tool that moves VMs from vSphere, AWS, Azure, and VMware Engine to Compute Engine. It replicates disks while the source runs, supports test clones, and needs a short cutover. Rollback is manual.",
+    "aws": "AWS Server Migration Service",
+    "match": [
+      "Migrate to Virtual Machines",
+      "Migrate for Compute Engine"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "Migration Center",
+    "def": "A platform for asset discovery, assessment, planning, and cost estimates. It groups assets and makes TCO reports from your migration preferences. You choose its data region once and cannot change it.",
+    "aws": "AWS Migration Hub",
+    "match": [
+      "Migration Center",
+      "Google Cloud Migration Center"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "Migration wave",
+    "def": "A group of workloads that migrate together. Rank waves by business value and effort: wave 1 has high value and low effort, and low-value, high-effort workloads go last.",
+    "match": [
+      "migration wave",
+      "migration waves",
+      "wave plan",
+      "wave matrix"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "Model Armor",
+    "def": "A service that screens LLM prompts and responses for prompt injection, jailbreaks, sensitive data, harmful content, and malicious URLs, for models in any cloud. Inspect-only mode logs violations but does not block them.",
+    "aws": "Amazon Bedrock Guardrails",
+    "match": [
+      "Model Armor"
+    ],
+    "note": "3.1-securing-ai"
+  },
+  {
+    "term": "Model Garden",
+    "def": "A library to discover, test, customize, and deploy Google models, partner models such as Anthropic Claude, and open models such as Llama. An organization policy controls which models people can use.",
+    "aws": "Amazon Bedrock, AWS JumpStart",
+    "match": [
+      "Model Garden",
+      "Vertex AI Model Garden"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Model Monitoring",
+    "def": "A service that tracks the quality of tabular models on a schedule or on demand. Use skew detection when you have the original training data, and drift detection when you do not.",
+    "match": [
+      "Model Monitoring",
+      "Vertex AI Model Monitoring"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "Model Registry",
+    "def": "The central list of models and versions in Agent Platform. From it, you evaluate a version, deploy it to an endpoint, or run batch inference. An alias is a movable name for one version.",
+    "match": [
+      "Model Registry",
+      "Vertex AI Model Registry"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "MTU",
+    "expansion": "Maximum transmission unit",
+    "def": "The largest packet size on a network path. Adjust it for protocol overhead; Cloud VPN can need a lower MTU. Do not use HA VPN between VPC networks that need a large MTU.",
+    "match": [
+      "MTU"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "N2D",
+    "def": "A balanced general-purpose machine series. It supports custom machine types and extended memory, regional Persistent Disk attaches to it, and sustained use discounts apply to it.",
+    "match": [
+      "N2D"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "N4",
+    "def": "A balanced general-purpose machine series. It does not support Persistent Disk or Local SSD, so it uses Hyperdisk. It supports custom machine types and extended memory.",
+    "match": [
+      "N4"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "Natural Language API",
+    "def": "A pre-trained API for sentiment, entities, entity sentiment, and text moderation against safety attributes.",
+    "aws": "Amazon Comprehend",
+    "match": [
+      "Natural Language API",
+      "Natural Language AI"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "NCC",
+    "expansion": "Network Connectivity Center",
+    "def": "A global hub with spokes that connects VPC networks, HA VPN tunnels, VLAN attachments, and Router appliance VMs. VPC spokes give transitive connectivity, unlike VPC Network Peering. The hub is control plane only.",
+    "aws": "AWS Transit Gateway",
+    "match": [
+      "NCC",
+      "Network Connectivity Center"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "Nearline",
+    "def": "A Cloud Storage class for infrequent access to data that you keep at least 30 days, such as backups. It has a 30-day minimum storage duration and retrieval fees.",
+    "match": [
+      "Nearline"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "NEG",
+    "expansion": "Network endpoint group",
+    "def": "A load balancer backend that lists endpoints: VM or Pod IP addresses, serverless services, internet or on-premises endpoints, or PSC services. One backend service uses one backend type. The only mix is GCE_VM_IP_PORT zonal NEGs with hybrid NEGs.",
+    "match": [
+      "NEG",
+      "network endpoint group",
+      "network endpoint groups"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "network firewall policy",
+    "def": "A Cloud NGFW firewall policy for VPC networks in one project, global or regional. Unlike VPC firewall rules, it supports secure tags. By default, it is evaluated after VPC firewall rules.",
+    "match": [
+      "network firewall policy",
+      "network firewall policies"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Network Intelligence Center",
+    "def": "Network troubleshooting tools: Connectivity Tests, Performance Dashboard, Network Topology, Network Analyzer, and Flow Analyzer. Use them to find the rule or route that drops a packet, or to see loss and latency.",
+    "aws": "AWS Network Manager",
+    "match": [
+      "Network Intelligence Center"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "network tags",
+    "def": "Strings on a VM that VPC firewall rules use as targets. Anyone who can edit the VM can change them, so they are not a security boundary. They do not match VMs across VPC Network Peering.",
+    "match": [
+      "network tag",
+      "network tags"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "NSX",
+    "def": "A VMware component that runs in each VMware Engine private cloud, with vSphere, vCenter, vSAN, and HCX. NSX Layer 2 VPN is one of the options to migrate VMs into VMware Engine.",
+    "match": [
+      "NSX"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "NVA",
+    "expansion": "Network virtual appliance",
+    "def": "An appliance VM that processes traffic between VPC networks. To insert NVAs in a hub-and-spoke design, use VPC Network Peering, because NCC VPC spokes do not support NVAs between spokes.",
+    "match": [
+      "NVA",
+      "network virtual appliance",
+      "network virtual appliances"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "Object Lifecycle Management",
+    "def": "Cloud Storage rules that change the storage class of objects or delete them by age, prefix, or version. SetStorageClass moves objects only to colder classes. A bucket with Autoclass cannot also have a SetStorageClass rule.",
+    "aws": "S3 Lifecycle",
+    "match": [
+      "Object Lifecycle Management",
+      "lifecycle rule",
+      "lifecycle rules"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "Object Versioning",
+    "def": "A Cloud Storage feature that keeps noncurrent versions of overwritten or deleted objects until you remove them. It does not protect against bucket deletion; soft delete does.",
+    "aws": "S3 Versioning",
+    "match": [
+      "Object Versioning"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "Observability Analytics",
+    "def": "A Cloud Logging feature (formerly Log Analytics) that runs SQL on upgraded log buckets, for grouping, aggregation, and joins of log and trace data. Use it when you must count or group; Logs Explorer cannot aggregate.",
+    "aws": "CloudWatch Logs Insights",
+    "match": [
+      "Observability Analytics",
+      "Log Analytics"
+    ],
+    "note": "6.2-observability"
+  },
+  {
+    "term": "OCR",
+    "expansion": "Optical character recognition",
+    "def": "Text extraction from images and scanned documents. Use Vision API text detection for images at high volume, and Document AI Enterprise Document OCR for scanned documents in a pipeline.",
+    "match": [
+      "OCR"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "OIDC",
+    "expansion": "OpenID Connect",
+    "def": "A token-based federation standard. Workload Identity Federation accepts OIDC tokens, for example from GitHub, and Workforce Identity Federation accepts OIDC identity providers.",
+    "match": [
+      "OIDC",
+      "OpenID Connect"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "On-Demand Scanning",
+    "def": "Artifact Analysis scans that you run with gcloud, locally or in a build. In a Cloud Build pipeline, it can stop a build when the image has vulnerabilities of a set severity.",
+    "match": [
+      "On-Demand Scanning"
+    ],
+    "note": "3.1-supply-chain"
+  },
+  {
+    "term": "Online inference",
+    "def": "Predictions for an application that waits for the answer. The model must be deployed to an endpoint, which autoscales replicas and keeps at least one replica in a normal deployment.",
+    "match": [
+      "online inference",
+      "online prediction"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "Operations Lead",
+    "def": "The incident role that applies operational tools to mitigate or resolve the incident. Only the operations team changes the system during an incident. It reports to the Incident Commander.",
+    "match": [
+      "Operations Lead",
+      "OL"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "Ops Agent",
+    "def": "The primary agent for Compute Engine VMs. Without it, you get only basic VM metrics such as CPU and network, but no memory or process metrics. It can also scrape Prometheus metrics.",
+    "aws": "CloudWatch agent",
+    "match": [
+      "Ops Agent"
+    ],
+    "note": "6.2-observability"
+  },
+  {
+    "term": "Organization Policy Service",
+    "def": "Restricts how resources can be configured, for everyone, including project owners. Policies apply to descendants in the hierarchy. Most are not retroactive, so existing resources that violate them keep working.",
+    "aws": "Service control policies (SCPs), AWS Config",
+    "match": [
+      "Organization Policy Service",
+      "Organization Policy",
+      "organization policy",
+      "organization policies"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "OS Login",
+    "def": "Controls SSH access to VMs with IAM roles instead of SSH keys in metadata. roles/compute.osLogin gives login without sudo, and roles/compute.osAdminLogin gives login with sudo.",
+    "aws": "Amazon EC2 Instance Connect",
+    "match": [
+      "OS Login"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "P1",
+    "def": "The highest Customer Care case priority: Critical Impact, Service Unusable in Production. The feature must be GA, with no workaround under 30 minutes. P2 to P4 mean high, medium, and low impact.",
+    "match": [
+      "P1"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "Packet Mirroring",
+    "def": "A feature that copies full packets, payloads included, from selected VMs to collectors behind an internal passthrough Network Load Balancer. Use it for a third-party IDS or deep forensics. It uses VM bandwidth.",
+    "match": [
+      "Packet Mirroring"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Partner Interconnect",
+    "def": "A connection to Google through a service provider, with 50 Mbps to 50 Gbps for each VLAN attachment. Use it without colocation presence. Its SLA covers only Google to the provider. Add IPsec for compliance requirements.",
+    "match": [
+      "Partner Interconnect"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "passthrough Network Load Balancer",
+    "def": "A Layer 4 load balancer that delivers packets unchanged, so backends see the client IP address and reply directly to clients. It carries TCP, UDP, and other IP protocols. The backends decrypt TLS.",
+    "aws": "Network Load Balancer",
+    "match": [
+      "passthrough Network Load Balancer",
+      "passthrough Network Load Balancers"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "PCI DSS",
+    "expansion": "Payment Card Industry Data Security Standard",
+    "def": "The card data security standard. Every system that stores, processes, or transmits cardholder data is in scope, and so are connected systems. Reduce scope with a folder, a separate network, and tokenization.",
+    "match": [
+      "PCI DSS",
+      "PCI"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "peering zone",
+    "def": "A Cloud DNS zone that sends queries to the zones of another VPC network. It is one-way and separate from VPC Network Peering. Other networks use it to resolve on-premises names through one forwarding network.",
+    "match": [
+      "peering zone",
+      "peering zones",
+      "DNS peering"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "Persistent Disk",
+    "def": "The older Compute Engine block storage. To get more performance, you must increase the disk size. It is not available on the newest machine series, such as N4 and C4.",
+    "match": [
+      "Persistent Disk"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "PHI",
+    "expansion": "Protected health information",
+    "def": "Health data that HIPAA protects. Keep it in BAA-covered products, and keep it out of resource names, labels, and other metadata, because audit logs can capture metadata.",
+    "match": [
+      "PHI",
+      "protected health information"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "PII",
+    "expansion": "Personally identifiable information",
+    "def": "Data that identifies a person. Sensitive Data Protection finds and de-identifies it, and Data Access audit logs record who reads it.",
+    "match": [
+      "PII",
+      "personally identifiable information"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "PITR",
+    "expansion": "Point-in-time recovery",
+    "def": "Recovery of a database to a chosen moment, to undo bad writes or logical corruption. In Cloud SQL, it always creates a new instance. In Spanner, it does not cover a deleted database.",
+    "match": [
+      "PITR",
+      "point-in-time recovery"
+    ],
+    "note": "2.2-data-protection"
+  },
+  {
+    "term": "Policy Controller",
+    "def": "Policy checks inside GKE clusters, as admission control and audit. It is based on Open Policy Agent Gatekeeper and has prebuilt policy bundles. It denies non-compliant configurations in the cluster.",
+    "aws": "OPA Gatekeeper that you run on Amazon EKS",
+    "match": [
+      "Policy Controller"
+    ],
+    "note": "6.5-quality-control"
+  },
+  {
+    "term": "Policy Troubleshooter",
+    "def": "Explains why a principal has, or does not have, a permission. It checks allow and deny policies, but not Cloud Storage ACLs or VPC Service Controls.",
+    "match": [
+      "Policy Troubleshooter"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "postmortem",
+    "def": "A written record of an incident: its impact, the mitigation, the root causes, and the follow-up actions. It is blameless and focuses on processes and tools, not people. Review it and share it widely.",
+    "match": [
+      "postmortem",
+      "postmortems",
+      "post-incident review",
+      "post-incident reviews"
+    ],
+    "note": "4.1-testing-and-troubleshooting"
+  },
+  {
+    "term": "preemptible VMs",
+    "def": "The older version of Spot VMs. They always stop after 24 hours, and Google recommends Spot VMs for new designs.",
+    "match": [
+      "preemptible VM",
+      "preemptible VMs"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "Premium Support",
+    "def": "The Customer Care service for enterprises with priority workloads. P1 cases get a 15-minute initial response target. It includes a named TAM, Customer Aware Support, and Event Management Service.",
+    "match": [
+      "Premium Support"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "Premium Tier",
+    "def": "The default Network Service Tier. Traffic enters Google's network as close as possible to the client. Global external load balancers and Cloud CDN need it. Its SLA is 99.99%.",
+    "match": [
+      "Premium Tier"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "principal access boundary",
+    "def": "An IAM policy, attached to a principal set, that limits which resources those principals can access. It fails closed: if IAM cannot evaluate it, IAM blocks access.",
+    "match": [
+      "principal access boundary"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "Private Google Access",
+    "def": "A per-subnet setting that lets VMs without external IP addresses reach Google APIs and services. It gives no internet access; use Cloud NAT for that. On-premises hosts use its VIPs over hybrid links.",
+    "match": [
+      "Private Google Access"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "Private NAT",
+    "def": "The Cloud NAT type for traffic to NCC VPC spokes, on-premises, or other clouds. It uses addresses from a PRIVATE_NAT subnet, so it works when subnet ranges overlap.",
+    "match": [
+      "Private NAT"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "private services access",
+    "def": "A private connection to managed services such as Cloud SQL, through VPC Network Peering to a producer network that uses a range you allocate. Peered networks cannot use it, and on-premises hosts need exported custom routes.",
+    "match": [
+      "private services access"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "private.googleapis.com",
+    "def": "A Google API domain with the VIP range 199.36.153.8/30. It allows most Google APIs, whether or not VPC Service Controls supports them. Do not mix it with restricted.googleapis.com.",
+    "match": [
+      "private.googleapis.com"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "Privileged Access Manager",
+    "def": "Gives temporary, on-demand role grants. An entitlement sets who can request which roles, for how long, and if a justification or approval is necessary. The roles end automatically, and audit logs record the access.",
+    "match": [
+      "Privileged Access Manager",
+      "PAM"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "Provisioned Throughput",
+    "def": "Reserved model capacity that you buy with a commitment of 1 week to 1 year, with an SLA. Cover only the steady baseline with it, and send spillover traffic to Standard or Priority PayGo.",
+    "match": [
+      "Provisioned Throughput"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "proxy Network Load Balancer",
+    "def": "A Layer 4 proxy load balancer for TCP, with optional SSL offload in some modes. Backends get the client IP address only through the PROXY protocol. For HTTPS, Google says to use an Application Load Balancer.",
+    "match": [
+      "proxy Network Load Balancer",
+      "proxy Network Load Balancers"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "PROXY protocol",
+    "def": "A way for proxy Network Load Balancers to give the client IP address to backends. Proxy load balancers do not keep the client IP address in the packet; the X-Forwarded-For header is the other method.",
+    "match": [
+      "PROXY protocol"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "proxy-only subnet",
+    "def": "A subnet for the Envoy proxies of regional and cross-region Envoy-based load balancers, and of Secure Web Proxy. Backend firewall rules must allow traffic from this subnet.",
+    "match": [
+      "proxy-only subnet",
+      "proxy-only subnets"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "PRR",
+    "expansion": "Production readiness review",
+    "def": "A review that checks that a service meets production standards before an SRE team takes responsibility for it. Its phases are engagement, analysis, improvements, training, onboarding, and continuous improvement.",
+    "match": [
+      "PRR",
+      "production readiness review"
+    ],
+    "note": "6.5-quality-control"
+  },
+  {
+    "term": "PSC",
+    "expansion": "Private Service Connect",
+    "def": "Private access to one published service through an internal IP address in the consumer VPC network. It uses NAT, so the consumer and the producer do not need to coordinate IP ranges.",
+    "aws": "AWS PrivateLink",
+    "match": [
+      "PSC",
+      "Private Service Connect"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "pseudonymization",
+    "def": "Replaces sensitive values with cryptographic tokens. Format-preserving tokens can narrow the PCI DSS or HIPAA scope of downstream applications.",
+    "match": [
+      "pseudonymization"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "PSH",
+    "expansion": "Personalized Service Health",
+    "def": "The primary source for Google Cloud incidents that affect your projects, including limited-scope incidents. It has a dashboard, an API, and log-based alerts. The public Service Health page shows only broad, severe incidents.",
+    "aws": "AWS Health Dashboard",
+    "match": [
+      "PSH",
+      "Personalized Service Health"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "Pub/Sub",
+    "def": "An asynchronous messaging service with at-least-once delivery by default. Publishers know nothing about subscribers, and many subscribers can get each message. Message order needs ordering keys.",
+    "aws": "Amazon Kinesis Data Streams",
+    "match": [
+      "Pub/Sub"
+    ],
+    "note": "1.1-integration-and-data-movement"
+  },
+  {
+    "term": "Public NAT",
+    "def": "The Cloud NAT type for internet egress. It uses external IP addresses that Google allocates or that you assign, for example for partner allowlists. It uses only routes with the default internet gateway as next hop.",
+    "aws": "NAT gateway",
+    "match": [
+      "Public NAT"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "RACI",
+    "expansion": "Responsible, accountable, consulted, informed",
+    "def": "A matrix that shows who owns each task. Google recommends one in the migration plan, next to the technical design document and the timeline, when task ownership is unclear.",
+    "match": [
+      "RACI"
+    ],
+    "note": "4.2-business-processes"
+  },
+  {
+    "term": "RAG",
+    "expansion": "Retrieval-augmented generation",
+    "def": "A pattern that first retrieves the relevant facts, then lets the model generate an answer from them. Use it for private or changing data, because tuning teaches skills, not facts.",
+    "match": [
+      "RAG",
+      "retrieval-augmented generation"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "RAG Engine",
+    "def": "A managed RAG framework that ingests, chunks, embeds, indexes, and retrieves your data in a corpus. It supports VPC Service Controls and CMEK, but not data residency.",
+    "aws": "Amazon Bedrock Knowledge Bases",
+    "match": [
+      "RAG Engine"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Rapid Cache",
+    "def": "An SSD-backed zonal read cache for Cloud Storage data that changes rarely and is read often, such as model training data. It also helps multi-region workloads with strict performance needs.",
+    "match": [
+      "Rapid Cache",
+      "Anywhere Cache"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Re-architect",
+    "def": "The migration type that changes how the code functions, for example a split of a monolith into microservices. It is more complex than refactor and needs several rounds of testing.",
+    "match": [
+      "re-architect",
+      "continue to modernize"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "read replica",
+    "def": "A Cloud SQL copy for read scaling, in the same region or another region. It cannot fail over, but you can promote it to a standalone primary. For replica failover, use an Enterprise Plus DR replica.",
+    "match": [
+      "read replica",
+      "read replicas"
+    ],
+    "note": "2.2-database-config"
+  },
+  {
+    "term": "Rebuild",
+    "def": "The migration type that removes and replaces a workload by a rewrite of the app. Use it when a workload does not meet your goals or costs too much to migrate; it does not suit off-the-shelf software.",
+    "match": [
+      "remove and replace",
+      "rip and replace"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "Refactor",
+    "def": "The migration type that changes a workload during the move (move and improve). Use it when the architecture is not supported as-is; it takes longer than rehost, and teams must learn new skills.",
+    "match": [
+      "Refactor",
+      "move and improve"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "Rehost",
+    "def": "The migration type that moves a workload as-is (lift and shift). It is the fastest type, and teams keep their tools, but the workload does not use cloud features such as horizontal scaling.",
+    "match": [
+      "rehost",
+      "lift and shift",
+      "lift-and-shift"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "release channel",
+    "def": "A GKE setting for how fast a cluster gets new versions: Rapid, Regular (the default), Stable, or Extended. To hold a version, use a maintenance exclusion instead of leaving the channel.",
+    "match": [
+      "release channel",
+      "release channels"
+    ],
+    "note": "2.3-gke"
+  },
+  {
+    "term": "Replatform",
+    "def": "The migration type that moves a workload and adds cloud capabilities, for example containers on GKE (lift and optimize). It needs more work and more rounds of testing than rehost.",
+    "match": [
+      "replatform",
+      "lift and optimize"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "Repurchase",
+    "def": "The migration type that replaces a purchased product with a SaaS product, for example Google Workspace. It takes less effort, but it can cost more and gives less control.",
+    "match": [
+      "repurchase"
+    ],
+    "note": "1.4-migration-planning"
+  },
+  {
+    "term": "restricted.googleapis.com",
+    "def": "A Google API domain with the VIP range 199.36.153.4/30. It allows only APIs that VPC Service Controls supports and blocks the others, which adds protection against data exfiltration.",
+    "match": [
+      "restricted.googleapis.com"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "RPO",
+    "expansion": "Recovery point objective",
+    "def": "The maximum acceptable length of time during which data can be lost. It measures time only. Back up at least as often as the RPO. RPO zero usually needs synchronous replication.",
+    "match": [
+      "RPO",
+      "recovery point objective"
+    ],
+    "note": "4.1-disaster-recovery"
+  },
+  {
+    "term": "RTO",
+    "expansion": "Recovery time objective",
+    "def": "The maximum acceptable time that an application can be offline. A business impact analysis sets it for each application. A smaller RTO costs more, and an RTO in minutes needs automatic recovery.",
+    "match": [
+      "RTO",
+      "recovery time objective"
+    ],
+    "note": "4.1-disaster-recovery"
+  },
+  {
+    "term": "SAML",
+    "expansion": "Security Assertion Markup Language",
+    "def": "A federation standard. Google delegates sign-in to an external IdP such as Active Directory through SAML SSO. Workforce Identity Federation and Workload Identity Federation also accept SAML.",
+    "match": [
+      "SAML"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "SBOM",
+    "expansion": "Software bill of materials",
+    "def": "A document that lists the contents of a software artifact. Artifact Analysis can generate one in SPDX 2.3 format and store it in Cloud Storage in your project. Assured OSS packages also come with one.",
+    "match": [
+      "SBOM",
+      "software bill of materials"
+    ],
+    "note": "3.1-supply-chain"
+  },
+  {
+    "term": "Secret Manager",
+    "def": "Stores secret values, such as passwords, API keys, and certificates, that a principal with access can read. A rotation schedule only sends Pub/Sub messages, so you write the code that adds the new version.",
+    "aws": "AWS Secrets Manager",
+    "match": [
+      "Secret Manager"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "secure tags",
+    "def": "Tags that IAM controls, which firewall policies use to select VMs. Only holders of the Tag User role can bind them, so app teams cannot change rules by editing a VM. VPC firewall rules cannot use them.",
+    "match": [
+      "secure tag",
+      "secure tags"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Secure Web Proxy",
+    "def": "A managed proxy for outbound HTTP and HTTPS. It denies all traffic by default, and allows traffic by source identity, such as a service account or secure tag, and by destination. It logs each request.",
+    "match": [
+      "Secure Web Proxy"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Security Command Center",
+    "def": "Finds misconfigurations, vulnerabilities, and threats across projects. The Standard tier has no additional charge. Premium adds threat detection, attack paths, and compliance monitoring.",
+    "aws": "Amazon GuardDuty, AWS Security Hub",
+    "match": [
+      "Security Command Center"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "Security Token Service",
+    "def": "The Google Cloud service that verifies an external credential against a workload identity pool provider and returns a federated access token. AWS STS AssumeRole maps to service account impersonation instead.",
+    "match": [
+      "Security Token Service",
+      "STS"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Sensitive Data Protection",
+    "def": "Discovers, inspects, and de-identifies sensitive data, such as PII, across an organization, folder, or project. It includes Cloud DLP. Unlike Amazon Macie, it also masks data and creates reversible tokens.",
+    "aws": "Amazon Macie",
+    "match": [
+      "Sensitive Data Protection",
+      "Cloud DLP"
+    ],
+    "note": "3.1-securing-ai"
+  },
+  {
+    "term": "separation of duties",
+    "def": "No single principal has all the permissions for a harmful action. For example, key managers with Cloud KMS Admin do not get the CryptoKey Encrypter/Decrypter role.",
+    "match": [
+      "separation of duties"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "serverless NEG",
+    "def": "A NEG that connects an Application Load Balancer to Cloud Run, Cloud Run functions, or App Engine. It does not support health checks; use outlier detection. With NEGs in several regions, traffic goes to the closest region.",
+    "match": [
+      "serverless NEG",
+      "serverless NEGs"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "Serverless VPC Access",
+    "def": "Connector instances that let serverless code reach a VPC network. They are billed as VMs, have higher latency than Direct VPC egress, and do not scale in after a peak.",
+    "match": [
+      "Serverless VPC Access"
+    ],
+    "note": "2.1-vpc-access-patterns"
+  },
+  {
+    "term": "service account impersonation",
+    "def": "A caller gets a short-lived token for a service account and acts as that service account. The caller needs Service Account Token Creator on it, and most audit logs record both identities.",
+    "aws": "AWS STS AssumeRole",
+    "match": [
+      "service account impersonation",
+      "impersonate a service account"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Service Account Token Creator",
+    "def": "The IAM role (roles/iam.serviceAccountTokenCreator) that lets a principal impersonate a service account. Grant it on one service account, because on a project it covers every service account in that project.",
+    "match": [
+      "Service Account Token Creator"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Service Account User",
+    "def": "The IAM role (roles/iam.serviceAccountUser) that lets a principal attach a service account to a resource. It does not allow impersonation. Impersonation needs Service Account Token Creator.",
+    "match": [
+      "Service Account User"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "service agent",
+    "def": "The identity that a Google Cloud service uses in your project. For CMEK, the service agent needs the CryptoKey Encrypter/Decrypter role on the key. The people who create or read the resource do not.",
+    "match": [
+      "service agent"
+    ],
+    "note": "3.1-data-protection-kms"
+  },
+  {
+    "term": "service attachment",
+    "def": "The producer resource that publishes a service through PSC. It points to an internal load balancer forwarding rule or a Secure Web Proxy, and translates consumer traffic with addresses from a PSC NAT subnet.",
+    "match": [
+      "service attachment",
+      "service attachments"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "service perimeter",
+    "def": "The VPC Service Controls boundary around projects and their restricted services. A project can be in only one perimeter. Ingress and egress rules allow chosen requests to cross it.",
+    "match": [
+      "service perimeter"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "Shared VPC",
+    "def": "A model in which service projects use subnets of a VPC network in a central host project. Host and service projects must be in the same organization. A central team keeps control of subnets, routes, and firewalls.",
+    "match": [
+      "Shared VPC"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "Shielded VM",
+    "def": "A VM option that protects the boot chain with Secure Boot, a vTPM, and integrity monitoring against boot-level and kernel-level malware. It does not protect data in memory; Confidential VM does that.",
+    "match": [
+      "Shielded VM"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "SLA",
+    "expansion": "Service level agreement",
+    "def": "A contract with customers that has explicit consequences, such as a rebate or a penalty, when a target is missed. A target without explicit consequences is an SLO, not an SLA.",
+    "match": [
+      "SLA"
+    ],
+    "note": "6.5-quality-control"
+  },
+  {
+    "term": "SLI",
+    "expansion": "Service level indicator",
+    "def": "A measure of the service level that users see, usually the ratio of good events to total events, such as the request success ratio. Measure it near the user, not with server metrics such as CPU usage.",
+    "match": [
+      "SLI",
+      "service level indicator"
+    ],
+    "note": "6.5-quality-control"
+  },
+  {
+    "term": "SLO",
+    "expansion": "Service level objective",
+    "def": "The target value for an SLI over a time window, for example 99.9% availability. Set it just reliable enough for user happiness, never 100%. A four-week rolling window is a good general-purpose interval.",
+    "match": [
+      "SLO"
+    ],
+    "note": "6.5-quality-control"
+  },
+  {
+    "term": "SLSA",
+    "expansion": "Supply-chain Levels for Software Artifacts",
+    "def": "A framework that describes software supply chain threats from source to deployment. Cloud Build can generate SLSA level 3 build provenance for artifacts that it stores in Artifact Registry.",
+    "match": [
+      "SLSA"
+    ],
+    "note": "3.1-supply-chain"
+  },
+  {
+    "term": "SNAT",
+    "expansion": "Source network address translation",
+    "def": "A change to the source IP address of packets. If GKE Standard Pods use privately used public IPv4 ranges, GKE applies SNAT to Pod-to-Pod traffic. Exclude the cluster ranges from SNAT, or disable default SNAT.",
+    "match": [
+      "SNAT",
+      "source NAT"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "SNI",
+    "expansion": "Server Name Indication",
+    "def": "The host name that a client sends at the start of a TLS connection. Without TLS inspection, Cloud NGFW Enterprise URL filtering sees only the domain and SNI of HTTPS traffic.",
+    "match": [
+      "SNI"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "SOC 2",
+    "def": "An audit report on controls for security, availability, processing integrity, confidentiality, or privacy. Google Cloud issues only Type II reports, which cover a period, and you get them from Compliance Reports Manager.",
+    "match": [
+      "SOC 2",
+      "SOC 2 Type II"
+    ],
+    "note": "3.2-compliance"
+  },
+  {
+    "term": "soft delete",
+    "def": "A Cloud Storage feature that keeps deleted objects and buckets for 7 days by default, up to 90 days. Google recommends it instead of Object Versioning to protect against accidental or malicious deletion.",
+    "match": [
+      "soft delete"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "sole-tenant nodes",
+    "def": "Physical servers that host only your project's VMs. Use them for physical isolation and for BYOL licenses that count physical cores. You pay for the whole node plus a sole-tenancy premium.",
+    "aws": "EC2 Dedicated Hosts",
+    "match": [
+      "sole-tenant node",
+      "sole-tenant nodes",
+      "sole-tenancy"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "Spanner",
+    "def": "A relational database that scales horizontally and gives external consistency. Multi-region configurations have a 99.999% SLA and need Enterprise Plus edition. Use it for global writes that Cloud SQL cannot give.",
+    "match": [
+      "Spanner"
+    ],
+    "note": "1.3-storage-choice"
+  },
+  {
+    "term": "Speech-to-Text",
+    "def": "A pre-trained API that transcribes audio. Synchronous recognition takes 1 minute or less, batch recognition takes files of up to 480 minutes, and streaming recognition over gRPC handles live audio.",
+    "aws": "Amazon Transcribe",
+    "match": [
+      "Speech-to-Text"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "SPOF",
+    "expansion": "Single point of failure",
+    "def": "One component whose failure stops the whole service. One large VM can become a SPOF. A global resource survives zone and region outages, but a configuration error can still make it a SPOF.",
+    "match": [
+      "SPOF",
+      "single point of failure"
+    ],
+    "note": "1.2-ha-scalability-performance"
+  },
+  {
+    "term": "Spot VMs",
+    "def": "VMs with discounts of up to 91% that Compute Engine can preempt at any time. They have no SLA and no maximum runtime, and reservations cannot supply them. Use them for fault-tolerant batch work.",
+    "aws": "EC2 Spot Instances",
+    "match": [
+      "Spot VM",
+      "Spot VMs"
+    ],
+    "note": "1.3-compute-resources"
+  },
+  {
+    "term": "SRE",
+    "expansion": "Site reliability engineering",
+    "def": "Google's approach to operations. SRE teams keep operational work (toil) below 50% of their time, and they spend the error budget on launches and experiments.",
+    "match": [
+      "SRE",
+      "site reliability engineering"
+    ],
+    "note": "6.6-production-reliability"
+  },
+  {
+    "term": "SSL policy",
+    "def": "A load balancer setting for the minimum TLS version and features between clients and the load balancer. With no SSL policy, the COMPATIBLE profile accepts TLS 1.0. A minimum of TLS 1.3 needs RESTRICTED.",
+    "match": [
+      "SSL policy",
+      "SSL policies"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "SSO",
+    "expansion": "Single sign-on",
+    "def": "Users authenticate at their identity provider and then use Google Cloud. Google recommends that you disable SSO for super-admin users, or enforce post-SSO verification for them.",
+    "match": [
+      "SSO",
+      "single sign-on"
+    ],
+    "note": "3.1-iam-and-hierarchy"
+  },
+  {
+    "term": "Standard Support",
+    "def": "The Customer Care service for small to medium organizations with workloads under development. It handles P2 to P4 cases during Hours of Operation. It has no P1 target; its fastest target is 4 hours for P2.",
+    "match": [
+      "Standard Support"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "Standard Tier",
+    "def": "The low-cost Network Service Tier. Traffic enters Google's network near the region of the load balancer. It does not support global external load balancers or Cloud CDN. Its SLA is 99.9%.",
+    "match": [
+      "Standard Tier"
+    ],
+    "note": "1.3-load-balancing"
+  },
+  {
+    "term": "stateful MIG",
+    "def": "A MIG that keeps each VM's name, disks, IP addresses, and metadata when it recreates the VM. It suits databases and legacy monoliths, but it cannot autoscale.",
+    "match": [
+      "stateful MIG",
+      "stateful MIGs"
+    ],
+    "note": "2.3-compute-engine-ops"
+  },
+  {
+    "term": "Storage Transfer Service",
+    "def": "A managed service that copies data into Cloud Storage from Amazon S3, Azure Blob Storage, HTTP URLs, HDFS, and file systems. File system transfers need agents in your data center, and the service has no SLA.",
+    "aws": "AWS DataSync",
+    "match": [
+      "Storage Transfer Service"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "SUD",
+    "expansion": "Sustained use discount",
+    "def": "An automatic Compute Engine discount for a resource that runs more than 25% of a billing month. Only N1, N2, N2D, C2, M1, M2, and sole-tenant nodes get it, and only on self-serve billing accounts.",
+    "match": [
+      "SUD",
+      "sustained use discount",
+      "sustained use discounts"
+    ],
+    "note": "4.2-cost-optimization"
+  },
+  {
+    "term": "Supervised fine-tuning",
+    "def": "Tuning a model on labeled examples (about 100 or more) to teach it a new skill, such as classification or entity extraction. Google recommends that you start with prompting and tune only if required.",
+    "match": [
+      "supervised fine-tuning"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "TAM",
+    "expansion": "Technical Account Manager",
+    "def": "A named Google contact that only Premium Support includes. The TAM assesses cloud maturity, helps create an adoption roadmap, and gives advice on case priority and escalation.",
+    "aws": "Technical Account Manager on AWS Enterprise Support",
+    "match": [
+      "TAM",
+      "Technical Account Manager"
+    ],
+    "note": "6.4-support"
+  },
+  {
+    "term": "TCO",
+    "expansion": "Total cost of ownership",
+    "def": "The full cost to run a workload, including management work, not only the resource price. A migration TCO also includes data center power, cooling, and maintenance, network use, and the period when both environments run.",
+    "match": [
+      "TCO",
+      "total cost of ownership"
+    ],
+    "note": "1.4-licensing-and-financials"
+  },
+  {
+    "term": "Terraform state",
+    "def": "The file where Terraform records the resources that it manages. For team use, keep it in the Cloud Storage (gcs) backend, which locks the state. Never edit it by hand, and keep secrets out of it.",
+    "match": [
+      "Terraform state"
+    ],
+    "note": "5.2-infrastructure-as-code"
+  },
+  {
+    "term": "TFX",
+    "expansion": "TensorFlow Extended",
+    "def": "A pipeline SDK for Agent Platform Pipelines. Use it only when you process terabytes of structured or text data with TensorFlow; otherwise, use the KFP SDK.",
+    "match": [
+      "TFX",
+      "TensorFlow Extended"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "time travel",
+    "def": "BigQuery access to table data as it was at any time in the last 2 to 7 days (default 7). After that, fail-safe keeps the data 7 more days, and only Cloud Customer Care can recover it.",
+    "match": [
+      "time travel",
+      "fail-safe"
+    ],
+    "note": "2.2-data-protection"
+  },
+  {
+    "term": "toil",
+    "def": "Work tied to a production service that is manual, repetitive, automatable, tactical, without enduring value, and grows linearly with the service. SRE teams keep operational work below 50% of their time.",
+    "match": [
+      "toil"
+    ],
+    "note": "6.6-production-reliability"
+  },
+  {
+    "term": "TPU",
+    "expansion": "Tensor Processing Unit",
+    "def": "Google's ML accelerator. TPU code must compile with XLA, so TPUs fit models where matrix math dominates, not custom operations or dynamic shapes. Use TPUs through Compute Engine, GKE, or Agent Platform.",
+    "aws": "Amazon EC2 Trn1 and Inf1 instances",
+    "match": [
+      "TPU",
+      "Cloud TPU"
+    ],
+    "note": "2.4-ai-hypercomputer"
+  },
+  {
+    "term": "Transfer Appliance",
+    "def": "A device that Google ships to you. You copy data to it and ship it back, and Google uploads the data to Cloud Storage. Use it when an online upload takes more than one week.",
+    "aws": "AWS Snowball",
+    "match": [
+      "Transfer Appliance"
+    ],
+    "note": "5.1-migration-tooling"
+  },
+  {
+    "term": "turbo replication",
+    "def": "A premium option for dual-region Cloud Storage buckets that targets an RPO of 15 minutes for all new objects. It does not work for multi-region buckets.",
+    "match": [
+      "turbo replication"
+    ],
+    "note": "2.2-cloud-storage-config"
+  },
+  {
+    "term": "Vector Search",
+    "def": "An approximate nearest neighbor (ANN) engine that scales to billions of vectors. Use it when you build your own retrieval with your own embeddings, or for semantic search and recommendations.",
+    "match": [
+      "Vector Search",
+      "Vertex AI Vector Search"
+    ],
+    "note": "1.3-ai-solutions"
+  },
+  {
+    "term": "Vertex Explainable AI",
+    "def": "A Vertex AI feature that explains model predictions. Google deprecated it, so do not design new solutions around it.",
+    "match": [
+      "Vertex Explainable AI",
+      "Explainable AI"
+    ],
+    "note": "2.4-ml-workflows"
+  },
+  {
+    "term": "Video Intelligence API",
+    "def": "A pre-trained video analysis API. It is deprecated from September 14, 2026 and shuts down on September 14, 2027. For new designs, Google recommends Gemini video understanding.",
+    "aws": "Amazon Rekognition Video",
+    "match": [
+      "Video Intelligence API",
+      "Video Intelligence"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "VIP",
+    "expansion": "Virtual IP address",
+    "def": "A shared IP address for a service. On-premises hosts reach Google APIs through the private.googleapis.com or restricted.googleapis.com VIPs, and Cloud Router must advertise the VIP range with a custom advertisement.",
+    "match": [
+      "VIP",
+      "virtual IP address",
+      "virtual IP addresses"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "Vision API",
+    "def": "A pre-trained API that analyzes images: labels, faces, landmarks, text, and SafeSearch ratings. Face detection does not identify people. For a scanned-document pipeline, use Document AI instead.",
+    "aws": "Amazon Rekognition Image",
+    "match": [
+      "Vision API",
+      "Cloud Vision",
+      "Vision AI"
+    ],
+    "note": "2.5-ai-apis-and-gemini-enterprise"
+  },
+  {
+    "term": "VLAN attachment",
+    "def": "The regional resource that carries traffic between a Cloud Interconnect connection and a VPC network. The multi-region 99.99% topology needs four VLAN attachments in two regions. You can add IPsec encryption only when you create one.",
+    "match": [
+      "VLAN attachment",
+      "VLAN attachments"
+    ],
+    "note": "2.1-hybrid-multicloud"
+  },
+  {
+    "term": "VM Manager",
+    "def": "A Compute Engine suite for Patch, OS inventory management, and OS policies. Each VM needs the OS Config agent and an attached service account, and patch jobs skip MIG VMs by default.",
+    "aws": "AWS Systems Manager",
+    "match": [
+      "VM Manager"
+    ],
+    "note": "2.3-compute-engine-ops"
+  },
+  {
+    "term": "VPA",
+    "expansion": "Vertical Pod Autoscaler",
+    "def": "A GKE autoscaler that changes the CPU and memory requests of Pods from their usage over time. In Auto mode, it evicts Pods to apply new requests. Do not combine it with the HPA on CPU or memory.",
+    "match": [
+      "VPA",
+      "Vertical Pod Autoscaler"
+    ],
+    "note": "2.3-gke"
+  },
+  {
+    "term": "VPC firewall rules",
+    "def": "Firewall rules that belong to one VPC network and target all instances, network tags, or service accounts. They have only allow and deny actions, and do not support secure tags or Enterprise features.",
+    "aws": "Security groups",
+    "match": [
+      "VPC firewall rule",
+      "VPC firewall rules"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "VPC Flow Logs",
+    "def": "Sampled 5-tuple flow records for a network, subnet, VLAN attachment, or VPN tunnel. Use them for monitoring, forensics, and cost analysis. They hold no payloads; Packet Mirroring captures full packets.",
+    "match": [
+      "VPC Flow Logs"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "VPC Network Peering",
+    "def": "A connection between two VPC networks, also across organizations, with full VM bandwidth. It is not transitive, subnet ranges cannot overlap, and network tags and internal DNS names do not work across it.",
+    "match": [
+      "VPC Network Peering"
+    ],
+    "note": "1.3-network-design"
+  },
+  {
+    "term": "VPC Service Controls",
+    "def": "Puts a perimeter around projects and Google-managed services such as Cloud Storage and BigQuery. It blocks API requests that cross the perimeter, even with valid credentials. Use it together with IAM.",
+    "match": [
+      "VPC Service Controls"
+    ],
+    "note": "3.1-security-controls"
+  },
+  {
+    "term": "WAF",
+    "expansion": "Web application firewall",
+    "def": "Rules that block web attacks such as SQL injection and cross-site scripting. Cloud Armor preconfigured WAF rules use the OWASP Core Rule Set. Start at sensitivity level 1 in preview mode, then tune.",
+    "aws": "AWS WAF",
+    "match": [
+      "WAF"
+    ],
+    "note": "2.1-network-security"
+  },
+  {
+    "term": "Well-Architected Framework",
+    "def": "Google's principles for cloud design: five core principles, six pillars (operational excellence; security, privacy, and compliance; reliability; cost optimization; performance optimization; sustainability), and two perspectives (AI and ML, and financial services).",
+    "aws": "AWS Well-Architected Framework",
+    "match": [
+      "Well-Architected Framework",
+      "Architecture Framework"
+    ],
+    "note": "1.2-well-architected-framework"
+  },
+  {
+    "term": "Workflows",
+    "def": "A serverless orchestrator that chains HTTP-based services, with YAML or JSON definitions, millisecond latency, and billing per step. A workflow can wait for up to a year.",
+    "aws": "AWS Step Functions",
+    "match": [
+      "Workflows"
+    ],
+    "note": "1.1-integration-and-data-movement"
+  },
+  {
+    "term": "Workforce Identity Federation",
+    "def": "Lets employees and partners from an OIDC or SAML 2.0 IdP sign in to Google Cloud with SSO. It stores no user accounts in Google Cloud, so you do not need Google Cloud Directory Sync.",
+    "match": [
+      "Workforce Identity Federation"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Workload Identity Federation",
+    "def": "Lets a workload outside Google Cloud exchange its own credential, such as an AWS credential or a GitHub OIDC token, for a short-lived Google token. It removes the need for service account keys.",
+    "aws": "AWS IAM Roles Anywhere",
+    "match": [
+      "Workload Identity Federation"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "Workload Identity Federation for GKE",
+    "def": "Lets IAM treat a Kubernetes ServiceAccount as a principal, so GKE workloads call Google Cloud APIs without keys. All clusters in one project share one workload identity pool, so the same namespace and ServiceAccount get the same access.",
+    "aws": "EKS Pod Identity or IAM roles for service accounts",
+    "match": [
+      "Workload Identity Federation for GKE"
+    ],
+    "note": "2.3-gke"
+  },
+  {
+    "term": "workload identity pool",
+    "def": "A container for the providers that Workload Identity Federation trusts. Create one pool for each environment, and manage pools and providers in a dedicated project.",
+    "match": [
+      "workload identity pool"
+    ],
+    "note": "3.1-secure-access"
+  },
+  {
+    "term": "WORM",
+    "expansion": "Write once, read many",
+    "def": "A form of immutability: after you write data, no one can change or delete it. Backup vaults in Backup and DR Service enforce it, so backups stay recoverable after ransomware attacks or accidental deletion.",
+    "match": [
+      "WORM",
+      "write once, read many"
+    ],
+    "note": "4.1-disaster-recovery"
+  },
+  {
+    "term": "XLA",
+    "expansion": "Accelerated Linear Algebra",
+    "def": "The compiler that all code for TPUs must compile with. JAX and PyTorch code compile with it. Models with custom operations in the training loop fit GPUs better.",
+    "match": [
+      "XLA"
+    ],
+    "note": "2.4-ai-hypercomputer"
+  }
+]
