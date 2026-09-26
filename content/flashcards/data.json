@@ -1,0 +1,782 @@
+[
+  {
+    "id": "data-f001",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Rapid Cache",
+    "back": "An SSD-backed zonal read cache for Cloud Storage buckets (formerly Anywhere Cache). Use it for data that changes rarely and is read often, for example AI model training data.",
+    "aws": null,
+    "source": {
+      "title": "Rapid Cache",
+      "url": "https://docs.cloud.google.com/storage/docs/rapid/rapid-cache",
+      "evidence": "Use Rapid Cache for data that's infrequently changed and frequently read to accelerate data reads for analytics workloads and AI/ML model training and loading."
+    }
+  },
+  {
+    "id": "data-f002",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Cloud Storage FUSE",
+    "back": "An adapter that mounts a Cloud Storage bucket as a local file system. It is not POSIX compliant, and it is not an NFS or CIFS file system. Do not use it where the application needs a POSIX file system.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Storage FUSE",
+      "url": "https://docs.cloud.google.com/storage/docs/cloud-storage-fuse/overview",
+      "evidence": "While Cloud Storage FUSE has a file system interface, it is not like an NFS or CIFS file system on the backend. Additionally, Cloud Storage FUSE is not POSIX compliant."
+    }
+  },
+  {
+    "id": "data-f003",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Hyperdisk",
+    "back": "The durable block storage for VMs that Google recommends. You set its performance separately from its size. Persistent Disk is not available with the latest machine series.",
+    "aws": "Amazon EBS",
+    "source": {
+      "title": "Choose a disk type",
+      "url": "https://docs.cloud.google.com/compute/docs/disks",
+      "evidence": "Hyperdisk and Persistent Disk are the durable block storage offerings in Google Cloud, but Persistent Disk isn't available with the latest machine series. Google recommends using Hyperdisk for the highest performance and advanced features."
+    }
+  },
+  {
+    "id": "data-f004",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "How do you get more performance from a Persistent Disk volume?",
+    "back": "Increase the disk size. Persistent Disk performance depends on the provisioned capacity. Hyperdisk performance is independent of the capacity, so you can change it without a change of size.",
+    "aws": null,
+    "source": {
+      "title": "Choose a disk type",
+      "url": "https://docs.cloud.google.com/compute/docs/disks",
+      "evidence": "Unlike Hyperdisk, Persistent Disk performance depends on provisioned capacity. Consequently, to improve a Persistent Disk volume's performance, you must increase its size."
+    }
+  },
+  {
+    "id": "data-f005",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "Which disk types should you choose to get an RPO of zero for a zone outage?",
+    "back": "Regional Persistent Disk or Hyperdisk Balanced High Availability. Both replicate the data synchronously between two zones in the same region.",
+    "aws": null,
+    "source": {
+      "title": "About synchronous disk replication",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/about-regional-persistent-disk",
+      "evidence": "Regional Persistent Disk and Hyperdisk Balanced High Availability synchronously replicate data between two zones in the same region and ensure HA for disk data for up to one zonal failure."
+    }
+  },
+  {
+    "id": "data-f006",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Local SSD",
+    "back": "Temporary block storage with higher IOPS and lower latency than Hyperdisk or Persistent Disk, for scratch data and caches such as SQL Server `tempdb`. By default, a VM stop or a preemption discards the data. A guest OS reboot or a live migration keeps it.",
+    "aws": "Amazon EC2 instance store",
+    "source": {
+      "title": "About Local SSD disks",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/local-ssd",
+      "evidence": "When you stop or suspend an instance, Compute Engine discards the data of any Local SSD disks attached to the instance by default."
+    }
+  },
+  {
+    "id": "data-f007",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "Which file storage product should you choose for Windows SMB file shares?",
+    "back": "Google Cloud NetApp Volumes. It supports SMB, NFS, iSCSI, and NVMe/TCP, so file-based applications move to Google Cloud without a redesign.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud NetApp Volumes overview",
+      "url": "https://docs.cloud.google.com/netapp/volumes/docs/discover/overview",
+      "evidence": "NetApp Volumes lets you move file and block based applications to Google Cloud. It has support for Network File System (NFSv3, NFSv4.1, and NFSv4.2), Server Message Block (SMB), Internet Small Computer Systems Interface (iSCSI), and NVMe/TCP protocols built-in"
+    }
+  },
+  {
+    "id": "data-f008",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "Which Filestore tier should you choose for a new NFS share that must survive a zone outage?",
+    "back": "Filestore Regional, which is designed for regional availability and resilience against zone outages. Basic HDD and Basic SSD are legacy, zonal tiers. Multishares for GKE (Enterprise) is for GKE workloads that need multiple shares.",
+    "aws": null,
+    "source": {
+      "title": "About service tiers",
+      "url": "https://docs.cloud.google.com/filestore/docs/service-tiers",
+      "evidence": "Regional: Designed for regional availability and resilience against zone outages."
+    }
+  },
+  {
+    "id": "data-f009",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Managed Lustre",
+    "back": "A managed, low-latency parallel file system. Use it for AI, ML, HPC, and other data-intensive applications that need a parallel file system.",
+    "aws": "Amazon FSx for Lustre",
+    "source": {
+      "title": "Design an optimal storage strategy for your cloud workload",
+      "url": "https://docs.cloud.google.com/architecture/storage-advisor",
+      "evidence": "For AI, ML, and HPC applications that need a parallel file system, use Managed Lustre."
+    }
+  },
+  {
+    "id": "data-f010",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "AlloyDB",
+    "back": "A fully managed, PostgreSQL-compatible database for demanding workloads. Choose it when you must run analytical queries on live transactional data (HTAP). Its columnar engine accelerates analytical queries.",
+    "aws": "Amazon Aurora",
+    "source": {
+      "title": "AlloyDB overview",
+      "url": "https://docs.cloud.google.com/alloydb/docs/overview",
+      "evidence": "Hybrid Transactional and Analytical Processing (HTAP): run complex analytical queries against your live transactional data without impacting performance or availability."
+    }
+  },
+  {
+    "id": "data-f011",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "What is the latency trade-off of a Spanner multi-region configuration compared with a regional one?",
+    "back": "Reads are faster in more places, but writes have a small latency increase. The read-write replicas are in more than one region, so each write quorum needs communication between regions.",
+    "aws": null,
+    "source": {
+      "title": "Regional, dual-region, and multi-region configurations",
+      "url": "https://docs.cloud.google.com/spanner/docs/instance-configurations",
+      "evidence": "The result is that your application achieves faster reads in more places at the cost of a small increase in write latency."
+    }
+  },
+  {
+    "id": "data-f012",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Bigtable",
+    "back": "A key-value database of sparse tables for large amounts of single-keyed data. It gives high read and write throughput at low latency. It is not a traditional relational database.",
+    "aws": "Amazon DynamoDB, for key-value data",
+    "source": {
+      "title": "Bigtable overview",
+      "url": "https://docs.cloud.google.com/bigtable/docs/overview",
+      "evidence": "Bigtable is ideal for storing large amounts of single-keyed data with low latency. It supports high read and write throughput at low latency, and it's an ideal data source for MapReduce operations."
+    }
+  },
+  {
+    "id": "data-f013",
+    "note": "1.3-data-processing",
+    "kind": "concept",
+    "front": "Which data integration approach does Google recommend for most customers that load data into BigQuery?",
+    "back": "ELT: load the raw data into BigQuery first, then transform it with SQL in BigQuery, for example with Dataform.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to loading, transforming, and exporting data",
+      "url": "https://docs.cloud.google.com/bigquery/docs/load-transform-export-intro",
+      "evidence": "In general, we recommend the ELT approach to most customers. The ELT workflow splits the complex data integration in two manageable parts - extract & load, then transform."
+    }
+  },
+  {
+    "id": "data-f014",
+    "note": "1.3-data-processing",
+    "kind": "concept",
+    "front": "Which Pub/Sub subscription type supports exactly-once delivery?",
+    "back": "Only pull subscriptions, including StreamingPull. Push and export subscriptions do not support it. The guarantee applies only when subscribers connect in the same region.",
+    "aws": null,
+    "source": {
+      "title": "Exactly-once delivery",
+      "url": "https://docs.cloud.google.com/pubsub/docs/exactly-once-delivery",
+      "evidence": "Only the pull subscription type supports exactly-once delivery, including subscribers that use the StreamingPull API. Push and export subscriptions don't support exactly-once delivery."
+    }
+  },
+  {
+    "id": "data-f015",
+    "note": "1.3-data-processing",
+    "kind": "concept",
+    "front": "What should you use instead of Pub/Sub Lite in a new or migrated design?",
+    "back": "Pub/Sub or Managed Service for Apache Kafka. Pub/Sub Lite is deprecated, and Google turns it down on January 31, 2027.",
+    "aws": null,
+    "source": {
+      "title": "Pub/Sub Lite documentation",
+      "url": "https://docs.cloud.google.com/pubsub/lite/docs",
+      "evidence": "You can migrate your Pub/Sub Lite service to Google Cloud Managed Service for Apache Kafka or Pub/Sub."
+    }
+  },
+  {
+    "id": "data-f016",
+    "note": "1.3-data-processing",
+    "kind": "term",
+    "front": "Datastream",
+    "back": "A serverless change data capture (CDC) service. It replicates changes from databases such as MySQL, Oracle, PostgreSQL, and SQL Server into BigQuery or Cloud Storage for near real-time analytics.",
+    "aws": "AWS Database Migration Service (CDC)",
+    "source": {
+      "title": "Datastream overview",
+      "url": "https://docs.cloud.google.com/datastream/docs/overview",
+      "evidence": "Datastream is a serverless and easy-to-use change data capture (CDC) and replication service that lets you synchronize data reliably, and with minimal latency."
+    }
+  },
+  {
+    "id": "data-f017",
+    "note": "1.3-data-processing",
+    "kind": "term",
+    "front": "Dataflow",
+    "back": "A managed service that runs Apache Beam pipelines for batch and streaming data. It gives exactly-once processing by default. At-least-once mode reduces cost and latency when the pipeline can accept duplicates.",
+    "aws": "Amazon Managed Service for Apache Flink",
+    "source": {
+      "title": "Dataflow overview",
+      "url": "https://docs.cloud.google.com/dataflow/docs/overview",
+      "evidence": "By default, Dataflow provides exactly-once processing of every record. For streaming pipelines that can tolerate duplicates, you can reduce cost and improve latency by enabling at-least-once mode."
+    }
+  },
+  {
+    "id": "data-f018",
+    "note": "1.3-data-processing",
+    "kind": "term",
+    "front": "Managed Service for Apache Spark",
+    "back": "Managed Spark and Hadoop (formerly Dataproc), with cluster and serverless deployments. Choose clusters for maximum control or to migrate Hadoop and Spark workloads. Choose serverless for intermittent jobs with no infrastructure to manage.",
+    "aws": "Amazon EMR",
+    "source": {
+      "title": "Compare Managed Service for Apache Spark serverless and cluster deployments",
+      "url": "https://docs.cloud.google.com/managed-spark/docs/concepts/serverless-spark-compare",
+      "evidence": "Choose Managed Service for Apache Spark clusters when you need maximum control, need to migrate Hadoop or Spark workloads, or require a persistent, customized, shared cluster environment."
+    }
+  },
+  {
+    "id": "data-f019",
+    "note": "1.3-data-processing",
+    "kind": "concept",
+    "front": "What should you do with an idle Managed Service for Apache Spark cluster to cut cost?",
+    "back": "Delete it, and create a new cluster for the next job. Google does not recommend autoscaling to shrink an idle cluster, because the creation of a cluster is as fast as a resize.",
+    "aws": null,
+    "source": {
+      "title": "Autoscale clusters",
+      "url": "https://docs.cloud.google.com/managed-spark/docs/concepts/configuring-clusters/autoscaling",
+      "evidence": "Autoscaling is not recommended for the purpose of scaling a cluster down to minimum size when the cluster is idle. Since creating a new cluster is as fast as resizing one, consider deleting idle clusters and recreating them instead."
+    }
+  },
+  {
+    "id": "data-f020",
+    "note": "1.3-data-processing",
+    "kind": "concept",
+    "front": "What compute billing do BigQuery continuous queries need?",
+    "back": "An Enterprise or Enterprise Plus edition reservation with a `CONTINUOUS` assignment type. Continuous queries do not support on-demand billing.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to continuous queries",
+      "url": "https://docs.cloud.google.com/bigquery/docs/continuous-queries-introduction",
+      "evidence": "You must create an Enterprise edition or Enterprise Plus edition reservation with a `CONTINUOUS` assignment type to run continuous queries. Continuous queries don't support the on-demand compute billing model."
+    }
+  },
+  {
+    "id": "data-f021",
+    "note": "1.3-data-processing",
+    "kind": "term",
+    "front": "Cloud Data Fusion",
+    "back": "A fully managed data integration service, based on open source CDAP, for visually designed data pipelines. At run time, it creates an ephemeral Managed Service for Apache Spark cluster, runs the pipeline on it, and then deletes it.",
+    "aws": "AWS Glue",
+    "source": {
+      "title": "Cloud Data Fusion overview",
+      "url": "https://docs.cloud.google.com/data-fusion/docs/concepts/overview",
+      "evidence": "Cloud Data Fusion provisions an ephemeral Managed Service for Apache Spark cluster in your customer project at the beginning of a pipeline run, executes the pipeline using Spark in the cluster"
+    }
+  },
+  {
+    "id": "data-f022",
+    "note": "1.3-data-processing",
+    "kind": "term",
+    "front": "Pub/Sub BigQuery subscription",
+    "back": "An export subscription that writes Pub/Sub messages to an existing BigQuery table as they arrive, with no subscriber client. Use it when the messages need no transformation or only a light Single Message Transform.",
+    "aws": null,
+    "source": {
+      "title": "BigQuery subscriptions",
+      "url": "https://docs.cloud.google.com/pubsub/docs/bigquery",
+      "evidence": "A BigQuery subscription is a type of export subscription that writes messages to an existing BigQuery table as they are received. You don't need to configure a separate subscriber client."
+    }
+  },
+  {
+    "id": "data-f023",
+    "note": "1.3-data-processing",
+    "kind": "concept",
+    "front": "When should you use Dataflow instead of a Pub/Sub BigQuery subscription?",
+    "back": "When the messages need complex transformation before storage, especially windows or aggregations across messages. A BigQuery subscription fits messages that need no transformation or only a light change to each message.",
+    "aws": null,
+    "source": {
+      "title": "BigQuery subscriptions",
+      "url": "https://docs.cloud.google.com/pubsub/docs/bigquery",
+      "evidence": "However, a Dataflow pipeline is recommended for Pub/Sub systems where more complex data transformation is required before the data is stored in a BigQuery table, especially if you want to window or aggregate across messages."
+    }
+  },
+  {
+    "id": "data-f024",
+    "note": "1.3-data-processing",
+    "kind": "term",
+    "front": "Knowledge Catalog",
+    "back": "The current name of Dataplex Universal Catalog. Use it for data discovery, data lineage, data quality scans, and business glossaries. Existing Dataplex configurations and APIs continue to work.",
+    "aws": null,
+    "source": {
+      "title": "Transition from Dataplex Universal Catalog to Knowledge Catalog",
+      "url": "https://docs.cloud.google.com/knowledge-catalog/docs/transition-dataplex-universal-catalog",
+      "evidence": "Existing Dataplex Universal Catalog configurations, APIs, and deployments remain operational. Core features like data discovery, data lineage, data quality scans, and business glossaries are unchanged and supported."
+    }
+  },
+  {
+    "id": "data-f025",
+    "note": "2.2-cloud-storage-config",
+    "kind": "term",
+    "front": "Turbo replication",
+    "back": "A premium option for dual-region buckets. It is designed to replicate 100% of new objects to both regions within an RPO of 15 minutes. Use it when you need a short and predictable RPO.",
+    "aws": null,
+    "source": {
+      "title": "Data availability and durability",
+      "url": "https://docs.cloud.google.com/storage/docs/availability-durability",
+      "evidence": "When enabled, turbo replication is designed to replicate 100% of newly written objects to the two regions that constitute a dual-region within the recovery point objective of 15 minutes, regardless of object size."
+    }
+  },
+  {
+    "id": "data-f026",
+    "note": "2.2-cloud-storage-config",
+    "kind": "concept",
+    "front": "What happens to existing objects when you change the default storage class of a bucket?",
+    "back": "Nothing. They keep their current storage class. New objects get the new default class, unless the upload sets another class.",
+    "aws": null,
+    "source": {
+      "title": "Storage classes",
+      "url": "https://docs.cloud.google.com/storage/docs/storage-classes",
+      "evidence": "Changing the default storage class of a bucket does not affect any of the objects that already exist in the bucket."
+    }
+  },
+  {
+    "id": "data-f027",
+    "note": "2.2-cloud-storage-config",
+    "kind": "term",
+    "front": "Autoclass",
+    "back": "A bucket feature that moves each object to a colder class when nobody reads it, and back to Standard when someone reads it. Use it when access frequencies vary or are unknown.",
+    "aws": "S3 Intelligent-Tiering",
+    "source": {
+      "title": "Autoclass",
+      "url": "https://docs.cloud.google.com/storage/docs/autoclass",
+      "evidence": "The feature moves data that isn't accessed to colder storage classes to reduce storage cost and moves data that is accessed to Standard storage to optimize future accesses."
+    }
+  },
+  {
+    "id": "data-f028",
+    "note": "2.2-cloud-storage-config",
+    "kind": "concept",
+    "front": "Why is Autoclass a poor fit for a bucket that Sensitive Data Protection scans regularly?",
+    "back": "Google does not recommend Autoclass when other Google Cloud services read the bucket regularly. Each read moves an object back to Standard storage, so the data does not stay in colder classes.",
+    "aws": null,
+    "source": {
+      "title": "Autoclass",
+      "url": "https://docs.cloud.google.com/storage/docs/autoclass",
+      "evidence": "Autoclass is also not recommended if other Google Cloud services regularly read data from the bucket. For example, Autoclass isn't recommended if you use Sensitive Data Protection to scan the content of your bucket."
+    }
+  },
+  {
+    "id": "data-f029",
+    "note": "2.2-cloud-storage-config",
+    "kind": "term",
+    "front": "Soft delete",
+    "back": "A bucket setting, on by default, that keeps deleted objects and buckets for a retention duration of 7 to 90 days (default 7). Use it to recover from accidental or malicious deletion.",
+    "aws": "S3 Versioning, for deletion protection",
+    "source": {
+      "title": "Soft delete overview",
+      "url": "https://docs.cloud.google.com/storage/docs/soft-delete",
+      "evidence": "Soft delete is enabled by default for all buckets that support it, with a default retention duration of 7 days."
+    }
+  },
+  {
+    "id": "data-f030",
+    "note": "2.2-cloud-storage-config",
+    "kind": "concept",
+    "front": "Which feature lets you recover objects after someone deletes the whole bucket?",
+    "back": "Soft delete. Object Versioning does not protect against bucket deletion. Google recommends soft delete instead of Object Versioning to protect against accidental or malicious deletion.",
+    "aws": null,
+    "source": {
+      "title": "Object Versioning",
+      "url": "https://docs.cloud.google.com/storage/docs/object-versioning",
+      "evidence": "Objects can only be recovered from a deleted bucket when soft delete is enabled. Object Versioning does not provide protection against bucket deletions."
+    }
+  },
+  {
+    "id": "data-f031",
+    "note": "2.2-cloud-storage-config",
+    "kind": "concept",
+    "front": "What can you change on a locked Cloud Storage retention policy?",
+    "back": "You can only increase the retention period. You cannot remove the policy or reduce the period, because the lock is irreversible.",
+    "aws": null,
+    "source": {
+      "title": "Bucket Lock",
+      "url": "https://docs.cloud.google.com/storage/docs/bucket-lock",
+      "evidence": "When you lock a bucket's retention policy, you prevent the policy from ever being removed or the retention period from ever being reduced (although you can still increase the retention period)."
+    }
+  },
+  {
+    "id": "data-f032",
+    "note": "2.2-cloud-storage-config",
+    "kind": "term",
+    "front": "Uniform bucket-level access",
+    "back": "A bucket setting that disables ACLs, so only IAM grants access to the bucket and its objects. Google generally recommends it. You cannot disable it after it is active for 90 consecutive days.",
+    "aws": null,
+    "source": {
+      "title": "Uniform bucket-level access",
+      "url": "https://docs.cloud.google.com/storage/docs/uniform-bucket-level-access",
+      "evidence": "Using this feature on a bucket disables ACLs for all Cloud Storage resources in the bucket; access to Cloud Storage resources then is granted exclusively through IAM."
+    }
+  },
+  {
+    "id": "data-f033",
+    "note": "2.2-cloud-storage-config",
+    "kind": "term",
+    "front": "Public access prevention",
+    "back": "A bucket setting that blocks access through `allUsers` and `allAuthenticatedUsers`. The organization policy constraint `storage.publicAccessPrevention` enforces it for a project, folder, or organization. It does not block signed URLs.",
+    "aws": "S3 Block Public Access",
+    "source": {
+      "title": "Public access prevention",
+      "url": "https://docs.cloud.google.com/storage/docs/public-access-prevention",
+      "evidence": "If your bucket is contained within an organization, you can enforce public access prevention by using the organization policy constraint `storage.publicAccessPrevention` at the project, folder, or organization level."
+    }
+  },
+  {
+    "id": "data-f034",
+    "note": "2.2-cloud-storage-config",
+    "kind": "concept",
+    "front": "How do you give users without Google accounts time-limited access to one private object?",
+    "back": "Give them a signed URL. It gives time-limited access to one resource. Anyone who has the URL can use it while it is active, with or without an account.",
+    "aws": null,
+    "source": {
+      "title": "Signed URLs",
+      "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+      "evidence": "signed URLs, which use signatures to give time-limited access to a specific Cloud Storage resource. Anyone in possession of the signed URL can use it while it's active, regardless of whether they have a valid account."
+    }
+  },
+  {
+    "id": "data-f035",
+    "note": "2.2-cloud-storage-config",
+    "kind": "concept",
+    "front": "What should you add to timestamp-based object names to keep a high request rate?",
+    "back": "A hash value before the timestamp, for example the first 6 characters of an MD5 hash of the name. Sequential names slow down the auto-scaling of index ranges.",
+    "aws": null,
+    "source": {
+      "title": "Request rate and access distribution guidelines",
+      "url": "https://docs.cloud.google.com/storage/docs/request-rate",
+      "evidence": "If you want to use sequential numbers or timestamps as part of your object names, introduce randomness to the object names by adding a hash value before the sequence number or timestamp."
+    }
+  },
+  {
+    "id": "data-f036",
+    "note": "2.2-cloud-storage-config",
+    "kind": "term",
+    "front": "Hierarchical namespace",
+    "back": "A bucket setting that adds folders and atomic folder operations for AI, ML, and analytics workloads. You must enable it when you create the bucket, and you cannot change it later.",
+    "aws": null,
+    "source": {
+      "title": "Hierarchical namespace",
+      "url": "https://docs.cloud.google.com/storage/docs/hns-overview",
+      "evidence": "To use folders in a bucket, you must enable hierarchical namespace when you create the bucket. Your bucket's hierarchical namespace setting can't be changed after the bucket is created."
+    }
+  },
+  {
+    "id": "data-f037",
+    "note": "2.2-database-config",
+    "kind": "term",
+    "front": "Cloud SQL Enterprise Plus",
+    "back": "The Cloud SQL edition with the best performance and availability. Its 99.99% SLA includes maintenance. It adds data cache, read pools, and advanced disaster recovery with a DR replica.",
+    "aws": null,
+    "source": {
+      "title": "Cloud SQL editions overview",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/editions-intro",
+      "evidence": "Cloud SQL Enterprise Plus edition: provides the best performance, availability, and observability to run applications. These are in addition to the core capabilities of Cloud SQL."
+    }
+  },
+  {
+    "id": "data-f038",
+    "note": "2.2-database-config",
+    "kind": "concept",
+    "front": "Why can a Cloud SQL read replica not replace a high availability configuration?",
+    "back": "Read replicas cannot fail over during an outage. For failover, configure the instance for high availability. A primary instance can fail over to a replica only if the replica is a DR replica.",
+    "aws": null,
+    "source": {
+      "title": "About replication in Cloud SQL",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/replication",
+      "evidence": "Read replicas don't provide failover capability. To provide failover capability for an instance, see Configuring an instance for high availability."
+    }
+  },
+  {
+    "id": "data-f039",
+    "note": "2.2-database-config",
+    "kind": "term",
+    "front": "DR replica",
+    "back": "A cross-region read replica that you designate for advanced disaster recovery in Cloud SQL Enterprise Plus. After a region failure, you start a replica failover to promote it. Later, a switchover restores the original roles with zero data loss.",
+    "aws": null,
+    "source": {
+      "title": "About disaster recovery (DR) in Cloud SQL",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/intro-to-cloud-sql-disaster-recovery",
+      "evidence": "With advanced DR, when a region failure occurs, you can invoke a replica failover. With replica failover, you promote a cross-region read replica similar to performing regular DR, except that you promote the designated disaster recovery (DR) replica."
+    }
+  },
+  {
+    "id": "data-f040",
+    "note": "2.2-database-config",
+    "kind": "concept",
+    "front": "Which private connection should you use to reach Cloud SQL from VPC networks in several projects?",
+    "back": "Private Service Connect. Private services access uses network peering and connects from a single VPC network only.",
+    "aws": null,
+    "source": {
+      "title": "Choose how to connect to Cloud SQL",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/connection-options",
+      "evidence": "Private services access: connect to Cloud SQL instances from a single VPC network based on networking peering. Private Service Connect: connect to Cloud SQL instances from multiple VPC networks that belong to different groups, projects, or organizations."
+    }
+  },
+  {
+    "id": "data-f041",
+    "note": "2.2-database-config",
+    "kind": "term",
+    "front": "Cloud SQL Auth Proxy",
+    "back": "A Cloud SQL connector that encrypts connections and verifies identities. Use it to connect over a public IP address without authorized networks and without SSL certificates to manage.",
+    "aws": null,
+    "source": {
+      "title": "Choose how to connect to Cloud SQL",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/connection-options",
+      "evidence": "Cloud SQL connectors are beneficial in the following scenarios: When you want to connect to a Cloud SQL instance using a public IP address without having to configure authorized networks."
+    }
+  },
+  {
+    "id": "data-f042",
+    "note": "2.2-database-config",
+    "kind": "concept",
+    "front": "Which Spanner edition do dual-region and multi-region configurations need?",
+    "back": "Enterprise Plus. Standard and Enterprise editions support only regional configurations. Enterprise Plus is for workloads that need 99.999% availability.",
+    "aws": null,
+    "source": {
+      "title": "Spanner editions overview",
+      "url": "https://docs.cloud.google.com/spanner/docs/editions-overview",
+      "evidence": "Enterprise Plus edition: designed for the most demanding workloads that require 99.999% availability with multi-region instance configurations and geo-partitioning support."
+    }
+  },
+  {
+    "id": "data-f043",
+    "note": "2.2-database-config",
+    "kind": "concept",
+    "front": "Why should a Spanner primary key not start with a timestamp?",
+    "back": "A key that always increases sends all inserts to one server and creates a hotspot. Use a UUID version 4 or a bit-reversed sequence instead.",
+    "aws": null,
+    "source": {
+      "title": "Schema design best practices",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-design",
+      "evidence": "Because Spanner uses key ranges to distribute data across servers, a monotonic key directs all insert traffic to a single server, creating a bottleneck."
+    }
+  },
+  {
+    "id": "data-f044",
+    "note": "2.2-database-config",
+    "kind": "concept",
+    "front": "Which Bigtable app profile routing gives read-your-writes consistency in a replicated instance?",
+    "back": "Single-cluster routing. By default, replication between Bigtable clusters is eventually consistent, so a read from another cluster can return older data.",
+    "aws": null,
+    "source": {
+      "title": "Replication overview",
+      "url": "https://docs.cloud.google.com/bigtable/docs/replication-overview",
+      "evidence": "If you use single-cluster routing, Bigtable can provide read-your-writes consistency when replication is enabled. This consistency model ensures that an application never reads data that is older than its most recent writes."
+    }
+  },
+  {
+    "id": "data-f045",
+    "note": "2.2-database-config",
+    "kind": "term",
+    "front": "Data Boost",
+    "back": "Serverless compute for high-throughput read jobs on Bigtable data. Analytics jobs use it instead of the cluster nodes, so they do not slow the application traffic. It does not accept writes or deletes.",
+    "aws": null,
+    "source": {
+      "title": "Bigtable Data Boost overview",
+      "url": "https://docs.cloud.google.com/bigtable/docs/data-boost-overview",
+      "evidence": "Data Boost is a serverless compute service designed to run high-throughput read jobs on your Bigtable data without impacting the performance of the clusters that handle your application traffic."
+    }
+  },
+  {
+    "id": "data-f046",
+    "note": "2.2-database-config",
+    "kind": "term",
+    "front": "Memorystore for Valkey",
+    "back": "A managed Valkey service. For high availability, Google recommends multi-zone instances with at least one replica for each shard. Replication is asynchronous, so a failover after an unexpected failure can lose acknowledged writes.",
+    "aws": "ElastiCache Multi-AZ",
+    "source": {
+      "title": "High availability and replicas",
+      "url": "https://docs.cloud.google.com/memorystore/docs/valkey/ha-and-replicas",
+      "evidence": "During a failover resulting from an unexpected failure, acknowledged writes may be lost due to the asynchronous nature of Valkey's replication protocol."
+    }
+  },
+  {
+    "id": "data-f047",
+    "note": "2.2-database-config",
+    "kind": "concept",
+    "front": "Why does a BigQuery multi-region dataset not protect against a region outage?",
+    "back": "A multi-region does not give regional redundancy. BigQuery stores the data in a single region of that area. For cross-region redundancy, use managed disaster recovery.",
+    "aws": null,
+    "source": {
+      "title": "BigQuery locations",
+      "url": "https://docs.cloud.google.com/bigquery/docs/locations",
+      "evidence": "Multi-region locations can provide larger quotas than single regions, but multi-regions don't provide regional redundancy. Data is stored in a single region and compute is only provided within that region."
+    }
+  },
+  {
+    "id": "data-f048",
+    "note": "2.2-database-config",
+    "kind": "concept",
+    "front": "Why does a `LIMIT` clause not reduce the cost of a `SELECT *` query?",
+    "back": "`LIMIT` does not change the amount of data that the query reads. BigQuery bills for all bytes in the table. Select only the columns that you need.",
+    "aws": null,
+    "source": {
+      "title": "Optimize query computation",
+      "url": "https://docs.cloud.google.com/bigquery/docs/best-practices-performance-compute",
+      "evidence": "Applying a `LIMIT` clause to a `SELECT *` query does not affect the amount of data read. You are billed for reading all bytes in the entire table"
+    }
+  },
+  {
+    "id": "data-f049",
+    "note": "2.2-data-protection",
+    "kind": "concept",
+    "front": "Why does disk replication not replace backups?",
+    "back": "Replication keeps a current copy of the data in another location, so it protects against infrastructure failure. It does not protect against data corruption, user error, or malicious attacks.",
+    "aws": null,
+    "source": {
+      "title": "Data protection options for disks and instances",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/data-protection",
+      "evidence": "Replication protects against infrastructure failure by maintaining a continuously updated copy of your data in another location. However, replication doesn't protect against data corruption, user error, or malicious attacks."
+    }
+  },
+  {
+    "id": "data-f050",
+    "note": "2.2-data-protection",
+    "kind": "concept",
+    "front": "What does Compute Engine back up by default?",
+    "back": "Nothing. Compute Engine does not back up instances or disks unless you configure a backup or replication option. Google recommends hourly standard snapshots.",
+    "aws": null,
+    "source": {
+      "title": "Data protection options for disks and instances",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/data-protection",
+      "evidence": "Compute Engine doesn't automatically back up your resources, such as instances and disks, unless you configure a backup or replication option."
+    }
+  },
+  {
+    "id": "data-f051",
+    "note": "2.2-data-protection",
+    "kind": "term",
+    "front": "Instant snapshots",
+    "back": "In-place disk backups in the same zone or region as the source disk, for fast rollback after a user error or a failed upgrade. They are not for disaster recovery: Compute Engine deletes them with the source disk.",
+    "aws": null,
+    "source": {
+      "title": "Data protection options for disks and instances",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/data-protection",
+      "evidence": "Instant snapshots are designed for fast, operational recovery, not disaster recovery. Instant snapshots are stored in the same location as the source disk and are automatically deleted when the source disk is deleted."
+    }
+  },
+  {
+    "id": "data-f052",
+    "note": "2.2-data-protection",
+    "kind": "term",
+    "front": "Archive snapshots",
+    "back": "Lower-cost, geo-redundant disk snapshots for data that you keep for months or years and rarely read, for example for compliance and audits. They have the longest recovery time of all snapshot types.",
+    "aws": "EBS snapshots",
+    "source": {
+      "title": "About archive and standard disk snapshots",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/snapshots",
+      "evidence": "If you require snapshot retention for many months or years and rarely need to access snapshots, consider using archive snapshots instead of standard snapshots."
+    }
+  },
+  {
+    "id": "data-f053",
+    "note": "2.2-data-protection",
+    "kind": "term",
+    "front": "Machine images",
+    "back": "A backup of a whole instance: its configuration, metadata, permissions, and a crash-consistent copy of all attached Persistent Disk and Hyperdisk volumes. Use it to back up an instance for disaster recovery or to clone it.",
+    "aws": null,
+    "source": {
+      "title": "Data protection options for disks and instances",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/data-protection",
+      "evidence": "the new instance is a clone of the source instance, including the full instance configuration and a crash-consistent copy of the data from all attached Persistent Disk and Hyperdisk volumes."
+    }
+  },
+  {
+    "id": "data-f054",
+    "note": "2.2-data-protection",
+    "kind": "concept",
+    "front": "Where does a Cloud SQL point-in-time recovery restore the data?",
+    "back": "To a new instance. You cannot perform a PITR to an existing instance. PITR works for a live instance and for a deleted instance.",
+    "aws": null,
+    "source": {
+      "title": "Perform point-in-time recovery (PITR)",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/backup-recovery/pitr",
+      "evidence": "A point-in-time recovery always creates a new instance; you cannot perform a PITR to an existing instance."
+    }
+  },
+  {
+    "id": "data-f055",
+    "note": "2.2-data-protection",
+    "kind": "concept",
+    "front": "What happens to Cloud SQL standard backups when you delete the instance?",
+    "back": "Cloud SQL deletes all the instance backups, unless you chose to retain backups or took a final backup before the deletion.",
+    "aws": null,
+    "source": {
+      "title": "Choose your backup option",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/backup-recovery/backup-options",
+      "evidence": "However, if you don't retain backups or take a final backup prior to deleting your instance, then Cloud SQL deletes all instance backups automatically."
+    }
+  },
+  {
+    "id": "data-f056",
+    "note": "2.2-data-protection",
+    "kind": "concept",
+    "front": "Which user error can Spanner point-in-time recovery not undo?",
+    "back": "The deletion of the whole database. PITR recovers from bad writes and logical corruption, up to 7 days back (1 hour by default). Against database deletion, enable deletion protection and keep other recovery options, such as backups.",
+    "aws": null,
+    "source": {
+      "title": "Point-in-time recovery (PITR) overview",
+      "url": "https://docs.cloud.google.com/spanner/docs/pitr",
+      "evidence": "PITR provides additional insurance against logical data corruption, but does not protect you in case a user accidentally deletes the database."
+    }
+  },
+  {
+    "id": "data-f057",
+    "note": "2.2-data-protection",
+    "kind": "term",
+    "front": "BigQuery time travel",
+    "back": "BigQuery keeps changed and deleted data for a window of 2 to 7 days, 7 by default. Use it to query past data or to restore a deleted, expired, or changed table.",
+    "aws": "Redshift snapshots",
+    "source": {
+      "title": "Data retention with time travel and fail-safe",
+      "url": "https://docs.cloud.google.com/bigquery/docs/time-travel",
+      "evidence": "You can access changed or deleted data from any point within the time travel window, which covers the past seven days by default."
+    }
+  },
+  {
+    "id": "data-f058",
+    "note": "2.2-data-protection",
+    "kind": "concept",
+    "front": "How do you recover a deleted BigQuery table after the time travel window ends, if you have no snapshot?",
+    "back": "Contact Cloud Customer Care. Fail-safe keeps deleted data for 7 more days, but you cannot query or recover it yourself.",
+    "aws": null,
+    "source": {
+      "title": "Data retention with time travel and fail-safe",
+      "url": "https://docs.cloud.google.com/bigquery/docs/time-travel",
+      "evidence": "You can't query or directly recover data in fail-safe storage. To recover data from fail-safe storage, contact Cloud Customer Care."
+    }
+  },
+  {
+    "id": "data-f059",
+    "note": "2.2-data-protection",
+    "kind": "term",
+    "front": "Table snapshot",
+    "back": "A read-only copy of a BigQuery table at a point in time. BigQuery stores only the bytes that differ from the base table. To change the data, restore the snapshot to a standard table.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to table snapshots",
+      "url": "https://docs.cloud.google.com/bigquery/docs/table-snapshots-intro",
+      "evidence": "BigQuery only stores bytes that are different between a snapshot and its base table, so a table snapshot typically uses less storage than a full copy of the table."
+    }
+  },
+  {
+    "id": "data-f060",
+    "note": "2.2-data-protection",
+    "kind": "concept",
+    "front": "Why is BigQuery cross-region dataset replication not a disaster recovery plan by itself?",
+    "back": "In a total outage of the primary region, you cannot promote the read-only secondary replica. For disaster recovery, use managed disaster recovery.",
+    "aws": null,
+    "source": {
+      "title": "Cross-region dataset replication",
+      "url": "https://docs.cloud.google.com/bigquery/docs/data-replication",
+      "evidence": "Cross-region replication is not intended for use as a disaster recovery plan during a total-region outage. In the case of a total region outage in the primary replica's region, you cannot promote the secondary replica."
+    }
+  }
+]

@@ -5,17 +5,19 @@
 // Documents (all under the artifact's db):
 //   progress/state     { v, objectives:{id:{s,c,t}}, notes:{id:t}, labs:{id:t}, settings:{...}, last:{...} }
 //   progress/qstats    { v, q:{questionId:{n,c,f,ft,l,lt,b,d,fl}} }
-//   progress/activity  { v, days:{"YYYY-MM-DD":{a,k}} }
+//   progress/cards     { v, c:{cardId:{n,c,f,ft,l,lt,b,d}} }   (flashcards; same fields as qstats)
+//   progress/activity  { v, days:{"YYYY-MM-DD":{a,k,r,l,f}} }
 //   mocks/<id>         one document per mock exam
 // Uses deepMerge() from logic.js (the build concatenates the files).
 
 const CACHE_KEY = "pca-workbook-v1";
-const DOC_PATHS = { state: "progress/state", qstats: "progress/qstats", activity: "progress/activity" };
+const DOC_PATHS = { state: "progress/state", qstats: "progress/qstats", cards: "progress/cards", activity: "progress/activity" };
 
 function emptyData() {
   return {
     state: { v: 1, objectives: {}, notes: {}, labs: {}, settings: { examDate: null, mockSize: 50, mockMinutes: 120 }, last: null },
     qstats: { v: 1, q: {} },
+    cards: { v: 1, c: {} },
     activity: { v: 1, days: {} },
     mocks: {},
   };
@@ -121,6 +123,7 @@ const Store = {
   _hasContent(key) {
     const d = this.data[key];
     if (key === "qstats") return Object.keys(d.q || {}).length > 0;
+    if (key === "cards") return Object.keys(d.c || {}).length > 0;
     if (key === "activity") return Object.keys(d.days || {}).length > 0;
     return Object.keys(d.objectives || {}).length + Object.keys(d.notes || {}).length + Object.keys(d.labs || {}).length > 0 || !!d.settings?.examDate;
   },
@@ -223,6 +226,7 @@ const Store = {
     this.data = {
       state: deepMerge(fresh.state, obj.state),
       qstats: deepMerge(fresh.qstats, obj.qstats),
+      cards: deepMerge(fresh.cards, obj.cards || {}),
       activity: deepMerge(fresh.activity, obj.activity || {}),
       mocks: obj.mocks || {},
     };

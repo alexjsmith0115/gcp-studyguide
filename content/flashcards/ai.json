@@ -1,0 +1,730 @@
+[
+  {
+    "id": "ai-f001",
+    "note": "1.3-ai-solutions",
+    "kind": "term",
+    "front": "Gemini Enterprise Agent Platform",
+    "back": "The Google Cloud platform to build, deploy, govern, and optimize AI agents and model-based solutions. It is the evolution of Vertex AI. The short form of the name is Agent Platform.",
+    "aws": "Amazon SageMaker",
+    "source": {
+      "title": "Agent Platform overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview",
+      "evidence": "Gemini Enterprise Agent Platform is a unified platform to build, deploy, govern, and optimize enterprise-grade AI agents and model-based solutions. As an evolution of Vertex AI, it supports the complete AI lifecycle"
+    }
+  },
+  {
+    "id": "ai-f002",
+    "note": "1.3-ai-solutions",
+    "kind": "term",
+    "front": "Agent Studio",
+    "back": "Agent Studio (formerly Vertex AI Studio) is a workspace in Agent Platform to refine prompts and system instructions and to compare models side by side. It can ground answers in Google Search, RAG Engine, or Agent Search.",
+    "aws": null,
+    "source": {
+      "title": "Agent Studio overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/agent-studio",
+      "evidence": "Use built-in natural language tools to automatically generate system instructions and perform side-by-side comparisons to test how different instructions and models affect agent behavior."
+    }
+  },
+  {
+    "id": "ai-f003",
+    "note": "1.3-ai-solutions",
+    "kind": "term",
+    "front": "Agent Development Kit (ADK)",
+    "back": "An open-source framework to build, debug, and deploy AI agents and multi-agent systems. It is available in Python, TypeScript, Go, and Java. ADK agents run locally or on Agent Runtime, Cloud Run, or GKE.",
+    "aws": null,
+    "source": {
+      "title": "Agent Development Kit",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/adk",
+      "evidence": "Agent Development Kit (ADK) is an open-source agent development framework that lets you build, debug, and deploy reliable AI agents at enterprise scale."
+    }
+  },
+  {
+    "id": "ai-f004",
+    "note": "1.3-ai-solutions",
+    "kind": "term",
+    "front": "Agent Runtime",
+    "back": "Agent Runtime (formerly Vertex AI Agent Engine) is a fully managed runtime in Agent Platform to deploy, operate, and scale agents. It accepts agents in any language or framework that can run in a container. Use it to focus on agent logic instead of infrastructure.",
+    "aws": null,
+    "source": {
+      "title": "Agent Runtime",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/runtime",
+      "evidence": "Agent Runtime is a fully-managed, opinionated runtime that you can use to deploy, operate, and scale agentic applications."
+    }
+  },
+  {
+    "id": "ai-f005",
+    "note": "1.3-ai-solutions",
+    "kind": "concept",
+    "front": "Besides the agent tools, which current product did the name Agent Builder also refer to?",
+    "back": "Agent Search (formerly Vertex AI Search). The Agent Search docs list Agent Builder among its former names. In an older question, search over company content points to Agent Search.",
+    "aws": null,
+    "source": {
+      "title": "Agent Search",
+      "url": "https://docs.cloud.google.com/generative-ai-app-builder/docs",
+      "evidence": "Some of the former names include Vertex AI Search, AI Applications, Agent Builder, Vertex AI Search and Conversation, Enterprise Search, and Generative AI App Builder."
+    }
+  },
+  {
+    "id": "ai-f006",
+    "note": "1.3-ai-solutions",
+    "kind": "concept",
+    "front": "What does Google recommend that you do before you fine-tune a Gemini model?",
+    "back": "Start with prompting and find the best prompt. Fine-tune only if prompting is not enough, for example to fix recurring errors.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to tuning",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/tuning",
+      "evidence": "We recommend starting with prompting to find the optimal prompt. Then, move on to fine-tuning (if required) to further boost performances or fix recurrent errors."
+    }
+  },
+  {
+    "id": "ai-f007",
+    "note": "1.3-ai-solutions",
+    "kind": "concept",
+    "front": "How should you give a Gemini model private company facts that change every day?",
+    "back": "Ground the model in your data sources, for example with Agent Search or RAG Engine. Grounding ties the output to those sources and reduces hallucinations.",
+    "aws": null,
+    "source": {
+      "title": "Grounding overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/overview",
+      "evidence": "If you provide models with access to specific data sources, then grounding tethers their output to these data and reduces the chances of inventing content."
+    }
+  },
+  {
+    "id": "ai-f008",
+    "note": "1.3-ai-solutions",
+    "kind": "concept",
+    "front": "Which Gemini tier fits simple, high-volume, cost-sensitive traffic?",
+    "back": "Flash-Lite, the most cost-efficient tier, optimized for low latency. Pro is for complex reasoning, and Flash balances intelligence and latency.",
+    "aws": null,
+    "source": {
+      "title": "Google models",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/google-models",
+      "evidence": "Our most cost-efficient model, optimized for low latency use cases for high-volume, cost-sensitive LLM traffic."
+    }
+  },
+  {
+    "id": "ai-f009",
+    "note": "1.3-ai-solutions",
+    "kind": "concept",
+    "front": "Which Gemini endpoint should you use when ML processing must stay in the EU?",
+    "back": "The EU multi-region (`eu`) endpoint, or a regional endpoint in the EU. The global endpoint can process requests in any Google Cloud location, so it gives no data residency guarantee.",
+    "aws": null,
+    "source": {
+      "title": "Data residency",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/data-residency",
+      "evidence": "When you use jurisdictional endpoints, ML processing stays within that specific geographical region (such as the United States or the European Union)."
+    }
+  },
+  {
+    "id": "ai-f010",
+    "note": "1.3-ai-solutions",
+    "kind": "term",
+    "front": "Provisioned Throughput",
+    "back": "A Gemini consumption option that guarantees throughput for a commitment of 1 week to 1 year. Use it for critical, steady workloads that need an SLA. Cover the baseline traffic with it, and let spillover go to Standard or Priority PayGo.",
+    "aws": null,
+    "source": {
+      "title": "Consumption options",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+      "evidence": "Cover baseline traffic with Provisioned Throughput. This improves utilization of your reserved capacity, making it economical while providing guaranteed reliability for the core of your traffic."
+    }
+  },
+  {
+    "id": "ai-f011",
+    "note": "1.3-ai-solutions",
+    "kind": "concept",
+    "front": "Which Gemini consumption option is most cost-effective for summarizing millions of documents when latency does not matter?",
+    "back": "Batch inference. It is the most cost-effective option for high-volume inference, at a discounted per-token rate. You put the requests in a file and submit one batch job.",
+    "aws": null,
+    "source": {
+      "title": "Consumption options",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/deploy/consumption-options",
+      "evidence": "If you have a large backlog of requests (for example, if you have millions of documents to summarize), and immediate latency is not a concern, you should submit a batch job"
+    }
+  },
+  {
+    "id": "ai-f012",
+    "note": "1.3-ai-solutions",
+    "kind": "term",
+    "front": "Model Garden",
+    "back": "Model Garden (formerly Vertex AI Model Garden) is a library in Agent Platform to discover, test, customize, and deploy Google, partner, and open-source models. A Model Garden organization policy controls which models people can use.",
+    "aws": "Amazon Bedrock, AWS JumpStart",
+    "source": {
+      "title": "Overview of Model Garden",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/model-garden/explore-models",
+      "evidence": "Model Garden is an AI/ML model library that helps you discover, test, customize, and deploy models and assets from Google and Google partners."
+    }
+  },
+  {
+    "id": "ai-f013",
+    "note": "1.3-ai-solutions",
+    "kind": "concept",
+    "front": "When should you self-deploy an open model instead of using Model as a Service (MaaS)?",
+    "back": "When you need custom or fine-tuned weights, predictable high-volume traffic, specific hardware or regions, or rules that forbid a multi-tenant service. The model then runs on an endpoint in your project and VPC network. MaaS fits prototypes and bursty traffic.",
+    "aws": null,
+    "source": {
+      "title": "Open models overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/open-models/choose-serving-option",
+      "evidence": "Self-deployment is the best choice when your application requires using custom weights or a fine-tuned version of a model, offering greater flexibility to deploy models tailored to your specific needs."
+    }
+  },
+  {
+    "id": "ai-f014",
+    "note": "1.3-ai-solutions",
+    "kind": "term",
+    "front": "RAG Engine",
+    "back": "A data framework in Agent Platform for retrieval-augmented generation (RAG). It ingests, chunks, embeds, and indexes your data in a corpus, and then retrieves context for the model. It supports VPC Service Controls and CMEK, but not data residency or Access Transparency.",
+    "aws": "Amazon Bedrock Knowledge Bases",
+    "source": {
+      "title": "RAG Engine overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview",
+      "evidence": "The VPC-SC security controls and CMEK are supported by Agent Platform RAG Engine. Data residency and AXT security controls aren't supported."
+    }
+  },
+  {
+    "id": "ai-f015",
+    "note": "2.4-ml-workflows",
+    "kind": "term",
+    "front": "Agent Platform Pipelines",
+    "back": "Agent Platform Pipelines (formerly Vertex AI Pipelines) runs ML workflows in a serverless manner, as a graph of containerized steps. Each run stores its parameters and artifact metadata in ML Metadata, which gives you lineage.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to Agent Platform Pipelines",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/pipelines/introduction",
+      "evidence": "Agent Platform Pipelines lets you automate, monitor, and govern your machine learning (ML) systems in a serverless manner by using ML pipelines to orchestrate your ML workflows."
+    }
+  },
+  {
+    "id": "ai-f016",
+    "note": "2.4-ml-workflows",
+    "kind": "concept",
+    "front": "Which SDK should you use to define most Agent Platform Pipelines?",
+    "back": "The Kubeflow Pipelines (KFP) SDK. Use the TFX SDK only when you use TensorFlow Extended to process terabytes of structured or text data.",
+    "aws": null,
+    "source": {
+      "title": "Interfaces for Agent Platform Pipelines",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/pipelines/interfaces",
+      "evidence": "Use KFP for all use cases where you don't need to use TensorFlow Extended to process huge amounts of structured or text data."
+    }
+  },
+  {
+    "id": "ai-f017",
+    "note": "2.4-ml-workflows",
+    "kind": "concept",
+    "front": "What does MLOps level 1 deploy to production that level 0 does not?",
+    "back": "The whole training pipeline. It runs automatically and retrains the model on new data (continuous training), with data and model validation steps. Level 0 deploys only a trained model.",
+    "aws": null,
+    "source": {
+      "title": "MLOps: Continuous delivery and automation pipelines in machine learning",
+      "url": "https://docs.cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning",
+      "evidence": "For level 1, you deploy a whole training pipeline, which automatically and recurrently runs to serve the trained model as the prediction service."
+    }
+  },
+  {
+    "id": "ai-f018",
+    "note": "2.4-ml-workflows",
+    "kind": "concept",
+    "front": "When should Managed Service for Apache Airflow orchestrate an ML workflow instead of Agent Platform Pipelines?",
+    "back": "When the workflow spans different systems, such as ELT jobs, ML training, and external business tools. For a workflow that stays inside Agent Platform, Google recommends Agent Platform Pipelines. Managed Service for Apache Airflow was formerly Cloud Composer.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for implementing machine learning on Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/ml-on-gcp-best-practices",
+      "evidence": "For complex, end-to-end processes that span data engineering tasks such as extract, load, and transform (ELT), ML training, and external business systems, we recommend Managed Airflow as an enterprise orchestrator."
+    }
+  },
+  {
+    "id": "ai-f019",
+    "note": "2.4-ml-workflows",
+    "kind": "term",
+    "front": "Execution caching",
+    "back": "An Agent Platform Pipelines feature that skips a step when the output for the same inputs is already known. This reduces cost. A pipeline run uses caching unless you turn it off.",
+    "aws": null,
+    "source": {
+      "title": "Run a pipeline",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/pipelines/run-pipeline",
+      "evidence": "Execution caching reduces costs by skipping pipeline tasks where the output is known for the current set of inputs. If the enable caching argument is not specified, execution caching is used in this pipeline run."
+    }
+  },
+  {
+    "id": "ai-f020",
+    "note": "2.4-ml-workflows",
+    "kind": "concept",
+    "front": "Which service account should run Agent Platform Pipelines jobs?",
+    "back": "A dedicated service account with granular permissions, for example through a custom role. If you specify none, runs use the Compute Engine default service account. The person who submits the run needs `roles/iam.serviceAccountUser` on the account.",
+    "aws": null,
+    "source": {
+      "title": "Configure your project for Agent Platform Pipelines",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/pipelines/configure-project",
+      "evidence": "We recommend that you create a service account to run your pipelines and then grant this account granular permissions to the Google Cloud resources that are needed to run your pipeline."
+    }
+  },
+  {
+    "id": "ai-f021",
+    "note": "2.4-ml-workflows",
+    "kind": "term",
+    "front": "Feature Store",
+    "back": "Feature Store (formerly Vertex AI Feature Store) is a managed Agent Platform service for ML features. Your BigQuery tables or views form the offline store, so it needs no separate offline store. It serves the latest feature values from BigQuery for low-latency online predictions.",
+    "aws": null,
+    "source": {
+      "title": "About Feature Store",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/featurestore/latest/overview",
+      "evidence": "In Agent Platform Feature Store, the BigQuery tables or views containing the feature data collectively form the offline store."
+    }
+  },
+  {
+    "id": "ai-f022",
+    "note": "2.4-ml-workflows",
+    "kind": "concept",
+    "front": "How can an application get online predictions from a BigQuery ML model?",
+    "back": "Register the model in Model Registry and deploy it to an Agent Platform endpoint. BigQuery ML itself supports only batch predictions.",
+    "aws": null,
+    "source": {
+      "title": "Agent Platform for BigQuery users",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/beginner/bqml",
+      "evidence": "BigQuery ML only supports batch predictions for your models. To get online predictions, you can train your models in BigQuery ML and deploy them to Agent Platform endpoints through Model Registry."
+    }
+  },
+  {
+    "id": "ai-f023",
+    "note": "2.4-ml-workflows",
+    "kind": "term",
+    "front": "Training clusters",
+    "back": "Training clusters (formerly Vertex AI Training Clusters) is an Agent Platform service for the largest training jobs on reserved clusters. It gives an open-source Slurm interface and automates cluster setup and hardware repair. You get access through your sales representative.",
+    "aws": null,
+    "source": {
+      "title": "Gemini Enterprise Agent Platform training clusters overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/training/training-clusters/overview",
+      "evidence": "Gemini Enterprise Agent Platform training clusters provides familiar, flexible tools to launch and manage jobs through an open-source Slurm user experience."
+    }
+  },
+  {
+    "id": "ai-f024",
+    "note": "2.4-ml-workflows",
+    "kind": "term",
+    "front": "Model Registry",
+    "back": "Model Registry (formerly Vertex AI Model Registry) is the central list of your models and model versions in Agent Platform. From it, you evaluate a version, deploy it to an endpoint, or run batch inference. You can deploy a version by an alias, such as `default`.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to Model Registry",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/model-registry/introduction",
+      "evidence": "Model Registry on Gemini Enterprise Agent Platform is a central repository where you can manage the lifecycle of your ML models."
+    }
+  },
+  {
+    "id": "ai-f025",
+    "note": "2.4-ml-workflows",
+    "kind": "concept",
+    "front": "When should you use batch inference instead of online inference on Agent Platform?",
+    "back": "When you need no immediate response and process accumulated data in a single request. Batch inference is asynchronous and needs no endpoint: you send the request directly to the model.",
+    "aws": null,
+    "source": {
+      "title": "Overview of getting inferences",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions",
+      "evidence": "Use batch inferences when you don't require an immediate response and want to process accumulated data by using a single request."
+    }
+  },
+  {
+    "id": "ai-f026",
+    "note": "2.4-ml-workflows",
+    "kind": "concept",
+    "front": "Which recommended Agent Platform endpoint type fits private traffic inside a VPC Service Controls perimeter?",
+    "back": "A dedicated private endpoint that uses Private Service Connect. It routes requests and responses privately. The dedicated public endpoint, the other recommended type, does not support VPC Service Controls.",
+    "aws": null,
+    "source": {
+      "title": "Choose an endpoint type",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/predictions/choose-endpoint-type",
+      "evidence": "Recommended for production enterprise applications. Improves network latency and security by making sure requests and responses are routed privately."
+    }
+  },
+  {
+    "id": "ai-f027",
+    "note": "2.4-ml-workflows",
+    "kind": "term",
+    "front": "Model Monitoring",
+    "back": "Model Monitoring (formerly Vertex AI Model Monitoring) tracks the quality of tabular models on a schedule or on demand. Enable skew detection when you have the original training data. Enable drift detection when you do not.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to Model Monitoring",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/machine-learning/model-monitoring/overview",
+      "evidence": "If the original training data is available, you can enable skew detection to monitor your models for training-serving skew."
+    }
+  },
+  {
+    "id": "ai-f028",
+    "note": "2.4-ml-workflows",
+    "kind": "term",
+    "front": "Colab Enterprise",
+    "back": "A managed notebook environment that starts a runtime when you need it. You share notebooks with a user, a group, or a domain through IAM. Choose it for collaboration with no infrastructure to manage, and Workbench instances for control and customization.",
+    "aws": "Amazon SageMaker (notebooks)",
+    "source": {
+      "title": "Choose a notebook solution",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/notebooks/workbench/notebook-solution",
+      "evidence": "If your project's priorities are to collaborate with others and to avoid spending time managing infrastructure, Colab Enterprise might be the best option for you."
+    }
+  },
+  {
+    "id": "ai-f029",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "term",
+    "front": "AI Hypercomputer",
+    "back": "Google Cloud's integrated supercomputing system for AI and ML workloads. It combines performance-optimized hardware (GPUs, TPUs, networking, storage), open software, and flexible consumption options. You deploy accelerators through GKE, Slurm with Cluster Director, or Cluster Toolkit blueprints.",
+    "aws": null,
+    "source": {
+      "title": "AI Hypercomputer overview",
+      "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/overview",
+      "evidence": "It is the unified portfolio for Google Cloud's AI infrastructure, and provides a single entry point to explore, configure, and deploy performance-optimized hardware, open software, and flexible consumption models."
+    }
+  },
+  {
+    "id": "ai-f030",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "concept",
+    "front": "Which accelerator fits a model with many custom PyTorch or JAX operations that must run partly on CPUs?",
+    "back": "GPUs. TPU code must compile with the XLA compiler, and TPUs do not suit custom operations in the main training loop or dynamic tensor shapes.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to Cloud TPU",
+      "url": "https://docs.cloud.google.com/tpu/docs/intro-to-tpu",
+      "evidence": "Models with a significant number of custom PyTorch/JAX operations that must run at least partially on CPUs"
+    }
+  },
+  {
+    "id": "ai-f031",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "term",
+    "front": "TPU7x (Ironwood)",
+    "back": "The latest TPU on Google Cloud (seventh generation), designed for large-scale AI training and inference. It supports JAX and PyTorch, not TensorFlow. You use it through GKE or Compute Engine.",
+    "aws": null,
+    "source": {
+      "title": "TPU7x (Ironwood)",
+      "url": "https://docs.cloud.google.com/tpu/docs/tpu7x",
+      "evidence": "You can use the JAX and PyTorch frameworks on TPU7x. TensorFlow is not supported."
+    }
+  },
+  {
+    "id": "ai-f032",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "term",
+    "front": "Clustered GPUs",
+    "back": "GPU machine series that Cluster Director manages as one tightly coupled system: A4X Max, A4X, A4, A3 Ultra, A3 Mega, and A3 High (8 GPUs). Use them for foundation-model and large-scale distributed training. General GPUs, such as G2 and G4, are independent units for inference.",
+    "aws": null,
+    "source": {
+      "title": "About GPU accelerators",
+      "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/understand-gpus",
+      "evidence": "Clustered GPUs are managed as a single, tightly coupled system of thousands of interconnected accelerators using Cluster Director."
+    }
+  },
+  {
+    "id": "ai-f033",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "concept",
+    "front": "Which consumption option gives the lowest accelerator price for fault-tolerant, checkpointed jobs?",
+    "back": "Spot VMs, with the deepest discount. Compute Engine can preempt them at any time to reclaim capacity, so the job must tolerate interruption.",
+    "aws": null,
+    "source": {
+      "title": "Consumption options for AI Hypercomputer",
+      "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/consumption-models",
+      "evidence": "To run fault-tolerant workloads, you can obtain compute resources immediately based on availability. You get resources at the lowest price possible. However, Compute Engine can preempt VMs at any time to reclaim capacity."
+    }
+  },
+  {
+    "id": "ai-f034",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "term",
+    "front": "Flex-start (Dynamic Workload Scheduler)",
+    "back": "A consumption option that gives VMs for up to seven days when capacity is available (best effort). Flex-start VMs use preemptible quota, but Compute Engine does not preempt them. Use it for short jobs that can wait for capacity, such as fine-tuning.",
+    "aws": null,
+    "source": {
+      "title": "Consumption options for AI Hypercomputer",
+      "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/consumption-models",
+      "evidence": "To run short-duration workloads that require densely allocated resources, you can request compute resources for up to seven days by using Flex-start."
+    }
+  },
+  {
+    "id": "ai-f035",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "term",
+    "front": "Future reservation in calendar mode",
+    "back": "A reservation of GPUs or TPUs that starts on a date and time that you choose and lasts 1 to 90 days. You pay for the full period. Use it when a job has a fixed start date, such as a fine-tuning run.",
+    "aws": null,
+    "source": {
+      "title": "About future reservation requests in calendar mode",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/future-reservations-calendar-mode-overview",
+      "evidence": "When Google Cloud approves a reservation request, Compute Engine provisions your reserved resources at your specified date and time, and for a duration of up to 90 days."
+    }
+  },
+  {
+    "id": "ai-f036",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "concept",
+    "front": "How far ahead must you submit a calendar-mode future reservation request for GPUs?",
+    "back": "At least 87 hours (three days and 15 hours) before the start time. So a GPU job that must start tomorrow cannot use calendar mode.",
+    "aws": null,
+    "source": {
+      "title": "About future reservation requests in calendar mode",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/future-reservations-calendar-mode-overview",
+      "evidence": "For GPU and H4D VMs, 87 hours (three days and 15 hours)"
+    }
+  },
+  {
+    "id": "ai-f037",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "concept",
+    "front": "Which option reserves clustered GPUs for a training job that runs longer than 90 days?",
+    "back": "A future reservation in AI Hypercomputer. It reserves capacity from a specific date, up to one year ahead. Calendar mode covers 90 days at most.",
+    "aws": null,
+    "source": {
+      "title": "AI Hypercomputer release notes",
+      "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/release-notes",
+      "evidence": "You can use future reservations in AI Hypercomputer to request to reserve capacity starting on a specific date up to one year in the future."
+    }
+  },
+  {
+    "id": "ai-f038",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "concept",
+    "front": "Which GPUs do Compute Engine flexible committed use discounts cover?",
+    "back": "Only the GPUs of the G2 and G4 machine series. For other GPUs, buy resource-based hardware commitments.",
+    "aws": null,
+    "source": {
+      "title": "Committed use discounts for Compute Engine",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/committed-use-discounts-overview",
+      "evidence": "For Compute Engine, the eligible resources include memory, vCPUs, and Local SSD disks that are used with the following machine series. For the G2 and G4 machine series only, the attached GPUs are also eligible."
+    }
+  },
+  {
+    "id": "ai-f039",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "term",
+    "front": "Multislice",
+    "back": "A group of interconnected multi-host TPU slices. Compute Engine does not offer Multislice. To use it, you must use GKE.",
+    "aws": null,
+    "source": {
+      "title": "TPU resources in Compute Engine",
+      "url": "https://docs.cloud.google.com/tpu/docs/tpus-in-compute-engine",
+      "evidence": "Creating groups of interconnected multi-host TPU slices isn't available with Compute Engine. To use Multislice, you must use Google Kubernetes Engine (GKE)."
+    }
+  },
+  {
+    "id": "ai-f040",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "term",
+    "front": "Cluster Director",
+    "back": "A managed service that handles the whole lifecycle of Slurm clusters for AI training and HPC. It is GA. Choose it when you want Slurm and want Google to manage the cluster lifecycle.",
+    "aws": null,
+    "source": {
+      "title": "Cluster Director is now generally available",
+      "url": "https://cloud.google.com/blog/products/compute/cluster-director-is-now-generally-available",
+      "evidence": "Cluster Director (GA) is a managed infrastructure service designed to meet the rigorous demands of modern supercomputing. It replaces fragile DIY tooling with a robust topology-aware control plane that handles the entire lifecycle of Slurm clusters"
+    }
+  },
+  {
+    "id": "ai-f041",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "concept",
+    "front": "Which storage service should hold synchronous checkpoints for large AI training jobs?",
+    "back": "Managed Lustre, a parallel file system for latency-sensitive work. Use Cloud Storage for training datasets, asynchronous checkpoints, and model weights.",
+    "aws": null,
+    "source": {
+      "title": "About storage services for AI and ML workloads",
+      "url": "https://docs.cloud.google.com/ai-hypercomputer/docs/storage",
+      "evidence": "Also recommended for latency-sensitive or high-metadata-concurrency workloads, such as KV caching offloads, synchronous checkpointing, and high-speed weight propagation for reinforcement learning."
+    }
+  },
+  {
+    "id": "ai-f042",
+    "note": "2.4-ai-hypercomputer",
+    "kind": "concept",
+    "front": "Which serverless option serves a smaller model on a GPU, with no reservation, and scales to zero?",
+    "back": "Cloud Run with GPUs. It offers NVIDIA L4 and RTX PRO 6000 GPUs on demand, with one GPU for each instance.",
+    "aws": null,
+    "source": {
+      "title": "GPU support for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/gpu",
+      "evidence": "Instances of a Cloud Run service that has been configured to use GPU can scale down to zero for cost savings when not in use."
+    }
+  },
+  {
+    "id": "ai-f043",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "term",
+    "front": "Agent Search",
+    "back": "Agent Search (formerly Vertex AI Search) is a Google-quality search engine over websites and structured or unstructured data in Cloud Storage or BigQuery. It combines keyword and semantic search and gives AI answers grounded in your data, with citations.",
+    "aws": "Amazon Kendra, Amazon Bedrock Knowledge Bases",
+    "source": {
+      "title": "Introduction to custom search",
+      "url": "https://docs.cloud.google.com/generative-ai-app-builder/docs/about-generic-search",
+      "evidence": "Generates AI answers grounded in your data, with citations to the source documents."
+    }
+  },
+  {
+    "id": "ai-f044",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "term",
+    "front": "CX Agent Studio",
+    "back": "A minimal-code builder for conversational agents, built on the Agent Development Kit (ADK). It is the evolution of Dialogflow CX. The docs list Dialogflow CX and ES as legacy conversational agents.",
+    "aws": "Amazon Lex",
+    "source": {
+      "title": "CX Agent Studio",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-cx/cx-agent-studio",
+      "evidence": "Customer Experience Agent Studio (CX Agent Studio) is a minimal code conversational agent builder."
+    }
+  },
+  {
+    "id": "ai-f045",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "term",
+    "front": "Document AI",
+    "back": "A document processing service that does OCR, structured form parsing, and entity extraction. For text in scanned documents, the Vision API docs point you to Document AI instead of Vision API OCR.",
+    "aws": "Amazon Textract",
+    "source": {
+      "title": "Vision features list",
+      "url": "https://docs.cloud.google.com/vision/docs/features-list",
+      "evidence": "If you are detecting text in scanned documents, try Document AI for optical character recognition, structured form parsing, and entity extraction."
+    }
+  },
+  {
+    "id": "ai-f046",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "concept",
+    "front": "What does Google recommend instead of the deprecated Imagen image generation endpoints?",
+    "back": "Gemini image models. The release notes map each deprecated Imagen GA generation endpoint to `gemini-2.5-flash-image`. Migrate to avoid service disruption.",
+    "aws": null,
+    "source": {
+      "title": "Release notes",
+      "url": "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/release-notes",
+      "evidence": "The following table describes image generation endpoints that are deprecated and their replacements. We recommend updating your model endpoints before June 30, 2026, to avoid service disruption."
+    }
+  },
+  {
+    "id": "ai-f047",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "concept",
+    "front": "Which Speech-to-Text API version does Chirp 3 transcription need?",
+    "back": "The Speech-to-Text V2 API. Chirp 3 transcription is not available in the V1 API.",
+    "aws": null,
+    "source": {
+      "title": "Chirp 3 Transcription",
+      "url": "https://docs.cloud.google.com/speech-to-text/docs/models/chirp-3",
+      "evidence": "Chirp 3: Transcription, is exclusively available within the Speech-to-Text API V2."
+    }
+  },
+  {
+    "id": "ai-f048",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "concept",
+    "front": "Which Speech-to-Text request type fits a two-hour recording in Cloud Storage?",
+    "back": "Asynchronous recognition, which accepts audio of any duration up to 480 minutes. Synchronous recognition accepts only 1 minute of audio or less.",
+    "aws": null,
+    "source": {
+      "title": "Speech-to-Text request types",
+      "url": "https://docs.cloud.google.com/speech-to-text/docs/v1/speech-to-text-requests",
+      "evidence": "Use asynchronous requests for audio data of any duration up to 480 minutes."
+    }
+  },
+  {
+    "id": "ai-f049",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "term",
+    "front": "Cloud Translation - Advanced",
+    "back": "The Cloud Translation edition with glossaries for domain terms, batch and document translation, and regional endpoints. It needs service account authentication with IAM and does not accept API keys. Use Translation - Basic for casual user content with API keys.",
+    "aws": "Amazon Translate",
+    "source": {
+      "title": "Overview of the Cloud Translation API",
+      "url": "https://docs.cloud.google.com/translate/docs/api-overview",
+      "evidence": "You can create service accounts and grant them permissions using IAM roles. Note that Cloud Translation - Advanced API does not support API keys."
+    }
+  },
+  {
+    "id": "ai-f050",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "term",
+    "front": "Gemini Enterprise",
+    "back": "Gemini Enterprise (formerly Google Agentspace) is an intranet search, AI assistant, and agentic platform for employees. Prebuilt connectors reach company data, such as Confluence, Jira, SharePoint, and ServiceNow. Search results follow each user's permissions.",
+    "aws": null,
+    "source": {
+      "title": "What is Gemini Enterprise?",
+      "url": "https://docs.cloud.google.com/gemini/enterprise/docs",
+      "evidence": "This provides employees with a single, multimodal search interface offering permissions-aware access to enterprise information."
+    }
+  },
+  {
+    "id": "ai-f051",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "term",
+    "front": "Workflow Builder",
+    "back": "Workflow Builder (formerly Agent Designer) is a Gemini Enterprise feature. Users across the organization build multi-step automated workflows that connect to enterprise data. It is GA.",
+    "aws": null,
+    "source": {
+      "title": "Gemini Enterprise release notes",
+      "url": "https://docs.cloud.google.com/gemini/enterprise/docs/release-notes",
+      "evidence": "Workflow Builder (formerly known as Agent Designer) is generally available (GA) in Gemini Enterprise."
+    }
+  },
+  {
+    "id": "ai-f052",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "concept",
+    "front": "What is the difference between data ingestion and data federation for Gemini Enterprise connectors?",
+    "back": "Ingestion copies data into the Gemini Enterprise index. It can improve search quality but uses more storage and time. Federation retrieves data directly from the source and copies nothing, but search quality might be lower.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to connectors and data stores",
+      "url": "https://docs.cloud.google.com/gemini/enterprise/docs/connectors/introduction-to-connectors-and-data-stores",
+      "evidence": "Data federation directly retrieves information from the specified data source. Because data isn't copied into the Gemini Enterprise index, you don't need to worry about data storage. However, because the data is not indexed, search quality might be lower."
+    }
+  },
+  {
+    "id": "ai-f053",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "concept",
+    "front": "Which location must a Gemini Enterprise app or data store use for CMEK?",
+    "back": "The US or EU multi-region. CMEK does not work with global apps or data stores. The Cloud KMS key must also be a multi-region key in `us` or `europe`.",
+    "aws": null,
+    "source": {
+      "title": "Customer-managed encryption keys",
+      "url": "https://docs.cloud.google.com/gemini/enterprise/docs/cmek",
+      "evidence": "You must use US or EU multi-region apps or data stores (not global ones)."
+    }
+  },
+  {
+    "id": "ai-f054",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "term",
+    "front": "Gemini Notebook Enterprise",
+    "back": "Gemini Notebook Enterprise (formerly NotebookLM Enterprise) is a highly compliant, enterprise-ready version of Gemini Notebook. Your data stays in your Google Cloud project. Users can share notebooks only with users in the same project, never publicly.",
+    "aws": null,
+    "source": {
+      "title": "What is Gemini Notebook Enterprise?",
+      "url": "https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/overview",
+      "evidence": "Gemini Notebook Enterprise runs in a Cloud-compliant environment. Your data is always within your Google Cloud project and can't be shared externally."
+    }
+  },
+  {
+    "id": "ai-f055",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "concept",
+    "front": "What does a person need to enable a partner model, such as Claude, in Model Garden?",
+    "back": "The Consumer Procurement Entitlement Manager IAM role. The organization policy must also allow the Cloud Commerce Consumer Procurement API.",
+    "aws": null,
+    "source": {
+      "title": "Partner models for MaaS",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/use-partner-models",
+      "evidence": "You must have the Consumer Procurement Entitlement Manager Identity and Access Management (IAM) role. Anyone who's been granted this role can enable partner models in Model Garden."
+    }
+  },
+  {
+    "id": "ai-f056",
+    "note": "2.5-ai-apis-and-gemini-enterprise",
+    "kind": "concept",
+    "front": "Which organization policy constraint blocks requests to the global Agent Platform endpoint?",
+    "back": "`constraints/gcp.restrictEndpointUsage`. Use it to enforce regional endpoints, for example when data must stay in one jurisdiction.",
+    "aws": null,
+    "source": {
+      "title": "Partner models for MaaS",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/partner-models/use-partner-models",
+      "evidence": "To help enforce the use of regional endpoints, use the `constraints/gcp.restrictEndpointUsage` organization policy constraint to block requests to the global API endpoint."
+    }
+  }
+]

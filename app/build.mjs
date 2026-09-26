@@ -206,6 +206,30 @@ for (const q of questions) {
   seenQ.add(q.id);
 }
 
+// Flashcards: one file per author domain. A card takes the objective of its notes page.
+const cards = [];
+const noteIndex = new Map(notes.map((n, i) => [n.id, i]));
+for (const f of listFiles(P("content", "flashcards"), /\.json$/)) {
+  let arr;
+  try { arr = JSON.parse(read(f)); } catch (e) { warn(`${f}: invalid JSON (${e.message})`); continue; }
+  for (const c of arr) {
+    const n = c && notes[noteIndex.get(c.note)];
+    if (!c || !c.id || !n) { warn(`${f}: skipped card ${c && c.id} (unknown note ${c && c.note})`); continue; }
+    const src = `card:${c.id}`;
+    cards.push({
+      id: c.id, note: n.id, objective: n.objective, kind: c.kind === "concept" ? "concept" : "term",
+      front: renderInline(c.front, src), back: renderInline(c.back, src), aws: c.aws ? renderInline(c.aws, src) : null,
+      source: c.source ? { title: String(c.source.title || c.source.url), url: String(c.source.url), evidence: c.source.evidence ? String(c.source.evidence) : "" } : null,
+    });
+  }
+}
+cards.sort((a, b) => noteIndex.get(a.note) - noteIndex.get(b.note)); // reading order; stable inside a page
+const seenC = new Set();
+for (const c of cards) {
+  if (seenC.has(c.id)) warn(`duplicate card id ${c.id}`);
+  seenC.add(c.id);
+}
+
 // ---------- link integrity ----------
 const noteIds = new Set(notes.map((n) => n.id));
 const labIds = new Set(labs.map((l) => l.id));
@@ -220,7 +244,7 @@ for (const n of notes) for (const l of n.labs) if (!labIds.has(l)) warn(`note:${
 const data = {
   builtAt: new Date().toISOString(),
   exam,
-  notes, cases, labs, questions, refs,
+  notes, cases, labs, questions, refs, cards,
 };
 const json = JSON.stringify(data).replace(/</g, "\\u003c");
 const css = read(P("app", "src", "styles.css"));
@@ -261,6 +285,7 @@ console.log(`  case studies: ${cases.filter((c) => c.textHtml).length} texts, ${
 console.log(`  labs: ${labs.length}`);
 console.log(`  reference pages: ${refs.length}`);
 console.log(`  questions: ${questions.length} (${questions.filter((q) => q.caseStudy).length} case study)`);
+console.log(`  flashcards: ${cards.length} (${cards.filter((c) => c.kind === "term").length} term, ${cards.filter((c) => c.kind === "concept").length} concept)`);
 console.log(`  per objective: ${Object.entries(byObj).sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })).map(([k, v]) => `${k}:${v}`).join(" ")}`);
 if (problems.length) {
   console.log(`\n${problems.length} problem(s):`);

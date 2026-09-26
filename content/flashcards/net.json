@@ -1,0 +1,769 @@
+[
+  {
+    "id": "net-f001",
+    "note": "1.3-network-design",
+    "kind": "term",
+    "front": "VPC network",
+    "back": "A global resource that is not tied to a region or zone. Its routes and firewall rules are also global. Its subnets are regional, so one VPC network can have subnets in many regions.",
+    "aws": "Amazon VPC",
+    "source": {
+      "title": "VPC networks",
+      "url": "https://docs.cloud.google.com/vpc/docs/vpc",
+      "evidence": "VPC networks, including their associated routes and firewall rules, are global resources. They are not associated with any particular region or zone."
+    }
+  },
+  {
+    "id": "net-f002",
+    "note": "1.3-network-design",
+    "kind": "concept",
+    "front": "What stops you from connecting two auto mode VPC networks with VPC Network Peering or Cloud VPN?",
+    "back": "All auto mode networks use the same predefined subnet ranges, from the `10.128.0.0/9` block. Google recommends custom mode networks for production.",
+    "aws": null,
+    "source": {
+      "title": "VPC networks",
+      "url": "https://docs.cloud.google.com/vpc/docs/vpc",
+      "evidence": "Because the subnets of every auto mode VPC network use the same predefined range of IP addresses, you can't connect auto mode VPC networks to one another by using VPC Network Peering or Cloud VPN."
+    }
+  },
+  {
+    "id": "net-f003",
+    "note": "1.3-network-design",
+    "kind": "concept",
+    "front": "What can you change in a subnet primary IPv4 range after you create the subnet?",
+    "back": "You can only expand it. You cannot shrink it or replace it, so plan its size before you build.",
+    "aws": null,
+    "source": {
+      "title": "Subnets",
+      "url": "https://docs.cloud.google.com/vpc/docs/subnets",
+      "evidence": "After you create a subnet, the primary IPv4 range for the subnet can be expanded but not replaced or shrunk."
+    }
+  },
+  {
+    "id": "net-f004",
+    "note": "1.3-network-design",
+    "kind": "concept",
+    "front": "Which dynamic routing mode lets hybrid connections in one region serve VMs in all regions?",
+    "back": "Global dynamic routing mode. Its dynamic routes in each region can have next hops in any region. In regional mode, the routes in a region have next hops only in that region.",
+    "aws": null,
+    "source": {
+      "title": "Learned routes",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/router/concepts/learned-routes",
+      "evidence": "The resulting dynamic routes created in a particular region of a VPC network can have next hops in any region."
+    }
+  },
+  {
+    "id": "net-f005",
+    "note": "1.3-network-design",
+    "kind": "concept",
+    "front": "Which IP range does Google recommend for extra GKE cluster addresses when RFC 1918 space runs out?",
+    "back": "The `100.64.0.0/10` range. Google recommends it instead of Class E space, because Class E space can cause problems with on-premises hardware.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for GKE networking",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/best-practices/networking",
+      "evidence": "We recommend using the 100.64.0.0/10 part of the RFC address space because Class E address space can present interoperability issues with on-premises hardware."
+    }
+  },
+  {
+    "id": "net-f006",
+    "note": "1.3-network-design",
+    "kind": "term",
+    "front": "Shared VPC",
+    "back": "Lets service projects use subnets of a Shared VPC network in a host project. A central team keeps control of subnets, routes, and firewalls. Host and service projects must be in the same organization.",
+    "aws": null,
+    "source": {
+      "title": "Shared VPC",
+      "url": "https://docs.cloud.google.com/vpc/docs/shared-vpc",
+      "evidence": "Shared VPC connects projects within the same organization. Linked projects can be in the same or different folders, but if they are in different folders the admin must have Shared VPC Admin rights to both folders."
+    }
+  },
+  {
+    "id": "net-f007",
+    "note": "1.3-network-design",
+    "kind": "concept",
+    "front": "At which level should you grant the Shared VPC Network User role to app teams?",
+    "back": "At the subnet level, not on the whole host project. This follows least privilege. Because subnets are regional, it also controls which regions each service project can use.",
+    "aws": null,
+    "source": {
+      "title": "Best practices and reference architectures for VPC design",
+      "url": "https://docs.cloud.google.com/architecture/best-practices-vpc-design",
+      "evidence": "Following the principle of least privilege, we recommend granting the network user role at the subnet level to the associated user, service account, or group."
+    }
+  },
+  {
+    "id": "net-f008",
+    "note": "1.3-network-design",
+    "kind": "term",
+    "front": "VPC Network Peering",
+    "back": "Connects two VPC networks, also in different organizations, so that they exchange routes. The networks stay administratively separate. Peering is not transitive, and subnet ranges cannot overlap.",
+    "aws": null,
+    "source": {
+      "title": "VPC Network Peering",
+      "url": "https://docs.cloud.google.com/vpc/docs/vpc-peering",
+      "evidence": "Peered VPC networks remain administratively separate. Only routes are exchanged, according to the peering configuration."
+    }
+  },
+  {
+    "id": "net-f009",
+    "note": "1.3-network-design",
+    "kind": "term",
+    "front": "NCC VPC spokes",
+    "back": "VPC networks attached as spokes to a Network Connectivity Center (NCC) hub. In a mesh topology, spokes get full bandwidth and transitive connectivity to each other. The hub gives only control plane management, not a hub network for the data plane.",
+    "aws": "AWS Transit Gateway",
+    "source": {
+      "title": "Hub-and-spoke network architecture",
+      "url": "https://docs.cloud.google.com/architecture/deploy-hub-spoke-vpc-network-topology",
+      "evidence": "NCC provides full bandwidth between workload VPCs and provides transitivity between workload VPCs."
+    }
+  },
+  {
+    "id": "net-f010",
+    "note": "1.3-network-design",
+    "kind": "term",
+    "front": "Private Service Connect (PSC)",
+    "back": "Lets a consumer reach a managed service at an internal IP address in the consumer VPC network. It uses NAT, so the consumer and the producer do not coordinate IP addresses. Use it to expose one service, not a whole network.",
+    "aws": "AWS PrivateLink",
+    "source": {
+      "title": "Private Service Connect",
+      "url": "https://docs.cloud.google.com/vpc/docs/private-service-connect",
+      "evidence": "Traffic between consumer and producers uses NAT so that no IP address coordination or other shared resource dependencies exist between the consumer and producer VPC networks."
+    }
+  },
+  {
+    "id": "net-f011",
+    "note": "1.3-network-design",
+    "kind": "term",
+    "front": "Private services access",
+    "back": "A private connection from your VPC network to a service producer network, for services such as Cloud SQL. It uses VPC Network Peering and an IP range that you allocate. Peered VPC networks cannot use the connection, because peering is not transitive.",
+    "aws": null,
+    "source": {
+      "title": "Private services access",
+      "url": "https://docs.cloud.google.com/vpc/docs/private-services-access",
+      "evidence": "To route traffic internally, private services access creates a private connection between your VPC network and the VPC network of the service producer, who can be Google or a third party."
+    }
+  },
+  {
+    "id": "net-f012",
+    "note": "1.3-network-design",
+    "kind": "concept",
+    "front": "Which GKE cluster IP range can you never expand or change after you create the cluster?",
+    "back": "The Service IP address range. You can add Pod ranges later, but the Service range stays fixed for the life of the cluster. Size it for growth before you create the cluster.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for GKE networking",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/best-practices/networking",
+      "evidence": "The secondary IP address range for Services can't be expanded or changed over the life of the cluster."
+    }
+  },
+  {
+    "id": "net-f013",
+    "note": "1.3-load-balancing",
+    "kind": "term",
+    "front": "Global external Application Load Balancer",
+    "back": "A proxy-based Layer 7 load balancer for HTTP(S) with a global anycast IP address. It serves globally dispersed users and backends in several regions. It supports Cloud CDN and Cloud Armor.",
+    "aws": "Application Load Balancer, one per region",
+    "source": {
+      "title": "External Application Load Balancer overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/https",
+      "evidence": "Use this load balancer for external HTTP(S) workloads with globally dispersed users or backend services in multiple regions."
+    }
+  },
+  {
+    "id": "net-f014",
+    "note": "1.3-load-balancing",
+    "kind": "concept",
+    "front": "Which load balancer do you choose for internal clients when the backends are in several regions?",
+    "back": "A cross-region internal load balancer. Only external load balancers can be global, so no global internal load balancer exists.",
+    "aws": null,
+    "source": {
+      "title": "Choose a load balancer",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+      "evidence": "Only external load balancers are available as global load balancers. For internal load balancers with backends in multiple regions, choose the cross-region load balancer."
+    }
+  },
+  {
+    "id": "net-f015",
+    "note": "1.3-load-balancing",
+    "kind": "term",
+    "front": "Passthrough Network Load Balancer",
+    "back": "A load balancer that delivers packets to the backends unchanged, so the backends see the client source IP address. The backends reply directly to clients (direct server return). Use it for UDP, ESP, or ICMP, or to avoid proxy overhead.",
+    "aws": "Network Load Balancer",
+    "source": {
+      "title": "Choose a load balancer",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+      "evidence": "Choose a passthrough Network Load Balancer to preserve client source IP addresses, avoid the overhead of proxies, and to support additional protocols like UDP, ESP, and ICMP."
+    }
+  },
+  {
+    "id": "net-f016",
+    "note": "1.3-load-balancing",
+    "kind": "concept",
+    "front": "Which load balancer can be the next hop of a static route to appliance VMs?",
+    "back": "An internal passthrough Network Load Balancer. Set it as the next hop of a static route to send traffic through a group of load-balanced gateway VMs.",
+    "aws": null,
+    "source": {
+      "title": "Internal passthrough Network Load Balancers as next hops",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/internal/ilb-next-hop-overview",
+      "evidence": "You can use an internal passthrough Network Load Balancer as the next hop to which packets are forwarded along the path to their final destination."
+    }
+  },
+  {
+    "id": "net-f017",
+    "note": "1.3-load-balancing",
+    "kind": "concept",
+    "front": "What authentication method does Google recommend instead of source IP checks behind an Application Load Balancer?",
+    "back": "Identity-Aware Proxy (IAP). Proxy load balancers do not keep client IP addresses by default, so authentication that depends on the source IP address can fail.",
+    "aws": null,
+    "source": {
+      "title": "Choose a load balancer",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+      "evidence": "For proxy load balancers such as the internal and external Application Load Balancers, we recommend that you use Identity-Aware Proxy (IAP) as your authentication method instead."
+    }
+  },
+  {
+    "id": "net-f018",
+    "note": "1.3-load-balancing",
+    "kind": "concept",
+    "front": "Which network tier do the global external Application and proxy Network Load Balancers require?",
+    "back": "Premium Tier. Standard Tier costs less and suits apps without strict latency needs, but these global load balancers do not support it.",
+    "aws": null,
+    "source": {
+      "title": "Choose a load balancer",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+      "evidence": "Certain external load balancers, such as the global external Application Load Balancer and the global external proxy Network Load Balancer can only be configured in Premium Tier."
+    }
+  },
+  {
+    "id": "net-f019",
+    "note": "1.3-load-balancing",
+    "kind": "term",
+    "front": "Serverless NEG",
+    "back": "A load balancer backend that points to a Cloud Run, Cloud Run functions, or App Engine resource. Only Application Load Balancers support it. It does not support health checks, and some load balancer modes offer optional outlier detection instead.",
+    "aws": null,
+    "source": {
+      "title": "Serverless network endpoint groups overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts",
+      "evidence": "Health checks are not supported for serverless backends. Therefore, backend services that contain serverless NEG backends can't be configured with health checks."
+    }
+  },
+  {
+    "id": "net-f020",
+    "note": "1.3-load-balancing",
+    "kind": "term",
+    "front": "Certificate Manager",
+    "back": "The Google Cloud service that manages TLS certificates for load balancers. Google Cloud strongly recommends it over Compute Engine SSL certificates. Google-managed wildcard certificates need Certificate Manager with DNS authorization.",
+    "aws": null,
+    "source": {
+      "title": "SSL certificates overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/ssl-certificates",
+      "evidence": "Google Cloud strongly recommends using Certificate Manager as your primary certificate management tool for load balancer deployments."
+    }
+  },
+  {
+    "id": "net-f021",
+    "note": "1.3-load-balancing",
+    "kind": "term",
+    "front": "SSL policy",
+    "back": "Sets the minimum TLS version and TLS features for connections between clients and the load balancer. It does not affect connections to the backends. With no SSL policy, the load balancer uses the `COMPATIBLE` profile and a TLS 1.0 minimum.",
+    "aws": null,
+    "source": {
+      "title": "SSL policies overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/ssl-policies-concepts",
+      "evidence": "SSL policies affect connections between clients and the load balancer (Connection-1 in the figure). SSL policies don't affect the connections between the load balancer and the backends (Connection-2 in the figure)."
+    }
+  },
+  {
+    "id": "net-f022",
+    "note": "1.3-load-balancing",
+    "kind": "term",
+    "front": "Cloud CDN",
+    "back": "Google's content delivery network, configured on a backend service or backend bucket. It works with the global external Application Load Balancer or the classic Application Load Balancer.",
+    "aws": "CloudFront",
+    "source": {
+      "title": "Cloud CDN overview",
+      "url": "https://docs.cloud.google.com/cdn/docs/overview",
+      "evidence": "Cloud CDN works with the global external Application Load Balancer or the classic Application Load Balancer to deliver content to your users."
+    }
+  },
+  {
+    "id": "net-f023",
+    "note": "1.3-load-balancing",
+    "kind": "concept",
+    "front": "Why does a geography block in a Cloud Armor backend security policy miss requests on a CDN-enabled backend?",
+    "back": "Backend security policies apply only to dynamic content, cache misses, and other requests that go to the origin. Cache hits never reach them. Put the block in an edge security policy, which applies before the cache lookup.",
+    "aws": null,
+    "source": {
+      "title": "Cloud CDN overview",
+      "url": "https://docs.cloud.google.com/cdn/docs/overview",
+      "evidence": "Backend security policies. These policies are enforced only for requests for dynamic content, cache misses, or other requests that are destined for your origin server."
+    }
+  },
+  {
+    "id": "net-f024",
+    "note": "1.3-load-balancing",
+    "kind": "concept",
+    "front": "Which access control feature cannot be enabled on the same backend service as Cloud CDN?",
+    "back": "Identity-Aware Proxy (IAP). IAP and Cloud CDN are incompatible, so they cannot both be enabled on one backend service.",
+    "aws": null,
+    "source": {
+      "title": "External Application Load Balancer overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/https",
+      "evidence": "IAP and Cloud CDN are incompatible with each other. They can't both be enabled on the same backend service."
+    }
+  },
+  {
+    "id": "net-f025",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "concept",
+    "front": "When should you choose Cloud VPN instead of Dedicated Interconnect or Partner Interconnect?",
+    "back": "When you need a lower-cost solution, have lower bandwidth needs, or test a migration of workloads to Google Cloud. For an enterprise-grade connection with higher throughput, choose Dedicated Interconnect or Partner Interconnect.",
+    "aws": null,
+    "source": {
+      "title": "Choosing a Network Connectivity product",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/how-to/choose-product",
+      "evidence": "If you need a lower cost solution, have lower bandwidth needs, or you are experimenting with migrating your workloads to Google Cloud, you can choose Cloud VPN."
+    }
+  },
+  {
+    "id": "net-f026",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "term",
+    "front": "HA VPN",
+    "back": "The high-availability Cloud VPN gateway. It connects your network to a VPC network with IPsec tunnels and supports only dynamic (BGP) routing. With the documented topology, it gives a 99.99% SLA.",
+    "aws": "AWS VPN",
+    "source": {
+      "title": "Cloud VPN overview",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/vpn/concepts/overview",
+      "evidence": "HA VPN is a high-availability (HA) Cloud VPN solution that lets you securely connect your on-premises network to your VPC network through an IPsec VPN connection."
+    }
+  },
+  {
+    "id": "net-f027",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "term",
+    "front": "Dedicated Interconnect",
+    "back": "A direct connection between your network and Google's network, with 10-Gbps, 100-Gbps, or 400-Gbps circuits. Your routing equipment must be in a colocation facility. For high bandwidth needs, it can be cost-effective.",
+    "aws": null,
+    "source": {
+      "title": "Choosing a Network Connectivity product",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/how-to/choose-product",
+      "evidence": "A direct connection to Google. Traffic flows directly between networks, not through the public internet. 10-Gbps, 100-Gbps, or 400-Gbps circuits"
+    }
+  },
+  {
+    "id": "net-f028",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "term",
+    "front": "Partner Interconnect",
+    "back": "Connectivity between your network and a VPC network through a supported service provider. Use it when you cannot reach a Dedicated Interconnect colocation facility, or when you do not need a full 10-Gbps connection.",
+    "aws": null,
+    "source": {
+      "title": "Partner Interconnect overview",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/partner-overview",
+      "evidence": "A Partner Interconnect connection is useful if your data center is in a physical location that can't reach a Dedicated Interconnect colocation facility, or your data needs don't warrant an entire 10-Gbps connection."
+    }
+  },
+  {
+    "id": "net-f029",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "term",
+    "front": "Cross-Cloud Interconnect",
+    "back": "A dedicated physical connection that Google provisions between Google's network and another cloud provider, such as AWS, Microsoft Azure, OCI, or Alibaba Cloud. Use it for dedicated capacity to another cloud.",
+    "aws": null,
+    "source": {
+      "title": "Cross-Cloud Interconnect overview",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/cci-overview",
+      "evidence": "When you buy Cross-Cloud Interconnect, Google provisions a dedicated physical connection between the Google network and that of another cloud service provider."
+    }
+  },
+  {
+    "id": "net-f030",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "concept",
+    "front": "Why does Google recommend Cloud Interconnect instead of Direct Peering for access to VPC networks?",
+    "back": "Direct Peering exists outside Google Cloud. It gives no direct access to VPC network resources that have only internal IP addresses, and Google offers no SLA for it.",
+    "aws": null,
+    "source": {
+      "title": "Choosing a Network Connectivity product",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/how-to/choose-product",
+      "evidence": "Does not provide direct access to VPC network resources that have only internal IP addresses."
+    }
+  },
+  {
+    "id": "net-f031",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "concept",
+    "front": "Which connection layout does the multi-region 99.99% Dedicated Interconnect topology need?",
+    "back": "At least four connections: at least two in each of two metros, in both edge availability domains of each metro. It also needs at least four VLAN attachments in two regions, and global dynamic routing.",
+    "aws": null,
+    "source": {
+      "title": "Establish 99.99% availability for Dedicated Interconnect",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/tutorials/dedicated-creating-9999-availability",
+      "evidence": "Use two metropolitan areas (metros): at least two interconnect connections must be in one metro, and at least two interconnect connections must be in a different metro."
+    }
+  },
+  {
+    "id": "net-f032",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "concept",
+    "front": "Which tunnels must an HA VPN gateway have to meet the 99.99% SLA on the Google Cloud side?",
+    "back": "A tunnel from each of the two HA VPN gateway interfaces to the peer gateway. One tunnel from a single interface leaves an interface unused and does not meet the SLA.",
+    "aws": null,
+    "source": {
+      "title": "HA VPN topologies",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/vpn/concepts/topologies",
+      "evidence": "To meet the 99.99% availability SLA on the Google Cloud side, there must be a tunnel from each of the two interfaces on the HA VPN gateway to the corresponding interfaces on the peer gateway."
+    }
+  },
+  {
+    "id": "net-f033",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "term",
+    "front": "MACsec for Cloud Interconnect",
+    "back": "Layer 2 encryption of Cloud Interconnect traffic between Google's edge router and the adjacent router, such as your on-premises router. It does not encrypt traffic inside Google. Google recommends layers: MACsec at Layer 2, IPsec at Layer 3, and application-level protocols such as TLS.",
+    "aws": null,
+    "source": {
+      "title": "MACsec for Cloud Interconnect overview",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/macsec-overview",
+      "evidence": "We recommend a layered security approach for encryption. At Layer 2, MACsec encrypts traffic between adjacent routers. At Layer 3, IPsec secures traffic between customer on-premises networks and VPC networks."
+    }
+  },
+  {
+    "id": "net-f034",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "concept",
+    "front": "When must you choose IPsec encryption for an HA VPN over Cloud Interconnect VLAN attachment?",
+    "back": "When you create the VLAN attachment. You cannot add encryption to an existing attachment later.",
+    "aws": null,
+    "source": {
+      "title": "HA VPN over Cloud Interconnect overview",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/interconnect/concepts/ha-vpn-interconnect",
+      "evidence": "You must select IPsec encryption when you create the VLAN attachment. You cannot add encryption to an existing attachment at a later time."
+    }
+  },
+  {
+    "id": "net-f035",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "term",
+    "front": "Site-to-site data transfer",
+    "back": "An NCC feature that uses Google's network as part of a WAN between your external sites. Each site connects through an NCC spoke. Traffic between sites is best effort, with no bandwidth or latency guarantee.",
+    "aws": null,
+    "source": {
+      "title": "Site-to-site data transfer overview",
+      "url": "https://docs.cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/data-transfer",
+      "evidence": "Network Connectivity Center (NCC) lets you use Google's network as part of a wide area network (WAN) that includes your external sites. This feature is known as site-to-site data transfer."
+    }
+  },
+  {
+    "id": "net-f036",
+    "note": "2.1-hybrid-multicloud",
+    "kind": "concept",
+    "front": "Which source range must on-premises route back through the VPC network for Cloud DNS forwarding?",
+    "back": "`35.199.192.0/19`. Cloud DNS sends forwarded queries from this range. On-premises needs a route for it through a Cloud VPN tunnel or VLAN attachment of the VPC network that sent the query.",
+    "aws": null,
+    "source": {
+      "title": "Create a forwarding zone",
+      "url": "https://docs.cloud.google.com/dns/docs/zones/forwarding-zones",
+      "evidence": "For Type 2 targets, your on-premises network must have a route for the 35.199.192.0/19 destination, whose next hop is in the same VPC network where the request originated, through a Cloud VPN tunnel or VLAN attachment for Cloud Interconnect."
+    }
+  },
+  {
+    "id": "net-f037",
+    "note": "2.1-network-security",
+    "kind": "term",
+    "front": "Cloud Next Generation Firewall (Cloud NGFW)",
+    "back": "A distributed firewall service with stateful inspection. It applies firewall rules to VMs and supported load balancers in a VPC network. It has three tiers: Essentials, Standard, and Enterprise.",
+    "aws": null,
+    "source": {
+      "title": "Cloud NGFW overview",
+      "url": "https://docs.cloud.google.com/firewall/docs/about-firewalls",
+      "evidence": "Distributed firewall service. Cloud NGFW applies firewall rules to VM instances, VM-based resources, and supported load balancers in a VPC network to allow traffic, deny traffic, or send traffic to inspection."
+    }
+  },
+  {
+    "id": "net-f038",
+    "note": "2.1-network-security",
+    "kind": "concept",
+    "front": "Which setting makes Cloud NGFW evaluate network firewall policies before VPC firewall rules?",
+    "back": "The `BEFORE_CLASSIC_FIREWALL` enforcement order. The default, `AFTER_CLASSIC_FIREWALL`, evaluates VPC firewall rules first. Hierarchical firewall policies always come before both.",
+    "aws": null,
+    "source": {
+      "title": "Evaluation order for firewall policies and rules",
+      "url": "https://docs.cloud.google.com/firewall/docs/firewall-policies-rule-eval-order",
+      "evidence": "BEFORE_CLASSIC_FIREWALL: Evaluates global and regional network firewall policies before evaluating classic VPC firewall rules."
+    }
+  },
+  {
+    "id": "net-f039",
+    "note": "2.1-network-security",
+    "kind": "concept",
+    "front": "Why are network tags a weak security boundary for VPC firewall rules?",
+    "back": "Anyone who can edit a VM can change its network tags, and so change which firewall rules apply to it. For strict control, use service accounts instead.",
+    "aws": null,
+    "source": {
+      "title": "VPC firewall rules",
+      "url": "https://docs.cloud.google.com/firewall/docs/firewalls",
+      "evidence": "IAM principals who can edit an instance can change its network tags, which could change the set of applicable firewall rules for that instance."
+    }
+  },
+  {
+    "id": "net-f040",
+    "note": "2.1-network-security",
+    "kind": "term",
+    "front": "Secure tags",
+    "back": "IAM-governed tags that Resource Manager holds as tag keys and values. Firewall policy rules can use them, but VPC firewall rules cannot. App teams with the Tag User role can bind tag values to their VMs without the right to change firewall rules.",
+    "aws": null,
+    "source": {
+      "title": "Secure tags for firewalls",
+      "url": "https://docs.cloud.google.com/firewall/docs/tags-firewalls-overview",
+      "evidence": "Identity and Access Management (IAM)-governed tags, also referred to as secure tags, are created and managed in Resource Manager as tag keys and tag values."
+    }
+  },
+  {
+    "id": "net-f041",
+    "note": "2.1-network-security",
+    "kind": "term",
+    "front": "Cloud NGFW Enterprise",
+    "back": "Cloud NGFW capabilities that include the intrusion detection and prevention service. Firewall policy rules send matched traffic to Google-managed zonal firewall endpoints, which inspect it and act to prevent threats. These capabilities work only through firewall policies, not VPC firewall rules.",
+    "aws": "AWS Network Firewall with Suricata",
+    "source": {
+      "title": "Intrusion detection and prevention service overview",
+      "url": "https://docs.cloud.google.com/firewall/docs/about-intrusion-prevention",
+      "evidence": "Cloud NGFW intrusion detection and prevention service works by creating Google-managed zonal firewall endpoints that use packet intercept technology to transparently inspect the workloads for the configured threat signatures and protect them against threats."
+    }
+  },
+  {
+    "id": "net-f042",
+    "note": "2.1-network-security",
+    "kind": "term",
+    "front": "Cloud IDS",
+    "back": "A managed intrusion detection service. It inspects a copy of traffic from Packet Mirroring and alerts on threats, but it does not block them. Use it for threat detection and compliance needs such as PCI 11.4 and HIPAA.",
+    "aws": "Traffic mirroring with a third-party IDS",
+    "source": {
+      "title": "Cloud IDS overview",
+      "url": "https://docs.cloud.google.com/intrusion-detection-system/docs/overview",
+      "evidence": "Cloud IDS detects and alerts on threats, but it does not take action to prevent attacks or repair damage."
+    }
+  },
+  {
+    "id": "net-f043",
+    "note": "2.1-network-security",
+    "kind": "concept",
+    "front": "Which workloads can one Cloud NGFW Enterprise firewall endpoint inspect?",
+    "back": "Only workloads in its own zone. To inspect workloads in several zones, attach one firewall endpoint in each zone. A zone without an attached endpoint gets no Layer 7 inspection.",
+    "aws": null,
+    "source": {
+      "title": "Firewall endpoint overview",
+      "url": "https://docs.cloud.google.com/firewall/docs/about-firewall-endpoints",
+      "evidence": "You can create a firewall endpoint in a zone and attach it to one or more VPC networks to monitor workloads in the same zone."
+    }
+  },
+  {
+    "id": "net-f044",
+    "note": "2.1-network-security",
+    "kind": "term",
+    "front": "Cloud Armor",
+    "back": "A service that protects apps behind load balancers. Its security policies can allow, deny, rate-limit, or redirect requests at the edge of Google's network, close to the source. Service-level policies attach to backend services.",
+    "aws": "AWS WAF, AWS Shield",
+    "source": {
+      "title": "Security policy overview",
+      "url": "https://docs.cloud.google.com/armor/docs/security-policy-overview",
+      "evidence": "Cloud Armor security policies enable you to allow, deny, rate-limit, or redirect requests to your backend services at the Google Cloud edge, as close as possible to the source of incoming traffic."
+    }
+  },
+  {
+    "id": "net-f045",
+    "note": "2.1-network-security",
+    "kind": "concept",
+    "front": "At which sensitivity level should you start a Cloud Armor preconfigured WAF rule?",
+    "back": "Level 1, in preview mode, then tune. Level 1 has the highest-confidence signatures and the fewest false positives. By default, Cloud Armor runs a rule at level 4 with all signatures.",
+    "aws": null,
+    "source": {
+      "title": "Preconfigured WAF rules overview",
+      "url": "https://docs.cloud.google.com/armor/docs/waf-rules",
+      "evidence": "Tuning and sensitivity: start with sensitivity level 1 in preview mode to understand how rules affect your application."
+    }
+  },
+  {
+    "id": "net-f046",
+    "note": "2.1-network-security",
+    "kind": "concept",
+    "front": "What is the difference between a Cloud Armor throttle rule and a rate-based ban rule?",
+    "back": "A `throttle` rule caps each client at the threshold. A `rate_based_ban` rule blocks a client for a set time after it exceeds the threshold.",
+    "aws": null,
+    "source": {
+      "title": "Rate limiting overview",
+      "url": "https://docs.cloud.google.com/armor/docs/rate-limiting-overview",
+      "evidence": "Rate-based ban. You can rate limit requests that match a rule on a per-client basis and then temporarily ban those clients for a configured period of time if they exceed a user-configured threshold."
+    }
+  },
+  {
+    "id": "net-f047",
+    "note": "2.1-network-security",
+    "kind": "term",
+    "front": "Secure Web Proxy",
+    "back": "A service that secures outbound HTTP and HTTPS traffic. It denies all traffic by default. Its rules allow traffic by source identity, such as a service account or secure tag, and by destination.",
+    "aws": null,
+    "source": {
+      "title": "Secure Web Proxy overview",
+      "url": "https://docs.cloud.google.com/secure-web-proxy/docs/overview",
+      "evidence": "Strong default security. Secure Web Proxy has a default deny-all setting that blocks all outbound traffic until you explicitly allow it."
+    }
+  },
+  {
+    "id": "net-f048",
+    "note": "2.1-network-security",
+    "kind": "concept",
+    "front": "Which tool captures full packet payloads from selected VMs for a third-party IDS?",
+    "back": "Packet Mirroring. It clones the traffic of selected VMs, including payloads and headers, and forwards it for examination. For new deployments, Google recommends Network Security Integration Packet Mirroring.",
+    "aws": null,
+    "source": {
+      "title": "Packet Mirroring",
+      "url": "https://docs.cloud.google.com/vpc/docs/packet-mirroring",
+      "evidence": "Packet Mirroring clones the traffic of specified instances in your VPC network and forwards it for examination. Packet Mirroring captures all traffic and packet data, including payloads and headers."
+    }
+  },
+  {
+    "id": "net-f049",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "term",
+    "front": "Private Google Access",
+    "back": "A per-subnet setting that lets VMs without external IP addresses reach Google APIs and services. It has no effect on VMs that have external IP addresses.",
+    "aws": null,
+    "source": {
+      "title": "Private Google Access",
+      "url": "https://docs.cloud.google.com/vpc/docs/private-google-access",
+      "evidence": "You enable Private Google Access on a subnet by subnet basis; it's a setting for subnets in a VPC network."
+    }
+  },
+  {
+    "id": "net-f050",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "concept",
+    "front": "Which Google APIs domain should VMs use to block APIs that VPC Service Controls does not support?",
+    "back": "`restricted.googleapis.com` (`199.36.153.4/30`). It allows only APIs that support VPC Service Controls, which reduces data exfiltration risk. If workloads also need other APIs, use `private.googleapis.com`.",
+    "aws": null,
+    "source": {
+      "title": "Configure Private Google Access",
+      "url": "https://docs.cloud.google.com/vpc/docs/configure-private-google-access",
+      "evidence": "If you need to restrict users to just the Google APIs and services that support VPC Service Controls, use restricted.googleapis.com, as it provides additional risk mitigation for data exfiltration."
+    }
+  },
+  {
+    "id": "net-f051",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "term",
+    "front": "PSC endpoint for Google APIs",
+    "back": "A Private Service Connect endpoint with a global internal IP address in your VPC network. It sends traffic to a bundle of Google APIs, `all-apis` or `vpc-sc`. On-premises hosts connected through Cloud VPN or VLAN attachments can also use it.",
+    "aws": "Interface VPC endpoint (AWS PrivateLink) for AWS services",
+    "source": {
+      "title": "About accessing global Google APIs through endpoints",
+      "url": "https://docs.cloud.google.com/vpc/docs/about-accessing-google-apis-endpoints",
+      "evidence": "With Private Service Connect, you can create private endpoints using global internal IP addresses within your VPC network."
+    }
+  },
+  {
+    "id": "net-f052",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "concept",
+    "front": "What does a VM without an external IP address need to use a PSC endpoint for Google APIs?",
+    "back": "Private Google Access enabled on its subnet. Without it, the VM cannot reach Google APIs through the endpoint.",
+    "aws": null,
+    "source": {
+      "title": "Access global Google APIs through endpoints",
+      "url": "https://docs.cloud.google.com/vpc/docs/configure-private-service-connect-apis",
+      "evidence": "Virtual machine (VM) instances without an external IP address assigned must use a subnet with Private Google Access enabled to access Google APIs and services using an endpoint."
+    }
+  },
+  {
+    "id": "net-f053",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "term",
+    "front": "Public NAT",
+    "back": "The Cloud NAT type that lets resources without external IP addresses connect to the internet. It does not use proxy VMs. It does not allow unsolicited inbound connections.",
+    "aws": "NAT gateway",
+    "source": {
+      "title": "Cloud NAT overview",
+      "url": "https://docs.cloud.google.com/nat/docs/overview",
+      "evidence": "Public NAT lets Google Cloud resources that don't have external IPv4 addresses communicate with IPv4 destinations on the internet."
+    }
+  },
+  {
+    "id": "net-f054",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "term",
+    "front": "Private NAT",
+    "back": "The Cloud NAT type for private-to-private translation, to NCC spokes, on-premises networks, or other clouds. Use it when your subnets overlap with the destination network. VMs can then reach only the non-overlapping subnets of that network.",
+    "aws": null,
+    "source": {
+      "title": "Cloud NAT overview",
+      "url": "https://docs.cloud.google.com/nat/docs/overview",
+      "evidence": "If your VPC network has IPv4 subnets that overlap with the destination network, you can use Private NAT to enable communication between the networks."
+    }
+  },
+  {
+    "id": "net-f055",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "concept",
+    "front": "Where do you create Cloud NAT gateways for VMs in Shared VPC service projects?",
+    "back": "In the host project. A Cloud NAT gateway serves one VPC network and region, so it also cannot serve VMs in peered VPC networks.",
+    "aws": null,
+    "source": {
+      "title": "Cloud NAT product interactions",
+      "url": "https://docs.cloud.google.com/nat/docs/nat-product-interactions",
+      "evidence": "To provide NAT for VMs in service projects that use a Shared VPC network, you must create Cloud NAT gateways in the host project."
+    }
+  },
+  {
+    "id": "net-f056",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "term",
+    "front": "Service connection policy",
+    "back": "A network administrator setting for service connectivity automation. It lets a managed service create Private Service Connect endpoints in chosen subnets, with IP addresses allocated automatically. Use it to give managed service instances private connectivity.",
+    "aws": null,
+    "source": {
+      "title": "About service connection policies",
+      "url": "https://docs.cloud.google.com/vpc/docs/about-service-connection-policies",
+      "evidence": "The subnets that are included in the service connection policy configuration provide IP addresses that are assigned to Private Service Connect endpoints."
+    }
+  },
+  {
+    "id": "net-f057",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "concept",
+    "front": "Which allocated range size does Google recommend for private services access to Google services?",
+    "back": "A `/16` block. The minimum for Google services is a single `/24` block. The allocated range reserves IP addresses for the producer and avoids overlaps with your network.",
+    "aws": null,
+    "source": {
+      "title": "Configure private services access",
+      "url": "https://docs.cloud.google.com/vpc/docs/configure-private-services-access",
+      "evidence": "For Google services, the minimum size is a single /24 block, but the recommended size is a /16 block."
+    }
+  },
+  {
+    "id": "net-f059",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "concept",
+    "front": "How does Google recommend that many VPC networks resolve on-premises DNS names?",
+    "back": "Designate one VPC network that forwards queries to the on-premises name servers. The other VPC networks use DNS peering zones that target that network. Outbound forwarding through VPC Network Peering is not supported.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for Cloud DNS",
+      "url": "https://docs.cloud.google.com/dns/docs/best-practices",
+      "evidence": "We recommend that you designate a single VPC network to query on-premises name servers by using outbound forwarding. Then, additional VPC networks can query the on-premises name servers by targeting the designated VPC network with a DNS peering zone."
+    }
+  },
+  {
+    "id": "net-f060",
+    "note": "2.1-vpc-access-patterns",
+    "kind": "term",
+    "front": "Connectivity Tests",
+    "back": "A diagnostics tool that checks connectivity between two network endpoints. It simulates the expected packet path through VPC networks, Cloud VPN tunnels, and VLAN attachments from your configuration. Use it to find configuration errors that block traffic.",
+    "aws": null,
+    "source": {
+      "title": "Connectivity Tests overview",
+      "url": "https://docs.cloud.google.com/network-intelligence-center/docs/connectivity-tests/concepts/overview",
+      "evidence": "Connectivity Tests is a diagnostics tool that lets you check connectivity between network endpoints. It analyzes your configuration and, in some cases, performs live data plane analysis between the endpoints."
+    }
+  }
+]

@@ -1,0 +1,912 @@
+[
+  {
+    "id": "mig-f001",
+    "note": "1.4-migration-planning",
+    "kind": "term",
+    "front": "Rehost: lift and shift",
+    "back": "A migration type that moves a workload with minor or no changes. Use it when the workload can run as-is on Google Cloud. It is the fastest type, but the workload does not use cloud features fully.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "A rehost migration is ideal when a workload can operate as-is in the target environment, or when there is little or no business need for change."
+    }
+  },
+  {
+    "id": "mig-f002",
+    "note": "1.4-migration-planning",
+    "kind": "term",
+    "front": "Replatform: lift and optimize",
+    "back": "A migration type that moves a workload and then optimizes it for the cloud, for example into containers on GKE. It takes more work than rehost and needs several rounds of testing.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "For example, you might replatform a workload to the cloud in order to take advantage of a cloud-based microservice architecture or containers in Google Kubernetes Engine."
+    }
+  },
+  {
+    "id": "mig-f003",
+    "note": "1.4-migration-planning",
+    "kind": "term",
+    "front": "Rebuild: remove and replace",
+    "back": "A migration type that retires an app and rewrites it as a cloud-optimized app. Use it when the app does not meet your goals, costs too much to migrate, or is not supported on Google Cloud. It is not suitable for ready-made apps.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "Moreover, this type of migration isn't suitable for ready-made apps because it requires rewriting the app."
+    }
+  },
+  {
+    "id": "mig-f004",
+    "note": "1.4-migration-planning",
+    "kind": "concept",
+    "front": "Which migration type must you use when you cannot refactor or decommission a workload?",
+    "back": "Rehost (lift and shift). For example, you cannot change the source code, or the build process cannot produce new artifacts.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "If you cannot refactor a workload to migrate and cannot decommission the workload, you must use a rehost migration."
+    }
+  },
+  {
+    "id": "mig-f005",
+    "note": "1.4-migration-planning",
+    "kind": "term",
+    "front": "Google Cloud Migration Center",
+    "back": "A Google Cloud platform for asset discovery and assessment. You group the discovered assets, set migration preferences, and generate total cost of ownership (TCO) reports to compare target products and costs.",
+    "aws": "AWS Migration Hub",
+    "source": {
+      "title": "About infrastructure discovery and assessment",
+      "url": "https://docs.cloud.google.com/migration-center/docs/discovery-and-assessment-overview",
+      "evidence": "Finally, you generate a total cost of ownership (TCO) report to compare different target products and their costs."
+    }
+  },
+  {
+    "id": "mig-f006",
+    "note": "1.4-migration-planning",
+    "kind": "concept",
+    "front": "What must you create before you can deploy a landing zone?",
+    "back": "An organization resource and a billing account. A landing zone is often a prerequisite for enterprise workloads.",
+    "aws": null,
+    "source": {
+      "title": "Landing zone design in Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/landing-zones",
+      "evidence": "To deploy a landing zone, you must first create an organization resource and create a billing account, either online or invoiced."
+    }
+  },
+  {
+    "id": "mig-f007",
+    "note": "1.4-migration-planning",
+    "kind": "concept",
+    "front": "How long does an online transfer of 100 TB take over a 100 Mbps connection?",
+    "back": "Over 100 days. At that speed, consider an offline transfer such as Transfer Appliance. At 1 Gbps, the same transfer takes over 10 days.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Transfer your large datasets",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+      "evidence": "If you only have a 100 Mbps connection (or worse from a remote location), the same transfer takes over 100 days. At this point, it's worth considering an offline-transfer option such as Transfer Appliance."
+    }
+  },
+  {
+    "id": "mig-f008",
+    "note": "1.4-migration-planning",
+    "kind": "concept",
+    "front": "Which workloads belong in migration wave 1?",
+    "back": "Workloads with high business value and low effort. Use them for early migrations or proofs of concept. Workloads with low value and high effort migrate last, in wave 4.",
+    "aws": null,
+    "source": {
+      "title": "Plan your migration waves",
+      "url": "https://docs.cloud.google.com/migration-center/docs/plan-migration-waves",
+      "evidence": "Wave 1: High business value, low effort to implement."
+    }
+  },
+  {
+    "id": "mig-f009",
+    "note": "1.4-migration-planning",
+    "kind": "concept",
+    "front": "Why is a rarely used workload a poor first mover?",
+    "back": "It is low risk, but it does not build momentum for the migration. Problems with it are also hard to detect and respond to.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Assess and discover your workloads",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+      "evidence": "although it's a low risk migration, it doesn't increase the momentum of your migration, and it can be hard to detect and respond to problems."
+    }
+  },
+  {
+    "id": "mig-f010",
+    "note": "1.4-migration-planning",
+    "kind": "concept",
+    "front": "Why should you avoid a zero-downtime requirement for a workload where possible?",
+    "back": "Zero and near-zero downtime strategies are usually more costly and complex than strategies with a downtime. Backend and batch workloads can often accept a cutover window.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Assess and discover your workloads",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+      "evidence": "consider that zero and near-zero downtime migration strategies are usually more costly and complex to design and implement than migration strategies that require a downtime."
+    }
+  },
+  {
+    "id": "mig-f011",
+    "note": "1.4-migration-planning",
+    "kind": "term",
+    "front": "Y (writing and reading)",
+    "back": "A data migration approach in which workloads write to and read from both the old and the new site during the migration. It needs no cutover window, but you must refactor every workload.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Transfer your large datasets",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+      "evidence": "With this approach, the workload is writing and reading data in both the legacy site and the new site during the migration."
+    }
+  },
+  {
+    "id": "mig-f012",
+    "note": "1.4-migration-planning",
+    "kind": "concept",
+    "front": "What should the team do when a migration step exceeds its maximum execution time?",
+    "back": "Start the rollback of that step. Prepare a rollback strategy for each step of the migration plan, and test each strategy periodically.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Best practices for validating a migration plan",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-best-practices",
+      "evidence": "Set a maximum-allowed execution time for each migration step. After this allowed execution time expires, your teams start rolling back the migration step."
+    }
+  },
+  {
+    "id": "mig-f013",
+    "note": "1.4-licensing-and-financials",
+    "kind": "term",
+    "front": "Premium images",
+    "back": "Compute Engine OS images, such as RHEL, SLES, and Windows Server, that include an on-demand license. Their price adds to the machine type price. Use them when you do not bring your own license.",
+    "aws": null,
+    "source": {
+      "title": "Disk and image pricing",
+      "url": "https://cloud.google.com/compute/disks-image-pricing",
+      "evidence": "All prices for premium images are in addition to charges for using a machine type."
+    }
+  },
+  {
+    "id": "mig-f014",
+    "note": "1.4-licensing-and-financials",
+    "kind": "term",
+    "front": "License Mobility",
+    "back": "A Microsoft Software Assurance benefit that lets you bring server application licenses, such as SQL Server and SharePoint Server, to Google Cloud. It does not cover Windows Server, because it applies only to server applications.",
+    "aws": null,
+    "source": {
+      "title": "Microsoft licensing on Google Cloud FAQ",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing-faq",
+      "evidence": "No, Windows server is not covered under License Mobility because License Mobility only applies to server applications, not the underlying operating system."
+    }
+  },
+  {
+    "id": "mig-f015",
+    "note": "1.4-licensing-and-financials",
+    "kind": "term",
+    "front": "Outsourcing Software Management Rights",
+    "back": "A Microsoft BYOL path for products that License Mobility does not cover, such as Windows Server 2019. It needs a product version released before October 1, 2019, and a license from an enrollment effective before that date. It also needs dedicated hardware, such as sole-tenant nodes.",
+    "aws": null,
+    "source": {
+      "title": "Microsoft licensing on Google Cloud",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing",
+      "evidence": "This option can be useful when you want to use your own licenses on Google Cloud for products that are not covered by License Mobility, such as Windows Server 2019."
+    }
+  },
+  {
+    "id": "mig-f016",
+    "note": "1.4-licensing-and-financials",
+    "kind": "concept",
+    "front": "Which license option must you use for Windows Server 2022 on Compute Engine?",
+    "back": "An on-demand license from Google, for example a premium image. BYOL for Windows Server needs a version released before October 1, 2019, and sole-tenant nodes.",
+    "aws": null,
+    "source": {
+      "title": "Microsoft licensing on Google Cloud",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing",
+      "evidence": "The license covers a Microsoft product version released before October 1, 2019. For example, Windows 2019 might be eligible for BYOL with Outsourcing Software Management Rights, but Windows Server 2022 is not eligible."
+    }
+  },
+  {
+    "id": "mig-f017",
+    "note": "1.4-licensing-and-financials",
+    "kind": "concept",
+    "front": "Why does SQL Server with License Mobility need sole-tenant nodes on a BYOL Windows Server image?",
+    "back": "Windows Server is not eligible for License Mobility. So a BYOL Windows Server image falls under Outsourcing Software Management Rights, which require sole-tenant nodes. On an on-demand Windows Server image, the same SQL Server license does not need sole-tenant nodes.",
+    "aws": null,
+    "source": {
+      "title": "Microsoft licensing on Google Cloud FAQ",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/windows/ms-licensing-faq",
+      "evidence": "This is because the Windows Server operating system is not eligible for License Mobility and is subject to the restrictions of Outsourcing Software Management Rights."
+    }
+  },
+  {
+    "id": "mig-f018",
+    "note": "1.4-licensing-and-financials",
+    "kind": "concept",
+    "front": "Which sole-tenant host maintenance policy suits highly available VMs with per-core licenses?",
+    "back": "Migrate within node group. During host events, VMs live migrate within a fixed group of physical servers, which limits the number of physical servers that the VMs use. Compute Engine reserves holdback nodes for the live migration.",
+    "aws": null,
+    "source": {
+      "title": "Sole-tenancy overview",
+      "url": "https://docs.cloud.google.com/compute/docs/nodes/sole-tenant-nodes",
+      "evidence": "When using this host maintenance policy, Compute Engine live migrates VMs within a fixed-sized group of physical servers during host events, which helps limit the number of unique physical servers used by the VM."
+    }
+  },
+  {
+    "id": "mig-f019",
+    "note": "1.4-licensing-and-financials",
+    "kind": "concept",
+    "front": "Why is an image based on a Google premium image not eligible for BYOL?",
+    "back": "Premium images require pay-as-you-go licenses from Google. For BYOL, import your own media, such as a VMDK or VHD disk, and choose your own license key during the import.",
+    "aws": null,
+    "source": {
+      "title": "Bringing your own licenses",
+      "url": "https://docs.cloud.google.com/compute/docs/nodes/bringing-your-own-licenses",
+      "evidence": "Images based on a premium image are not eligible for BYOL because premium images require pay-as-you-go licenses from Google."
+    }
+  },
+  {
+    "id": "mig-f020",
+    "note": "1.4-licensing-and-financials",
+    "kind": "term",
+    "front": "Red Hat Cloud Access",
+    "back": "A feature that lets you use an existing RHEL subscription on Compute Engine. Use it instead of a premium RHEL image, which has extra fees.",
+    "aws": null,
+    "source": {
+      "title": "Operating system details",
+      "url": "https://docs.cloud.google.com/compute/docs/images/os-details",
+      "evidence": "RHEL images are premium resources that incur additional fees to use. If you want to use an existing RHEL subscription, you can use the Red Hat Cloud Access feature."
+    }
+  },
+  {
+    "id": "mig-f021",
+    "note": "1.4-licensing-and-financials",
+    "kind": "concept",
+    "front": "How do Spot VMs change the charges for a premium image such as Windows Server?",
+    "back": "They do not change them. Spot VMs do not reduce premium image costs, so they do not lower OS license charges.",
+    "aws": null,
+    "source": {
+      "title": "Disk and image pricing",
+      "url": "https://cloud.google.com/compute/disks-image-pricing",
+      "evidence": "Spot VMs (and preemptible VMs) don't reduce the costs of premium images and don't change the way that you are billed for the use of those images."
+    }
+  },
+  {
+    "id": "mig-f022",
+    "note": "1.4-licensing-and-financials",
+    "kind": "term",
+    "front": "Oracle Database@Google Cloud",
+    "back": "A service that brings Oracle database services, such as Oracle Exadata Database Service, to Google Cloud. Google positions it as more integrated than Bare Metal Solution for most Oracle deployments.",
+    "aws": null,
+    "source": {
+      "title": "Explore Oracle and Google Cloud partnership offerings",
+      "url": "https://docs.cloud.google.com/bare-metal/docs/explore-oracle-partnership-offerings",
+      "evidence": "For a majority of Oracle deployments, our new strategic partnership offering, Oracle Database@Google Cloud, provides a more integrated and efficient experience than Bare Metal Solution."
+    }
+  },
+  {
+    "id": "mig-f023",
+    "note": "1.4-licensing-and-financials",
+    "kind": "concept",
+    "front": "Which cost do teams commonly overlook in a cloud migration TCO?",
+    "back": "Network use. In a data center, network hardware and cabling are one-time costs. In the cloud, you can be billed for network use in many ways.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Assess and discover your workloads",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+      "evidence": "A commonly overlooked cost when considering cloud migrations is the use of a cloud network."
+    }
+  },
+  {
+    "id": "mig-f024",
+    "note": "1.4-licensing-and-financials",
+    "kind": "concept",
+    "front": "Which pricing track does a Migration Center TCO report use when you select \"No preference\"?",
+    "back": "A 3-year resource-based committed use discount (CUD). So the default report does not show the on-demand cost.",
+    "aws": null,
+    "source": {
+      "title": "Migration preferences for servers",
+      "url": "https://docs.cloud.google.com/migration-center/docs/server-preferences",
+      "evidence": "No preference: defaults to a 3-year resource-based committed use discount (CUD) for the lowest total cost of ownership on predictable workloads."
+    }
+  },
+  {
+    "id": "mig-f025",
+    "note": "5.1-migration-tooling",
+    "kind": "term",
+    "front": "Migrate to Virtual Machines",
+    "back": "A lift-and-shift service that moves VMs from a source environment, such as a vSphere data center, to Compute Engine. It replicates disk data while the source VM runs. The cutover needs only a short downtime.",
+    "aws": "AWS Server Migration Service",
+    "source": {
+      "title": "VM migration process",
+      "url": "https://docs.cloud.google.com/migrate/virtual-machines/docs/5.0/discover/lifecycle",
+      "evidence": "Migrate to Virtual Machines lets you migrate (lift and shift) your virtual machines (VMs), with minor automatic modifications, from your source environment to Compute Engine."
+    }
+  },
+  {
+    "id": "mig-f026",
+    "note": "5.1-migration-tooling",
+    "kind": "concept",
+    "front": "What happens to data written to the new VM when you roll back a Migrate to Virtual Machines cutover?",
+    "back": "The tool does not copy it back to the source VM. Rollback is manual: you delete the new VM, start the source VM, and redirect traffic.",
+    "aws": null,
+    "source": {
+      "title": "VM migration process",
+      "url": "https://docs.cloud.google.com/migrate/virtual-machines/docs/5.0/discover/lifecycle",
+      "evidence": "If you have to perform a rollback, you have to ensure that you redirect traffic back to the source VM. Also, note any data written on the Compute Engine instance is not pushed back to the original source VM."
+    }
+  },
+  {
+    "id": "mig-f027",
+    "note": "5.1-migration-tooling",
+    "kind": "concept",
+    "front": "Which Google Cloud option lets teams move VMware VMs and keep their VMware tools and processes?",
+    "back": "Google Cloud VMware Engine. It includes vSphere, vCenter, vSAN, NSX, and HCX, so it is compatible with your existing VMware tools, skills, and processes.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud VMware Engine overview",
+      "url": "https://docs.cloud.google.com/vmware-engine/docs/overview",
+      "evidence": "VMware Engine includes vSphere, vCenter, vSAN, NSX, HCX, and corresponding tools, so it's fully compatible with your existing VMware tools, skills training, and the processes used by teams already familiar with VMware."
+    }
+  },
+  {
+    "id": "mig-f028",
+    "note": "5.1-migration-tooling",
+    "kind": "term",
+    "front": "Migrate to Containers",
+    "back": "A tool that moves workloads from VMs into containers on GKE or Cloud Run. Use it to replatform applications such as Tomcat, JBoss, WebSphere, or Windows IIS.",
+    "aws": "AWS App2Container",
+    "source": {
+      "title": "Migrate to Containers overview",
+      "url": "https://docs.cloud.google.com/migrate/containers/docs/getting-started",
+      "evidence": "Use Migrate to Containers to modernize traditional applications away from virtual machine (VM) instances and into native containers that run on Google Kubernetes Engine (GKE) or Cloud Run platform."
+    }
+  },
+  {
+    "id": "mig-f029",
+    "note": "5.1-migration-tooling",
+    "kind": "term",
+    "front": "Database Migration Service",
+    "back": "A serverless service that migrates databases into Cloud SQL and AlloyDB for PostgreSQL. For heterogeneous migrations, such as Oracle to Cloud SQL for PostgreSQL, it converts the schema and objects.",
+    "aws": null,
+    "source": {
+      "title": "Database Migration Service overview",
+      "url": "https://docs.cloud.google.com/database-migration/docs/overview",
+      "evidence": "Database Migration Service helps you migrate your data to Google Cloud. The service supports database migrations into Cloud SQL and AlloyDB for PostgreSQL instances."
+    }
+  },
+  {
+    "id": "mig-f030",
+    "note": "5.1-migration-tooling",
+    "kind": "concept",
+    "front": "Which Database Migration Service migration type gives minimal downtime?",
+    "back": "Continuous migration. It runs a full dump and load, then replicates changes with change data capture (CDC) until you switch. A one-time migration allows no new writes during the whole migration.",
+    "aws": null,
+    "source": {
+      "title": "Database Migration Service overview",
+      "url": "https://docs.cloud.google.com/database-migration/docs/overview",
+      "evidence": "Doing the switch when the source and destination are in sync gives you minimal downtime."
+    }
+  },
+  {
+    "id": "mig-f031",
+    "note": "5.1-migration-tooling",
+    "kind": "concept",
+    "front": "What must you do before you promote a Database Migration Service migration to avoid data loss?",
+    "back": "Stop all writes to the source database, then wait until the replication delay is zero. After the promotion starts, you cannot stop or undo it.",
+    "aws": null,
+    "source": {
+      "title": "Promote a migration",
+      "url": "https://docs.cloud.google.com/database-migration/docs/mysql/promote-migration",
+      "evidence": "Wait until the replication delay is at zero, which means that the migration job has processed all outstanding changes."
+    }
+  },
+  {
+    "id": "mig-f032",
+    "note": "5.1-migration-tooling",
+    "kind": "concept",
+    "front": "Which service replicates changes from an operational database into BigQuery in near real time?",
+    "back": "Datastream, a serverless change data capture (CDC) and replication service. It can also write the change stream to Cloud Storage. Use it for analytics, or for synchronization during migrations and hybrid-cloud configurations.",
+    "aws": null,
+    "source": {
+      "title": "Datastream overview",
+      "url": "https://docs.cloud.google.com/datastream/docs/overview",
+      "evidence": "Datastream provides seamless replication of data from operational databases into BigQuery. In addition, Datastream supports writing the change event stream into Cloud Storage"
+    }
+  },
+  {
+    "id": "mig-f033",
+    "note": "5.1-migration-tooling",
+    "kind": "term",
+    "front": "BigQuery Migration Service",
+    "back": "A BigQuery service for data warehouse migration. It assesses the source warehouse, translates its SQL into GoogleSQL, and transfers its data to BigQuery. Sources include Teradata, Amazon Redshift, and Snowflake.",
+    "aws": "AWS Schema Conversion Tool",
+    "source": {
+      "title": "Introduction to BigQuery migration",
+      "url": "https://docs.cloud.google.com/bigquery/docs/migration-intro",
+      "evidence": "It includes features that help you with each phase of migration, including assessment and planning, SQL translation for a variety of SQL dialects, and data transfer."
+    }
+  },
+  {
+    "id": "mig-f034",
+    "note": "5.1-migration-tooling",
+    "kind": "concept",
+    "front": "Which tool does Google suggest for small to medium transfers from a private data center to Cloud Storage?",
+    "back": "The `gcloud storage` command. For large-scale transfers of up to petabytes, use Storage Transfer Service for on-premises data.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Transfer your large datasets",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+      "evidence": "The `gcloud storage` command is the standard tool for small- to medium-sized transfers over a typical enterprise-scale network, from a private data center or from another cloud provider to Google Cloud."
+    }
+  },
+  {
+    "id": "mig-f035",
+    "note": "5.1-migration-tooling",
+    "kind": "concept",
+    "front": "What does Storage Transfer Service need to copy data from an on-premises file system?",
+    "back": "Agents. You install an agent on a machine with access to the file system. The agent runs in a Docker container and reads the locally mounted NFS data.",
+    "aws": null,
+    "source": {
+      "title": "Data transfer options",
+      "url": "https://docs.cloud.google.com/storage-transfer/docs/transfer-options",
+      "evidence": "For file system transfers, you install a small piece of software, called an agent, on a machine with access to your file system. The agent runs within a Docker container and has access to your locally-mounted NFS data."
+    }
+  },
+  {
+    "id": "mig-f036",
+    "note": "5.1-migration-tooling",
+    "kind": "term",
+    "front": "Transfer Appliance",
+    "back": "A storage device that Google ships to you. You copy data to it, ship it back, and Google uploads the data to Cloud Storage. It fits when a network upload would take more than one week.",
+    "aws": "AWS Snowball",
+    "source": {
+      "title": "Transfer Appliance",
+      "url": "https://docs.cloud.google.com/transfer-appliance/docs/4.0/overview",
+      "evidence": "It would take more than one week to upload your data over the network."
+    }
+  },
+  {
+    "id": "mig-f037",
+    "note": "5.1-deployment-and-apis",
+    "kind": "term",
+    "front": "Immutable infrastructure",
+    "back": "A practice in which you never modify a deployed resource. You change its configuration in source control, test the change, and re-create the resource. It makes deployments and rollbacks more predictable.",
+    "aws": null,
+    "source": {
+      "title": "Patterns for scalable and resilient apps",
+      "url": "https://docs.cloud.google.com/architecture/scalable-and-resilient-apps",
+      "evidence": "Immutable infrastructure is a philosophy that builds on the benefits of infrastructure as code. Immutable infrastructure mandates that resources never be modified after they're deployed."
+    }
+  },
+  {
+    "id": "mig-f038",
+    "note": "5.1-deployment-and-apis",
+    "kind": "concept",
+    "front": "How should a pipeline move one container image from development to production?",
+    "back": "Inject the configuration and secrets at deployment time, so that the image stays immutable. Then promote the same tested image from development to QA to production.",
+    "aws": null,
+    "source": {
+      "title": "Migrate from manual deployments to automated, containerized deployments",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-automated-containerized-deployments",
+      "evidence": "For example, you can deploy your artifacts in your development environment. Then, after testing and validating them, you move them to your quality assurance environment. Finally, you move them to the production environment."
+    }
+  },
+  {
+    "id": "mig-f039",
+    "note": "5.1-deployment-and-apis",
+    "kind": "concept",
+    "front": "Which API management product should you choose for a partner API program with a developer portal and monetization?",
+    "back": "Apigee. It offers developer portals, API productization, and monetization. Google positions it for APIs that partners and third parties use.",
+    "aws": null,
+    "source": {
+      "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+      "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+      "evidence": "In these use cases, Apigee’s multiple developer portal offerings, API productization and monetization capabilities streamline this process significantly."
+    }
+  },
+  {
+    "id": "mig-f040",
+    "note": "5.1-deployment-and-apis",
+    "kind": "term",
+    "front": "API Gateway",
+    "back": "A fully managed gateway, with consumption-based pricing, for APIs on serverless backends such as Cloud Run. It fits project-level APIs whose consumers do not need a developer portal.",
+    "aws": "Amazon API Gateway",
+    "source": {
+      "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+      "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+      "evidence": "API Gateway is optimal for cloud-native use cases where the target backends are generally limited to services deployed on Google Cloud, and where the developer audiences consuming the APIs don’t require a developer portal."
+    }
+  },
+  {
+    "id": "mig-f041",
+    "note": "5.1-deployment-and-apis",
+    "kind": "term",
+    "front": "Cloud Endpoints",
+    "back": "A gateway in which you configure, deploy, and manage the ESPv2 proxy yourself. Use it to host the gateway on your own runtime with private networking. Its most common use is with gRPC services.",
+    "aws": null,
+    "source": {
+      "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+      "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+      "evidence": "Cloud Endpoints is most useful when you specifically want to host the gateway on your own runtime with private networking"
+    }
+  },
+  {
+    "id": "mig-f042",
+    "note": "5.1-deployment-and-apis",
+    "kind": "term",
+    "front": "SpikeArrest policy",
+    "back": "An Apigee policy that throttles requests to protect backends against sudden traffic spikes. To enforce business contracts with developers and partners, use the Quota policy instead.",
+    "aws": null,
+    "source": {
+      "title": "SpikeArrest policy",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/policies/spike-arrest-policy",
+      "evidence": "Use Quota to enforce business contracts or SLAs with developers and partners, rather than for operational traffic management. Use SpikeArrest to protect against sudden spikes in API traffic."
+    }
+  },
+  {
+    "id": "mig-f043",
+    "note": "5.1-deployment-and-apis",
+    "kind": "term",
+    "front": "Apigee hybrid",
+    "back": "An Apigee deployment model. Google runs the management plane, and you run the runtime plane on your own Kubernetes clusters. Use it when all API traffic must stay inside your network.",
+    "aws": null,
+    "source": {
+      "title": "What is Apigee hybrid?",
+      "url": "https://docs.cloud.google.com/apigee/docs/hybrid/v1.17/what-is-hybrid",
+      "evidence": "The hybrid model includes a management plane hosted by Apigee in the Cloud and a runtime plane that you install and manage on one of the supported Kubernetes platforms."
+    }
+  },
+  {
+    "id": "mig-f044",
+    "note": "5.1-deployment-and-apis",
+    "kind": "concept",
+    "front": "Which Apigee pricing model is not available for Apigee hybrid?",
+    "back": "Pay-as-you-go. The Pay-as-you-go billing model is available only for Apigee, not for Apigee hybrid.",
+    "aws": null,
+    "source": {
+      "title": "Pay-as-you-go pricing FAQ",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/pay-as-you-go-updated-faq",
+      "evidence": "Pay-as-you-go pricing is not available for Apigee hybrid at this time."
+    }
+  },
+  {
+    "id": "mig-f045",
+    "note": "5.1-deployment-and-apis",
+    "kind": "concept",
+    "front": "How do you change the API definition that an API Gateway gateway serves?",
+    "back": "Upload the edited definition, which creates a new API config. Then update the gateway to use the new config. You cannot modify an existing API config.",
+    "aws": null,
+    "source": {
+      "title": "API Gateway Deployment Model",
+      "url": "https://docs.cloud.google.com/api-gateway/docs/deployment-model",
+      "evidence": "Each time you upload an API definition, API Gateway creates a new API config. That is, you can create an API config but you cannot later modify it."
+    }
+  },
+  {
+    "id": "mig-f046",
+    "note": "5.1-deployment-and-apis",
+    "kind": "concept",
+    "front": "Why do API Gateway calls fail when the backend is a Google API such as BigQuery?",
+    "back": "API Gateway authenticates to backends with an ID token, but Google Cloud APIs need an access token. The calls fail with `401`.",
+    "aws": null,
+    "source": {
+      "title": "Securing backend services",
+      "url": "https://docs.cloud.google.com/api-gateway/docs/securing-backend-services",
+      "evidence": "API Gateway authenticates to backends with an ID token while other Google Cloud APIs require an access token."
+    }
+  },
+  {
+    "id": "mig-f048",
+    "note": "5.2-programmatic-access",
+    "kind": "term",
+    "front": "Cloud Shell",
+    "back": "An interactive shell on a temporary VM. Use it for interactive work only, because non-interactive sessions end after 40 minutes. Changes outside `$HOME` are lost when the VM ends.",
+    "aws": "AWS CloudShell",
+    "source": {
+      "title": "Cloud Shell quotas and limits",
+      "url": "https://docs.cloud.google.com/shell/docs/quotas-limits",
+      "evidence": "Cloud Shell is intended for interactive use only. Non-interactive sessions are ended automatically after 40 minutes."
+    }
+  },
+  {
+    "id": "mig-f049",
+    "note": "5.2-programmatic-access",
+    "kind": "term",
+    "front": "gcloud configuration",
+    "back": "A named set of gcloud CLI properties, such as the project and the account. Select one per command with `--configuration`, or per terminal with `CLOUDSDK_ACTIVE_CONFIG_NAME`.",
+    "aws": null,
+    "source": {
+      "title": "Managing gcloud CLI configurations",
+      "url": "https://docs.cloud.google.com/sdk/docs/configurations",
+      "evidence": "A configuration is a named set of Google Cloud CLI properties. These properties are key-value pairs, organized in sections, that govern the behavior of the gcloud CLI."
+    }
+  },
+  {
+    "id": "mig-f050",
+    "note": "5.2-programmatic-access",
+    "kind": "concept",
+    "front": "How should a script read gcloud CLI output reliably?",
+    "back": "Use `--format` (such as `json` or `value`) and `--filter`. Do not depend on the default output, because it can change in a future release.",
+    "aws": null,
+    "source": {
+      "title": "Scripting gcloud CLI commands",
+      "url": "https://docs.cloud.google.com/sdk/docs/scripting-gcloud",
+      "evidence": "In order to script with the gcloud CLI, it's important to have predictable output; this is where `--filter` and `--format` flags help."
+    }
+  },
+  {
+    "id": "mig-f051",
+    "note": "5.2-programmatic-access",
+    "kind": "term",
+    "front": "Application Default Credentials (ADC)",
+    "back": "The strategy that the authentication libraries use to find credentials from the environment. The same code runs in development and production. In production on Google Cloud, the attached service account is the preferred source.",
+    "aws": null,
+    "source": {
+      "title": "How Application Default Credentials works",
+      "url": "https://docs.cloud.google.com/docs/authentication/application-default-credentials",
+      "evidence": "Application Default Credentials (ADC) is a strategy used by the authentication libraries to automatically find credentials based on the application environment."
+    }
+  },
+  {
+    "id": "mig-f052",
+    "note": "5.2-programmatic-access",
+    "kind": "concept",
+    "front": "Why does `gcloud auth login` not give credentials to local code that uses client libraries?",
+    "back": "The gcloud CLI does not use ADC, and the client libraries use ADC. Run `gcloud auth application-default login` to create local ADC credentials.",
+    "aws": null,
+    "source": {
+      "title": "Set up Application Default Credentials",
+      "url": "https://docs.cloud.google.com/docs/authentication/provide-credentials-adc",
+      "evidence": "The gcloud CLI itself doesn't use ADC to access Google Cloud resources."
+    }
+  },
+  {
+    "id": "mig-f053",
+    "note": "5.2-programmatic-access",
+    "kind": "concept",
+    "front": "Why can IAM not authorize a request that uses only a standard API key?",
+    "back": "A standard API key does not identify a principal. It only associates the request with a project for billing and quota.",
+    "aws": null,
+    "source": {
+      "title": "Manage API keys",
+      "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
+      "evidence": "When you use a standard API key (an API key that has not been bound to a service account) to access an API, the API key doesn't identify a principal."
+    }
+  },
+  {
+    "id": "mig-f054",
+    "note": "5.2-programmatic-access",
+    "kind": "concept",
+    "front": "Which project provides the quota for a request to a resource-based API such as Compute Engine?",
+    "back": "The project that contains the resource. You cannot change the quota project for a resource-based API.",
+    "aws": null,
+    "source": {
+      "title": "Quota project overview",
+      "url": "https://docs.cloud.google.com/docs/quotas/quota-project",
+      "evidence": "You cannot change the quota project used by a request to a resource-based API. The request always uses the project that contains the resource that the request is operating on."
+    }
+  },
+  {
+    "id": "mig-f055",
+    "note": "5.2-programmatic-access",
+    "kind": "term",
+    "front": "Exponential backoff",
+    "back": "A retry strategy that waits exponentially longer between attempts, up to a maximum, with random jitter. Retry only idempotent requests that fail with a transient error, such as HTTP 408, 429, or 5xx.",
+    "aws": null,
+    "source": {
+      "title": "Retry strategy",
+      "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+      "evidence": "An exponential backoff algorithm retries requests using exponentially increasing waiting times between requests, up to a maximum backoff time."
+    }
+  },
+  {
+    "id": "mig-f056",
+    "note": "5.2-programmatic-access",
+    "kind": "concept",
+    "front": "Why should you not add an application retry loop around client library calls?",
+    "back": "The retries multiply. Three application retries around three library retries give nine attempts. Use and configure the built-in retries of the client library instead.",
+    "aws": null,
+    "source": {
+      "title": "Retry strategy",
+      "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+      "evidence": "For example, if your application retries an operation three times, and the underlying client library also retries it three times for each of your application's attempts, you could end up with nine retry attempts."
+    }
+  },
+  {
+    "id": "mig-f057",
+    "note": "5.2-programmatic-access",
+    "kind": "concept",
+    "front": "What must you use to reach a regional API endpoint privately from a VPC network?",
+    "back": "Private Service Connect endpoints. Private Google Access cannot reach regional or multi-regional endpoints.",
+    "aws": null,
+    "source": {
+      "title": "Regional and multi-regional API endpoints",
+      "url": "https://docs.cloud.google.com/docs/security/compliance/about-regional-endpoints",
+      "evidence": "Regional and multi-regional endpoints are not accessible through Private Google Access. To connect to regional endpoints through private access, use Private Service Connect to create private endpoints."
+    }
+  },
+  {
+    "id": "mig-f058",
+    "note": "5.2-programmatic-access",
+    "kind": "term",
+    "front": "Cloud Client Libraries",
+    "back": "Google's recommended libraries for calling Google Cloud APIs from code. Some of them use gRPC for better performance. The older Google API Client Libraries support REST only.",
+    "aws": "AWS SDKs",
+    "source": {
+      "title": "Client libraries and Cloud APIs explained",
+      "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained",
+      "evidence": "Cloud Client Libraries are the recommended option for accessing Cloud APIs programmatically, where available."
+    }
+  },
+  {
+    "id": "mig-f059",
+    "note": "5.2-programmatic-access",
+    "kind": "concept",
+    "front": "Why can tests pass on the Firestore emulator but queries fail in production?",
+    "back": "The emulator does not track composite indexes, and it runs any valid query. Test against a real Firestore instance to find the indexes that you need.",
+    "aws": null,
+    "source": {
+      "title": "Firestore emulator",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/emulator",
+      "evidence": "The emulator does not track composite indexes and will instead execute any valid query. Make sure to test your app against a real Firestore instance to determine which indexes you require."
+    }
+  },
+  {
+    "id": "mig-f060",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "term",
+    "front": "Infrastructure Manager",
+    "back": "A managed service (Infra Manager) that runs Terraform in an ephemeral Cloud Build environment. For each revision, it stores the logs, the configuration, the resource list, and the state file. Use it to automate Terraform deployments with a Google-managed toolchain.",
+    "aws": null,
+    "source": {
+      "title": "Infrastructure Manager overview",
+      "url": "https://docs.cloud.google.com/infrastructure-manager/docs/overview",
+      "evidence": "The runtime environment of Infra Manager is an ephemeral Cloud Build environment. Infra Manager executes Terraform commands in this Cloud Build environment, and then the environment is discarded."
+    }
+  },
+  {
+    "id": "mig-f061",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "concept",
+    "front": "Why must a Terraform configuration for Infrastructure Manager not define a backend block?",
+    "back": "Infra Manager manages the Terraform state automatically and stores it with each revision. Remove the backend block from the configuration.",
+    "aws": null,
+    "source": {
+      "title": "Deployment Manager deprecation",
+      "url": "https://docs.cloud.google.com/deployment-manager/docs/deprecations",
+      "evidence": "Familiarize yourself with Terraform's state management (which involves managing state files and potential state locking issues). Infra Manager handles state management automatically."
+    }
+  },
+  {
+    "id": "mig-f062",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "concept",
+    "front": "Which credential should a Terraform pipeline outside Google Cloud use instead of a service account key?",
+    "back": "Workload Identity Federation. A pipeline on Google Cloud, such as Cloud Build, inherits service account credentials from the service that runs it. Neither option needs a downloaded key.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for Terraform operations",
+      "url": "https://docs.cloud.google.com/docs/terraform/best-practices/operations",
+      "evidence": "For pipelines that run outside of Google Cloud, prefer workload identity federation to obtain credentials without downloading service account keys."
+    }
+  },
+  {
+    "id": "mig-f063",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "term",
+    "front": "Terraform `gcs` backend",
+    "back": "The Terraform backend that keeps state in a Cloud Storage bucket. Google recommends it for teams, because it locks the state and keeps sensitive state data out of version control.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for security",
+      "url": "https://docs.cloud.google.com/docs/terraform/best-practices/security",
+      "evidence": "For Google Cloud customers, we recommend using the Cloud Storage state backend. This approach locks the state to allow for collaboration as a team."
+    }
+  },
+  {
+    "id": "mig-f064",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "concept",
+    "front": "How does Google recommend that you separate Terraform environments such as dev and prod?",
+    "back": "Use one environment directory for each environment, each with its own root configuration and backend. Use only the default workspace, not several CLI workspaces.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for root modules",
+      "url": "https://docs.cloud.google.com/docs/terraform/best-practices/root-modules",
+      "evidence": "Each environment directory (`dev`, `qa`, `prod`) corresponds to a default Terraform workspace and deploys a version of the service to that environment."
+    }
+  },
+  {
+    "id": "mig-f065",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "concept",
+    "front": "Which Terraform IAM resources should you use so that roles that Google Cloud manages are not removed?",
+    "back": "The non-authoritative `google_*_iam_member` resources. The authoritative `google_*_iam_policy` and `google_*_iam_binding` resources overwrite all permissions and can remove roles that Google Cloud manages.",
+    "aws": null,
+    "source": {
+      "title": "Best practices when working with Google Cloud resources",
+      "url": "https://docs.cloud.google.com/docs/terraform/best-practices/working-with-resources",
+      "evidence": "To prevent this, we recommend using either `google_*_iam_member` resources directly or the IAM module from Google."
+    }
+  },
+  {
+    "id": "mig-f066",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "concept",
+    "front": "What does Google recommend that you do with a Terraform plan before you apply it?",
+    "back": "Save the plan to an output file. Apply that saved plan only after an infrastructure owner approves it.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for Terraform operations",
+      "url": "https://docs.cloud.google.com/docs/terraform/best-practices/operations",
+      "evidence": "Always generate a plan first for Terraform executions. Save the plan to an output file. After an infrastructure owner approves it, execute the plan."
+    }
+  },
+  {
+    "id": "mig-f067",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "term",
+    "front": "`gcloud beta terraform vet`",
+    "back": "A gcloud command (Preview) that checks a Terraform plan against a library of policy constraints. Run it in the CI/CD pipeline to stop a deployment that violates policy before it reaches production.",
+    "aws": null,
+    "source": {
+      "title": "Policy validation",
+      "url": "https://docs.cloud.google.com/docs/terraform/policy-validation",
+      "evidence": "You can use `gcloud beta terraform vet` to detect policy violations and provide warnings or halt deployments before they reach production."
+    }
+  },
+  {
+    "id": "mig-f068",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "concept",
+    "front": "What happens to deleted data when you re-apply a previous Infrastructure Manager revision?",
+    "back": "The data does not come back. Infra Manager does not migrate data, so you must manage data for databases that a revision deletes or replaces.",
+    "aws": null,
+    "source": {
+      "title": "Automate the deployment of Google Cloud resources",
+      "url": "https://docs.cloud.google.com/infrastructure-manager/docs/automate-git",
+      "evidence": "Creating a revision can cause unrecoverable data loss. Re-applying the previous revision will not restore the data."
+    }
+  },
+  {
+    "id": "mig-f069",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "term",
+    "front": "Config Connector",
+    "back": "An open source Kubernetes add-on whose custom resource definitions (CRDs) and controllers create and manage Google Cloud resources. Use it when teams want to manage Google Cloud resources through Kubernetes.",
+    "aws": "AWS Controllers for Kubernetes (ACK)",
+    "source": {
+      "title": "Config Connector overview",
+      "url": "https://docs.cloud.google.com/config-connector/docs/overview",
+      "evidence": "Config Connector is an open source Kubernetes add-on that lets you manage Google Cloud resources through Kubernetes."
+    }
+  },
+  {
+    "id": "mig-f070",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "term",
+    "front": "Config Controller",
+    "back": "A hosted version of Config Connector. It includes Config Sync for GitOps and Policy Controller for guardrails, and it detects and repairs drift.",
+    "aws": null,
+    "source": {
+      "title": "Config Controller overview",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/config-controller/docs/overview",
+      "evidence": "Config Controller is a hosted version of Config Connector that simplifies installation and maintenance. Config Controller also includes Policy Controller and Config Sync."
+    }
+  },
+  {
+    "id": "mig-f071",
+    "note": "5.2-infrastructure-as-code",
+    "kind": "term",
+    "front": "Deployment Manager",
+    "back": "A Google Cloud deployment service that is deprecated. Support stopped on April 1, 2026, and Google turns it down after June 30, 2027. Migrate to Infra Manager with the DM Convert tool.",
+    "aws": null,
+    "source": {
+      "title": "Deployment Manager deprecation",
+      "url": "https://docs.cloud.google.com/deployment-manager/docs/deprecations",
+      "evidence": "Support for Google Cloud Deployment Manager was discontinued on April 1, 2026."
+    }
+  }
+]

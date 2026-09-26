@@ -1,0 +1,1276 @@
+[
+  {
+    "id": "ops-f001",
+    "note": "4.1-sdlc-cicd",
+    "kind": "concept",
+    "front": "Can an organization that never used Cloud Source Repositories start to use it now?",
+    "back": "No. Since June 17, 2024, Cloud Source Repositories is not available to new customers. Connect GitHub, GitLab, or Bitbucket through Developer Connect or Cloud Build repositories (2nd gen) instead.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Build repositories",
+      "url": "https://docs.cloud.google.com/build/docs/repositories",
+      "evidence": "Effective June 17, 2024, Cloud Source Repositories isn't available to new customers. If your organization hasn't previously used Cloud Source Repositories, you can't enable the API or use Cloud Source Repositories."
+    }
+  },
+  {
+    "id": "ops-f002",
+    "note": "4.1-sdlc-cicd",
+    "kind": "term",
+    "front": "Secure Source Manager",
+    "back": "A regional, single-tenant, managed Git repository service that Google Cloud hosts, with built-in pull requests and issues. Use it when code must stay in a Git service on Google Cloud instead of an external Git host.",
+    "aws": "AWS CodeCommit",
+    "source": {
+      "title": "Secure Source Manager overview",
+      "url": "https://docs.cloud.google.com/secure-source-manager/docs/overview",
+      "evidence": "Secure Source Manager is a regionally deployed, single-tenant managed source code repository hosted on Google Cloud."
+    }
+  },
+  {
+    "id": "ops-f003",
+    "note": "4.1-sdlc-cicd",
+    "kind": "term",
+    "front": "Private pools",
+    "back": "Dedicated Cloud Build worker pools that Cloud Build hosts, manages, and scales to zero. Use them when builds must reach resources in a private network, for example through VPC peering.",
+    "aws": null,
+    "source": {
+      "title": "Private pools overview",
+      "url": "https://docs.cloud.google.com/build/docs/private-pools/private-pools-overview",
+      "evidence": "Private pools are private, dedicated pools of workers that offer greater customization over the build environment, including the ability to access resources in a private network."
+    }
+  },
+  {
+    "id": "ops-f004",
+    "note": "4.1-sdlc-cicd",
+    "kind": "concept",
+    "front": "Which organization policy constraint stops all builds in an organization from using the Cloud Build default pool?",
+    "back": "`constraints/cloudbuild.allowedWorkerPools`. When you enforce it, builds in the organization cannot use the default pool and must use a private pool.",
+    "aws": null,
+    "source": {
+      "title": "Using Cloud Build in a private network",
+      "url": "https://docs.cloud.google.com/build/docs/private-pools/use-in-private-network",
+      "evidence": "Cloud Build provides a `constraints/cloudbuild.allowedWorkerPools` organization policy constraint that you can enforce to mandate the builds in your organization to not use the default pool and only use the private pool."
+    }
+  },
+  {
+    "id": "ops-f005",
+    "note": "4.1-sdlc-cicd",
+    "kind": "concept",
+    "front": "Which service account is the most secure choice for manual and triggered Cloud Build builds?",
+    "back": "A user-specified service account for both manual and triggered builds. By default, new projects run builds as the Compute Engine default service account.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Build default service account change",
+      "url": "https://docs.cloud.google.com/build/docs/cloud-build-service-account-updates",
+      "evidence": "Most secure option: Use a user-specified service account for both manually submitted builds and triggered builds."
+    }
+  },
+  {
+    "id": "ops-f006",
+    "note": "4.1-sdlc-cicd",
+    "kind": "concept",
+    "front": "Where should builds in a new project get passwords and API keys?",
+    "back": "From Secret Manager, the recommended way to manage sensitive data with Cloud Build. Existing projects can keep Cloud KMS encrypted credentials, but new projects use Secret Manager.",
+    "aws": null,
+    "source": {
+      "title": "Use encrypted credentials from Cloud KMS",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/use-encrypted-credentials",
+      "evidence": "Secret Manager is the recommended technique for managing sensitive data with Cloud Build. For existing projects, you can continue using Cloud KMS, but for new projects, use Secret Manager."
+    }
+  },
+  {
+    "id": "ops-f007",
+    "note": "4.1-sdlc-cicd",
+    "kind": "term",
+    "front": "Artifact Registry",
+    "back": "The recommended Google Cloud service to store and manage container images, and also non-container artifacts such as language packages. Container Registry is deprecated, and since March 18, 2025, you cannot write images to it.",
+    "aws": "Amazon ECR and AWS CodeArtifact",
+    "source": {
+      "title": "Transition from Container Registry",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/transition/transition-from-gcr",
+      "evidence": "Artifact Registry is the recommended service for container image storage and management on Google Cloud."
+    }
+  },
+  {
+    "id": "ops-f008",
+    "note": "4.1-sdlc-cicd",
+    "kind": "term",
+    "front": "Remote repository",
+    "back": "An Artifact Registry repository mode that acts as a read-only proxy for an upstream source, such as Docker Hub or Maven Central. It caches the artifacts. Use it for third-party dependencies to reduce latency and improve availability.",
+    "aws": null,
+    "source": {
+      "title": "Repository overview",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories",
+      "evidence": "Remote repositories are read-only repositories that act as proxies to store artifacts from the following upstream sources:"
+    }
+  },
+  {
+    "id": "ops-f010",
+    "note": "4.1-sdlc-cicd",
+    "kind": "term",
+    "front": "Application Design Center",
+    "back": "A Google Cloud product where platform teams build approved application templates and share them in catalogs. Developers customize and deploy the templates. Use it for self-service deployment of patterns that follow organization standards.",
+    "aws": "AWS Service Catalog",
+    "source": {
+      "title": "Application Design Center overview",
+      "url": "https://docs.cloud.google.com/application-design-center/docs/overview",
+      "evidence": "By creating and sharing templates, platform teams ensure that applications follow organizational standards while reducing deployment time for developers."
+    }
+  },
+  {
+    "id": "ops-f011",
+    "note": "4.1-sdlc-cicd",
+    "kind": "concept",
+    "front": "Which product organizes existing resources from many projects into applications?",
+    "back": "App Hub. It is a registry that groups existing services and workloads into applications. Application Design Center is for templates and the deployment of new applications.",
+    "aws": null,
+    "source": {
+      "title": "Application-centric Google Cloud",
+      "url": "https://docs.cloud.google.com/application-design-center/docs/application-centric-google-cloud",
+      "evidence": "Use App Hub to organize existing resources into applications."
+    }
+  },
+  {
+    "id": "ops-f012",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "concept",
+    "front": "Which Terraform test method should you run first?",
+    "back": "Static analysis, such as `terraform validate` and linters, because it deploys no resources and costs the least. Then run module integration tests, and run end-to-end tests last.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for testing",
+      "url": "https://docs.cloud.google.com/docs/terraform/best-practices/testing",
+      "evidence": "There are multiple methods that you can use to test Terraform. In ascending order of cost, run time, and depth, they include the following:"
+    }
+  },
+  {
+    "id": "ops-f013",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "concept",
+    "front": "Where should each Terraform integration test create its resources?",
+    "back": "In a fresh project or folder that the test creates, isolated from development and production projects. This prevents accidental deletions during the cleanup.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for testing",
+      "url": "https://docs.cloud.google.com/docs/terraform/best-practices/testing",
+      "evidence": "Ensure that the environment is isolated from development or production projects to avoid accidental deletions during resource cleanup. The best approach is to have each test create a fresh project or folder."
+    }
+  },
+  {
+    "id": "ops-f014",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "concept",
+    "front": "In a canary evaluation, what do you compare the canary with?",
+    "back": "The control: the part of the service that does not get the change, measured at the same time. A before/after comparison is risky, because time is one of the biggest sources of change in metrics.",
+    "aws": null,
+    "source": {
+      "title": "Canarying Releases",
+      "url": "https://sre.google/workbook/canarying-releases/",
+      "evidence": "Because time is one of the biggest sources of change in observed metrics, it is difficult to assess degradation of performance with before/after evaluation."
+    }
+  },
+  {
+    "id": "ops-f015",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "concept",
+    "front": "Where should you start when you choose canary metrics?",
+    "back": "With your SLIs, such as HTTP error rate and latency, because they show user impact. CPU usage of the whole system is a poor canary metric.",
+    "aws": null,
+    "source": {
+      "title": "Canarying Releases",
+      "url": "https://sre.google/workbook/canarying-releases/",
+      "evidence": "We typically recommend using SLIs as a place to start thinking about canary metrics. Good SLIs tend to have strong attribution to service health."
+    }
+  },
+  {
+    "id": "ops-f016",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "concept",
+    "front": "What is the difference between Cloud Deploy verification and Cloud Deploy analysis?",
+    "back": "Verification runs your own containers to validate a deployment. Analysis uses telemetry, such as Cloud Monitoring alerting policies, to evaluate the application over time, and can trigger an automatic rollback.",
+    "aws": null,
+    "source": {
+      "title": "Run analysis jobs in Cloud Deploy",
+      "url": "https://docs.cloud.google.com/deploy/docs/analysis",
+      "evidence": "Although Cloud Deploy offers deployment verification, which you can use to run arbitrary containers to validate a deployment, analysis lets you use telemetry data from Google Cloud Observability or the monitoring service of your choice"
+    }
+  },
+  {
+    "id": "ops-f017",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "concept",
+    "front": "What should responders do first in a major outage?",
+    "back": "Stop the bleeding: make the system work as well as it can, for example divert traffic from a broken cluster or disable subsystems. Keep evidence such as logs, and find the root cause later.",
+    "aws": null,
+    "source": {
+      "title": "Effective Troubleshooting",
+      "url": "https://sre.google/sre-book/effective-troubleshooting/",
+      "evidence": "Stopping the bleeding should be your first priority; you aren’t helping your users if the system dies while you’re root-causing."
+    }
+  },
+  {
+    "id": "ops-f018",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "concept",
+    "front": "Where is a productive place to start when you diagnose a failing system?",
+    "back": "Recent changes to the system, such as deployments and configuration changes. A working system tends to keep working until an external force, such as a change, acts on it.",
+    "aws": null,
+    "source": {
+      "title": "Effective Troubleshooting",
+      "url": "https://sre.google/sre-book/effective-troubleshooting/",
+      "evidence": "Recent changes to a system can be a productive place to start identifying what’s going wrong."
+    }
+  },
+  {
+    "id": "ops-f019",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "term",
+    "front": "Postmortem",
+    "back": "A written record of an incident: its impact, the mitigation, the root causes, and the follow-up actions. Keep it blameless: it focuses on processes, tools, and technologies, not on people. Define the postmortem criteria before an incident occurs.",
+    "aws": null,
+    "source": {
+      "title": "Conduct thorough postmortems",
+      "url": "https://docs.cloud.google.com/architecture/framework/reliability/conduct-postmortems",
+      "evidence": "Effective postmortems focus on processes, tools, and technologies, and don't place blame on individuals or teams."
+    }
+  },
+  {
+    "id": "ops-f020",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "term",
+    "front": "Error Reporting",
+    "back": "A service that groups application error events by their root cause, so that you can identify, prioritize, and triage issues. It does not analyze log entries that are stored in log buckets with CMEK enabled.",
+    "aws": null,
+    "source": {
+      "title": "Error Reporting overview",
+      "url": "https://docs.cloud.google.com/error-reporting/docs/grouping-errors",
+      "evidence": "Error Reporting aggregates and groups application error events by their root cause, helping you identify, prioritize, and triage issues across your cloud services."
+    }
+  },
+  {
+    "id": "ops-f021",
+    "note": "4.1-testing-and-troubleshooting",
+    "kind": "term",
+    "front": "Cloud Profiler",
+    "back": "A statistical, low-overhead profiler that continuously collects CPU and memory-allocation data from production applications and maps it to source code. Use it to find which code uses the most CPU or memory. Its low overhead lets it stay on in production.",
+    "aws": "Amazon CodeGuru Profiler",
+    "source": {
+      "title": "Cloud Profiler overview",
+      "url": "https://docs.cloud.google.com/profiler/docs/about-profiler",
+      "evidence": "Cloud Profiler is a statistical, low-overhead profiler that continuously gathers CPU usage and memory-allocation information from your production applications."
+    }
+  },
+  {
+    "id": "ops-f022",
+    "note": "4.1-disaster-recovery",
+    "kind": "term",
+    "front": "Recovery time objective (RTO)",
+    "back": "The maximum acceptable length of time that an application can be offline. A business impact analysis defines it. RTO and RPO values usually roll up into an SLO.",
+    "aws": null,
+    "source": {
+      "title": "Disaster recovery planning guide",
+      "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+      "evidence": "A recovery time objective (RTO), which is the maximum acceptable length of time that your application can be offline."
+    }
+  },
+  {
+    "id": "ops-f023",
+    "note": "4.1-disaster-recovery",
+    "kind": "term",
+    "front": "Recovery point objective (RPO)",
+    "back": "The maximum acceptable length of time during which data can be lost after a major incident. It measures time only, not the amount or quality of the lost data.",
+    "aws": null,
+    "source": {
+      "title": "Disaster recovery planning guide",
+      "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+      "evidence": "A recovery point objective (RPO), which is the maximum acceptable length of time during which data might be lost from your application due to a major incident."
+    }
+  },
+  {
+    "id": "ops-f024",
+    "note": "4.1-disaster-recovery",
+    "kind": "concept",
+    "front": "How do smaller RTO and RPO values usually affect the cost to run an application?",
+    "back": "They usually make the application cost more to run. They also often add complexity, so the administrative overhead increases too.",
+    "aws": null,
+    "source": {
+      "title": "Disaster recovery planning guide",
+      "url": "https://docs.cloud.google.com/architecture/dr-scenarios-planning-guide",
+      "evidence": "Typically, the smaller your RTO and RPO values are (that is, the faster your application must recover from an interruption), the more your application will cost to run."
+    }
+  },
+  {
+    "id": "ops-f025",
+    "note": "4.1-disaster-recovery",
+    "kind": "term",
+    "front": "Cold pattern",
+    "back": "A DR pattern that keeps only minimal resources in the DR location, just enough to recover. At failover, you start a mirror of the production environment, and clients then use it. Use it for parts of an application that accept a larger RTO.",
+    "aws": null,
+    "source": {
+      "title": "Disaster recovery scenarios for applications",
+      "url": "https://docs.cloud.google.com/architecture/dr-scenarios-for-applications",
+      "evidence": "In a cold pattern, you have minimal resources in the DR Google Cloud project—just enough to enable a recovery scenario."
+    }
+  },
+  {
+    "id": "ops-f026",
+    "note": "4.1-disaster-recovery",
+    "kind": "term",
+    "front": "Warm pattern",
+    "back": "A DR pattern that keeps part of the stack running in the DR location, for example a small database server that receives replicated data. At failover, you resize the database, create the other servers from snapshots, and switch DNS. Google calls it a good trade-off between budget and availability.",
+    "aws": null,
+    "source": {
+      "title": "Disaster recovery scenarios for applications",
+      "url": "https://docs.cloud.google.com/architecture/dr-scenarios-for-applications",
+      "evidence": "Therefore, implementing a warm pattern for your DR scenario is a good trade-off between budget and availability."
+    }
+  },
+  {
+    "id": "ops-f027",
+    "note": "4.1-disaster-recovery",
+    "kind": "term",
+    "front": "Hot pattern",
+    "back": "A DR pattern where both environments serve production traffic, so a failover moves no data or processing. Only this pattern meets small RTO and RPO values. It costs the most, because it is fully redundant.",
+    "aws": null,
+    "source": {
+      "title": "Disaster recovery scenarios for applications",
+      "url": "https://docs.cloud.google.com/architecture/dr-scenarios-for-applications",
+      "evidence": "If you have small RTO and RPO values, you can achieve these only by running HA across your production environment and Google Cloud concurrently. This approach gives you a hot pattern"
+    }
+  },
+  {
+    "id": "ops-f028",
+    "note": "4.1-disaster-recovery",
+    "kind": "concept",
+    "front": "What does an RPO of zero usually require?",
+    "back": "Synchronous replication of the data to another zone or region. Many Google Cloud products replicate synchronously across zones, but only a few do it across regions.",
+    "aws": null,
+    "source": {
+      "title": "Architecting disaster recovery for cloud infrastructure outages",
+      "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+      "evidence": "At least some applications have an RPO requirement of zero, meaning there should be no data loss in the event of an outage. This typically requires data to be synchronously replicated to another zone or region."
+    }
+  },
+  {
+    "id": "ops-f029",
+    "note": "4.1-disaster-recovery",
+    "kind": "concept",
+    "front": "Which Google Cloud components may business-critical operations with RTO and RPO targets depend on?",
+    "back": "Only data plane components. These operations must not depend on management plane operations, such as a VM-creation API call or an IAM permission update.",
+    "aws": null,
+    "source": {
+      "title": "Architecting disaster recovery for cloud infrastructure outages",
+      "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+      "evidence": "In other words, such customer business-critical operations must not depend on management plane operations, which manage configuration state and push configuration to the control plane and the data plane."
+    }
+  },
+  {
+    "id": "ops-f030",
+    "note": "4.1-disaster-recovery",
+    "kind": "concept",
+    "front": "Which kind of recovery does an RTO measured in minutes need?",
+    "back": "Automatic recovery, with no human intervention or only minimal steps, such as a button that starts the failover. Load balancers and instance groups make this design less expensive and simpler.",
+    "aws": null,
+    "source": {
+      "title": "Architecting disaster recovery for cloud infrastructure outages",
+      "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+      "evidence": "An RTO measured in minutes means designing an application which recovers automatically from a disaster without human intervention, or with minimal steps such as pushing a button to failover."
+    }
+  },
+  {
+    "id": "ops-f031",
+    "note": "4.1-disaster-recovery",
+    "kind": "concept",
+    "front": "Why should you create Compute Engine reservations in the DR target zones?",
+    "back": "Without reservations, you might not get the on-demand capacity that you need to meet the RTO. Reservations can be useful in cold, warm, and hot DR patterns.",
+    "aws": null,
+    "source": {
+      "title": "Disaster recovery building blocks",
+      "url": "https://docs.cloud.google.com/architecture/dr-scenarios-building-blocks",
+      "evidence": "Without reservations, there is a possibility that you might not get the on-demand capacity you need to meet your recovery time objective."
+    }
+  },
+  {
+    "id": "ops-f032",
+    "note": "4.1-disaster-recovery",
+    "kind": "term",
+    "front": "Backup vault",
+    "back": "Google-managed, isolated storage in Backup and DR Service that keeps backups immutable and indelible (WORM). Use it so that backups stay recoverable after ransomware attacks or accidental deletion. A vault can enforce a minimum retention of up to 99 years.",
+    "aws": null,
+    "source": {
+      "title": "Backup and DR overview",
+      "url": "https://docs.cloud.google.com/backup-disaster-recovery/docs/concepts/backup-dr",
+      "evidence": "Backup vault enforces write once, read many (WORM) immutability and indelibility. This approach ensures that your backups remain intact and recoverable, even in the event of ransomware attacks or accidental deletion."
+    }
+  },
+  {
+    "id": "ops-f033",
+    "note": "4.1-disaster-recovery",
+    "kind": "concept",
+    "front": "How often must backups run to meet an RPO?",
+    "back": "At least as often as the RPO. For example, a 15-minute RPO needs a backup at least every 15 minutes. Alert in Cloud Monitoring when a backup interval exceeds the RPO.",
+    "aws": null,
+    "source": {
+      "title": "Perform testing for recovery from data loss",
+      "url": "https://docs.cloud.google.com/architecture/framework/reliability/perform-testing-for-recovery-from-data-loss",
+      "evidence": "Establish a backup frequency that aligns with your RPO. For example, if your RPO is 15 minutes, schedule backups to run at least every 15 minutes."
+    }
+  },
+  {
+    "id": "ops-f034",
+    "note": "6.1-operational-excellence",
+    "kind": "term",
+    "front": "Operational excellence pillar",
+    "back": "The Well-Architected Framework pillar with recommendations to operate workloads efficiently on Google Cloud. Its five principles cover operational readiness with CloudOps, incidents and problems, cloud resources, change management, and continuous improvement. Use it to map an operations problem to the recommended practice.",
+    "aws": "AWS Well-Architected operational excellence pillar",
+    "source": {
+      "title": "Operational excellence pillar",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence",
+      "evidence": "The operational excellence pillar in the Google Cloud Well-Architected Framework provides recommendations to operate workloads efficiently on Google Cloud."
+    }
+  },
+  {
+    "id": "ops-f035",
+    "note": "6.1-operational-excellence",
+    "kind": "concept",
+    "front": "Which three practices does the operational excellence pillar tell you to embrace?",
+    "back": "Automation, orchestration, and data-driven insights. Automation removes toil, orchestration coordinates complex processes, and data gives evidence for decisions.",
+    "aws": null,
+    "source": {
+      "title": "Operational excellence pillar",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence",
+      "evidence": "To achieve operational excellence, you should embrace automation, orchestration, and data-driven insights. Automation helps to eliminate toil."
+    }
+  },
+  {
+    "id": "ops-f036",
+    "note": "6.1-operational-excellence",
+    "kind": "term",
+    "front": "CloudOps",
+    "back": "The go-live and day-2 operations that an organization prepares for when it runs workloads on Google Cloud. The first principle of the operational excellence pillar is to ensure operational readiness and performance using CloudOps.",
+    "aws": null,
+    "source": {
+      "title": "Ensure operational readiness and performance using CloudOps",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/operational-readiness-and-performance-using-cloudops",
+      "evidence": "Preparing to operate a complex, multilayered cloud workload requires careful planning for both go-live and day-2 operations. These operations are often called CloudOps."
+    }
+  },
+  {
+    "id": "ops-f037",
+    "note": "6.1-operational-excellence",
+    "kind": "concept",
+    "front": "Which qualities must an SLO have, according to the operational excellence pillar?",
+    "back": "It must be SMART: specific, measurable, achievable, relevant, and time-bound. It must also reflect the level of service and performance that you want.",
+    "aws": null,
+    "source": {
+      "title": "Ensure operational readiness and performance using CloudOps",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/operational-readiness-and-performance-using-cloudops",
+      "evidence": "SLOs must be specific, measurable, achievable, relevant, and time-bound (SMART), and they must reflect the level of service and performance that you want."
+    }
+  },
+  {
+    "id": "ops-f038",
+    "note": "6.1-operational-excellence",
+    "kind": "concept",
+    "front": "Besides seasonal peaks and product launches, what capacity should a capacity plan include for disruptions?",
+    "back": "Capacity that supports graceful failover during disruptions, such as natural disasters and cyberattacks. Then the primary and DR systems can handle unexpected surges in demand.",
+    "aws": null,
+    "source": {
+      "title": "Ensure operational readiness and performance using CloudOps",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/operational-readiness-and-performance-using-cloudops",
+      "evidence": "To make sure that your primary and disaster recovery (DR) system can handle unexpected surges in demand, plan for capacity that can support graceful failover during disruptions like natural disasters and cyberattacks."
+    }
+  },
+  {
+    "id": "ops-f039",
+    "note": "6.1-operational-excellence",
+    "kind": "concept",
+    "front": "What must a post-incident review find besides the immediate cause of an incident?",
+    "back": "The systemic issues that contributed to the incident, and other contributing factors, such as communication breakdowns or lack of training. A blameless culture lets the team address the systemic issues.",
+    "aws": null,
+    "source": {
+      "title": "Manage incidents and problems",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+      "evidence": "This analysis must identify both the immediate cause and the systemic issues that contributed to the incident."
+    }
+  },
+  {
+    "id": "ops-f040",
+    "note": "6.1-operational-excellence",
+    "kind": "concept",
+    "front": "Which Google Cloud products does the operational excellence pillar name to automate incident response?",
+    "back": "Cloud Run functions (formerly Cloud Functions) or Cloud Run. Automated tools can trigger predefined remediation, such as a rollback to a known good state.",
+    "aws": null,
+    "source": {
+      "title": "Manage incidents and problems",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/manage-incidents-and-problems",
+      "evidence": "By using Google Cloud products like Cloud Run functions or Cloud Run, you can automate various tasks that are typically manual and time-consuming."
+    }
+  },
+  {
+    "id": "ops-f041",
+    "note": "6.1-operational-excellence",
+    "kind": "concept",
+    "front": "Which practice does the operational excellence pillar recommend when environments drift because people change them by hand?",
+    "back": "Adopt IaC, for example with Terraform, and keep the code in version control. IaC provisions and configures the infrastructure the same way every time, whoever runs the deployment.",
+    "aws": null,
+    "source": {
+      "title": "Automate and manage change",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/automate-and-manage-change",
+      "evidence": "Consistency and repeatability: IaC enables consistency and repeatability in your infrastructure deployments. You can ensure that your infrastructure is provisioned and configured the same way every time, regardless of who is performing the deployment."
+    }
+  },
+  {
+    "id": "ops-f042",
+    "note": "6.1-operational-excellence",
+    "kind": "term",
+    "front": "Start-Stop-Continue model",
+    "back": "A structure for retrospectives: start new practices, stop practices that are no longer effective, and continue practices that work well. The operational excellence pillar suggests it for retrospectives after projects or major incidents.",
+    "aws": null,
+    "source": {
+      "title": "Continuously improve and innovate",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/continuously-improve-and-innovate",
+      "evidence": "An effective way to structure a retrospective is to use the Start-Stop-Continue model:"
+    }
+  },
+  {
+    "id": "ops-f043",
+    "note": "6.1-operational-excellence",
+    "kind": "concept",
+    "front": "What is the difference between a KPI and a metric in the operational excellence pillar?",
+    "back": "A KPI is a quantifiable measurement that reflects overall performance. A metric is a specific data point that feeds the calculation of a KPI.",
+    "aws": null,
+    "source": {
+      "title": "Continuously improve and innovate",
+      "url": "https://docs.cloud.google.com/architecture/framework/operational-excellence/continuously-improve-and-innovate",
+      "evidence": "KPIs are quantifiable measurements that reflect the overall performance. Metrics are specific data points that contribute to the calculation of KPIs."
+    }
+  },
+  {
+    "id": "ops-f044",
+    "note": "6.2-observability",
+    "kind": "term",
+    "front": "Google Cloud Observability",
+    "back": "Google Cloud's monitoring, logging, and tracing services (formerly the Cloud operations suite, or Stackdriver). Cloud Monitoring, Cloud Logging, and Cloud Trace are on by default in each project and collect telemetry and audit logs for most services automatically.",
+    "aws": null,
+    "source": {
+      "title": "Observability in Google Cloud",
+      "url": "https://docs.cloud.google.com/stackdriver/docs",
+      "evidence": "Monitoring, Logging, and Trace are services that are enabled by default when you create a Google Cloud project."
+    }
+  },
+  {
+    "id": "ops-f045",
+    "note": "6.2-observability",
+    "kind": "term",
+    "front": "Metrics scope",
+    "back": "The list of resource containers, such as projects, whose time-series data one scoping project can chart and monitor. Use it for one monitoring view across many projects. Google recommends a new project, or one without resources, as the scoping project.",
+    "aws": null,
+    "source": {
+      "title": "Metrics scopes overview",
+      "url": "https://docs.cloud.google.com/monitoring/settings",
+      "evidence": "we recommend that you use a new Google Cloud project or one without resources as the scoping project, because these projects don't store any time-series data."
+    }
+  },
+  {
+    "id": "ops-f046",
+    "note": "6.2-observability",
+    "kind": "concept",
+    "front": "What must a Compute Engine VM have to report memory and process metrics?",
+    "back": "The Ops Agent, the primary agent for Compute Engine telemetry. Without it, you get only basic VM metrics, such as CPU utilization and network traffic.",
+    "aws": null,
+    "source": {
+      "title": "Observe and monitor VMs",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/observe-monitor-vms",
+      "evidence": "Metrics for memory and process utilization are only available with the installation of the Ops Agent, which is the primary agent for collecting telemetry from your Compute Engine instances."
+    }
+  },
+  {
+    "id": "ops-f047",
+    "note": "6.2-observability",
+    "kind": "term",
+    "front": "Log Router",
+    "back": "The Cloud Logging component that manages the flow of log entries through sinks. Each project, folder, organization, and billing account has one. Sinks route entries to log buckets, BigQuery, Cloud Storage, Pub/Sub, or another project.",
+    "aws": null,
+    "source": {
+      "title": "Route log entries",
+      "url": "https://docs.cloud.google.com/logging/docs/routing/overview",
+      "evidence": "Each Google Cloud project, billing account, folder, and organization has a Log Router, which manages the flow of log entries through resource-level sinks."
+    }
+  },
+  {
+    "id": "ops-f048",
+    "note": "6.2-observability",
+    "kind": "concept",
+    "front": "Do log exclusion filters reduce `entries.write` API calls or quota?",
+    "back": "No. The Logging API applies exclusion filters after it receives the log entries. Exclusions reduce what log buckets store, not the `entries.write` calls or quota.",
+    "aws": null,
+    "source": {
+      "title": "Route log entries",
+      "url": "https://docs.cloud.google.com/logging/docs/routing/overview",
+      "evidence": "You can't use exclusion filters to reduce the consumption of your `entries.write` API quota or the number of `entries.write` API calls. Exclusion filters are applied after log entries are received by the Logging API."
+    }
+  },
+  {
+    "id": "ops-f049",
+    "note": "6.2-observability",
+    "kind": "concept",
+    "front": "Which sink destination fits low-cost log retention for many years, such as seven-year audit retention?",
+    "back": "A Cloud Storage bucket, the destination for long-term storage of log data. The sink stores the log entries as JSON files.",
+    "aws": null,
+    "source": {
+      "title": "Route log entries",
+      "url": "https://docs.cloud.google.com/logging/docs/routing/overview",
+      "evidence": "Select this destination when you want long-term storage of your log data."
+    }
+  },
+  {
+    "id": "ops-f050",
+    "note": "6.2-observability",
+    "kind": "term",
+    "front": "Observability Analytics",
+    "back": "The Cloud Logging feature (formerly Log Analytics) that runs SQL queries on log buckets where you enable analytics. Use it to group and aggregate log entries, or to join log and trace data. Logs Explorer cannot aggregate.",
+    "aws": "CloudWatch Logs Insights",
+    "source": {
+      "title": "Analyze logs using Logs Explorer and Observability Analytics",
+      "url": "https://docs.cloud.google.com/logging/docs/log-analytics",
+      "evidence": "The Logs Explorer doesn't support aggregate operations, like counting the number of log entries that contain a specific pattern. To perform aggregate operations, enable analytics on the log bucket and then use Observability Analytics."
+    }
+  },
+  {
+    "id": "ops-f051",
+    "note": "6.2-observability",
+    "kind": "term",
+    "front": "Four golden signals",
+    "back": "The four metrics to focus on if you can measure only four metrics of a user-facing system: latency, traffic, errors, and saturation. Page a human when one of them shows a problem.",
+    "aws": null,
+    "source": {
+      "title": "Monitoring Distributed Systems",
+      "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+      "evidence": "The four golden signals of monitoring are latency, traffic, errors, and saturation. If you can only measure four metrics of your user-facing system, focus on these four."
+    }
+  },
+  {
+    "id": "ops-f052",
+    "note": "6.2-observability",
+    "kind": "concept",
+    "front": "Why is high CPU utilization a poor condition for a page?",
+    "back": "High CPU is a possible cause, not a symptom that users see. Google SRE pages mainly on symptoms, such as slow responses or errors, and uses cause-oriented signals to help debug.",
+    "aws": null,
+    "source": {
+      "title": "Monitoring Distributed Systems",
+      "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+      "evidence": "It focuses primarily on symptoms for paging, reserving cause-oriented heuristics to serve as aids to debugging problems."
+    }
+  },
+  {
+    "id": "ops-f053",
+    "note": "6.2-observability",
+    "kind": "term",
+    "front": "Burn rate",
+    "back": "How fast a service uses its error budget during the compliance period. A burn rate above 1 means that, if the error rate continues, the service misses its SLO for that period. Cloud Monitoring can alert on it.",
+    "aws": null,
+    "source": {
+      "title": "Alerting on your burn rate",
+      "url": "https://docs.cloud.google.com/stackdriver/docs/solutions/slo-monitoring/alerting-on-budget-burn-rate",
+      "evidence": "The burn rate tells you how fast you are consuming your error budget for a compliance period."
+    }
+  },
+  {
+    "id": "ops-f054",
+    "note": "6.2-observability",
+    "kind": "concept",
+    "front": "What is the Cloud Monitoring starting point for a fast-burn SLO alerting policy?",
+    "back": "A burn rate of 10 times the baseline, with a short lookback period of 1 or 2 hours. Pair it with a slow-burn policy: 2 times the baseline over 24 hours.",
+    "aws": null,
+    "source": {
+      "title": "Alerting on your burn rate",
+      "url": "https://docs.cloud.google.com/stackdriver/docs/solutions/slo-monitoring/alerting-on-budget-burn-rate",
+      "evidence": "A good starting point for a fast-burn threshold policy is 10x the baseline with a short (1- or 2-hour) lookback period."
+    }
+  },
+  {
+    "id": "ops-f055",
+    "note": "6.3-release-management",
+    "kind": "concept",
+    "front": "What should incident responders do with a recent rollout that they cannot rule out as the cause?",
+    "back": "Roll it back. Google's production playbooks default to a rollback, because a bad rollout is the most likely cause of a production incident.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud's approach to change",
+      "url": "https://docs.cloud.google.com/docs/cloud-approach-to-change",
+      "evidence": "to default to rolling back a recent rollout if incident responders can't rule out recent changes as a root cause of the incident."
+    }
+  },
+  {
+    "id": "ops-f056",
+    "note": "6.3-release-management",
+    "kind": "term",
+    "front": "Canary",
+    "back": "A release strategy that sends a small part of production traffic to the new version and compares it with the old version. Then you increase the share in steps. It protects the error budget, because the cost is in proportion to the traffic that the defect reaches.",
+    "aws": null,
+    "source": {
+      "title": "Canarying Releases",
+      "url": "https://sre.google/workbook/canarying-releases/",
+      "evidence": "This strategy allows us to conserve our error budget—impact on the budget is directly proportional to the amount of traffic exposed to defects."
+    }
+  },
+  {
+    "id": "ops-f057",
+    "note": "6.3-release-management",
+    "kind": "term",
+    "front": "Blue/green",
+    "back": "A release strategy with two full environments. You deploy the new release to the idle one and then move traffic to it. Cutover and rollback are router changes with no downtime, but the setup uses twice the resources.",
+    "aws": null,
+    "source": {
+      "title": "Canarying Releases",
+      "url": "https://sre.google/workbook/canarying-releases/",
+      "evidence": "The cutover doesn’t require downtime, and rollback is a trivial reversal of the router change. One downside is that this setup uses twice as many resources as a more “traditional” deployment."
+    }
+  },
+  {
+    "id": "ops-f058",
+    "note": "6.3-release-management",
+    "kind": "term",
+    "front": "Shadow (traffic teeing)",
+    "back": "A test strategy that sends a copy of live requests to the new version and discards its responses, so users never see it. It is weak for stateful systems, because the copied requests can affect shared state, such as a shared cache.",
+    "aws": null,
+    "source": {
+      "title": "Canarying Releases",
+      "url": "https://sre.google/workbook/canarying-releases/",
+      "evidence": "Traffic teeing also doesn’t adequately identify risk in stateful systems; copies of traffic may introduce unexpected influences between the seemingly independent deployments."
+    }
+  },
+  {
+    "id": "ops-f059",
+    "note": "6.3-release-management",
+    "kind": "term",
+    "front": "Cloud Deploy",
+    "back": "A managed service that delivers a release to a series of targets in a defined promotion sequence, such as dev, staging, and prod. Use it for promotion, approvals, and rollback of releases to GKE and Cloud Run.",
+    "aws": "AWS CodeDeploy",
+    "source": {
+      "title": "Overview of Cloud Deploy",
+      "url": "https://docs.cloud.google.com/deploy/docs/overview",
+      "evidence": "Cloud Deploy is a managed service that automates delivery of your applications to a series of target environments in a defined promotion sequence."
+    }
+  },
+  {
+    "id": "ops-f060",
+    "note": "6.3-release-management",
+    "kind": "concept",
+    "front": "What does a rollback in Cloud Deploy create?",
+    "back": "A new rollout of the last successfully deployed release, with the same parameters as that deployment. You can roll back on any target.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Cloud Deploy",
+      "url": "https://docs.cloud.google.com/deploy/docs/overview",
+      "evidence": "A rollback in Cloud Deploy consists of triggering a rollout against the last successfully deployed release. The new rollout uses the same parameters that were used in that successful deployment."
+    }
+  },
+  {
+    "id": "ops-f061",
+    "note": "6.3-release-management",
+    "kind": "concept",
+    "front": "What happens on the first Cloud Deploy canary rollout to a target?",
+    "back": "Cloud Deploy skips the canary phases and runs the `stable` phase, so the release gets all the traffic at once. There is no old version yet to split traffic with.",
+    "aws": null,
+    "source": {
+      "title": "Manage rollouts",
+      "url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/manage-rollout",
+      "evidence": "For this reason, when you deploy a canary for the first time, we skip the canary phase or phases and run the `stable` phase."
+    }
+  },
+  {
+    "id": "ops-f062",
+    "note": "6.3-release-management",
+    "kind": "concept",
+    "front": "Which Cloud Deploy feature blocks rollouts during a holiday change freeze?",
+    "back": "A deploy policy. It prevents rollouts on a delivery pipeline or target during the time windows that you define. You can override it, for example to roll back a bad rollout.",
+    "aws": null,
+    "source": {
+      "title": "Restrict deploy behavior using policies",
+      "url": "https://docs.cloud.google.com/deploy/docs/deploy-policy",
+      "evidence": "For example, a policy can prevent rollout creation for a given delivery pipeline during a specified time period. You might use this for seasonal restrictions, for example."
+    }
+  },
+  {
+    "id": "ops-f063",
+    "note": "6.3-release-management",
+    "kind": "concept",
+    "front": "How should you name the image when you create a Cloud Deploy release?",
+    "back": "A SHA-qualified image name, such as `image@sha256:...`, as Google recommends. Google also recommends templatized manifests, where the `--images=` flag replaces a placeholder with that image.",
+    "aws": null,
+    "source": {
+      "title": "Canary-deploy an application to a target",
+      "url": "https://docs.cloud.google.com/deploy/docs/deploy-app-canary",
+      "evidence": "Google recommends that you templatize your manifests this way, and that you use SHA-qualified image names at release creation."
+    }
+  },
+  {
+    "id": "ops-f064",
+    "note": "6.3-release-management",
+    "kind": "term",
+    "front": "Feature flag",
+    "back": "A switch that lets you deploy code in an inactive state and turn the feature on for more users over time. If the feature causes problems, you switch it off at once, with no new build.",
+    "aws": null,
+    "source": {
+      "title": "Reliable Product Launches at Scale",
+      "url": "https://sre.google/sre-book/reliable-product-launches/",
+      "evidence": "Having this sort of dormant functionality also makes aborting launches easier when adverse effects are discovered during a rollout. In such cases, we can simply switch the feature off, iterate, and release an updated version of the app."
+    }
+  },
+  {
+    "id": "ops-f065",
+    "note": "6.3-release-management",
+    "kind": "concept",
+    "front": "When can a release drop an old database column?",
+    "back": "Only when no application version still writes to the column or reads from it. The same rule applies when you drop a table or an index.",
+    "aws": null,
+    "source": {
+      "title": "Schema update best practices",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-updates-best-practices",
+      "evidence": "If you're dropping a column, table, or index, make sure you are not still writing to or reading from it."
+    }
+  },
+  {
+    "id": "ops-f066",
+    "note": "6.4-support",
+    "kind": "term",
+    "front": "Cloud Customer Care",
+    "back": "Google Cloud's support offering, with four services: Basic, Standard, Enhanced, and Premium. The support service applies to all projects in the organization, so only an Organization Administrator can change it.",
+    "aws": "AWS Support plans",
+    "source": {
+      "title": "Get support with Cloud Customer Care",
+      "url": "https://docs.cloud.google.com/support/docs/overview",
+      "evidence": "Only Organization Administrators can change the support service, since it applies to all projects under your Google Cloud organization."
+    }
+  },
+  {
+    "id": "ops-f067",
+    "note": "6.4-support",
+    "kind": "concept",
+    "front": "Which Cloud Customer Care service gives production workloads a 1-hour response target for P1 cases?",
+    "back": "Enhanced Support. It targets a first meaningful response within 1 hour for P1 cases, and it is designed for companies that run workloads in production.",
+    "aws": null,
+    "source": {
+      "title": "Enhanced Support overview",
+      "url": "https://docs.cloud.google.com/support/docs/enhanced",
+      "evidence": "P1 response SLO: For Priority 1 (P1) support cases, receive the first meaningful response within 1 hour."
+    }
+  },
+  {
+    "id": "ops-f068",
+    "note": "6.4-support",
+    "kind": "term",
+    "front": "Premium Support",
+    "back": "The Cloud Customer Care service for enterprises with priority workloads. It targets a first response within 15 minutes for P1 cases, and it includes a Technical Account Manager (TAM).",
+    "aws": null,
+    "source": {
+      "title": "Premium Support overview",
+      "url": "https://docs.cloud.google.com/support/docs/premium",
+      "evidence": "P1 response SLO: For Priority 1 (P1) support cases, receive the first meaningful response within 15 minutes."
+    }
+  },
+  {
+    "id": "ops-f069",
+    "note": "6.4-support",
+    "kind": "term",
+    "front": "Mission Critical Services",
+    "back": "A Premium Support Value-Add Service for environments whose disruption has a significant impact on operations. It adds an assessment, drills, proactive monitoring, and P0 cases with a 5-minute response time.",
+    "aws": null,
+    "source": {
+      "title": "Premium Support overview",
+      "url": "https://docs.cloud.google.com/support/docs/premium",
+      "evidence": "Mission Critical Services assess and mitigate potential service disruptions for environments that are essential to an organization and cause significant impact to operations when disrupted."
+    }
+  },
+  {
+    "id": "ops-f070",
+    "note": "6.4-support",
+    "kind": "concept",
+    "front": "When should you escalate a support case instead of raising its priority?",
+    "back": "When the support process breaks, for example the response is too slow or the recommended fix does not work. For a higher business impact, change the priority instead, because escalation usually does not make a case go faster.",
+    "aws": null,
+    "source": {
+      "title": "Create and manage support cases",
+      "url": "https://docs.cloud.google.com/support/docs/customer-care-procedures",
+      "evidence": "Escalation is meant for flagging process breaks. When you are experiencing high-impact issues, escalation doesn't generally make the case proceed faster."
+    }
+  },
+  {
+    "id": "ops-f071",
+    "note": "6.4-support",
+    "kind": "term",
+    "front": "Personalized Service Health",
+    "back": "The primary source for Google Cloud service disruptions that are relevant to you, with a view of the products that you use. Add it to your incident response process as a corroboration signal.",
+    "aws": "AWS Health Dashboard (your account events)",
+    "source": {
+      "title": "Google Cloud incident communication",
+      "url": "https://docs.cloud.google.com/service-health/docs/incident-communication",
+      "evidence": "Personalized Service Health (PSH): This is your primary source for service disruptions relevant to you. It provides a personalized view tailored to the specific Google Cloud products you use."
+    }
+  },
+  {
+    "id": "ops-f072",
+    "note": "6.4-support",
+    "kind": "concept",
+    "front": "Why can the public Google Cloud Service Health page show no incident while Google has one that affects you?",
+    "back": "The public page shows only broad, severe incidents. Google communicates incidents with a limited scope, such as one zone, one location, or a subset of projects, in Personalized Service Health.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud incident communication",
+      "url": "https://docs.cloud.google.com/service-health/docs/incident-communication",
+      "evidence": "For issues with a more limited scope, such as those impacting a single location, zone, or a smaller subset of projects, we will communicate relevant incidents to customers using Personalized Service Health."
+    }
+  },
+  {
+    "id": "ops-f073",
+    "note": "6.4-support",
+    "kind": "concept",
+    "front": "How should Personalized Service Health events reach on-call engineers?",
+    "back": "Do not page for every event. Show PSH incidents in the team's dashboards and tools. Alert only for critical services and locations, or for events with a relevance of Related or Impacted.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud incident communication",
+      "url": "https://docs.cloud.google.com/service-health/docs/incident-communication",
+      "evidence": "To avoid paging an on-call engineer for every Personalized Service Health event, integrate Personalized Service Health incident visibility into your team's dashboards and tools."
+    }
+  },
+  {
+    "id": "ops-f074",
+    "note": "6.4-support",
+    "kind": "term",
+    "front": "Incident Commander (IC)",
+    "back": "The incident role that commands and coordinates the response and delegates roles as needed. The IC holds every role that is not delegated yet. The Communications Lead and the Operations Lead report to the IC.",
+    "aws": null,
+    "source": {
+      "title": "Incident Response",
+      "url": "https://sre.google/workbook/incident-response/",
+      "evidence": "Commands and coordinates the incident response, delegating roles as needed. By default, the IC assumes all roles that have not been delegated yet."
+    }
+  },
+  {
+    "id": "ops-f075",
+    "note": "6.4-support",
+    "kind": "term",
+    "front": "Operations Lead (OL)",
+    "back": "The incident role that works with the Incident Commander and applies operational tools to respond to the incident. Only the operations team should change the system during an incident.",
+    "aws": null,
+    "source": {
+      "title": "Managing Incidents",
+      "url": "https://sre.google/sre-book/managing-incidents/",
+      "evidence": "The Ops lead works with the incident commander to respond to the incident by applying operational tools to the task at hand. The operations team should be the only group modifying the system during an incident."
+    }
+  },
+  {
+    "id": "ops-f076",
+    "note": "6.4-support",
+    "kind": "concept",
+    "front": "When should a team declare an incident?",
+    "back": "Early, based on clear conditions that the team sets in advance. It is better to declare an incident and close it quickly than to start the incident process hours into a growing problem.",
+    "aws": null,
+    "source": {
+      "title": "Managing Incidents",
+      "url": "https://sre.google/sre-book/managing-incidents/",
+      "evidence": "It is better to declare an incident early and then find a simple fix and close out the incident than to have to spin up the incident management framework hours into a burgeoning problem."
+    }
+  },
+  {
+    "id": "ops-f077",
+    "note": "6.5-quality-control",
+    "kind": "term",
+    "front": "Error budget",
+    "back": "100% minus the SLO. For example, a 99.9% success-ratio SLO gives an error budget of 0.1% of requests.",
+    "aws": null,
+    "source": {
+      "title": "Implementing SLOs",
+      "url": "https://sre.google/workbook/implementing-slos/",
+      "evidence": "the SLO is a target percentage and the error budget is 100% minus the SLO. For example, if you have a 99.9% success ratio SLO"
+    }
+  },
+  {
+    "id": "ops-f078",
+    "note": "6.5-quality-control",
+    "kind": "concept",
+    "front": "Why is 100% the wrong reliability target for a service?",
+    "back": "Higher reliability can cost much more and limit innovation, and it gives a low return when users are already happy. Design systems to be just reliable enough for user happiness.",
+    "aws": null,
+    "source": {
+      "title": "Set realistic targets for reliability",
+      "url": "https://docs.cloud.google.com/architecture/framework/reliability/set-targets",
+      "evidence": "Design your systems to be just reliable enough for user happiness. It might seem counterintuitive, but a goal of 100% reliability is often not the most effective strategy."
+    }
+  },
+  {
+    "id": "ops-f079",
+    "note": "6.5-quality-control",
+    "kind": "term",
+    "front": "Error budget policy",
+    "back": "A written policy that says what actions to take, and who takes them, when a service uses all of its error budget, for example a production freeze. The product manager, the developers, and the SREs must all approve it.",
+    "aws": null,
+    "source": {
+      "title": "Implementing SLOs",
+      "url": "https://sre.google/workbook/implementing-slos/",
+      "evidence": "Getting the error budget policy approved by all key stakeholders—the product manager, the development team, and the SREs—is a good test for whether the SLOs are fit for purpose:"
+    }
+  },
+  {
+    "id": "ops-f080",
+    "note": "6.5-quality-control",
+    "kind": "concept",
+    "front": "What does the SRE workbook's example error budget policy require after a service exceeds its budget?",
+    "back": "A halt to all changes and releases, except P0 issues and security fixes, until the service is back within its SLO. The policy is not a punishment for missing SLOs.",
+    "aws": null,
+    "source": {
+      "title": "Example Error Budget Policy",
+      "url": "https://sre.google/workbook/error-budget-policy/",
+      "evidence": "If the service has exceeded its error budget for the preceding four-week window, we will halt all changes and releases other than P01 issues or security fixes until the service is back within its SLO."
+    }
+  },
+  {
+    "id": "ops-f081",
+    "note": "6.5-quality-control",
+    "kind": "term",
+    "front": "DORA metrics",
+    "back": "DORA's four measures of software delivery performance: change lead time, deployment frequency, change failure rate, and failed deployment recovery time. They measure the throughput and stability of software changes. Elite performers achieve both.",
+    "aws": null,
+    "source": {
+      "title": "Announcing the 2023 State of DevOps Report",
+      "url": "https://cloud.google.com/blog/products/devops-sre/announcing-the-2023-state-of-devops-report",
+      "evidence": "In turn, we use the following measures to understand the throughput and stability of software changes:"
+    }
+  },
+  {
+    "id": "ops-f082",
+    "note": "6.5-quality-control",
+    "kind": "term",
+    "front": "Change failure rate",
+    "back": "A DORA software delivery metric: how frequently a software deployment introduces a failure that requires immediate intervention. It is one of the four measures of the throughput and stability of software changes.",
+    "aws": null,
+    "source": {
+      "title": "Announcing the 2023 State of DevOps Report",
+      "url": "https://cloud.google.com/blog/products/devops-sre/announcing-the-2023-state-of-devops-report",
+      "evidence": "Change failure rate: how frequently a software deployment introduces a failure that requires immediate intervention"
+    }
+  },
+  {
+    "id": "ops-f083",
+    "note": "6.5-quality-control",
+    "kind": "concept",
+    "front": "When does the Cloud Deploy Deployment failure rate metric count a deployment as successful?",
+    "back": "When its pod or pods report a ready state. The metric counts failed deployments as a percentage of all deployment attempts.",
+    "aws": null,
+    "source": {
+      "title": "Viewing metrics in Cloud Deploy",
+      "url": "https://docs.cloud.google.com/deploy/docs/metrics",
+      "evidence": "A successful deployment is one for which the pod or pods report a ready state. The Deployment failure rate metric counts failures as a percentage of all deployment attempts."
+    }
+  },
+  {
+    "id": "ops-f084",
+    "note": "6.5-quality-control",
+    "kind": "concept",
+    "front": "What does DORA research recommend instead of a heavyweight change-approval process?",
+    "back": "Peer review. It gives a more reliable and compliant release process without a loss of speed.",
+    "aws": null,
+    "source": {
+      "title": "DevOps capabilities",
+      "url": "https://docs.cloud.google.com/architecture/devops",
+      "evidence": "Replace heavyweight change-approval processes with peer review, to get the benefits of a more reliable, compliant release process without sacrificing speed."
+    }
+  },
+  {
+    "id": "ops-f085",
+    "note": "6.5-quality-control",
+    "kind": "concept",
+    "front": "How should you test a new organization policy custom constraint before you enforce it?",
+    "back": "First use Policy Simulator to see where current resources violate it. Then create the policy in dry-run mode, which logs violations but does not deny them. Enforce it after the dry run works as intended.",
+    "aws": null,
+    "source": {
+      "title": "Create custom constraints",
+      "url": "https://docs.cloud.google.com/organization-policy/create-custom-constraints",
+      "evidence": "An organization policy in dry-run mode is a type of organization policy where violations of the policy are audit-logged, but the violating actions aren't denied."
+    }
+  },
+  {
+    "id": "ops-f086",
+    "note": "6.5-quality-control",
+    "kind": "term",
+    "front": "Production readiness review (PRR)",
+    "back": "A review that checks that a service meets the standards for production setup and operational readiness. It is usually the first step when an SRE team takes on a service, and a prerequisite before the team accepts responsibility for it.",
+    "aws": null,
+    "source": {
+      "title": "The Evolving SRE Engagement Model",
+      "url": "https://sre.google/sre-book/evolving-sre-engagement-model/",
+      "evidence": "A PRR is considered a prerequisite for an SRE team to accept responsibility for managing the production aspects of a service."
+    }
+  },
+  {
+    "id": "ops-f087",
+    "note": "6.5-quality-control",
+    "kind": "concept",
+    "front": "What must every postmortem action item have?",
+    "back": "An owner and a tracking number, a priority, and a verifiable end state. For example, \"Add an alert when more than X% of our machines have been taken away from us\" has a verifiable end state.",
+    "aws": null,
+    "source": {
+      "title": "Postmortem Culture: Learning from Failure",
+      "url": "https://sre.google/workbook/postmortem-culture/",
+      "evidence": "All action items have both an owner and a tracking number."
+    }
+  },
+  {
+    "id": "ops-f088",
+    "note": "6.6-production-reliability",
+    "kind": "term",
+    "front": "Toil",
+    "back": "Work tied to running a production service that tends to be manual, repetitive, automatable, tactical, without enduring value, and that grows linearly with the service. SRE teams reduce it with engineering work.",
+    "aws": null,
+    "source": {
+      "title": "Eliminating Toil",
+      "url": "https://sre.google/sre-book/eliminating-toil/",
+      "evidence": "Toil is the kind of work tied to running a production service that tends to be manual, repetitive, automatable, tactical, devoid of enduring value, and that scales linearly as a service grows."
+    }
+  },
+  {
+    "id": "ops-f089",
+    "note": "6.6-production-reliability",
+    "kind": "concept",
+    "front": "What is Google SRE's goal for the share of each SRE's time that goes to toil?",
+    "back": "Below 50%. At least half of each SRE's time goes to engineering work that reduces future toil or adds service features.",
+    "aws": null,
+    "source": {
+      "title": "Eliminating Toil",
+      "url": "https://sre.google/sre-book/eliminating-toil/",
+      "evidence": "Our SRE organization has an advertised goal of keeping operational work (i.e., toil) below 50% of each SRE’s time."
+    }
+  },
+  {
+    "id": "ops-f090",
+    "note": "6.6-production-reliability",
+    "kind": "term",
+    "front": "Chaos engineering",
+    "back": "Planned failures, injected with tools such as Chaos Monkey or custom scripts, to check that a system behaves as intended during a disruption. Escalate the failures gradually, repeat the tests periodically, and automate them in CI/CD pipelines.",
+    "aws": null,
+    "source": {
+      "title": "Perform testing for recovery from failures",
+      "url": "https://docs.cloud.google.com/architecture/framework/reliability/perform-testing-for-recovery-from-failures",
+      "evidence": "Plan and execute failures by using tools like Chaos Monkey. You can use custom scripts to simulate failures of critical services such as a shutdown of a primary node in a multi-zone GKE cluster or a disabled Cloud SQL instance."
+    }
+  },
+  {
+    "id": "ops-f091",
+    "note": "6.6-production-reliability",
+    "kind": "term",
+    "front": "Fault Injection Testing",
+    "back": "A Google Cloud service (Preview) that causes real failures: it fails Compute Engine or GKE compute, degrades traffic through a layer 7 load balancer, or fails over Cloud SQL. Its faults stay inside one project and one region. Use it to approximate a zone or region failure.",
+    "aws": "AWS Fault Injection Service",
+    "source": {
+      "title": "Choose setup instructions for a fault type",
+      "url": "https://docs.cloud.google.com/fault-injection-testing/set-up-experiment",
+      "evidence": "These faults are designed to restrict the scope of the experiment to a single project's resources in a single region or narrower."
+    }
+  },
+  {
+    "id": "ops-f092",
+    "note": "6.6-production-reliability",
+    "kind": "concept",
+    "front": "Must you notify Google before you run a penetration test on your own Google Cloud projects?",
+    "back": "No. You do not need to contact Google. Follow the Acceptable Use Policy and the Terms of Service, and make sure that your tests affect only your own projects.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Security FAQ",
+      "url": "https://support.google.com/cloud/answer/6262505?hl=en",
+      "evidence": "If you plan to evaluate the security of your Cloud Platform infrastructure with penetration testing, you are not required to contact us."
+    }
+  },
+  {
+    "id": "ops-f093",
+    "note": "6.6-production-reliability",
+    "kind": "concept",
+    "front": "Why should Web Security Scanner scans run against a test deployment instead of production?",
+    "back": "The scanner can adversely affect the reliability of some applications. It is also likely to activate any state-changing action that its account has permission for. Use a test environment and a test account.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Web Security Scanner",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+      "evidence": "Web Security Scanner can adversely affect the reliability of some applications and might not be suitable for use in a production environment."
+    }
+  },
+  {
+    "id": "ops-f094",
+    "note": "6.6-production-reliability",
+    "kind": "concept",
+    "front": "Why is Pub/Sub a poor tool to generate load for a load test?",
+    "back": "You cannot control the rate of the traffic or the number of clients, so you do not know what you test. Use a test harness, such as JMeter, that controls the rate and the concurrency.",
+    "aws": null,
+    "source": {
+      "title": "Load testing best practices",
+      "url": "https://docs.cloud.google.com/run/docs/about-load-testing",
+      "evidence": "Pub/Sub is a poor choice of tool to generate load because you cannot control the rate of the traffic and number of clients."
+    }
+  },
+  {
+    "id": "ops-f095",
+    "note": "6.6-production-reliability",
+    "kind": "concept",
+    "front": "Does a quota increase guarantee Compute Engine capacity for a failover?",
+    "back": "No. A quota is only the maximum number of resources that you can create, if they are available. If a region or zone is out of the resource, you cannot create it, even with quota left.",
+    "aws": null,
+    "source": {
+      "title": "Allocation quotas",
+      "url": "https://docs.cloud.google.com/compute/resource-usage",
+      "evidence": "Allocation quotas are the maximum number of resources you can create of that resource type, if those resources are available. Quotas don't guarantee that resources are always available."
+    }
+  },
+  {
+    "id": "ops-f096",
+    "note": "6.6-production-reliability",
+    "kind": "concept",
+    "front": "How much should you overprovision a regional MIG in three zones to survive a zone failure?",
+    "back": "To at least 150% of the VMs that you need. Then the two remaining zones can carry all the traffic if one zone fails.",
+    "aws": null,
+    "source": {
+      "title": "About regional MIGs",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+      "evidence": "By overprovisioning to 150%, you can ensure that if 1/3 of the capacity is lost, 100% of traffic is supported by the remaining zones."
+    }
+  },
+  {
+    "id": "ops-f097",
+    "note": "6.6-production-reliability",
+    "kind": "term",
+    "front": "Load shedding",
+    "back": "Dropping a part of the traffic when a server approaches overload, so that it stays healthy and still does useful work. Graceful degradation goes further: it reduces the work for each request, for example with a search of cached data only.",
+    "aws": null,
+    "source": {
+      "title": "Addressing Cascading Failures",
+      "url": "https://sre.google/sre-book/addressing-cascading-failures/",
+      "evidence": "Load shedding drops some proportion of load by dropping traffic as the server approaches overload conditions."
+    }
+  },
+  {
+    "id": "ops-f098",
+    "note": "6.6-production-reliability",
+    "kind": "concept",
+    "front": "Why should a service avoid retries at several layers of the stack?",
+    "back": "Retries multiply from layer to layer. If three layers each make 4 attempts, one user action can create 64 attempts on an overloaded database. Also use randomized exponential backoff and limit the retries for each request.",
+    "aws": null,
+    "source": {
+      "title": "Addressing Cascading Failures",
+      "url": "https://sre.google/sre-book/addressing-cascading-failures/",
+      "evidence": "If the database can’t service requests because it’s overloaded, and the backend, frontend, and JavaScript layers all issue 3 retries (4 attempts), then a single user action may create 64 attempts (4^3) on the database."
+    }
+  },
+  {
+    "id": "ops-f099",
+    "note": "6.5-quality-control",
+    "kind": "concept",
+    "front": "What older names did DORA use for its lead time and recovery time metrics?",
+    "back": "Lead Time for Changes: the time for a commit to get into production. Time to Restore Service: how long it takes to recover from a failure in production. The older material calls lead time a velocity metric and time to restore a stability metric.",
+    "aws": null,
+    "source": {
+      "title": "Use Four Keys metrics like change failure rate to measure your DevOps performance",
+      "url": "https://cloud.google.com/blog/products/devops-sre/using-the-four-keys-to-measure-your-devops-performance",
+      "evidence": "At a high level, Deployment Frequency and Lead Time for Changes measure velocity, while Change Failure Rate and Time to Restore Service measure stability."
+    }
+  }
+]

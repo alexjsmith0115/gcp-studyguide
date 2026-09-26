@@ -1,0 +1,1081 @@
+[
+  {
+    "id": "sec-f001",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "concept",
+    "front": "Why can a more restrictive project allow policy not remove a role that the folder grants?",
+    "back": "The effective allow policy of a resource is the union of its own allow policy and the allow policies that it inherits. To take away an inherited permission, use a deny policy, or grant the role at a lower level.",
+    "aws": null,
+    "source": {
+      "title": "Using resource hierarchy for access control",
+      "url": "https://docs.cloud.google.com/iam/docs/resource-hierarchy-access-control",
+      "evidence": "The effective allow policy for a resource is the union of the allow policy set at that resource and the allow policy inherited from its parent."
+    }
+  },
+  {
+    "id": "sec-f002",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "term",
+    "front": "Deny policy",
+    "back": "An IAM policy that stops principals from using permissions, whatever roles they have. IAM checks deny policies before allow policies. Use it to take away an inherited grant or to keep admin permissions in one group.",
+    "aws": null,
+    "source": {
+      "title": "Deny policies",
+      "url": "https://docs.cloud.google.com/iam/docs/deny-overview",
+      "evidence": "When a principal is denied a permission, they can't do anything that requires that permission, regardless of the IAM roles they've been granted. This is because IAM always checks relevant deny policies before checking relevant allow policies."
+    }
+  },
+  {
+    "id": "sec-f003",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "term",
+    "front": "Principal access boundary policy",
+    "back": "An IAM policy that you bind to a principal set. It defines the resources that those principals are eligible to access. Use it to stop principals from using resources in other organizations, or to keep service accounts in certain projects.",
+    "aws": null,
+    "source": {
+      "title": "Principal access boundary policies",
+      "url": "https://docs.cloud.google.com/iam/docs/principal-access-boundary-policies",
+      "evidence": "With Principal Access Boundary policies, you can define the resources that a principal is eligible to access. If a principal is ineligible to access a resource, then their access to that resource is limited"
+    }
+  },
+  {
+    "id": "sec-f004",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "concept",
+    "front": "Why should you not grant legacy basic roles, such as Editor, in production?",
+    "back": "Basic roles include thousands of permissions across all Google Cloud services. Grant the most limited predefined roles, or custom roles, that meet the need.",
+    "aws": null,
+    "source": {
+      "title": "Roles overview",
+      "url": "https://docs.cloud.google.com/iam/docs/roles-overview",
+      "evidence": "Basic roles include thousands of permissions across all Google Cloud services. In production environments, do not grant basic roles unless there is no alternative."
+    }
+  },
+  {
+    "id": "sec-f005",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "concept",
+    "front": "At which levels of the resource hierarchy can you create a custom role?",
+    "back": "Only in an organization or a project, not in a folder. To use a custom role in a folder, create it at the organization level.",
+    "aws": null,
+    "source": {
+      "title": "Roles overview",
+      "url": "https://docs.cloud.google.com/iam/docs/roles-overview",
+      "evidence": "You cannot define custom roles at the folder level. If you need to use a custom role within a folder, define the custom role at the organization level."
+    }
+  },
+  {
+    "id": "sec-f006",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "concept",
+    "front": "What effect does a conditional role binding have when the principal already has that role without a condition?",
+    "back": "None. A conditional binding does not override an unconditional binding for the same role. Remove the unconditional binding so that the condition applies.",
+    "aws": null,
+    "source": {
+      "title": "Overview of IAM Conditions",
+      "url": "https://docs.cloud.google.com/iam/docs/conditions-overview",
+      "evidence": "Conditional role bindings do not override role bindings with no conditions. If a principal is bound to a role, and the role binding does not have a condition, then the principal always has that role."
+    }
+  },
+  {
+    "id": "sec-f007",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "term",
+    "front": "Privileged Access Manager (PAM)",
+    "back": "An IAM service for temporary elevated access. An entitlement defines who can request which roles, for how long, and if a justification or approval is necessary. PAM revokes the roles when the grant ends.",
+    "aws": null,
+    "source": {
+      "title": "Privileged Access Manager overview",
+      "url": "https://docs.cloud.google.com/iam/docs/pam-overview",
+      "evidence": "If successful, they are granted the roles listed in the entitlement until the end of the grant duration, after which the roles are revoked by Privileged Access Manager."
+    }
+  },
+  {
+    "id": "sec-f008",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "concept",
+    "front": "What does enforcing `iam.automaticIamGrantsForDefaultServiceAccounts` do to existing default service accounts?",
+    "back": "Nothing. The constraint only stops the automatic Editor grant, so default service accounts in new projects get no access. It does not remove the Editor role from existing default service accounts.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for using service accounts securely",
+      "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts",
+      "evidence": "Applying the constraint doesn't remove the Editor role from existing default service accounts."
+    }
+  },
+  {
+    "id": "sec-f009",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "concept",
+    "front": "Why should you grant Service Account Token Creator on one service account instead of on the project?",
+    "back": "A grant on the project lets the user impersonate every service account in that project. The user can then reach all resources that those service accounts can access, even outside the project.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for using service accounts securely",
+      "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts",
+      "evidence": "For example, if you grant a user the Service Account Token Creator role in a Google Cloud project, the user can impersonate any service account in the Google Cloud project."
+    }
+  },
+  {
+    "id": "sec-f010",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "term",
+    "front": "Policy Troubleshooter",
+    "back": "A Policy Intelligence tool that explains why a principal has, or does not have, a permission on a resource. It checks allow, deny, and principal access boundary (Preview) policies. It does not diagnose Cloud Storage ACLs or VPC Service Controls denials.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot IAM permissions",
+      "url": "https://docs.cloud.google.com/policy-intelligence/docs/troubleshoot-access",
+      "evidence": "Policy Troubleshooter does not account for access granted by Cloud Storage access control lists (ACLs). It also does not diagnose access issues related to VPC Service Controls."
+    }
+  },
+  {
+    "id": "sec-f011",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "term",
+    "front": "Cloud Identity",
+    "back": "An identity as a service (IDaaS) product that manages users and groups. It can federate with Active Directory and Microsoft Entra ID. You grant IAM roles to its user and group accounts.",
+    "aws": "AWS IAM Identity Center",
+    "source": {
+      "title": "Overview of Cloud Identity",
+      "url": "https://docs.cloud.google.com/identity/docs/overview",
+      "evidence": "Cloud Identity is an Identity as a Service (IDaaS) solution that centrally manages users and groups. You can configure Cloud Identity to federate identities between Google and other identity providers"
+    }
+  },
+  {
+    "id": "sec-f012",
+    "note": "3.1-iam-and-hierarchy",
+    "kind": "term",
+    "front": "Google Cloud Directory Sync (GCDS)",
+    "back": "A free Google tool that provisions users and groups from Active Directory to Google. Provisioning works in one direction and does not include passwords. Users authenticate to Active Directory through SAML SSO.",
+    "aws": null,
+    "source": {
+      "title": "Federate Google Cloud with Active Directory",
+      "url": "https://docs.cloud.google.com/architecture/identity/federating-gcp-with-active-directory-introduction",
+      "evidence": "Provisioning works one way, which means changes in Active Directory are replicated to Google Cloud but not the other way around. Also, provisioning does not include passwords."
+    }
+  },
+  {
+    "id": "sec-f013",
+    "note": "3.1-data-protection-kms",
+    "kind": "term",
+    "front": "Customer-managed encryption key (CMEK)",
+    "back": "A Cloud KMS key that you control. A CMEK-integrated service uses it to wrap its data encryption keys (envelope encryption). Use it when you must control key rotation, location, or access, or crypto-shred data.",
+    "aws": null,
+    "source": {
+      "title": "Cloud KMS overview",
+      "url": "https://docs.cloud.google.com/kms/docs/key-management-service",
+      "evidence": "CMEK integrations use your Cloud KMS keys to encrypt or \"wrap\" your data encryption keys (DEKs). Wrapping DEKs with key encryption keys (KEKs) is called envelope encryption."
+    }
+  },
+  {
+    "id": "sec-f014",
+    "note": "3.1-data-protection-kms",
+    "kind": "term",
+    "front": "Cloud HSM",
+    "back": "A Cloud KMS service that keeps keys in a Google-managed cluster of FIPS 140-2 Level 3 certified HSMs. It uses Cloud KMS as its front end, so you use the same API as for software keys. Choose it when a requirement names hardware protection or FIPS 140-2 Level 3.",
+    "aws": null,
+    "source": {
+      "title": "Cloud HSM",
+      "url": "https://docs.cloud.google.com/kms/docs/hsm",
+      "evidence": "Cloud HSM is a cloud-hosted Hardware Security Module (HSM) service that lets you host encryption keys and perform cryptographic operations in a cluster of FIPS 140-2 Level 3 certified HSMs."
+    }
+  },
+  {
+    "id": "sec-f015",
+    "note": "3.1-data-protection-kms",
+    "kind": "term",
+    "front": "Autokey",
+    "back": "A Cloud KMS feature that creates Cloud HSM keys on demand when a developer creates a resource. It also grants the service agent access to the key. Google recommends it when its keys meet all of your requirements.",
+    "aws": null,
+    "source": {
+      "title": "Customer-managed encryption keys (CMEK)",
+      "url": "https://docs.cloud.google.com/kms/docs/cmek",
+      "evidence": "Using Autokey is simpler than provisioning keys yourself, and is the recommended choice if the keys created by Autokey meet all of your requirements."
+    }
+  },
+  {
+    "id": "sec-f016",
+    "note": "3.1-data-protection-kms",
+    "kind": "concept",
+    "front": "Which key option should you use for new Compute Engine disks instead of a customer-supplied encryption key?",
+    "back": "CMEK in Cloud KMS. CSEK for Compute Engine is deprecated. Since July 20, 2026, you cannot use a CSEK to encrypt new disks, images, or snapshots.",
+    "aws": null,
+    "source": {
+      "title": "Deprecation of CSEK in Compute Engine",
+      "url": "https://docs.cloud.google.com/compute/docs/deprecations/csek-deprecation-in-compute-engine",
+      "evidence": "Use customer-managed encryption keys (CMEK) managed by the Cloud Key Management Service. Cloud KMS offers enhanced security controls, auditability, and rotation support for your keys, and support for Hyperdisk volumes."
+    }
+  },
+  {
+    "id": "sec-f017",
+    "note": "3.1-data-protection-kms",
+    "kind": "concept",
+    "front": "Where must the Cloud KMS key for a CMEK-protected regional resource be located?",
+    "back": "In the same exact location as the resource. Some CMEK integrations do not support the `global` location. You cannot move a key ring or key after you create it.",
+    "aws": null,
+    "source": {
+      "title": "Cloud KMS locations",
+      "url": "https://docs.cloud.google.com/kms/docs/locations",
+      "evidence": "For Customer-Managed Encryption Keys (CMEK) integrations, you must use the same exact location as other resources related to the integration. Some CMEK integrations don't support the `global` location."
+    }
+  },
+  {
+    "id": "sec-f018",
+    "note": "3.1-data-protection-kms",
+    "kind": "concept",
+    "front": "Which principal needs the CryptoKey Encrypter/Decrypter role on a CMEK key?",
+    "back": "The service agent of the CMEK-integrated service. The principals that create or read the resource do not need a role on the key.",
+    "aws": null,
+    "source": {
+      "title": "Customer-managed encryption keys (CMEK)",
+      "url": "https://docs.cloud.google.com/kms/docs/cmek",
+      "evidence": "The principal that creates or views resources in the CMEK-integrated service does not require the Cloud KMS CryptoKey Encrypter/Decrypter (`roles/cloudkms.cryptoKeyEncrypterDecrypter`) for the CMEK used to protect the resource."
+    }
+  },
+  {
+    "id": "sec-f019",
+    "note": "3.1-data-protection-kms",
+    "kind": "concept",
+    "front": "Which organization policy constraint must you add to `gcp.restrictCmekCryptoKeyProjects` to require CMEK?",
+    "back": "`gcp.restrictNonCmekServices`. It requires CMEK for the services that you list. `restrictCmekCryptoKeyProjects` only limits the projects that keys can come from.",
+    "aws": null,
+    "source": {
+      "title": "CMEK organization policies",
+      "url": "https://docs.cloud.google.com/kms/docs/cmek-org-policy",
+      "evidence": "To require CMEK protection for your organization, configure the `constraints/gcp.restrictNonCmekServices` organization policy."
+    }
+  },
+  {
+    "id": "sec-f020",
+    "note": "3.1-data-protection-kms",
+    "kind": "concept",
+    "front": "What happens to existing data when you rotate a Cloud KMS key?",
+    "back": "Nothing. Rotation creates a new key version, but it does not re-encrypt data or disable old versions. Re-encrypt the data before you destroy the old versions.",
+    "aws": null,
+    "source": {
+      "title": "Key rotation",
+      "url": "https://docs.cloud.google.com/kms/docs/key-rotation",
+      "evidence": "Rotating keys creates new active key versions, but doesn't re-encrypt your data and doesn't disable or delete previous key versions."
+    }
+  },
+  {
+    "id": "sec-f021",
+    "note": "3.1-data-protection-kms",
+    "kind": "concept",
+    "front": "What happens to data encrypted with a Cloud KMS key version after that version is destroyed?",
+    "back": "The data is crypto-shredded. After the scheduled-destruction period, the key material is gone, and nobody can recover the data.",
+    "aws": null,
+    "source": {
+      "title": "Delete Cloud KMS resources",
+      "url": "https://docs.cloud.google.com/kms/docs/delete-kms-resources",
+      "evidence": "You can destroy a key version that was used to encrypt data to crypto-shred data that you want to be permanently unrecoverable."
+    }
+  },
+  {
+    "id": "sec-f022",
+    "note": "3.1-data-protection-kms",
+    "kind": "term",
+    "front": "Cloud EKM",
+    "back": "A Cloud KMS option that keeps key material in a supported external key manager outside Google Cloud. Google never stores or caches these keys. If the external key manager is unavailable, the data is unavailable.",
+    "aws": "AWS KMS External Key Store (XKS)",
+    "source": {
+      "title": "Cloud EKM",
+      "url": "https://docs.cloud.google.com/kms/docs/ekm",
+      "evidence": "Externally managed keys are never cached or stored within Google Cloud. Instead, Cloud EKM communicates directly with the external key management partner for each request."
+    }
+  },
+  {
+    "id": "sec-f023",
+    "note": "3.1-data-protection-kms",
+    "kind": "term",
+    "front": "Confidential Space",
+    "back": "A Confidential Computing environment in which several parties process shared sensitive data with an agreed workload. The workload operator cannot access the data. Use it for multi-party data sharing.",
+    "aws": "AWS Nitro Enclaves",
+    "source": {
+      "title": "Confidential Space overview",
+      "url": "https://docs.cloud.google.com/confidential-computing/confidential-space/docs/confidential-space-overview",
+      "evidence": "You might use Confidential Space to operate on sensitive data that's only visible to its original owners and a mutually agreed-upon workload."
+    }
+  },
+  {
+    "id": "sec-f024",
+    "note": "3.1-data-protection-kms",
+    "kind": "term",
+    "front": "Secret Manager",
+    "back": "A service that stores secrets such as database passwords, API keys, and TLS certificates that an application needs at runtime. A principal with access can read the secret value. Cloud KMS stores keys and does not return key material.",
+    "aws": "AWS Secrets Manager",
+    "source": {
+      "title": "Secret Manager overview",
+      "url": "https://docs.cloud.google.com/secret-manager/docs/overview",
+      "evidence": "Store configuration information such as database passwords, API keys, or TLS certificates needed by an application at runtime."
+    }
+  },
+  {
+    "id": "sec-f025",
+    "note": "3.1-security-controls",
+    "kind": "term",
+    "front": "Organization Policy Service",
+    "back": "A service that sets constraints on how resources can be configured, across the resource hierarchy. IAM decides who can act. Organization Policy decides what configurations are allowed.",
+    "aws": "AWS Config",
+    "source": {
+      "title": "Organization Policy overview",
+      "url": "https://docs.cloud.google.com/organization-policy/overview",
+      "evidence": "Organization Policy focuses on what, and lets the administrator set restrictions on specific resources to determine how they can be configured."
+    }
+  },
+  {
+    "id": "sec-f026",
+    "note": "3.1-security-controls",
+    "kind": "concept",
+    "front": "What happens to existing resources that violate a new organization policy?",
+    "back": "Usually nothing. Most new organization policies are not retroactive, so existing resources keep working. You must find and fix the violations yourself.",
+    "aws": null,
+    "source": {
+      "title": "Organization Policy overview",
+      "url": "https://docs.cloud.google.com/organization-policy/overview",
+      "evidence": "Google Cloud services will enforce constraints to prevent violations, but the application of new organization policies is usually not retroactive."
+    }
+  },
+  {
+    "id": "sec-f027",
+    "note": "3.1-security-controls",
+    "kind": "concept",
+    "front": "Which control stops everyone, including project owners, from creating VMs with external IPv4 addresses?",
+    "back": "An organization policy with the managed constraint `compute.managed.vmExternalIpAccess`, or the legacy `compute.vmExternalIpAccess`. It denies the creation or update of VMs with IPv4 external IP addresses.",
+    "aws": null,
+    "source": {
+      "title": "Organization policy constraints",
+      "url": "https://docs.cloud.google.com/organization-policy/reference/org-policy-constraints",
+      "evidence": "If enforced, this constraint will deny the creation or update of VM instances with IPv4 external IP addresses."
+    }
+  },
+  {
+    "id": "sec-f028",
+    "note": "3.1-security-controls",
+    "kind": "term",
+    "front": "VPC Service Controls",
+    "back": "A control that puts a service perimeter around projects. The perimeter protects Google-managed services, such as Cloud Storage and BigQuery, from data exfiltration, also by clients with stolen credentials. It is independent of IAM, and Google recommends that you use both.",
+    "aws": null,
+    "source": {
+      "title": "Overview of VPC Service Controls",
+      "url": "https://docs.cloud.google.com/vpc-service-controls/docs/overview",
+      "evidence": "VPC Service Controls provides an extra layer of security defense for Google Cloud services that is independent of Identity and Access Management (IAM)."
+    }
+  },
+  {
+    "id": "sec-f029",
+    "note": "3.1-security-controls",
+    "kind": "concept",
+    "front": "What does a VPC Service Controls perimeter do with requests to third-party APIs on the internet?",
+    "back": "Nothing. The perimeter works only with Google Cloud managed services. It does not block access to third-party APIs or services on the internet.",
+    "aws": null,
+    "source": {
+      "title": "Overview of VPC Service Controls",
+      "url": "https://docs.cloud.google.com/vpc-service-controls/docs/overview",
+      "evidence": "The perimeter works specifically with Google Cloud managed services. The perimeter doesn't block access to any third-party APIs or services on the internet."
+    }
+  },
+  {
+    "id": "sec-f030",
+    "note": "3.1-security-controls",
+    "kind": "concept",
+    "front": "How do you roll out a new VPC Service Controls perimeter without blocking legitimate access?",
+    "back": "Create the perimeter in dry-run mode first. It logs the requests that it would deny, but it does not deny them. Read the logs, change the configuration to fix the issues, and then enforce it.",
+    "aws": null,
+    "source": {
+      "title": "Dry run mode for service perimeters",
+      "url": "https://docs.cloud.google.com/vpc-service-controls/docs/dry-run-mode",
+      "evidence": "In the dry run mode, requests that violate the perimeter policy are not denied, only logged. You can use the dry run mode to test perimeter configuration and to monitor usage of services without preventing access to resources."
+    }
+  },
+  {
+    "id": "sec-f031",
+    "note": "3.1-security-controls",
+    "kind": "term",
+    "front": "Access Context Manager",
+    "back": "A service that defines access levels: conditions on the request, such as IP address, device type, or user identity. It does not enforce them. VPC Service Controls, IAP, and IAM Conditions enforce access levels, in addition to IAM.",
+    "aws": null,
+    "source": {
+      "title": "Access Context Manager overview",
+      "url": "https://docs.cloud.google.com/access-context-manager/docs/overview",
+      "evidence": "Access Context Manager isn't responsible for policy enforcement. Rather, Access Context Manager is designed to define specific rules or context. Policy is configured and enforced across various points, such as VPC Service Controls."
+    }
+  },
+  {
+    "id": "sec-f032",
+    "note": "3.1-security-controls",
+    "kind": "concept",
+    "front": "Which audit logs can you not configure, exclude, or disable?",
+    "back": "Admin Activity and System Event audit logs. Cloud Logging always writes them. You cannot disable Policy Denied audit logs either, but you can exclude them from storage.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Audit Logs overview",
+      "url": "https://docs.cloud.google.com/logging/docs/audit",
+      "evidence": "Admin Activity audit logs are always written; you can't configure, exclude, or disable them."
+    }
+  },
+  {
+    "id": "sec-f033",
+    "note": "3.1-security-controls",
+    "kind": "concept",
+    "front": "Which audit logs must you turn on to record who reads data in Cloud Storage?",
+    "back": "Data Access audit logs. They are off by default for all services except some BigQuery services. You can turn them on for an organization or folder, and then they apply to all its projects.",
+    "aws": null,
+    "source": {
+      "title": "Enable Data Access audit logs",
+      "url": "https://docs.cloud.google.com/logging/docs/audit/configure-data-access",
+      "evidence": "Data Access audit logs are disabled by default for all services but some BigQuery services."
+    }
+  },
+  {
+    "id": "sec-f034",
+    "note": "3.1-security-controls",
+    "kind": "term",
+    "front": "Aggregated sink",
+    "back": "A log sink on an organization or folder that routes logs from the resources in it to one destination. Use it to collect logs in a central location. An intercepting sink stops the entries from reaching sinks in child resources, except the `_Required` sinks.",
+    "aws": null,
+    "source": {
+      "title": "Aggregated sinks overview",
+      "url": "https://docs.cloud.google.com/logging/docs/export/aggregated_sinks_overview",
+      "evidence": "This document describes aggregated sinks, which let you collate and route log entries that originate in resources within a folder or organization to a supported destination."
+    }
+  },
+  {
+    "id": "sec-f035",
+    "note": "3.1-security-controls",
+    "kind": "term",
+    "front": "Security Command Center",
+    "back": "The Google Cloud service that finds misconfigurations, vulnerabilities, and threats. The Standard tier has no additional charge. Choose Premium for threat detection, attack paths, and compliance monitoring.",
+    "aws": "Amazon GuardDuty, AWS Security Hub",
+    "source": {
+      "title": "Security Command Center service tiers",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/service-tiers",
+      "evidence": "Premium. Everything in Standard, plus advanced security and compliance posture management, attack paths, threat detection, and compliance monitoring for Google Cloud only."
+    }
+  },
+  {
+    "id": "sec-f036",
+    "note": "3.1-secure-access",
+    "kind": "term",
+    "front": "Identity-Aware Proxy (IAP)",
+    "back": "A central authorization layer for applications that users reach over HTTPS. IAP authenticates the user and then checks an IAM role on the app. Use it to give employees access to internal apps without a VPN.",
+    "aws": "Application Load Balancer with Cognito, AWS Verified Access",
+    "source": {
+      "title": "Identity-Aware Proxy overview",
+      "url": "https://docs.cloud.google.com/iap/docs/concepts-overview",
+      "evidence": "IAP lets you establish a central authorization layer for applications accessed by HTTPS, so you can use an application-level access control model instead of relying on network-level firewalls."
+    }
+  },
+  {
+    "id": "sec-f037",
+    "note": "3.1-secure-access",
+    "kind": "concept",
+    "front": "Why should an app behind IAP verify the JWT in the `x-goog-iap-jwt-assertion` header?",
+    "back": "An attacker who bypasses IAP can forge the unsigned identity headers. The signed JWT protects the app if someone disables IAP by accident, misconfigures a firewall, or connects from inside the project.",
+    "aws": null,
+    "source": {
+      "title": "Securing your app with signed headers",
+      "url": "https://docs.cloud.google.com/iap/docs/signed-headers-howto",
+      "evidence": "The JWT is in the HTTP request header `x-goog-iap-jwt-assertion`. If an attacker bypasses IAP, the attacker can forge the IAP unsigned identity headers, `x-goog-authenticated-user-{email,id}`."
+    }
+  },
+  {
+    "id": "sec-f038",
+    "note": "3.1-secure-access",
+    "kind": "term",
+    "front": "IAP TCP forwarding",
+    "back": "An IAP feature that builds an encrypted tunnel for SSH, RDP, and other TCP traffic to VMs. The VMs need no external IP address. IAM controls which users can open tunnels to which VMs.",
+    "aws": "AWS Session Manager",
+    "source": {
+      "title": "Use IAP for TCP forwarding",
+      "url": "https://docs.cloud.google.com/iap/docs/using-tcp-forwarding",
+      "evidence": "use Identity-Aware Proxy (IAP) TCP forwarding to enable administrative access to VM instances that either don't have external IP addresses or don't permit direct access over the internet."
+    }
+  },
+  {
+    "id": "sec-f039",
+    "note": "3.1-secure-access",
+    "kind": "concept",
+    "front": "Which source range must a firewall rule allow so that IAP TCP forwarding can reach VMs?",
+    "back": "`35.235.240.0/20`, to the ports that you need, such as 22 for SSH or 3389 for RDP. The `default-allow-ssh` and `default-allow-rdp` rules allow all source addresses, so remove them to stop direct access.",
+    "aws": null,
+    "source": {
+      "title": "Use IAP for TCP forwarding",
+      "url": "https://docs.cloud.google.com/iap/docs/using-tcp-forwarding",
+      "evidence": "allows ingress traffic from the IP range `35.235.240.0/20`. This range contains all IP addresses that IAP uses for TCP forwarding."
+    }
+  },
+  {
+    "id": "sec-f040",
+    "note": "3.1-secure-access",
+    "kind": "term",
+    "front": "OS Login",
+    "back": "A Compute Engine feature that controls SSH access to VMs with IAM roles instead of SSH keys in metadata. When you remove the IAM role, access to the VM stops.",
+    "aws": "Amazon EC2 Instance Connect",
+    "source": {
+      "title": "About OS Login",
+      "url": "https://docs.cloud.google.com/compute/docs/oslogin",
+      "evidence": "Use OS Login to manage SSH access to your instances using IAM without having to create and manage individual SSH keys."
+    }
+  },
+  {
+    "id": "sec-f041",
+    "note": "3.1-secure-access",
+    "kind": "concept",
+    "front": "Why should a VM that users log in to have a minimal service account, or none?",
+    "back": "A user who connects to the VM can use all the IAM permissions of the service account that is attached to it.",
+    "aws": null,
+    "source": {
+      "title": "About OS Login",
+      "url": "https://docs.cloud.google.com/compute/docs/oslogin",
+      "evidence": "When a user connects to a VM, that user can use all of the IAM permissions granted to the service account attached to the VM."
+    }
+  },
+  {
+    "id": "sec-f042",
+    "note": "3.1-secure-access",
+    "kind": "term",
+    "front": "Service account impersonation",
+    "back": "A caller gets a short-lived token for a service account and uses it to authenticate. It always involves two identities, and most audit logs record both. Use it for temporary elevated access instead of a service account key.",
+    "aws": "AWS STS `AssumeRole`",
+    "source": {
+      "title": "Service account impersonation",
+      "url": "https://docs.cloud.google.com/iam/docs/service-account-impersonation",
+      "evidence": "Service account impersonation always involves two identities: an authenticated principal, and the service account that the principal impersonates."
+    }
+  },
+  {
+    "id": "sec-f043",
+    "note": "3.1-secure-access",
+    "kind": "concept",
+    "front": "Which role does a user need on a service account to use `--impersonate-service-account`?",
+    "back": "Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`). Service Account User only lets the user attach the service account to a resource.",
+    "aws": null,
+    "source": {
+      "title": "Roles for service account authentication",
+      "url": "https://docs.cloud.google.com/iam/docs/service-account-permissions",
+      "evidence": "or to use the `--impersonate-service-account` flag for the Google Cloud CLI. To complete these tasks, you need the Service Account Token Creator role on the service account."
+    }
+  },
+  {
+    "id": "sec-f044",
+    "note": "3.1-secure-access",
+    "kind": "term",
+    "front": "Workload Identity Federation",
+    "back": "A way for a workload outside Google Cloud to exchange its own credential for a short-lived Google token. Use it for pipelines and apps on AWS, Azure, GitHub, or on-premises, instead of service account keys.",
+    "aws": "AWS IAM Roles Anywhere",
+    "source": {
+      "title": "Workload Identity Federation",
+      "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation",
+      "evidence": "Using Workload Identity Federation, you can provide on-premises or multicloud workloads with access to Google Cloud resources by using federated identities instead of a service account key."
+    }
+  },
+  {
+    "id": "sec-f045",
+    "note": "3.1-secure-access",
+    "kind": "concept",
+    "front": "What must a Workload Identity Federation provider for GitHub Actions include to prevent spoofing?",
+    "back": "An attribute condition that accepts only tokens from your GitHub organization. GitHub uses one issuer URL for all organizations.",
+    "aws": null,
+    "source": {
+      "title": "Configure Workload Identity Federation with deployment pipelines",
+      "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines",
+      "evidence": "To help protect against spoofing threats, you must use an attribute condition that restricts access to tokens issued by your GitHub organization, GitLab group, or HCP Terraform organization."
+    }
+  },
+  {
+    "id": "sec-f046",
+    "note": "3.1-secure-access",
+    "kind": "term",
+    "front": "Workforce Identity Federation",
+    "back": "A way for users of an external OIDC or SAML IdP to use SSO to Google Cloud. It stores no user accounts in Google Cloud, so you do not need Google Cloud Directory Sync (GCDS).",
+    "aws": null,
+    "source": {
+      "title": "Workforce Identity Federation",
+      "url": "https://docs.cloud.google.com/iam/docs/workforce-identity-federation",
+      "evidence": "For example, by using Workforce Identity Federation, you don't need to use Cloud Identity's Google Cloud Directory Sync (GCDS)."
+    }
+  },
+  {
+    "id": "sec-f047",
+    "note": "3.1-secure-access",
+    "kind": "term",
+    "front": "Chrome Enterprise Premium",
+    "back": "Google's secure enterprise browsing product (formerly BeyondCorp Enterprise). It adds context-aware access by user identity, device security posture, and location. It also adds data loss prevention and phishing and malware protection in Chrome.",
+    "aws": null,
+    "source": {
+      "title": "Chrome Enterprise Premium overview",
+      "url": "https://docs.cloud.google.com/chrome-enterprise-premium/docs/overview",
+      "evidence": "Context-Aware Access Controls: Enforce secure access to critical applications and resources based on user identity, device security posture, and geographic location."
+    }
+  },
+  {
+    "id": "sec-f048",
+    "note": "3.1-supply-chain",
+    "kind": "term",
+    "front": "Supply-chain Levels for Software Artifacts (SLSA)",
+    "back": "A framework that describes attack vectors in the software supply chain, such as bad source code, a compromised build system, and bad dependencies. It does not directly describe some threats, such as a compromised deployment process. Google Cloud tools mitigate both kinds of threats.",
+    "aws": null,
+    "source": {
+      "title": "Software supply chain threats",
+      "url": "https://docs.cloud.google.com/software-supply-chain-security/docs/attack-vectors",
+      "evidence": "Letters A to H indicate attack vectors in the software supply chain that are described as threats in the Supply-chain Levels for Software Artifacts (SLSA) framework."
+    }
+  },
+  {
+    "id": "sec-f049",
+    "note": "3.1-supply-chain",
+    "kind": "term",
+    "front": "Build provenance",
+    "back": "Verifiable data about a build: the image digests, source locations, build arguments, and build duration. Use it to prove that an image came from your trusted source and builder. Cloud Build can generate SLSA level 3 provenance.",
+    "aws": null,
+    "source": {
+      "title": "Generate and validate build provenance",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+      "evidence": "Build provenance is a collection of verifiable data about a build. Provenance metadata includes details such as the digests of the built images, the input source locations, the build arguments, and the build duration."
+    }
+  },
+  {
+    "id": "sec-f050",
+    "note": "3.1-supply-chain",
+    "kind": "concept",
+    "front": "Why does Cloud Build generate no provenance when a build step runs `docker push`?",
+    "back": "Cloud Build generates provenance only for images that it pushes to Artifact Registry from the `images` field of the build config.",
+    "aws": null,
+    "source": {
+      "title": "Generate and validate build provenance",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+      "evidence": "Cloud Build can't generate provenance if you push your image to Artifact Registry using an explicit `docker push` step."
+    }
+  },
+  {
+    "id": "sec-f051",
+    "note": "3.1-supply-chain",
+    "kind": "term",
+    "front": "Artifact Registry virtual repository",
+    "back": "A repository that puts several repositories of one format behind one endpoint, and controls the search order across the upstream repositories. Put private packages first to reduce the risk of dependency confusion attacks.",
+    "aws": null,
+    "source": {
+      "title": "Software supply chain security",
+      "url": "https://docs.cloud.google.com/software-supply-chain-security/docs/overview",
+      "evidence": "Virtual repositories consolidate repositories of the same format behind a single endpoint and let you control the search order across upstream repositories. You can prioritize your private packages, which reduces the risk of dependency confusion attacks"
+    }
+  },
+  {
+    "id": "sec-f052",
+    "note": "3.1-supply-chain",
+    "kind": "term",
+    "front": "Assured Open Source Software (Assured OSS)",
+    "back": "Popular open source packages that Google builds, scans, and signs. They have SLSA level 3 provenance and an SBOM. Use them to reduce the risk from open source dependencies.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Assured Open Source Software",
+      "url": "https://docs.cloud.google.com/assured-open-source-software/docs/overview",
+      "evidence": "The open-source packages are built by Google in a secure manner. These packages meet Supply-chain Levels for Software Artifacts (SLSA) level 3 requirements and have a verifiable provenance and SBOM."
+    }
+  },
+  {
+    "id": "sec-f053",
+    "note": "3.1-supply-chain",
+    "kind": "term",
+    "front": "Artifact Analysis",
+    "back": "The service (formerly Container Analysis) that scans each new image when you push it to Artifact Registry. It keeps the vulnerability information up to date. Binary Authorization can use its results to allow only compliant images.",
+    "aws": "Amazon ECR image scanning",
+    "source": {
+      "title": "Artifact Analysis overview",
+      "url": "https://docs.cloud.google.com/artifact-analysis/docs/artifact-analysis",
+      "evidence": "The scanning process is triggered automatically every time you push a new image to Artifact Registry. The vulnerability information is continuously updated when new vulnerabilities are discovered."
+    }
+  },
+  {
+    "id": "sec-f054",
+    "note": "3.1-supply-chain",
+    "kind": "concept",
+    "front": "Which images does Artifact Analysis not scan after you enable the Container Scanning API?",
+    "back": "The images that are already in the registry. Automatic scanning covers only new pushes. To scan an existing image, push it again.",
+    "aws": null,
+    "source": {
+      "title": "Artifact Analysis pricing",
+      "url": "https://cloud.google.com/artifact-analysis/pricing",
+      "evidence": "Artifact Analysis does not automatically scan existing images after you enable the API. To scan an existing image, you must push it again."
+    }
+  },
+  {
+    "id": "sec-f055",
+    "note": "3.1-supply-chain",
+    "kind": "concept",
+    "front": "Which scanning option can stop a build when the image has vulnerabilities of a set severity?",
+    "back": "On-Demand Scanning in the Cloud Build pipeline. The build scans the image and checks the severity levels. It pushes the image to Artifact Registry only if no vulnerabilities of that severity exist.",
+    "aws": null,
+    "source": {
+      "title": "Use On-Demand Scanning in your Cloud Build pipeline",
+      "url": "https://docs.cloud.google.com/artifact-analysis/docs/ods-cloudbuild",
+      "evidence": "Using On-Demand Scanning as part of your Cloud Build pipeline allows you to block builds if the container image has vulnerabilities with a severity matching a predefined level."
+    }
+  },
+  {
+    "id": "sec-f056",
+    "note": "3.1-supply-chain",
+    "kind": "term",
+    "front": "Binary Authorization",
+    "back": "A product that enforces a policy when you deploy container images to platforms such as GKE and Cloud Run. It allows an image only if it conforms to the policy, for example if it has the required attestations.",
+    "aws": null,
+    "source": {
+      "title": "Binary Authorization overview",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/overview",
+      "evidence": "Images that conform with the policy are allowed to be deployed; otherwise, they are disallowed from being deployed."
+    }
+  },
+  {
+    "id": "sec-f057",
+    "note": "3.1-supply-chain",
+    "kind": "concept",
+    "front": "Which Binary Authorization mode lets you test a new policy in production without blocking deployments?",
+    "back": "Dry run (audit log only). Images that do not conform still deploy, and Cloud Audit Logs record the details. Change to block and audit log after you check the results.",
+    "aws": null,
+    "source": {
+      "title": "Binary Authorization concepts",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/key-concepts",
+      "evidence": "Dry run mode allows you to test a policy, for example in your production environment, before enforcement actually goes into effect."
+    }
+  },
+  {
+    "id": "sec-f058",
+    "note": "3.1-supply-chain",
+    "kind": "concept",
+    "front": "What must you configure so that developers cannot deploy to Cloud Run with Binary Authorization turned off?",
+    "back": "An organization policy that requires Binary Authorization for Cloud Run. Without it, Cloud Run developers can disable Binary Authorization on their services.",
+    "aws": null,
+    "source": {
+      "title": "Enable Binary Authorization for Cloud Run",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/run/enabling-binauthz-cloud-run",
+      "evidence": "We recommend that you require Binary Authorization for Cloud Run by configuring an organization policy to do so. Binary Authorization can be disabled by Cloud Run developers if the policy is not configured."
+    }
+  },
+  {
+    "id": "sec-f059",
+    "note": "3.1-supply-chain",
+    "kind": "concept",
+    "front": "What replaces GKE workload vulnerability scanning, which Google shut down?",
+    "back": "Artifact Analysis, with automatic or on-demand scanning of images in Artifact Registry. Security Command Center can also assess the images that you deploy.",
+    "aws": null,
+    "source": {
+      "title": "Vulnerability scanning removal from GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/deprecations/vulnerability-scanning-gkee",
+      "evidence": "Artifact Analysis has automatic or on-demand vulnerability scanning options for container images in Artifact Registry."
+    }
+  },
+  {
+    "id": "sec-f060",
+    "note": "3.1-securing-ai",
+    "kind": "term",
+    "front": "Model Armor",
+    "back": "A service that screens LLM prompts and responses for prompt injection, jailbreaks, sensitive data, harmful content, and malicious URLs. It works for AI in Google Cloud and in other clouds.",
+    "aws": "Amazon Bedrock Guardrails",
+    "source": {
+      "title": "Model Armor overview",
+      "url": "https://docs.cloud.google.com/model-armor/overview",
+      "evidence": "It works by proactively screening LLM prompts and responses, protecting against various risks and ensuring responsible AI practices. Whether you are deploying AI in Google Cloud or other cloud providers, Model Armor can help you prevent malicious input"
+    }
+  },
+  {
+    "id": "sec-f061",
+    "note": "3.1-securing-ai",
+    "kind": "concept",
+    "front": "What does Model Armor do with a violation when the template uses \"Inspect only\"?",
+    "back": "It logs the violation to Cloud Logging but does not stop the prompt or response. Use it to tune a template, then change to \"Inspect and block\".",
+    "aws": null,
+    "source": {
+      "title": "Model Armor overview",
+      "url": "https://docs.cloud.google.com/model-armor/overview",
+      "evidence": "If a violation is found, it logs the details to Cloud Logging for monitoring and analysis. However, it doesn't stop the request or response from being processed by the integrated service."
+    }
+  },
+  {
+    "id": "sec-f062",
+    "note": "3.1-securing-ai",
+    "kind": "concept",
+    "front": "Who blocks the content when Model Armor returns a block verdict?",
+    "back": "The calling service, integration point, or policy enforcement point. With the REST API, your application must stop the prompt or response.",
+    "aws": null,
+    "source": {
+      "title": "Model Armor overview",
+      "url": "https://docs.cloud.google.com/model-armor/overview",
+      "evidence": "The calling service or integration point or Policy Enforcement Point (PEP) is responsible for blocking the further processing."
+    }
+  },
+  {
+    "id": "sec-f063",
+    "note": "3.1-securing-ai",
+    "kind": "term",
+    "front": "Model Armor floor settings",
+    "back": "Minimum Model Armor filter settings at the organization, folder, or project level. Nobody can create or update a template that is less strict. Use them to set a baseline for all AI teams.",
+    "aws": null,
+    "source": {
+      "title": "Configure floor settings",
+      "url": "https://docs.cloud.google.com/model-armor/configure-floor-settings",
+      "evidence": "Configure floor settings to define the minimum detection thresholds for Model Armor templates. These settings ensure that all new and modified templates meet specific requirements."
+    }
+  },
+  {
+    "id": "sec-f064",
+    "note": "3.1-securing-ai",
+    "kind": "concept",
+    "front": "What does the Agent Platform integration do with a request when Model Armor fails or is unavailable?",
+    "back": "It skips the Model Armor check and continues to process the request without screening. This happens when Model Armor is not in the region, is temporarily unreachable, or has an error.",
+    "aws": null,
+    "source": {
+      "title": "Integrate Model Armor with Gemini Enterprise Agent Platform",
+      "url": "https://docs.cloud.google.com/model-armor/model-armor-vertex-integration",
+      "evidence": "Gemini Enterprise Agent Platform skips the Model Armor sanitization step and continues processing the request under the following conditions:"
+    }
+  },
+  {
+    "id": "sec-f065",
+    "note": "3.1-securing-ai",
+    "kind": "term",
+    "front": "Cryptographic hash (HMAC-SHA-256)",
+    "back": "A Sensitive Data Protection method that replaces a value with a one-way token. Nobody can reverse it, but it keeps joins between records. Use it when analysts must join or count records without the original value.",
+    "aws": null,
+    "source": {
+      "title": "Pseudonymization",
+      "url": "https://docs.cloud.google.com/sensitive-data-protection/docs/pseudonymization",
+      "evidence": "Generate one-way HMAC-SHA-256 digests. This method is suitable when cross-record correlation is required for statistical analysis but restoring the original plaintext must remain computationally infeasible."
+    }
+  },
+  {
+    "id": "sec-f066",
+    "note": "3.1-securing-ai",
+    "kind": "term",
+    "front": "Format-preserving encryption (FPE-FFX)",
+    "back": "A reversible Sensitive Data Protection token that keeps the length and character set of the value. Use it only when you must keep the input alphabet and size. It can run slowly and has limits, so otherwise use deterministic encryption (AES-SIV).",
+    "aws": null,
+    "source": {
+      "title": "Transformation reference",
+      "url": "https://docs.cloud.google.com/sensitive-data-protection/docs/transformations-reference",
+      "evidence": "Important: Don't use the `CryptoReplaceFfxFpeConfig` method, except when preserving the input alphabet space and size is a requirement."
+    }
+  },
+  {
+    "id": "sec-f067",
+    "note": "3.1-securing-ai",
+    "kind": "concept",
+    "front": "Which key type should you use for Sensitive Data Protection tokens that you must re-identify later?",
+    "back": "A key wrapped with Cloud KMS, which Google calls the preferred method. A transient key keeps integrity only within one request, so you cannot re-identify with it.",
+    "aws": null,
+    "source": {
+      "title": "Pseudonymization",
+      "url": "https://docs.cloud.google.com/sensitive-data-protection/docs/pseudonymization",
+      "evidence": "By wrapping it using Cloud Key Management Service (Cloud KMS). (For maximum security, Cloud KMS is the preferred method.)"
+    }
+  },
+  {
+    "id": "sec-f068",
+    "note": "3.1-securing-ai",
+    "kind": "concept",
+    "front": "Which organization policy constraint limits the Model Garden models that users can use, tune, or deploy?",
+    "back": "`vertexai.allowedModels`. It applies to all principals, and only to Model Garden models. It does not cover models in Model Registry.",
+    "aws": null,
+    "source": {
+      "title": "Control access to Model Garden models",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/control-model-access",
+      "evidence": "You can set a policy for Model Garden by using the Google Cloud console or the Google Cloud CLI. The name of the constraint is `vertexai.allowedModels`."
+    }
+  },
+  {
+    "id": "sec-f069",
+    "note": "3.1-securing-ai",
+    "kind": "concept",
+    "front": "Which grounding option should you use instead of Grounding with Google Search for zero data retention?",
+    "back": "Web Grounding for Enterprise. Grounding with Google Search keeps queries for up to 3 days, and you cannot turn this off.",
+    "aws": null,
+    "source": {
+      "title": "Gemini Enterprise Agent Platform and zero data retention",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention",
+      "evidence": "There is no way to disable the storage of this information if you use Grounding with Google Search. If you require zero data retention, we recommend using Web Grounding for Enterprise."
+    }
+  },
+  {
+    "id": "sec-f070",
+    "note": "3.1-securing-ai",
+    "kind": "term",
+    "front": "Agent Identity",
+    "back": "A SPIFFE-based identity for each AI agent, with an X.509 certificate. Unlike a service account, it cannot be impersonated and has no long-lived keys. Use it so that each agent authenticates as itself.",
+    "aws": null,
+    "source": {
+      "title": "Agent Identity overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/agent-identity-overview",
+      "evidence": "Unlike service accounts, agent identities are not shared by multiple workloads by default, can't be impersonated, and don't allow developers to generate long-lived service account keys."
+    }
+  },
+  {
+    "id": "sec-f071",
+    "note": "3.1-securing-ai",
+    "kind": "term",
+    "front": "AI Protection",
+    "back": "A Security Command Center capability that finds AI assets, their vulnerabilities, and threats to them. Threat detection and vulnerability findings for AI assets need the Premium tier.",
+    "aws": null,
+    "source": {
+      "title": "AI Protection overview",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/ai-protection-overview",
+      "evidence": "AI Protection helps you manage the security posture of your AI workloads by providing a view of AI security across your Google Cloud environment, and helping you to detect threats and mitigate risks to your AI inventory."
+    }
+  },
+  {
+    "id": "sec-f072",
+    "note": "3.2-compliance",
+    "kind": "concept",
+    "front": "Which Google Cloud products can store PHI after you accept the HIPAA Business Associate Agreement (BAA)?",
+    "back": "Only the products that the BAA explicitly covers. Do not use Pre-GA offerings with PHI unless their terms allow it.",
+    "aws": null,
+    "source": {
+      "title": "HIPAA Compliance on Google Cloud",
+      "url": "https://cloud.google.com/security/compliance/hipaa",
+      "evidence": "Disable or otherwise ensure that you do not use Google Cloud Products that are not explicitly covered by the BAA (see Covered Products) when working with PHI."
+    }
+  },
+  {
+    "id": "sec-f073",
+    "note": "3.2-compliance",
+    "kind": "concept",
+    "front": "What does the `gcp.resourceLocations` constraint do to resources that already exist in other locations?",
+    "back": "Nothing. It applies only to newly created resources, so existing resources continue to work. It also does not affect global resources.",
+    "aws": null,
+    "source": {
+      "title": "Restrict resource locations",
+      "url": "https://docs.cloud.google.com/organization-policy/restrict-locations",
+      "evidence": "After you define resource locations, this limitation will apply only to newly-created resources. Resources you created before setting the resource locations constraint will continue to exist and perform their function."
+    }
+  },
+  {
+    "id": "sec-f074",
+    "note": "3.2-compliance",
+    "kind": "term",
+    "front": "Assured Workloads",
+    "back": "A service that applies a control package to a folder. The package enforces data location, personnel access, and key management controls, for example for FedRAMP High or the EU Data Boundary. It runs on commercial cloud infrastructure.",
+    "aws": "AWS GovCloud",
+    "source": {
+      "title": "Overview of Assured Workloads",
+      "url": "https://docs.cloud.google.com/assured-workloads/docs/overview",
+      "evidence": "You can use Assured Workloads to simplify management and configuration of regulated workloads by applying predefined control packages to folders."
+    }
+  },
+  {
+    "id": "sec-f075",
+    "note": "3.2-compliance",
+    "kind": "term",
+    "front": "Access Transparency",
+    "back": "Logs that record the actions of Google personnel when they access your Customer Data. An entry shows the resource, action, time, reason, and accessor. Use it with Cloud Audit Logs, which record the actions of your own principals.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Access Transparency",
+      "url": "https://docs.cloud.google.com/assured-workloads/access-transparency/docs/overview",
+      "evidence": "Access Transparency logs record the actions that Google personnel take when accessing Customer Data."
+    }
+  },
+  {
+    "id": "sec-f076",
+    "note": "3.2-compliance",
+    "kind": "term",
+    "front": "Access Approval",
+    "back": "A control that makes Google support and engineering staff get your explicit approval before they access your Customer Data. It needs Access Transparency. Support responses take longer while Google waits for your approval.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Access Approval",
+      "url": "https://docs.cloud.google.com/assured-workloads/access-approval/docs/overview",
+      "evidence": "Access Approval ensures that Cloud Customer Care and engineering teams require your explicit approval whenever they need to access your Customer Data."
+    }
+  },
+  {
+    "id": "sec-f077",
+    "note": "3.2-compliance",
+    "kind": "term",
+    "front": "Key Access Justifications (KAJ)",
+    "back": "A feature that gives a justification code for each use of an enrolled Cloud KMS or external key. In some control packages, your policy can deny a request by its code. It works only with Assured Workloads.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Key Access Justifications",
+      "url": "https://docs.cloud.google.com/assured-workloads/key-access-justifications/docs/overview",
+      "evidence": "Key Access Justifications can only be used with Assured Workloads, and is enabled by default when you create a new Assured Workloads folder configured for a control package that includes Key Access Justifications."
+    }
+  },
+  {
+    "id": "sec-f078",
+    "note": "3.2-compliance",
+    "kind": "concept",
+    "front": "Which log records the actions of Google personnel whom you gave access with your own IAM policy?",
+    "back": "Cloud Audit Logs, when they are enabled. Access Transparency does not log this access, because you granted it yourself.",
+    "aws": null,
+    "source": {
+      "title": "Access Transparency exclusions",
+      "url": "https://docs.cloud.google.com/assured-workloads/access-transparency/docs/exclusions",
+      "evidence": "You've granted the Google personnel access to your content by using your Identity and Access Management (IAM) policy; their activities are recorded in Cloud Audit Logs (when enabled), not Access Transparency logs."
+    }
+  },
+  {
+    "id": "sec-f079",
+    "note": "3.2-compliance",
+    "kind": "concept",
+    "front": "Which strategies does Google recommend to reduce the PCI DSS assessment scope?",
+    "back": "Use all three together: a dedicated PCI folder with restricted access, a dedicated VPC network with VPC Service Controls, and tokenization of card numbers.",
+    "aws": null,
+    "source": {
+      "title": "Limiting scope of compliance for PCI environments in Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/limiting-compliance-scope-pci-environments-google-cloud",
+      "evidence": "This section discusses the following strategies for reducing assessment scope: resource hierarchy controls, VPC Service Controls segmentation, and tokenization. Rather than picking one approach, consider employing all of these strategies in order to maximize your potential scope reduction."
+    }
+  },
+  {
+    "id": "sec-f080",
+    "note": "3.2-compliance",
+    "kind": "term",
+    "front": "Sensitive Data Protection",
+    "back": "A service (includes Cloud DLP) that discovers, classifies, and de-identifies sensitive data inside and outside Google Cloud. Use it to find PII across an organization and to replace it with masks or tokens.",
+    "aws": "Amazon Macie",
+    "source": {
+      "title": "Sensitive Data Protection overview",
+      "url": "https://docs.cloud.google.com/sensitive-data-protection/docs/sensitive-data-protection-overview",
+      "evidence": "Sensitive Data Protection helps you discover, classify, and de-identify sensitive data inside and outside Google Cloud."
+    }
+  },
+  {
+    "id": "sec-f081",
+    "note": "3.2-compliance",
+    "kind": "concept",
+    "front": "What is the difference between a SOC 2 Type I report and a Type II report?",
+    "back": "A Type I report covers the design of controls at one point in time. A Type II report also covers how well the controls operated over a period. Google Cloud issues only Type II reports.",
+    "aws": null,
+    "source": {
+      "title": "SOC 2",
+      "url": "https://cloud.google.com/security/compliance/soc-2",
+      "evidence": "A SOC 2 Type I report covers the design of the service organization's controls at a specific point in time. A SOC 2 Type II report covers the design and operating effectiveness"
+    }
+  },
+  {
+    "id": "sec-f082",
+    "note": "3.2-compliance",
+    "kind": "concept",
+    "front": "Why can you not keep audit logs for seven years in the `_Required` log bucket?",
+    "back": "Its retention is fixed at 400 days, and you cannot change it. Route the logs to a user-defined log bucket, set its retention period, and lock the bucket.",
+    "aws": null,
+    "source": {
+      "title": "Store log entries",
+      "url": "https://docs.cloud.google.com/logging/docs/store-log-entries",
+      "evidence": "Log entries in this log bucket are retained for 400 days; you can't change this retention period."
+    }
+  },
+  {
+    "id": "sec-f083",
+    "note": "3.2-compliance",
+    "kind": "concept",
+    "front": "Why does a new log sink not export the audit logs from last year?",
+    "back": "A sink routes only the log entries that arrive after you create it. To export older entries, copy them from the log bucket to Cloud Storage.",
+    "aws": null,
+    "source": {
+      "title": "Route log entries",
+      "url": "https://docs.cloud.google.com/logging/docs/routing/overview",
+      "evidence": "Log sinks can't retroactively route log entries. That is, a log sink can't route a log entry that was received before the sink was created."
+    }
+  }
+]

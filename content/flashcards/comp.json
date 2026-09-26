@@ -1,0 +1,782 @@
+[
+  {
+    "id": "comp-f001",
+    "note": "1.3-compute-choice",
+    "kind": "concept",
+    "front": "Which runtime does Google recommend that you consider first for a new containerized workload?",
+    "back": "Serverless (Cloud Run), unless you need Kubernetes. If the workload does not fit serverless, Google recommends GKE Autopilot.",
+    "aws": null,
+    "source": {
+      "title": "Select a managed container runtime environment",
+      "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+      "evidence": "If you don't need Kubernetes, then we recommend that you consider whether your application is a good fit for serverless. If there are criteria that make your workload less suitable for serverless, then we recommend using Autopilot."
+    }
+  },
+  {
+    "id": "comp-f002",
+    "note": "1.3-compute-choice",
+    "kind": "term",
+    "front": "Cloud Run worker pool",
+    "back": "A Cloud Run resource for always-on, pull-based background work with no HTTP endpoint, such as Kafka or Pub/Sub pull consumers. It does not scale automatically: you set the instance count, or you deploy the CREMA autoscaler.",
+    "aws": null,
+    "source": {
+      "title": "What is Cloud Run",
+      "url": "https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run",
+      "evidence": "Worker pools are designed for workloads that don't rely on handling HTTP requests. They provide a flexible and scalable pool of compute resources tailored for continuous, non-HTTP, pull-based background processing."
+    }
+  },
+  {
+    "id": "comp-f003",
+    "note": "1.3-compute-choice",
+    "kind": "concept",
+    "front": "Which Cloud Run resource should you choose for a batch script that runs for several hours?",
+    "back": "A Cloud Run job. A job task can run for up to 168 hours (7 days), or for up to 1 hour when the task uses GPUs.",
+    "aws": null,
+    "source": {
+      "title": "Set task timeout for jobs",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/task-timeout",
+      "evidence": "you can change this to a shorter time or a longer time up to 168 hours (7 days). For tasks using GPUs, the maximum available timeout is 1 hour."
+    }
+  },
+  {
+    "id": "comp-f004",
+    "note": "1.3-compute-choice",
+    "kind": "term",
+    "front": "Cloud Run functions",
+    "back": "A Cloud Run service that Cloud Run deploys from your source code (formerly Cloud Functions 2nd gen). HTTP functions can run for up to 60 minutes and process up to 1,000 concurrent requests per instance. 1st gen functions allow 9 minutes and 1 request.",
+    "aws": "AWS Lambda",
+    "source": {
+      "title": "Compare Cloud Run functions",
+      "url": "https://docs.cloud.google.com/run/docs/functions/comparison",
+      "evidence": "A function is a Cloud Run service that is deployed from source code"
+    }
+  },
+  {
+    "id": "comp-f005",
+    "note": "1.3-compute-choice",
+    "kind": "term",
+    "front": "GKE Autopilot",
+    "back": "The default and recommended GKE mode of operation. Google manages node provisioning, scaling, and the default security posture, and you pay for the resources that general-purpose Pods request. Use it when a workload needs Kubernetes or does not fit Cloud Run.",
+    "aws": "Amazon EKS",
+    "source": {
+      "title": "Select a managed container runtime environment",
+      "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+      "evidence": "GKE Autopilot is the default and recommended cluster mode of operation in GKE. Autopilot lets you run applications on Kubernetes without the overhead of managing infrastructure."
+    }
+  },
+  {
+    "id": "comp-f006",
+    "note": "1.3-compute-choice",
+    "kind": "concept",
+    "front": "Which GKE mode of operation should you choose when a workload needs privileged Pods?",
+    "back": "GKE Standard. Autopilot applies best-practice constraints that prevent privileged Pods. In Standard, you can configure Pods in any way, but you manage the node pools.",
+    "aws": null,
+    "source": {
+      "title": "About GKE modes of operation",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/choose-cluster-mode",
+      "evidence": "You can configure Pods in any way that you want, such as by enabling privileged mode."
+    }
+  },
+  {
+    "id": "comp-f007",
+    "note": "1.3-compute-choice",
+    "kind": "concept",
+    "front": "Which platform does Google recommend instead of App Engine for new projects?",
+    "back": "Cloud Run. Google recommends Cloud Run for new projects and for the modernization of existing App Engine apps.",
+    "aws": null,
+    "source": {
+      "title": "Choose an App Engine environment",
+      "url": "https://docs.cloud.google.com/appengine/docs/the-appengine-environments",
+      "evidence": "For new Google Cloud users, we recommend using Cloud Run as the preferred alternative over App Engine."
+    }
+  },
+  {
+    "id": "comp-f008",
+    "note": "1.3-compute-choice",
+    "kind": "term",
+    "front": "Google Cloud VMware Engine",
+    "back": "A Google-managed service that runs the VMware stack (vSphere, vCenter, vSAN, NSX, HCX) on dedicated Google Cloud bare metal. Use it to migrate VMware workloads and keep the existing VMware tools, skills, and processes.",
+    "aws": "VMware Cloud on AWS",
+    "source": {
+      "title": "VMware Engine overview",
+      "url": "https://docs.cloud.google.com/vmware-engine/docs/overview",
+      "evidence": "VMware Engine includes vSphere, vCenter, vSAN, NSX, HCX, and corresponding tools, so it's fully compatible with your existing VMware tools, skills training, and the processes used by teams already familiar with VMware."
+    }
+  },
+  {
+    "id": "comp-f009",
+    "note": "1.3-compute-choice",
+    "kind": "term",
+    "front": "Bare Metal Solution",
+    "back": "Bare-metal servers for specialized workloads, with a bring-your-own-license (BYOL) model. Google manages the infrastructure and the network. You manage the OS, the databases, backups, and patches, so it is not a managed database.",
+    "aws": "Amazon RDS for Oracle",
+    "source": {
+      "title": "Bare Metal Solution overview",
+      "url": "https://docs.cloud.google.com/bare-metal/docs/bms-overview",
+      "evidence": "You are responsible for the licensing of all of your software. Bare Metal Solution uses a bring-your-own-license (BYOL) model."
+    }
+  },
+  {
+    "id": "comp-f010",
+    "note": "1.3-compute-choice",
+    "kind": "term",
+    "front": "Batch",
+    "back": "A managed service that queues and runs batch jobs, such as HPC, ML, or data processing, on Compute Engine VMs. Batch creates and deletes the VMs for each job. Batch itself has no additional cost.",
+    "aws": "AWS Batch",
+    "source": {
+      "title": "Get started with Batch",
+      "url": "https://docs.cloud.google.com/batch/docs/get-started",
+      "evidence": "Batch is a fully managed service that lets you schedule, queue, and execute batch processing workloads on Google Cloud resources. For example, consider using Batch for high performance computing (HPC), machine learning (ML), and data-processing workloads."
+    }
+  },
+  {
+    "id": "comp-f011",
+    "note": "1.3-compute-choice",
+    "kind": "concept",
+    "front": "Which runtime does Google recommend for a containerized app that ships as a Helm chart?",
+    "back": "GKE Autopilot. Cloud Run does not support Kubernetes, so an app that depends on Kubernetes APIs, custom resources, or Helm goes to Autopilot.",
+    "aws": null,
+    "source": {
+      "title": "Select a managed container runtime environment",
+      "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+      "evidence": "In these scenarios, Autopilot is the target runtime environment because Cloud Run doesn't support Kubernetes."
+    }
+  },
+  {
+    "id": "comp-f012",
+    "note": "1.3-compute-choice",
+    "kind": "concept",
+    "front": "What happened to the features of the GKE Enterprise edition?",
+    "back": "GKE Enterprise no longer exists as a separate edition. Its features are now part of GKE, or are separate products that you use with GKE. GKE is one offering without editions or tiers.",
+    "aws": null,
+    "source": {
+      "title": "GKE Enterprise release notes",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/enterprise/docs/release-notes",
+      "evidence": "The features that were part of GKE Enterprise have become part of the standard Google Kubernetes Engine (GKE) offering, or are products or features that you can use in addition to GKE."
+    }
+  },
+  {
+    "id": "comp-f013",
+    "note": "1.3-compute-resources",
+    "kind": "concept",
+    "front": "Which Compute Engine machine family fits extra-large SAP HANA in-memory databases?",
+    "back": "The memory-optimized family, for example the X4, M4, and M3 series. It gives more memory per core than the other machine families.",
+    "aws": null,
+    "source": {
+      "title": "Machine families resource and comparison guide",
+      "url": "https://docs.cloud.google.com/compute/docs/machine-resource",
+      "evidence": "Memory-optimized—ideal for memory-intensive workloads, offering more memory per core than other machine families, with up to 12 TB of memory."
+    }
+  },
+  {
+    "id": "comp-f014",
+    "note": "1.3-compute-resources",
+    "kind": "concept",
+    "front": "What is the difference between Compute Engine bare metal instances and Bare Metal Solution?",
+    "back": "They are not related. Compute Engine bare metal instances use `-metal` machine types with no hypervisor, and they run in VPC networks like VM instances. Bare Metal Solution is a separate service.",
+    "aws": null,
+    "source": {
+      "title": "Machine families resource and comparison guide",
+      "url": "https://docs.cloud.google.com/compute/docs/machine-resource",
+      "evidence": "Compute Engine bare metal instances aren't related to Bare Metal Solution."
+    }
+  },
+  {
+    "id": "comp-f015",
+    "note": "1.3-compute-resources",
+    "kind": "term",
+    "front": "Custom machine type",
+    "back": "A machine type where you set the vCPU count and the memory, on the N and E general-purpose series and G2. Use it when no predefined shape fits, or to match per-vCPU software licenses. It costs more than an equivalent predefined type.",
+    "aws": null,
+    "source": {
+      "title": "Create a VM with a custom machine type",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type",
+      "evidence": "Specifically, you can create a VM instance with a custom number of vCPUs and amount of memory, effectively using a custom machine type."
+    }
+  },
+  {
+    "id": "comp-f016",
+    "note": "1.3-compute-resources",
+    "kind": "term",
+    "front": "Extended memory",
+    "back": "Memory above the default per-vCPU maximum of a custom machine type, on N4, N4A, N4D, N2, N2D, and N1. Use it for in-memory databases, or to add memory without more vCPUs when software is licensed per vCPU. E2 and G2 custom types do not support it.",
+    "aws": null,
+    "source": {
+      "title": "Create a VM with a custom machine type",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type",
+      "evidence": "For a premium, you can get more memory per vCPU beyond the default maximum up to the machine series limit. This is referred to as extended memory."
+    }
+  },
+  {
+    "id": "comp-f017",
+    "note": "1.3-compute-resources",
+    "kind": "term",
+    "front": "Spot VMs",
+    "back": "Excess Compute Engine capacity at discounts of up to 91%. Compute Engine can preempt them at any time, and no SLA covers them. Use them for fault-tolerant work such as batch jobs.",
+    "aws": "EC2 Spot Instances",
+    "source": {
+      "title": "Spot VMs",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+      "evidence": "This provisioning model lets you obtain resources at much lower prices compared to standard VMs. However, Compute Engine can preempt Spot VMs at any time to reclaim resources. Use Spot VMs to reduce costs for fault-tolerant workloads."
+    }
+  },
+  {
+    "id": "comp-f018",
+    "note": "1.3-compute-resources",
+    "kind": "concept",
+    "front": "Which runtime limit applies to preemptible VMs but not to Spot VMs?",
+    "back": "Compute Engine always stops preemptible VMs after 24 hours. Spot VMs have no maximum runtime, and Google recommends them instead of preemptible VMs.",
+    "aws": null,
+    "source": {
+      "title": "Preemptible VM instances",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/preemptible",
+      "evidence": "preemptible VMs can only run for up to 24 hours at a time, but Spot VMs don't have a maximum runtime unless you limit the runtime."
+    }
+  },
+  {
+    "id": "comp-f019",
+    "note": "1.3-compute-resources",
+    "kind": "concept",
+    "front": "What must you add to committed use discounts to get assured zonal capacity?",
+    "back": "Reservations. Commitments give a discount, but they do not reserve zonal capacity. For both a discount and assured capacity, buy commitments and also create reservations.",
+    "aws": null,
+    "source": {
+      "title": "Combine reservations with committed use discounts",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/reservations-with-commitments",
+      "evidence": "However, commitments don't reserve zonal capacity for your committed resources. To get zonal resources at discounted prices and also ensure that capacity is reserved for them, you must both purchase commitments and create reservations for those zonal resources."
+    }
+  },
+  {
+    "id": "comp-f020",
+    "note": "1.3-compute-resources",
+    "kind": "term",
+    "front": "Sole-tenant nodes",
+    "back": "Physical Compute Engine servers that host only your project's VMs. Use them when compliance requires physical isolation from other VMs, or for BYOL licenses that are per core or per processor.",
+    "aws": "EC2 Dedicated Hosts",
+    "source": {
+      "title": "Sole-tenancy overview",
+      "url": "https://docs.cloud.google.com/compute/docs/nodes/sole-tenant-nodes",
+      "evidence": "Sole-tenancy provides exclusive access to a sole-tenant node, a physical Compute Engine server that is dedicated to hosting only your project's VMs. Use sole-tenant nodes to keep your VMs physically separated from VMs in other projects"
+    }
+  },
+  {
+    "id": "comp-f021",
+    "note": "1.3-compute-resources",
+    "kind": "concept",
+    "front": "Which BYOL cases on Compute Engine do not need sole-tenant nodes?",
+    "back": "Linux BYOS for RHEL or SLES, and Microsoft applications such as SQL Server through Microsoft License Mobility. Physical-core or physical-processor licenses with dedicated hardware terms still need sole-tenant nodes.",
+    "aws": null,
+    "source": {
+      "title": "Bringing your own licenses",
+      "url": "https://docs.cloud.google.com/compute/docs/nodes/bringing-your-own-licenses",
+      "evidence": "Licensing scenarios such as licenses related to Linux BYOS with RHEL or SLES, as well as Microsoft applications don't require sole-tenant nodes."
+    }
+  },
+  {
+    "id": "comp-f022",
+    "note": "1.3-compute-resources",
+    "kind": "term",
+    "front": "Shielded VM",
+    "back": "A Compute Engine VM feature that verifies boot integrity with Secure Boot, a vTPM, and integrity monitoring. Use it to protect VMs against boot-level and kernel-level malware and rootkits.",
+    "aws": null,
+    "source": {
+      "title": "Shielded VM overview",
+      "url": "https://docs.cloud.google.com/compute/shielded-vm/docs/shielded-vm",
+      "evidence": "Shielded VM offers verifiable integrity of your Compute Engine VM instances, so you can be confident your instances haven't been compromised by boot- or kernel-level malware or rootkits."
+    }
+  },
+  {
+    "id": "comp-f023",
+    "note": "1.3-compute-resources",
+    "kind": "concept",
+    "front": "Which Compute Engine VM type protects data in use, while it is in memory?",
+    "back": "Confidential VM. It uses hardware-based memory encryption to help prevent reading or changing data and applications while they are in use.",
+    "aws": null,
+    "source": {
+      "title": "Confidential VM overview",
+      "url": "https://docs.cloud.google.com/confidential-computing/confidential-vm/docs/confidential-vm-overview",
+      "evidence": "Confidential VM instances are a type of Compute Engine virtual machine. They use hardware-based memory encryption to help ensure that your data and applications can't be read or modified while in use."
+    }
+  },
+  {
+    "id": "comp-f024",
+    "note": "1.3-compute-resources",
+    "kind": "concept",
+    "front": "Why do Compute Engine VMs with attached GPUs stop during host maintenance?",
+    "back": "VMs with attached GPUs cannot live migrate. Compute Engine stops them and gives a 1-hour notice through the metadata server, so design the workload for restarts.",
+    "aws": null,
+    "source": {
+      "title": "Handle GPU host maintenance events",
+      "url": "https://docs.cloud.google.com/compute/docs/gpus/gpu-host-maintenance",
+      "evidence": "When Compute Engine performs maintenance on a Compute Engine instance with attached graphics processing units (GPUs), the compute instance must be stopped. This is because compute instances with attached GPUs can't be live migrated."
+    }
+  },
+  {
+    "id": "comp-f025",
+    "note": "2.3-compute-engine-ops",
+    "kind": "term",
+    "front": "Instance template",
+    "back": "A saved VM configuration, such as the machine type, boot disk image, and startup script, that a MIG uses to create identical VMs. You cannot update it, so you create a new template. Google recommends regional templates unless you reuse a template across regions.",
+    "aws": "EC2 launch template",
+    "source": {
+      "title": "Instance templates",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-templates",
+      "evidence": "Instance templates are designed to create VMs with identical configurations. You can't update instance templates after they're created."
+    }
+  },
+  {
+    "id": "comp-f026",
+    "note": "2.3-compute-engine-ops",
+    "kind": "term",
+    "front": "Image family",
+    "back": "A group of related images that points to the latest image in the family, so automation can use the family name. To roll back, deprecate the newest image. The family then points to the previous image, if that image is not deprecated.",
+    "aws": "AMI",
+    "source": {
+      "title": "Image families best practices",
+      "url": "https://docs.cloud.google.com/compute/docs/images/image-families-best-practices",
+      "evidence": "To roll an image family back to a previous image version, you can deprecate the most recent image in that family, provided that the previous image is not deprecated."
+    }
+  },
+  {
+    "id": "comp-f027",
+    "note": "2.3-compute-engine-ops",
+    "kind": "term",
+    "front": "Regional MIG",
+    "back": "A managed instance group that spreads its VMs across several zones of one region, three by default. Google recommends it over a zonal MIG because the other zones keep serving when one zone fails.",
+    "aws": "EC2 Auto Scaling group",
+    "source": {
+      "title": "About regional MIGs",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+      "evidence": "By default, a regional MIG distributes its managed instances evenly across three zones."
+    }
+  },
+  {
+    "id": "comp-f028",
+    "note": "2.3-compute-engine-ops",
+    "kind": "concept",
+    "front": "By how much should you overprovision a regional MIG in three zones to survive a zone failure?",
+    "back": "By at least 50%, to a group size of 150%. After a zone failure, the MIG does not add VMs unless autoscaling is on, so the other two zones must carry all traffic.",
+    "aws": null,
+    "source": {
+      "title": "About regional MIGs",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+      "evidence": "When you create a regional MIG in a region with at least three zones, Google recommends overprovisioning your group by at least 50%."
+    }
+  },
+  {
+    "id": "comp-f029",
+    "note": "2.3-compute-engine-ops",
+    "kind": "term",
+    "front": "Autohealing",
+    "back": "A MIG feature that recreates VMs whose application fails a health check. Use a separate autohealing health check that is more conservative than the load balancing health check, so that the MIG does not recreate VMs that are only busy.",
+    "aws": null,
+    "source": {
+      "title": "Set up an application-based health check and autohealing",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/autohealing-instances-in-migs",
+      "evidence": "Health checks for autohealing detect unhealthy VMs and proactively recreate those VMs, so this health check should be more conservative than a load balancing health check."
+    }
+  },
+  {
+    "id": "comp-f030",
+    "note": "2.3-compute-engine-ops",
+    "kind": "concept",
+    "front": "Which source ranges must firewall rules allow so that MIG health check probes reach the VMs?",
+    "back": "`130.211.0.0/22` and `35.191.0.0/16`. If a firewall rule blocks the probes, the MIG marks the VMs as `UNHEALTHY` and can recreate VMs that are healthy.",
+    "aws": null,
+    "source": {
+      "title": "Set up an application-based health check and autohealing",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/autohealing-instances-in-migs",
+      "evidence": "Health check probes come from addresses in the ranges `130.211.0.0/22` and `35.191.0.0/16`, so make sure your network firewall rules allow the health check to connect."
+    }
+  },
+  {
+    "id": "comp-f031",
+    "note": "2.3-compute-engine-ops",
+    "kind": "concept",
+    "front": "Which MIG autoscaling signals can scale the group in to zero VMs?",
+    "back": "Schedules, and Cloud Monitoring metrics that do not come from the VMs of the MIG, with the minimum size set to `0`. CPU utilization and load balancing serving capacity cannot scale a MIG to zero.",
+    "aws": null,
+    "source": {
+      "title": "Autoscaling groups of instances",
+      "url": "https://docs.cloud.google.com/compute/docs/autoscaler",
+      "evidence": "However, you can use other Monitoring metrics when scaling in to zero instances, provided you set the minimum number of instances (`autoscalingPolicy.minNumReplicas`) to `0`."
+    }
+  },
+  {
+    "id": "comp-f032",
+    "note": "2.3-compute-engine-ops",
+    "kind": "concept",
+    "front": "Which MIG update settings keep full serving capacity during a rolling update?",
+    "back": "Set `maxUnavailable` to `0` and `maxSurge` above `0`. The MIG then removes each old VM only after its replacement runs.",
+    "aws": null,
+    "source": {
+      "title": "Automatically apply VM configuration updates in a MIG",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/rolling-out-updates-to-managed-instance-groups",
+      "evidence": "If you do not want any unavailable machines during an update, set the `maxUnavailable` value to `0` and the `maxSurge` value to greater than 0."
+    }
+  },
+  {
+    "id": "comp-f033",
+    "note": "2.3-compute-engine-ops",
+    "kind": "concept",
+    "front": "How do you roll back a MIG rolling update?",
+    "back": "Start a new update with the previous instance template. MIGs have no rollback command.",
+    "aws": null,
+    "source": {
+      "title": "Automatically apply VM configuration updates in a MIG",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/rolling-out-updates-to-managed-instance-groups",
+      "evidence": "you can do so by making a new update request and passing in the instance template that you want to roll back to."
+    }
+  },
+  {
+    "id": "comp-f034",
+    "note": "2.3-compute-engine-ops",
+    "kind": "term",
+    "front": "Stateful MIG",
+    "back": "A MIG that keeps the name, persistent disks, IP addresses, and metadata of each VM when it recreates or updates VMs. Use it for databases such as Cassandra and for legacy monoliths, after you consider managed services. It cannot autoscale.",
+    "aws": null,
+    "source": {
+      "title": "Stateful managed instance groups",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/stateful-migs",
+      "evidence": "A stateful managed instance group preserves the unique state of each instance (including instance name, attached persistent disks, IP addresses, and metadata) on VM restart, recreation, autohealing, or update."
+    }
+  },
+  {
+    "id": "comp-f035",
+    "note": "2.3-compute-engine-ops",
+    "kind": "term",
+    "front": "VM Manager",
+    "back": "A suite of Compute Engine services for the OS management of large VM fleets: Patch, OS inventory management, and OS policies. Use it to patch Windows and Linux VMs, collect OS inventory, and install or update software packages.",
+    "aws": "AWS Systems Manager",
+    "source": {
+      "title": "VM Manager",
+      "url": "https://docs.cloud.google.com/compute/vm-manager/docs/overview",
+      "evidence": "VM Manager is a suite of tools that can be used to manage operating systems for large virtual machine (VM) fleets running Windows and Linux on Compute Engine."
+    }
+  },
+  {
+    "id": "comp-f036",
+    "note": "2.3-compute-engine-ops",
+    "kind": "concept",
+    "front": "What does each VM need so that VM Manager can manage it?",
+    "back": "An active OS Config agent (`enable-osconfig=TRUE` in metadata) and an attached service account. The service account needs no IAM roles. The project also needs the OS Config API.",
+    "aws": null,
+    "source": {
+      "title": "Set up VM Manager",
+      "url": "https://docs.cloud.google.com/compute/vm-manager/docs/setup",
+      "evidence": "Verify that all VMs have an attached service account. You don't need to grant any IAM roles to this service account. VM Manager uses this service account to sign requests to the API service."
+    }
+  },
+  {
+    "id": "comp-f037",
+    "note": "2.3-gke",
+    "kind": "concept",
+    "front": "What control plane SLA does a zonal GKE Standard cluster get?",
+    "back": "99.5%. Autopilot clusters and regional Standard clusters get 99.95%.",
+    "aws": null,
+    "source": {
+      "title": "GKE pricing",
+      "url": "https://cloud.google.com/kubernetes-engine/pricing",
+      "evidence": "99.5% for the control plane of zonal Standard clusters."
+    }
+  },
+  {
+    "id": "comp-f038",
+    "note": "2.3-gke",
+    "kind": "term",
+    "front": "Release channels",
+    "back": "GKE channels (Rapid, Regular, Stable, Extended) that set how soon a cluster gets new versions. Google recommends that you enroll clusters in a channel, and Regular is the default. Rapid versions are excluded from the GKE SLA.",
+    "aws": null,
+    "source": {
+      "title": "About release channels",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/release-channels",
+      "evidence": "We recommend enrolling your cluster in a release channel, as this gives you the most control with regards to the scope of maintenance exclusions—preventing specific types of upgrades instead of all upgrades—and sequencing the rollout of cluster upgrades."
+    }
+  },
+  {
+    "id": "comp-f039",
+    "note": "2.3-gke",
+    "kind": "concept",
+    "front": "How should you keep a GKE cluster on its current version while you test a new one?",
+    "back": "Use a maintenance exclusion and stay in the release channel. \"No channel\" is deprecated, so do not leave the channel to stop upgrades.",
+    "aws": null,
+    "source": {
+      "title": "About release channels",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/release-channels",
+      "evidence": "If you need to keep a cluster on a specific version, for example to validate or test newer versions prior to upgrading, we recommend using maintenance exclusions."
+    }
+  },
+  {
+    "id": "comp-f040",
+    "note": "2.3-gke",
+    "kind": "concept",
+    "front": "What is the maximum length of a GKE \"No upgrades\" maintenance exclusion?",
+    "back": "90 days, and Google recommends less than 30 days. To hold a minor version longer, use a \"No minor upgrades\" exclusion, which can last until the end of support.",
+    "aws": null,
+    "source": {
+      "title": "Maintenance windows and exclusions",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/maintenance-windows-and-exclusions",
+      "evidence": "Cannot exceed 90 days. We recommend limiting the length of this type of maintenance exclusion to less than 30 days."
+    }
+  },
+  {
+    "id": "comp-f041",
+    "note": "2.3-gke",
+    "kind": "concept",
+    "front": "What does the GKE cluster autoscaler base its node scaling decisions on?",
+    "back": "The resource requests of the Pods, not the actual resource utilization. It adds nodes when Pods cannot be scheduled, so set explicit resource requests for all workloads.",
+    "aws": null,
+    "source": {
+      "title": "About GKE cluster autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler",
+      "evidence": "Cluster autoscaler makes these scaling decisions based on the resource requests (rather than actual resource utilization) of Pods running on that node pool's nodes."
+    }
+  },
+  {
+    "id": "comp-f042",
+    "note": "2.3-gke",
+    "kind": "concept",
+    "front": "What should you use to scale Pods horizontally on CPU and vertically on memory at the same time?",
+    "back": "Multidimensional Pod autoscaling, which is in beta. Do not use the Horizontal Pod Autoscaler and the Vertical Pod Autoscaler together on CPU or memory.",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+      "evidence": "You can configure multidimensional Pod autoscaling (in beta) in order to scale horizontally on CPU and vertically on memory at the same time."
+    }
+  },
+  {
+    "id": "comp-f043",
+    "note": "2.3-gke",
+    "kind": "term",
+    "front": "DNS-based endpoint",
+    "back": "The recommended way to reach a GKE control plane: a stable DNS name that any network with access to Google Cloud APIs can reach. IAM controls access, and VPC Service Controls can add a second layer. No bastion host is necessary.",
+    "aws": null,
+    "source": {
+      "title": "About network isolation in GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/network-isolation",
+      "evidence": "Enabling the DNS-based endpoint eliminates the need for a bastion host or proxy nodes to access the control plane from other VPC networks or external locations."
+    }
+  },
+  {
+    "id": "comp-f044",
+    "note": "2.3-gke",
+    "kind": "term",
+    "front": "Multi-cluster Gateway",
+    "back": "A GKE Gateway that gives one entry point for Services in several GKE clusters. All the clusters must be registered to one fleet, and you deploy the Gateway resources only to the config cluster.",
+    "aws": null,
+    "source": {
+      "title": "About multi-cluster Gateways",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-gateways",
+      "evidence": "Multi-cluster Gateways uses Google Cloud's global load-balancing infrastructure to provide a single, unified entry point for your applications."
+    }
+  },
+  {
+    "id": "comp-f045",
+    "note": "2.3-gke",
+    "kind": "term",
+    "front": "Workload Identity Federation for GKE",
+    "back": "The recommended way for GKE workloads to call Google Cloud APIs. IAM treats a Kubernetes ServiceAccount as a principal, so you grant IAM roles to it directly and need no service account key files.",
+    "aws": "EKS Pod Identity or IAM roles for service accounts",
+    "source": {
+      "title": "About Workload Identity Federation for GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+      "evidence": "In most cases, Workload Identity Federation for GKE is the recommended way to help secure and manage how your workloads that run on GKE access Google Cloud services."
+    }
+  },
+  {
+    "id": "comp-f046",
+    "note": "2.3-gke",
+    "kind": "concept",
+    "front": "Why should an untrusted GKE cluster not share a project with trusted clusters?",
+    "back": "All clusters in a project share one workload identity pool. IAM treats the same namespace and ServiceAccount in two clusters as one identity, so both get the same access. Use a separate project, distinct namespaces, or conditional IAM policies.",
+    "aws": null,
+    "source": {
+      "title": "About Workload Identity Federation for GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+      "evidence": "For example, if you have the same namespace in two clusters and you grant access to that namespace in IAM, the workloads in that namespace in both clusters get that access."
+    }
+  },
+  {
+    "id": "comp-f047",
+    "note": "2.3-gke",
+    "kind": "term",
+    "front": "Backup for GKE",
+    "back": "A managed service that backs up Kubernetes resource manifests and persistent volume snapshots. It can restore them into the same cluster or into another cluster, and scheduled backups help you meet your RPO.",
+    "aws": null,
+    "source": {
+      "title": "Backup for GKE overview",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/add-on/backup-for-gke/concepts/backup-for-gke",
+      "evidence": "Backup for GKE is a managed service for backing up and restoring workloads and persistent data in GKE clusters."
+    }
+  },
+  {
+    "id": "comp-f048",
+    "note": "2.3-gke",
+    "kind": "term",
+    "front": "Spot Pods",
+    "back": "Autopilot Pods that run on nodes backed by Spot VMs, at a lower price. GKE can evict them at any time, with a grace period of 15 seconds at most. Use the `cloud.google.com/gke-spot=true` label for stateless, batch, or fault-tolerant work.",
+    "aws": null,
+    "source": {
+      "title": "Run fault-tolerant workloads at lower costs in Spot Pods",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/autopilot-spot-pods",
+      "evidence": "Spot Pods are ideal for running stateless, batch, or fault-tolerant workloads at lower costs compared to running those workloads as standard Pods."
+    }
+  },
+  {
+    "id": "comp-f049",
+    "note": "2.3-serverless",
+    "kind": "term",
+    "front": "Minimum instances",
+    "back": "A Cloud Run setting that keeps idle instances warm and ready, which reduces latency when the service scales from zero. Idle instances have a charge. Google recommends that you set it at the service level, not at the revision level.",
+    "aws": null,
+    "source": {
+      "title": "Set minimum instances",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/min-instances",
+      "evidence": "Google recommends that you apply minimum instances at the service level and avoid combining service-level and revision-level minimum instances."
+    }
+  },
+  {
+    "id": "comp-f050",
+    "note": "2.3-serverless",
+    "kind": "concept",
+    "front": "Which Cloud Run setting limits the number of connections to a backing database?",
+    "back": "Maximum instances. It limits the number of instances, so it also limits cost and the connections to a backing service such as a database.",
+    "aws": null,
+    "source": {
+      "title": "Set maximum instances",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/max-instances",
+      "evidence": "You can use this setting as a way to control your costs or to limit the number of connections to a backing service, such as to a database."
+    }
+  },
+  {
+    "id": "comp-f051",
+    "note": "2.3-serverless",
+    "kind": "term",
+    "front": "Instance-based billing",
+    "back": "A Cloud Run billing setting (formerly CPU always allocated) that charges for the whole instance lifecycle and gives CPU outside requests. Use it for background work after the response or for steady traffic. Request-based billing is the default for services; jobs always use instance-based billing.",
+    "aws": null,
+    "source": {
+      "title": "Billing settings for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+      "evidence": "Instance-based billing can be useful for running short-lived background tasks and other asynchronous processing tasks. This setting was previously called CPU always allocated."
+    }
+  },
+  {
+    "id": "comp-f052",
+    "note": "2.3-serverless",
+    "kind": "concept",
+    "front": "Which Cloud Run ingress setting fits a service that must take internet traffic only through an external Application Load Balancer?",
+    "back": "Internal and Cloud Load Balancers (gcloud value `internal-and-cloud-load-balancing`). It blocks direct internet requests to the `run.app` URL, so internet requests must pass load balancer features such as Cloud Armor, IAP, and Cloud CDN.",
+    "aws": null,
+    "source": {
+      "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+      "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+      "evidence": "Accept requests from the internet through the external Application Load Balancer. Direct requests to the `run.app` URL from the internet are not allowed."
+    }
+  },
+  {
+    "id": "comp-f053",
+    "note": "2.3-serverless",
+    "kind": "concept",
+    "front": "How should you make a Cloud Run service public when an organization policy blocks `allUsers`?",
+    "back": "Disable the Cloud Run Invoker IAM check. Google recommends this way to make a service public, and it works under the domain restricted sharing constraint.",
+    "aws": null,
+    "source": {
+      "title": "Allowing public (unauthenticated) access",
+      "url": "https://docs.cloud.google.com/run/docs/authenticating/public",
+      "evidence": "The recommended way to make a public service is to disable the Cloud Run Invoker IAM check."
+    }
+  },
+  {
+    "id": "comp-f054",
+    "note": "2.3-serverless",
+    "kind": "term",
+    "front": "Cloud Run Invoker role (`roles/run.invoker`)",
+    "back": "The IAM role that lets a principal call a Cloud Run service. For service-to-service calls, grant it to the service account of the calling service, on the receiving service. The caller sends a Google-signed OpenID Connect ID token.",
+    "aws": null,
+    "source": {
+      "title": "Authenticating service-to-service",
+      "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+      "evidence": "making the calling service's service account a principal on the receiving service. Then you grant that service account the Cloud Run Invoker (`roles/run.invoker`) role."
+    }
+  },
+  {
+    "id": "comp-f055",
+    "note": "2.3-serverless",
+    "kind": "term",
+    "front": "Direct VPC egress",
+    "back": "The recommended way for Cloud Run services and jobs to send traffic to a VPC network, with no Serverless VPC Access connector. It has lower latency, higher throughput, and no connector VMs to pay for, but it uses more IP addresses.",
+    "aws": null,
+    "source": {
+      "title": "Compare Direct VPC egress and VPC connectors",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/connecting-vpc",
+      "evidence": "Setup: Cloud Run services and jobs can send traffic to a VPC network without the overhead of managing a Serverless VPC Access connector."
+    }
+  },
+  {
+    "id": "comp-f056",
+    "note": "2.3-serverless",
+    "kind": "concept",
+    "front": "What does Google recommend to serve a production Cloud Run service on a custom domain?",
+    "back": "A global external Application Load Balancer. It supports your own TLS certificates, URL path routing, Cloud CDN, and Cloud Armor. Cloud Run domain mapping is in Preview and is not production-ready.",
+    "aws": null,
+    "source": {
+      "title": "Mapping custom domains",
+      "url": "https://docs.cloud.google.com/run/docs/mapping-custom-domains",
+      "evidence": "Use a global external Application Load Balancer (Recommended)"
+    }
+  },
+  {
+    "id": "comp-f057",
+    "note": "2.3-serverless",
+    "kind": "concept",
+    "front": "What must you add so that a multi-region Cloud Run setup fails over when a region returns errors?",
+    "back": "Cloud Run service health or outlier detection. Serverless NEGs behind one global external Application Load Balancer do not send requests to another region when a regional service returns errors.",
+    "aws": null,
+    "source": {
+      "title": "Serve traffic from multiple regions",
+      "url": "https://docs.cloud.google.com/run/docs/multiple-regions",
+      "evidence": "The architecture described in the following sections does not automatically route requests to a different region when a regional Cloud Run service becomes unresponsive or returns errors."
+    }
+  },
+  {
+    "id": "comp-f058",
+    "note": "2.3-serverless",
+    "kind": "concept",
+    "front": "Which service must deliver events to an event-driven Cloud Run function?",
+    "back": "Eventarc. Event-driven functions must use Eventarc triggers, and Pub/Sub and Cloud Storage triggers are types of Eventarc triggers. HTTP functions answer HTTPS requests instead.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Run function triggers",
+      "url": "https://docs.cloud.google.com/run/docs/function-triggers",
+      "evidence": "You must use Eventarc, Google's implementation of the CloudEvents spec that supports building event-driven architectures, to trigger functions in response to specified events."
+    }
+  },
+  {
+    "id": "comp-f059",
+    "note": "2.3-serverless",
+    "kind": "term",
+    "front": "Standard VMware Engine network",
+    "back": "The default, global network type of VMware Engine. It connects private clouds, VPC networks, and on-premises networks, and a VPC network connects to it through VPC Network Peering. Only projects created before November 2023 use regional Legacy networks.",
+    "aws": null,
+    "source": {
+      "title": "About VMware Engine networks",
+      "url": "https://docs.cloud.google.com/vmware-engine/docs/networking/vmware-engine-network",
+      "evidence": "By default, VMware Engine offers a global VMware network which provides network connectivity between one or more private clouds, Virtual Private Cloud networks, or on-premises networks. These global VMware networks are referred to as Standard VMware Engine Networks."
+    }
+  },
+  {
+    "id": "comp-f060",
+    "note": "2.3-serverless",
+    "kind": "concept",
+    "front": "When must you choose the final vSphere/vSAN subnets range for a VMware Engine private cloud?",
+    "back": "When you create the private cloud. You cannot change the range later without deleting the private cloud. The prefix must be between /24 and /20, and it must not overlap on-premises, VPC, or workload subnets.",
+    "aws": null,
+    "source": {
+      "title": "Networking requirements",
+      "url": "https://docs.cloud.google.com/vmware-engine/docs/quickstart-networking-requirements",
+      "evidence": "VMware Engine divides the vSphere/vSAN subnets CIDR range into different subnets during private cloud deployment, and you cannot change this range after private cloud creation without deleting the private cloud."
+    }
+  }
+]

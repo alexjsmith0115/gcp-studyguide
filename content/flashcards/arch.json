@@ -1,0 +1,1146 @@
+[
+  {
+    "id": "arch-f001",
+    "note": "1.1-business-requirements",
+    "kind": "term",
+    "front": "Non-functional requirement",
+    "back": "A requirement for an area such as reliability, security, performance, cost, or operational efficiency. These requirements have dependencies and trade-offs. When you assess reliability requirements, consider them together with the other requirements.",
+    "aws": null,
+    "source": {
+      "title": "Assess the reliability requirements for your cloud workloads",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+      "evidence": "Besides reliability requirements, enterprise applications can have other important non-functional requirements for security, performance, cost, and operational efficiency. When you assess the reliability requirements of an application, consider the dependencies and trade-offs with these other requirements."
+    }
+  },
+  {
+    "id": "arch-f002",
+    "note": "1.1-business-requirements",
+    "kind": "concept",
+    "front": "Why should you assess reliability requirements separately for each component and operation?",
+    "back": "So that you focus your money and effort on the parts that are critical for the business. For example, writes to an orders database can need higher reliability than reads.",
+    "aws": null,
+    "source": {
+      "title": "Assess the reliability requirements for your cloud workloads",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+      "evidence": "Assessing the reliability requirements of your workloads granularly helps you focus your spending and effort on the workloads that are critical for your business."
+    }
+  },
+  {
+    "id": "arch-f003",
+    "note": "1.1-business-requirements",
+    "kind": "term",
+    "front": "Critical periods",
+    "back": "Times when an application is more critical to the business than usual, often at peak load. Identify them, plan enough capacity, and test against peak load. A production code freeze reduces the risk of an outage in these periods.",
+    "aws": null,
+    "source": {
+      "title": "Assess the reliability requirements for your cloud workloads",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+      "evidence": "There might be periods when an application is more business-critical than at other times. These periods are often the times when the application has peak load."
+    }
+  },
+  {
+    "id": "arch-f004",
+    "note": "1.1-business-requirements",
+    "kind": "term",
+    "front": "Measurement window",
+    "back": "The period over which you measure an availability target. 99.99% annual availability allows a 45-minute outage once a year. 99.99% monthly availability allows at most 4.3 minutes of downtime each month.",
+    "aws": null,
+    "source": {
+      "title": "Assess the reliability requirements for your cloud workloads",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/requirements",
+      "evidence": "For example, one team might consider a 45-minute outage once a year (that is, 99.99% annual availability) as acceptable. But another team might expect a maximum downtime of 4.3 minutes per month (that is, 99.99% monthly availability)."
+    }
+  },
+  {
+    "id": "arch-f005",
+    "note": "1.1-business-requirements",
+    "kind": "term",
+    "front": "Vision statement",
+    "back": "A statement of the targeted business use case, its objectives, and why the current environment does not meet them. Write it first, and get stakeholder sign-off on the objectives before the next planning steps. It helps avoid competing stakeholder visions.",
+    "aws": null,
+    "source": {
+      "title": "Plan a hybrid and multicloud strategy",
+      "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/strategy",
+      "evidence": "Agreeing on the key business and technical objectives and drivers, then obtaining relevant stakeholder sign-off can provide a foundation for the next steps in the planning process."
+    }
+  },
+  {
+    "id": "arch-f006",
+    "note": "1.1-business-requirements",
+    "kind": "concept",
+    "front": "What is the difference between a refactor migration and a re-architect migration?",
+    "back": "A refactor restructures how the code works, so that it can use cloud capabilities. A re-architect changes how the code functions, for example it splits a monolith into independent microservices.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "Re-architect migrations are similar to refactor migrations. However, instead of restructuring how the workload code works, re-architect migrations change how that code functions."
+    }
+  },
+  {
+    "id": "arch-f007",
+    "note": "1.1-business-requirements",
+    "kind": "concept",
+    "front": "Which migration type replaces a purchased on-premises workload with a SaaS equivalent?",
+    "back": "Repurchase, for example a move from on-premises collaboration software to Google Workspace. It can cost a lot more, and it gives less granular control of your environment.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "A repurchase migration is when you move from a purchased on-premises workload to a cloud-hosted software-as-a-service (SaaS) equivalent."
+    }
+  },
+  {
+    "id": "arch-f008",
+    "note": "1.1-business-requirements",
+    "kind": "term",
+    "front": "Unit cost",
+    "back": "A cost measure that relates cloud spend to a business unit of measure, such as revenue per customer or transaction volume. It shows whether more spend comes from profitable growth or from operational inefficiency.",
+    "aws": null,
+    "source": {
+      "title": "Align cloud spending with business value",
+      "url": "https://docs.cloud.google.com/architecture/framework/cost-optimization/align-cloud-spending-business-value",
+      "evidence": "By correlating cloud spending with business units of measure, such as revenue per customer or transaction volume, you can measure unit margins and verify that increasing spend is driven by profitable growth."
+    }
+  },
+  {
+    "id": "arch-f009",
+    "note": "1.1-business-requirements",
+    "kind": "concept",
+    "front": "Which measure should define reliability instead of server metrics such as CPU usage?",
+    "back": "A user-facing measure, such as the success ratio of user requests. High CPU usage is not an outage when users do not see a problem.",
+    "aws": null,
+    "source": {
+      "title": "Define reliability based on user-experience goals",
+      "url": "https://docs.cloud.google.com/architecture/framework/reliability/define-reliability-based-on-user-experience-goals",
+      "evidence": "Focus on metrics like the success ratio of user requests. Don't rely solely on server-centric metrics, like CPU usage, which can lead to misleading conclusions about your service's reliability."
+    }
+  },
+  {
+    "id": "arch-f010",
+    "note": "1.1-business-requirements",
+    "kind": "concept",
+    "front": "What does an SLA have that an SLO does not?",
+    "back": "Explicit consequences when the service misses its SLOs, such as a rebate or a penalty. A target without an explicit consequence is almost certainly an SLO.",
+    "aws": null,
+    "source": {
+      "title": "Service Level Objectives (Google SRE book)",
+      "url": "https://sre.google/sre-book/service-level-objectives/",
+      "evidence": "An easy way to tell the difference between an SLO and an SLA is to ask \"what happens if the SLOs aren’t met?\": if there is no explicit consequence, then you are almost certainly looking at an SLO."
+    }
+  },
+  {
+    "id": "arch-f011",
+    "note": "1.1-business-requirements",
+    "kind": "term",
+    "front": "Migration success criteria",
+    "back": "Measurable criteria that show whether a migration succeeded. Define them in the plan phase, with clear milestones for each migration phase or wave. Select them even when the hybrid setup is only for the short term.",
+    "aws": null,
+    "source": {
+      "title": "Plan a hybrid and multicloud strategy",
+      "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/strategy",
+      "evidence": "Decide on measurable success criteria for the migration, with clear milestones for each migration phase or wave. Selecting criteria is essential, even if the technical objective is to have the hybrid architecture as a short term setup."
+    }
+  },
+  {
+    "id": "arch-f012",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "concept",
+    "front": "Why is Cloud Tasks unsuitable when a user waits for the result?",
+    "back": "Cloud Tasks guarantees the delivery of a task, but not the timing of the delivery. Use it for asynchronous work outside the main request flow.",
+    "aws": null,
+    "source": {
+      "title": "Understand Cloud Tasks",
+      "url": "https://docs.cloud.google.com/tasks/docs/dual-overview",
+      "evidence": "While Cloud Tasks guarantees delivery of the task itself, it doesn't provide strong guarantees around the timing of task delivery and is therefore unsuitable for interactive applications where a user is waiting for the result."
+    }
+  },
+  {
+    "id": "arch-f013",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "term",
+    "front": "Implicit invocation",
+    "back": "The Pub/Sub delivery model: publishing an event causes the subscribers to run. The publisher does not need to know its subscribers and has no control over delivery, except the delivery guarantee. Cloud Tasks uses explicit invocation instead.",
+    "aws": null,
+    "source": {
+      "title": "Choosing Pub/Sub or Cloud Tasks",
+      "url": "https://docs.cloud.google.com/pubsub/docs/choosing-pubsub-or-cloud-tasks",
+      "evidence": "Therefore, Pub/Sub gives publishers no control over the delivery of the messages save for the guarantee of delivery. In this way, Pub/Sub supports implicit invocation: a publisher implicitly causes the subscribers to execute by publishing an event."
+    }
+  },
+  {
+    "id": "arch-f014",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "concept",
+    "front": "Which service should you use to send requests to a partner API that has a rate limit?",
+    "back": "Cloud Tasks. It uses explicit invocation: the sender names the endpoint and keeps full control of execution, including the dispatch rate. Pub/Sub gives the publisher no control over delivery.",
+    "aws": null,
+    "source": {
+      "title": "Choosing Pub/Sub or Cloud Tasks",
+      "url": "https://docs.cloud.google.com/pubsub/docs/choosing-pubsub-or-cloud-tasks",
+      "evidence": "By contrast, Cloud Tasks is aimed at explicit invocation where the publisher retains full control of execution. In particular, a publisher specifies an endpoint where each message is to be delivered."
+    }
+  },
+  {
+    "id": "arch-f015",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "term",
+    "front": "Eventarc Advanced",
+    "back": "An Eventarc edition with a central bus that routes events from many sources to many targets, also across projects. It filters events on their attributes and can transform them before delivery. It is not compliant with the certifications that Eventarc Standard supports.",
+    "aws": "Amazon EventBridge",
+    "source": {
+      "title": "Eventarc Advanced overview",
+      "url": "https://docs.cloud.google.com/eventarc/advanced/docs/overview",
+      "evidence": "Eventarc Advanced lets you collect events that occur in a system and publish them to a central bus. Interested services can subscribe to specific messages by creating enrollments."
+    }
+  },
+  {
+    "id": "arch-f016",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "concept",
+    "front": "Why must a Cloud Tasks handler be idempotent?",
+    "back": "Cloud Tasks gives at-least-once delivery, so a handler can get the same task more than once. Repeated execution must have no harmful side effects.",
+    "aws": null,
+    "source": {
+      "title": "Understand Cloud Tasks",
+      "url": "https://docs.cloud.google.com/tasks/docs/dual-overview",
+      "evidence": "In some rare circumstances, multiple task execution is possible, so your code must ensure that there are no harmful side-effects of repeated execution. Your handlers should be idempotent."
+    }
+  },
+  {
+    "id": "arch-f017",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "term",
+    "front": "Choreography",
+    "back": "A coordination style in which each service works independently and interacts with other services through events. Pub/Sub and Eventarc suit it. It has no single point of failure, but it is hard to monitor and troubleshoot.",
+    "aws": null,
+    "source": {
+      "title": "Service orchestration on Google Cloud",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/service-orchestration-google-cloud",
+      "evidence": "With service choreography, each service works independently and interacts with other services in a loosely coupled way through events."
+    }
+  },
+  {
+    "id": "arch-f018",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "concept",
+    "front": "Which coordination style fits a business process that you must track and troubleshoot end to end?",
+    "back": "Orchestration. A central orchestrator controls all interactions between the services and gives a high-level view of the process. On Google Cloud, Workflows handles service orchestration.",
+    "aws": null,
+    "source": {
+      "title": "Service orchestration on Google Cloud",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/service-orchestration-google-cloud",
+      "evidence": "This orchestrator provides a high-level view of the business processes to track execution and troubleshoot issues. In Google Cloud, Workflows handles service orchestration."
+    }
+  },
+  {
+    "id": "arch-f019",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "concept",
+    "front": "Why is Managed Service for Apache Airflow a poor choice for low-latency service orchestration?",
+    "back": "Managed Airflow (formerly Cloud Composer) suits batch data pipelines that accept a few seconds of latency between tasks, and it uses provisioned capacity. Workflows has millisecond latency and scales to zero.",
+    "aws": null,
+    "source": {
+      "title": "Choose Workflows or Managed Airflow for service orchestration",
+      "url": "https://docs.cloud.google.com/workflows/docs/choose-orchestration",
+      "evidence": "Managed Airflow is best for batch workloads that can handle a few seconds of latency between task executions."
+    }
+  },
+  {
+    "id": "arch-f020",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "term",
+    "front": "Application Integration",
+    "back": "A service that connects, maps, transforms, and integrates data between business systems such as Salesforce, ServiceNow, or Cloud SQL. It uses connectors and a drag-and-drop editor, with little or no code. Use Workflows instead to orchestrate services.",
+    "aws": "Amazon AppFlow",
+    "source": {
+      "title": "Choose Workflows or Application Integration",
+      "url": "https://docs.cloud.google.com/workflows/docs/choose-app-integ-or-workflows",
+      "evidence": "who needs a way to connect, map, transform, and integrate data between business systems like Salesforce, ServiceNow, or a Cloud SQL database"
+    }
+  },
+  {
+    "id": "arch-f021",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "concept",
+    "front": "How can you run BigQuery analytics on data in Amazon S3 without moving the data?",
+    "back": "Use BigQuery Omni with BigLake tables. It runs BigQuery analytics on data in Amazon S3 or Azure Blob Storage, so the data stays where it is.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to BigQuery Omni",
+      "url": "https://docs.cloud.google.com/bigquery/docs/omni-introduction",
+      "evidence": "With BigQuery Omni, you can run BigQuery analytics on data stored in Amazon Simple Storage Service (Amazon S3) or Azure Blob Storage using BigLake tables."
+    }
+  },
+  {
+    "id": "arch-f022",
+    "note": "1.1-integration-and-data-movement",
+    "kind": "term",
+    "front": "Data-access microservice",
+    "back": "A data migration approach in which one microservice becomes the only entry point to the data storage layer. The refactoring effort focuses on that service, and no cut-over window is necessary. It is the preferred option in a microservices architecture.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Transfer your large datasets",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-transferring-your-large-datasets",
+      "evidence": "The data-access microservice approach is the preferred option in a microservices architecture."
+    }
+  },
+  {
+    "id": "arch-f023",
+    "note": "1.2-well-architected-framework",
+    "kind": "term",
+    "front": "Google Cloud Well-Architected Framework",
+    "back": "Google's recommendations for cloud designs that are secure, efficient, resilient, high-performing, cost-effective, and sustainable. It has five core principles, six pillars, and cross-pillar perspectives. Use its principles to find the Google-recommended option in a scenario.",
+    "aws": "AWS Well-Architected Framework",
+    "source": {
+      "title": "Google Cloud Well-Architected Framework",
+      "url": "https://docs.cloud.google.com/architecture/framework",
+      "evidence": "The Well-Architected Framework provides recommendations to help architects, developers, administrators, and other cloud practitioners design and operate a cloud topology that's secure, efficient, resilient, high-performing, cost-effective, and sustainable."
+    }
+  },
+  {
+    "id": "arch-f024",
+    "note": "1.2-well-architected-framework",
+    "kind": "term",
+    "front": "Cross-pillar perspectives",
+    "back": "Views of the framework recommendations for one technology, domain, or sector, aligned with the pillars. Two exist: AI and ML, and financial services (FS). Use them when the workload is an AI system or a regulated financial service.",
+    "aws": "AWS Well-Architected lenses",
+    "source": {
+      "title": "Google Cloud Well-Architected Framework",
+      "url": "https://docs.cloud.google.com/architecture/framework",
+      "evidence": "A perspective in the Well-Architected Framework is a cross-pillar view of recommendations for a specific technology, domain, or sector."
+    }
+  },
+  {
+    "id": "arch-f025",
+    "note": "1.2-well-architected-framework",
+    "kind": "concept",
+    "front": "Which category of the older Architecture Framework did Google remove in 2024?",
+    "back": "The System Design category, in August 2024. Its guidance is now in other Google Cloud documentation. Study material that still lists it is out of date.",
+    "aws": null,
+    "source": {
+      "title": "What's new in the Well-Architected Framework",
+      "url": "https://docs.cloud.google.com/architecture/framework/whats-new",
+      "evidence": "The System Design category of the Architecture Framework has been removed. The guidance in this category is available in other Google Cloud documentation."
+    }
+  },
+  {
+    "id": "arch-f026",
+    "note": "1.2-well-architected-framework",
+    "kind": "term",
+    "front": "Design for change",
+    "back": "A core principle of the framework. Build a process that lets teams deliver small changes often and get fast feedback on them. Use the DORA software delivery metrics to track the speed, ease, and safety of change.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud Well-Architected Framework",
+      "url": "https://docs.cloud.google.com/architecture/framework",
+      "evidence": "With the need for change in mind, build a development and production process that enables teams to regularly deliver small changes and get fast feedback on those changes."
+    }
+  },
+  {
+    "id": "arch-f027",
+    "note": "1.2-well-architected-framework",
+    "kind": "term",
+    "front": "Use a stateless architecture",
+    "back": "A core principle of the framework. Avoid significant local dependencies, and use shared storage or cached services instead. Stateless applications scale up quickly and withstand hard restarts.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud Well-Architected Framework",
+      "url": "https://docs.cloud.google.com/architecture/framework",
+      "evidence": "Stateless applications can perform tasks without significant local dependencies by using shared storage or cached services. A stateless architecture enables your applications to scale up quickly with minimum boot dependencies."
+    }
+  },
+  {
+    "id": "arch-f028",
+    "note": "1.2-well-architected-framework",
+    "kind": "concept",
+    "front": "Which defects does shift-left security prevent, as opposed to security by design?",
+    "back": "Implementation defects, such as bugs and misconfigurations, before changes are applied. Security by design helps you avoid fundamental design flaws that would make you re-architect the system.",
+    "aws": null,
+    "source": {
+      "title": "Implement shift-left security",
+      "url": "https://docs.cloud.google.com/architecture/framework/security/implement-shift-left-security",
+      "evidence": "Shift-left security helps you to avoid implementation defects (bugs and misconfigurations) before changes are applied, and it enables fast, reliable fixes after deployment."
+    }
+  },
+  {
+    "id": "arch-f029",
+    "note": "1.2-well-architected-framework",
+    "kind": "concept",
+    "front": "How should a system handle an overload so that most users still get service?",
+    "back": "Throttle requests, and drop the excess requests early at the frontend layer to protect the backends. Some users see errors. A circuit breaker, by contrast, drops all traffic during an overload.",
+    "aws": null,
+    "source": {
+      "title": "Design for graceful degradation",
+      "url": "https://docs.cloud.google.com/architecture/framework/reliability/graceful-degradation",
+      "evidence": "However, you can minimize the impact of outages, in contrast to an approach like circuit-breaking, where all traffic is dropped during an overload."
+    }
+  },
+  {
+    "id": "arch-f030",
+    "note": "1.2-well-architected-framework",
+    "kind": "concept",
+    "front": "Why can self-managed VMs have a higher TCO than a serverless service?",
+    "back": "The team must maintain, patch, and scale the VMs, and that work adds to the total cost of ownership (TCO). Serverless services such as Cloud Run lower the operational overhead.",
+    "aws": null,
+    "source": {
+      "title": "Align cloud spending with business value",
+      "url": "https://docs.cloud.google.com/architecture/framework/cost-optimization/align-cloud-spending-business-value",
+      "evidence": "However, when you consider the overhead to maintain, patch, and scale the VMs, the TCO can increase."
+    }
+  },
+  {
+    "id": "arch-f031",
+    "note": "1.2-well-architected-framework",
+    "kind": "term",
+    "front": "Carbon Footprint",
+    "back": "A Google Cloud report of the carbon emissions from your cloud use. The sustainability pillar uses it to set a baseline, find carbon hotspots, and verify the result of each optimization.",
+    "aws": null,
+    "source": {
+      "title": "Continuously measure and improve sustainability",
+      "url": "https://docs.cloud.google.com/architecture/framework/sustainability/continuously-measure-improve",
+      "evidence": "The recommendations in this section provide a framework for using Carbon Footprint to quantify carbon emissions, identify carbon hotspots, implement targeted workload optimizations, and verify the outcomes of the optimization efforts."
+    }
+  },
+  {
+    "id": "arch-f032",
+    "note": "1.2-well-architected-framework",
+    "kind": "concept",
+    "front": "Why does the sustainability pillar advise against an idle warm DR site?",
+    "back": "Idle or under-utilized DR resources waste energy. When the RTO allows, provision the DR environment with an IaC tool such as Terraform only when you need it.",
+    "aws": null,
+    "source": {
+      "title": "Optimize resource usage for sustainability",
+      "url": "https://docs.cloud.google.com/architecture/framework/sustainability/optimize-resource-usage",
+      "evidence": "Preparing for disaster recovery (DR) often involves pre-provisioning redundant resources in a secondary region. However, idle or under-utilized resources can cause significant energy waste."
+    }
+  },
+  {
+    "id": "arch-f033",
+    "note": "1.2-well-architected-framework",
+    "kind": "concept",
+    "front": "How many regions and zones does the FS perspective recommend for critical financial services applications?",
+    "back": "At least two regions, with three zones in each region. The FS perspective also prefers resources with a wider location scope, for example regional resources instead of zonal ones.",
+    "aws": null,
+    "source": {
+      "title": "Financial services perspective: Reliability",
+      "url": "https://docs.cloud.google.com/architecture/framework/perspectives/fsi/reliability",
+      "evidence": "For critical financial services applications, we recommend that you use a multi-region topology that's distributed across at least two regions and across three zones within each region."
+    }
+  },
+  {
+    "id": "arch-f034",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "term",
+    "front": "Location scope",
+    "back": "The extent to which an infrastructure failure can affect a resource: zonal, regional, multi-region, or global. For example, a Compute Engine VM is zonal and a VPC network is global.",
+    "aws": null,
+    "source": {
+      "title": "Building blocks of reliability in Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/building-blocks",
+      "evidence": "The location scope of a Google Cloud resource determines the extent to which an infrastructure failure can affect the resource."
+    }
+  },
+  {
+    "id": "arch-f035",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "term",
+    "front": "Deployment archetype",
+    "back": "A model that specifies the failure domains where an application runs: zonal, regional, multi-regional, global, hybrid, or multicloud. Choose the archetype first, because it simplifies later product choices.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud deployment archetypes",
+      "url": "https://docs.cloud.google.com/architecture/deployment-archetypes",
+      "evidence": "A deployment archetype is an abstract, provider-independent model that you use as the foundation to build application-specific deployment architectures that meet your business and technical requirements. Each deployment archetype specifies a combination of failure domains where an application can run."
+    }
+  },
+  {
+    "id": "arch-f036",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "Which deployment archetypes keep a near-zero RTO during a region outage?",
+    "back": "Multi-regional and global, but only if data replication is synchronous. With the zonal and regional archetypes, recovery from a region outage takes hours or days.",
+    "aws": null,
+    "source": {
+      "title": "Comparative analysis of Google Cloud deployment archetypes",
+      "url": "https://docs.cloud.google.com/architecture/deployment-archetypes/comparison",
+      "evidence": "An architecture that uses the multi-regional or global deployment archetype is robust against zone and region outages. The RTO is near zero if data is replicated synchronously."
+    }
+  },
+  {
+    "id": "arch-f037",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "Which deployment archetype is often enough for an internal app that employees use in one area?",
+    "back": "The regional archetype, when cost has priority over availability. An app that serves users in several countries and needs high availability fits the multi-regional archetype.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud deployment archetypes",
+      "url": "https://docs.cloud.google.com/architecture/deployment-archetypes",
+      "evidence": "But for an internal application that's used by employees in a single geographical region, you might prioritize cost over availability and, therefore, choose the regional deployment archetype."
+    }
+  },
+  {
+    "id": "arch-f038",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "How do you calculate the aggregate availability of interdependent tiers in a stack?",
+    "back": "Multiply the availabilities of the tiers. Three tiers at 99.9% each give about 99.7%. The stack is less available than its least available tier.",
+    "aws": null,
+    "source": {
+      "title": "Building blocks of reliability in Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/building-blocks",
+      "evidence": "For example, if every tier in a three-tier stack is designed to provide 99.9% availability, then the aggregate availability of the stack is approximately 99.7% (0.999 x 0.999 x 0.999)."
+    }
+  },
+  {
+    "id": "arch-f039",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "What caps the actual availability of redundant resources in separate failure domains?",
+    "back": "The target availability of the deployment location: 99.9% in one zone, 99.99% across zones, and 99.999% across regions. So more VMs in one zone cannot reach 99.99%.",
+    "aws": null,
+    "source": {
+      "title": "Building blocks of reliability in Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/building-blocks",
+      "evidence": "the actual availability that you can expect is limited to the target availability of the deployment location: 99.9% if the resources are in a single Google Cloud zone, 99.99% for a multi-zone deployment"
+    }
+  },
+  {
+    "id": "arch-f040",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "term",
+    "front": "N+1 redundancy",
+    "back": "A capacity rule: every component of the application stack has at least one redundant instance beyond the minimum that the forecast load needs. Plan it when you estimate capacity.",
+    "aws": null,
+    "source": {
+      "title": "Manage traffic and load for your workloads in Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/traffic-load",
+      "evidence": "For example, to achieve N+1 redundancy, every component in the application stack must have at least one redundant component beyond the minimum that's necessary to handle the forecast load."
+    }
+  },
+  {
+    "id": "arch-f041",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "How can a global load balancer become a single point of failure?",
+    "back": "An error in its configuration can make it unavailable in all geographies. Global resources survive zone and region outages, but you must manage their configuration changes carefully.",
+    "aws": null,
+    "source": {
+      "title": "Building blocks of reliability in Google Cloud",
+      "url": "https://docs.cloud.google.com/architecture/infra-reliability-guide/building-blocks",
+      "evidence": "However, an error in the configuration of the load balancer can cause it to become unavailable across all geographies."
+    }
+  },
+  {
+    "id": "arch-f042",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "Why must a service be stateless before you put it behind an autoscaler?",
+    "back": "The autoscaler can create and destroy instances at any time. A stateless service keeps no local persistent data, so it loses nothing when an instance goes away. Separate the services that must keep state from the stateless ones.",
+    "aws": null,
+    "source": {
+      "title": "Patterns for scalable and resilient apps",
+      "url": "https://docs.cloud.google.com/architecture/scalable-and-resilient-apps",
+      "evidence": "Statelessness is especially important when you are using an autoscaler, because the instances, nodes, or pods hosting the service can be created and destroyed unexpectedly."
+    }
+  },
+  {
+    "id": "arch-f043",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "What should you do before a known traffic peak such as a seasonal sale?",
+    "back": "Scale up or scale out manually before the event. Reactive autoscaling can take several minutes to add resources, so some users can see delays. Keep autoscaling for surges that you do not expect.",
+    "aws": null,
+    "source": {
+      "title": "Take advantage of elasticity",
+      "url": "https://docs.cloud.google.com/architecture/framework/performance-optimization/elasticity",
+      "evidence": "We recommend that you manually scale up or scale out your systems before those sales to ensure that your system can immediately handle the increased load or immediately adjust existing limits."
+    }
+  },
+  {
+    "id": "arch-f044",
+    "note": "1.2-ha-scalability-performance",
+    "kind": "concept",
+    "front": "How does a cache improve resilience, and not only latency?",
+    "back": "If the storage layer is overloaded or unavailable, the cache can continue to handle requests. The data can be incomplete or out of date, which is acceptable in some scenarios.",
+    "aws": null,
+    "source": {
+      "title": "Patterns for scalable and resilient apps",
+      "url": "https://docs.cloud.google.com/architecture/scalable-and-resilient-apps",
+      "evidence": "If the underlying storage layer is overloaded or unavailable, the cache can continue to handle requests."
+    }
+  },
+  {
+    "id": "arch-f045",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "term",
+    "front": "Gemini Cloud Assist",
+    "back": "An AI assistant (Preview) in Google Cloud for the design, deployment, troubleshooting, and optimization of workloads. Its output can look correct and still be wrong, so validate all output before you use it.",
+    "aws": "Amazon Q Developer in the AWS console",
+    "source": {
+      "title": "Gemini Cloud Assist overview",
+      "url": "https://docs.cloud.google.com/cloud-assist/overview",
+      "evidence": "By integrating deeply into the cloud platform, Gemini Cloud Assist simplifies the end-to-end application lifecycle, offering intelligent, agentic guidance for designing, deploying, troubleshooting, and optimizing your workloads."
+    }
+  },
+  {
+    "id": "arch-f046",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "concept",
+    "front": "Why is model training not a valid reason to block Gemini Cloud Assist?",
+    "back": "Gemini does not use your prompts or its responses as data to train its models. Optional data sharing is for product improvement, not for model training.",
+    "aws": null,
+    "source": {
+      "title": "How Gemini products in Google Cloud use your data",
+      "url": "https://docs.cloud.google.com/gemini/docs/discover/data-governance",
+      "evidence": "Gemini doesn't use your prompts or its responses as data to train its models."
+    }
+  },
+  {
+    "id": "arch-f047",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "concept",
+    "front": "Which projects should not enable the Gemini Cloud Assist API?",
+    "back": "Projects that have data residency or customer-managed encryption key (CMEK) requirements. Gemini Cloud Assist can store data in any Google Cloud data center.",
+    "aws": null,
+    "source": {
+      "title": "Set up Gemini Cloud Assist",
+      "url": "https://docs.cloud.google.com/cloud-assist/set-up-gemini",
+      "evidence": "Gemini Cloud Assist can store data in any Google Cloud data center globally. You shouldn't enable the Gemini Cloud Assist API for projects that have data residency or customer-managed encryption key requirements."
+    }
+  },
+  {
+    "id": "arch-f048",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "concept",
+    "front": "Which permissions does Gemini Cloud Assist use when it answers a user?",
+    "back": "The same permissions as the user who asks. A user who cannot read a resource cannot get information about it from Gemini Cloud Assist either.",
+    "aws": null,
+    "source": {
+      "title": "IAM requirements for using Gemini Cloud Assist",
+      "url": "https://docs.cloud.google.com/cloud-assist/iam-requirements",
+      "evidence": "Gemini Cloud Assist has the same permissions that the user querying Gemini Cloud Assist has, so in many cases, the necessary IAM permissions are already granted."
+    }
+  },
+  {
+    "id": "arch-f049",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "term",
+    "front": "Gemini Cloud Assist User",
+    "back": "The IAM role that Google recommends for most users of Gemini Cloud Assist. It allows agent invocation, chat, and the creation and sharing of the user's own artifacts. Grant Cloud Asset Viewer together with it.",
+    "aws": null,
+    "source": {
+      "title": "IAM requirements for using Gemini Cloud Assist",
+      "url": "https://docs.cloud.google.com/cloud-assist/iam-requirements",
+      "evidence": "In most cases, the recommended IAM role for using Gemini Cloud Assist is Gemini Cloud Assist User."
+    }
+  },
+  {
+    "id": "arch-f050",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "term",
+    "front": "Gemini Cloud Assist investigations",
+    "back": "A root-cause analysis tool in Gemini Cloud Assist (Preview). It ranks observations from logs, configurations, and metrics, and proposes probable root causes. One investigation covers one project or one App Hub application, and its token never changes data.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+      "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+      "evidence": "Investigations synthesizes the observations and uses domain-specific knowledge to identify probable root causes."
+    }
+  },
+  {
+    "id": "arch-f051",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "concept",
+    "front": "Who can create and run Gemini Cloud Assist investigations since April 10, 2026?",
+    "back": "Only users with a Premium Support contract, or users who requested access through their account team. The results of earlier investigations stay available.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+      "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+      "evidence": "As of April 10, 2026, creating, running, and editing investigations are only available to users that have a Premium Support contract or who have requested access through their account team."
+    }
+  },
+  {
+    "id": "arch-f052",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "concept",
+    "front": "What code does Gemini Cloud Assist generate from your requirements in Application Design Center?",
+    "back": "Terraform infrastructure as code (IaC). You deploy it with the built-in pipeline from the console, or you download it for your own deployment pipeline.",
+    "aws": null,
+    "source": {
+      "title": "Design an application with Gemini assistance",
+      "url": "https://docs.cloud.google.com/cloud-assist/design-application",
+      "evidence": "This combination lets you translate your application requirements and goals into Terraform infrastructure as code (IaC), which you can then deploy in a built-in or personal deployment pipeline."
+    }
+  },
+  {
+    "id": "arch-f053",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "term",
+    "front": "Custom instructions",
+    "back": "A Gemini Cloud Assist setting (Preview) in which administrators define guidelines that shape the responses. The instructions apply to all users in the project. Use them when every answer must follow a standard, for example CMEK for all infrastructure.",
+    "aws": null,
+    "source": {
+      "title": "Configure custom instructions for Gemini Cloud Assist",
+      "url": "https://docs.cloud.google.com/cloud-assist/custom-instructions",
+      "evidence": "These instructions can be free-form or structured, contain up to 3,000 characters, and apply to all users interacting with Gemini Cloud Assist in the Google Cloud project."
+    }
+  },
+  {
+    "id": "arch-f054",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "concept",
+    "front": "Why should you not use Gemini Cloud Assist cost totals for chargeback?",
+    "back": "The totals use contract prices before committed use discounts (CUDs) and other credits. An application total also leaves out resources that several applications share.",
+    "aws": null,
+    "source": {
+      "title": "Use Gemini Cloud Assist in the Google Cloud console",
+      "url": "https://docs.cloud.google.com/cloud-assist/chat-panel",
+      "evidence": "Cost totals in Gemini Cloud Assist responses are based on your contract prices, before any committed-use discounts (CUDs) or other credits are applied."
+    }
+  },
+  {
+    "id": "arch-f055",
+    "note": "1.2-gemini-cloud-assist",
+    "kind": "term",
+    "front": "Web Grounding for Enterprise",
+    "back": "A Gemini Cloud Assist grounding option that uses a restricted subset of web content. It is the preferred option for regulated industries with strict data residency needs. The default, Grounding with Google Search, does not support data residency, Access Transparency, or CMEK.",
+    "aws": null,
+    "source": {
+      "title": "Configure grounding for Gemini Cloud Assist",
+      "url": "https://docs.cloud.google.com/cloud-assist/configure-grounding",
+      "evidence": "it's the preferred option for highly-regulated industries that require strict data residency compliance, such as finance, healthcare, and the public sector."
+    }
+  },
+  {
+    "id": "arch-f056",
+    "note": "1.5-future-improvements",
+    "kind": "term",
+    "front": "Cloud-first",
+    "back": "An adoption approach: deploy new workloads to the public cloud, and keep existing workloads where they are. Google suggests it only for selected workloads, because a strict cloud-first approach can increase complexity.",
+    "aws": null,
+    "source": {
+      "title": "Architectural approaches to adopt a hybrid or multicloud architecture",
+      "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/adopt",
+      "evidence": "In this approach, you deploy your new workloads to the public cloud while your existing workloads stay where they are."
+    }
+  },
+  {
+    "id": "arch-f057",
+    "note": "1.5-future-improvements",
+    "kind": "term",
+    "front": "Cloud native",
+    "back": "An approach to build and run scalable applications that take full advantage of cloud services and delivery models. It is about how you build and deliver an application, not only where it runs.",
+    "aws": null,
+    "source": {
+      "title": "What is cloud native?",
+      "url": "https://cloud.google.com/learn/what-is-cloud-native",
+      "evidence": "Overall, the majority boils down to this: Cloud native is an approach to building and running scalable applications to take full advantage of cloud-based services and delivery models."
+    }
+  },
+  {
+    "id": "arch-f058",
+    "note": "1.5-future-improvements",
+    "kind": "term",
+    "front": "Always be architecting",
+    "back": "The last of five cloud-native principles in a Google Cloud blog post. Keep refining, simplifying, and improving the architecture as the organization, the IT landscape, and the cloud provider change.",
+    "aws": null,
+    "source": {
+      "title": "5 principles for cloud-native architecture",
+      "url": "https://cloud.google.com/blog/products/application-development/5-principles-for-cloud-native-architecture-what-it-is-and-how-to-master-it",
+      "evidence": "As a cloud-native architect, you should always seek to refine, simplify and improve the architecture of the system, as the needs of the organization change"
+    }
+  },
+  {
+    "id": "arch-f059",
+    "note": "1.5-future-improvements",
+    "kind": "concept",
+    "front": "How can you replace a legacy backend later without breaking the apps that call it?",
+    "back": "Put an API facade, such as Apigee API proxies, in front of the backend. The proxy decouples the app-facing API from the backend, so apps keep calling the same API while you change the backend.",
+    "aws": null,
+    "source": {
+      "title": "Understanding APIs and API proxies",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies",
+      "evidence": "API proxies decouple the app-facing API from your backend services, shielding those apps from backend code changes. As you make backend changes to your services, apps continue to call the same API without any interruption."
+    }
+  },
+  {
+    "id": "arch-f060",
+    "note": "1.5-future-improvements",
+    "kind": "concept",
+    "front": "Which modernization sequence does Google suggest instead of a big-bang rewrite?",
+    "back": "A phased approach: rehost or replatform first, then refactor or re-architect as the next step. After the applications run in the cloud, it is easier to add cloud services to them.",
+    "aws": null,
+    "source": {
+      "title": "Architectural approaches to adopt a hybrid or multicloud architecture",
+      "url": "https://docs.cloud.google.com/architecture/hybrid-multicloud-patterns/adopt",
+      "evidence": "You might want to consider a phased migration approach, starting with lifting and shifting or replatforming and then refactoring or rearchitecting as the next step."
+    }
+  },
+  {
+    "id": "arch-f061",
+    "note": "1.5-future-improvements",
+    "kind": "concept",
+    "front": "When should you stop an optimization iteration?",
+    "back": "When you meet its measurable goals, such as SLOs. You can then set new goals, but optimization costs resources, time, effort, and skills.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Optimize your environment",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-optimizing-your-environment",
+      "evidence": "To avoid uncontrolled and duplicative efforts, you can set measurable optimization goals and stop when you meet these goals."
+    }
+  },
+  {
+    "id": "arch-f062",
+    "note": "1.5-future-improvements",
+    "kind": "concept",
+    "front": "Why should a production design that needs an SLA avoid Preview offerings?",
+    "back": "Preview offerings have no SLA and no technical support commitments, and they are not necessarily feature-complete. Unless Google states otherwise, they are for test environments only.",
+    "aws": null,
+    "source": {
+      "title": "Product launch stages",
+      "url": "https://cloud.google.com/products#product-launch-stages",
+      "evidence": "Preview offerings are often publicly announced, but are not necessarily feature-complete, and no SLAs or technical support commitments are provided for these."
+    }
+  },
+  {
+    "id": "arch-f063",
+    "note": "1.5-future-improvements",
+    "kind": "concept",
+    "front": "Why can a Preview feature change or disappear with less notice than other services?",
+    "back": "The 12-month discontinuation notice in the Terms of Service does not apply to pre-general availability (pre-GA) offerings. Covered services get at least 12 months' notice before Google discontinues them, with some exceptions.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud Terms of Service",
+      "url": "https://cloud.google.com/terms",
+      "evidence": "This Section 1.4(e) (Discontinuation of Services) does not apply to Cloud Identity Services or pre-general availability Services, offerings, or functionality"
+    }
+  },
+  {
+    "id": "arch-f064",
+    "note": "1.5-future-improvements",
+    "kind": "term",
+    "front": "Deprecation recommender",
+    "back": "A Recommender feature (Preview) that identifies your resources that upcoming deprecations and breaking changes affect. It also gives guidelines to manage them. Use it to plan changes before a deprecation reaches you.",
+    "aws": null,
+    "source": {
+      "title": "Cloud deprecation and breaking changes general recommender",
+      "url": "https://docs.cloud.google.com/recommender/docs/deprecation-change-recommender",
+      "evidence": "It identifies Cloud resources that will be affected by upcoming deprecations and breaking changes while providing guidelines on how to manage them."
+    }
+  },
+  {
+    "id": "arch-f065",
+    "note": "1.5-future-improvements",
+    "kind": "term",
+    "front": "Active Assist",
+    "back": "The portfolio of Google Cloud tools that generate recommendations and insights to optimize your projects. Its recommendations show impacts in areas such as cost, performance, and security. Use them as an input to the next improvement.",
+    "aws": "AWS Cost Optimization",
+    "source": {
+      "title": "What is Active Assist",
+      "url": "https://docs.cloud.google.com/recommender/docs/whatis-activeassist",
+      "evidence": "Active Assist refers to the portfolio of tools used in Google Cloud to generate recommendations and insights to help you optimize your Google Cloud projects."
+    }
+  },
+  {
+    "id": "arch-f066",
+    "note": "1.5-future-improvements",
+    "kind": "concept",
+    "front": "What must you set up before you apply Active Assist recommendations without human review?",
+    "back": "A rollback process. Google recommends that a qualified reviewer assess each recommendation first, because unreviewed changes can hurt performance, reliability, or required permissions.",
+    "aws": null,
+    "source": {
+      "title": "What is Active Assist",
+      "url": "https://docs.cloud.google.com/recommender/docs/whatis-activeassist",
+      "evidence": "If you choose to apply recommendations without human review, ensure that you have set up a rollback process before making any changes."
+    }
+  },
+  {
+    "id": "arch-f067",
+    "note": "4.2-business-processes",
+    "kind": "term",
+    "front": "Google Cloud Adoption Framework",
+    "back": "A map of where your IT capabilities are now and a guide to where you want to be. Use it to assess the maturity of the organization before a migration. It assesses four themes: Learn, Lead, Scale, and Secure.",
+    "aws": "AWS Cloud Adoption Framework",
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "The Google Cloud Adoption Framework serves both as a map for determining where your business information technology capabilities are now, and as a guide to where you want to be."
+    }
+  },
+  {
+    "id": "arch-f068",
+    "note": "4.2-business-processes",
+    "kind": "term",
+    "front": "Cloud Maturity Scale",
+    "back": "The result of an evaluation of the four Adoption Framework themes in three phases: tactical, strategic, and transformational. A tactical organization has no coherent plan and wants a quick return on investment.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Get started",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-getting-started",
+      "evidence": "When you evaluate the four topics in terms of the three phases, you get the Cloud Maturity Scale."
+    }
+  },
+  {
+    "id": "arch-f069",
+    "note": "4.2-business-processes",
+    "kind": "concept",
+    "front": "What builds stakeholder confidence when leaders doubt the value of a migration plan?",
+    "back": "A successful proof of concept (POC) with defined success criteria, such as workload compatibility, migration downtime, and performance. It shows tangible benefits to leadership and technical teams.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Best practices for validating a migration plan",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-best-practices",
+      "evidence": "A successful POC builds stakeholder confidence in the migration plan by demonstrating tangible benefits to your leadership and technical teams."
+    }
+  },
+  {
+    "id": "arch-f070",
+    "note": "4.2-business-processes",
+    "kind": "term",
+    "front": "Cloud Center of Excellence (CoE)",
+    "back": "A team that drives cloud adoption across the organization. Successful CoE members are multidisciplinary, so they reflect the views of the stakeholders. They are also empowered to decide without higher-level sign-off.",
+    "aws": null,
+    "source": {
+      "title": "Optimize your organization's cloud journey with a Cloud Center of Excellence",
+      "url": "https://cloud.google.com/blog/topics/training-certifications/optimize-your-organizations-cloud-journey-with-a-cloud-center-of-excellence",
+      "evidence": "Empowered: Team members have decision-making authority without need for higher-level sign-off."
+    }
+  },
+  {
+    "id": "arch-f071",
+    "note": "4.2-business-processes",
+    "kind": "term",
+    "front": "Prosci ADKAR",
+    "back": "A people-centric change management model. ADKAR names five goals that each person must reach: awareness, desire, knowledge, ability, and reinforcement. SRE managers can consider it to coordinate change across globally distributed teams.",
+    "aws": null,
+    "source": {
+      "title": "Organizational change management in SRE",
+      "url": "https://sre.google/workbook/organizational-change/",
+      "evidence": "ADKAR is an acronym for the goals individuals must achieve for successful organizational change: awareness, desire, knowledge, ability, and reinforcement."
+    }
+  },
+  {
+    "id": "arch-f072",
+    "note": "4.2-business-processes",
+    "kind": "concept",
+    "front": "Why is the Deming cycle a poor fit for organizational change management?",
+    "back": "The Plan-Do-Check-Act cycle improves existing processes. It does not cover the human side of change, such as motivations and leadership styles.",
+    "aws": null,
+    "source": {
+      "title": "Organizational change management in SRE",
+      "url": "https://sre.google/workbook/organizational-change/",
+      "evidence": "It is not suited to organizational change management because it does not cover the human side of change, including motivations and leadership styles."
+    }
+  },
+  {
+    "id": "arch-f073",
+    "note": "4.2-business-processes",
+    "kind": "concept",
+    "front": "Why does the SRE Workbook recommend incremental change instead of a jump to the perfect solution?",
+    "back": "Incremental change is much easier to manage. Early wins help the organization buy into the change and justify more investment. A failed early iteration wastes less time and fewer resources.",
+    "aws": null,
+    "source": {
+      "title": "Organizational change management in SRE",
+      "url": "https://sre.google/workbook/organizational-change/",
+      "evidence": "An iterative approach can demonstrate early wins that help an organization buy into the vision of change and justify further investment."
+    }
+  },
+  {
+    "id": "arch-f074",
+    "note": "4.2-business-processes",
+    "kind": "concept",
+    "front": "What is the first step to close a skills gap in a team?",
+    "back": "Assess the team. List all skills, the level of expertise for each skill, and the most knowledgeable people. Then use the list to find the skills that are missing.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Optimize your environment",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-google-cloud-optimizing-your-environment",
+      "evidence": "You start by listing all skills, the level of expertise for each skill, and which team members are the most knowledgeable for each skill."
+    }
+  },
+  {
+    "id": "arch-f075",
+    "note": "4.2-business-processes",
+    "kind": "concept",
+    "front": "Which team should own the first-mover workload of a migration?",
+    "back": "A highly motivated team that is eager to try Google Cloud. Business leadership must give it clear goals and actively sponsor it.",
+    "aws": null,
+    "source": {
+      "title": "Migrate to Google Cloud: Assess and discover your workloads",
+      "url": "https://docs.cloud.google.com/architecture/migration-to-gcp-assessing-and-discovering-your-workloads",
+      "evidence": "The team responsible for a first-mover should be highly motivated, and eager to try Google Cloud and its services."
+    }
+  },
+  {
+    "id": "arch-f076",
+    "note": "4.2-business-processes",
+    "kind": "term",
+    "front": "Architecture decision record (ADR)",
+    "back": "A record of the key options, the main requirements, and the decision for one design question. Write one when two or more engineering options exist. When a decision changes, keep the previous decision and the reason.",
+    "aws": null,
+    "source": {
+      "title": "Architecture decision records overview",
+      "url": "https://docs.cloud.google.com/architecture/architecture-decision-records",
+      "evidence": "An ADR captures the key options available, the main requirements that drive a decision, and the design decisions themselves."
+    }
+  },
+  {
+    "id": "arch-f077",
+    "note": "4.2-business-processes",
+    "kind": "concept",
+    "front": "How does an error budget help negotiations between SREs and product developers?",
+    "back": "It is an objective metric, based on the SLO, that shows how unreliable the service can be. It removes the politics from decisions about how much risk to allow.",
+    "aws": null,
+    "source": {
+      "title": "Embracing Risk (Google SRE book)",
+      "url": "https://sre.google/sre-book/embracing-risk/",
+      "evidence": "This metric removes the politics from negotiations between the SREs and the product developers when deciding how much risk to allow."
+    }
+  },
+  {
+    "id": "arch-f078",
+    "note": "4.2-cost-optimization",
+    "kind": "concept",
+    "front": "How does the cost treatment of most cloud resources differ from on-premises assets?",
+    "back": "On premises, you buy assets (CapEx) and depreciate them over their operating life. In the cloud, most resource costs are OpEx, which you incur when you consume the resources.",
+    "aws": null,
+    "source": {
+      "title": "Well-Architected Framework: Cost optimization pillar",
+      "url": "https://docs.cloud.google.com/architecture/framework/cost-optimization",
+      "evidence": "In the cloud, the costs for most cloud resources are treated as OpEx, where costs are incurred when the cloud resources are consumed."
+    }
+  },
+  {
+    "id": "arch-f079",
+    "note": "4.2-cost-optimization",
+    "kind": "term",
+    "front": "Resource-based CUD",
+    "back": "A 1-year or 3-year commitment to a minimum amount of Compute Engine resources in one region and machine configuration, for a lower price. Use it for steady, predictable usage. You pay for the full term and cannot cancel it.",
+    "aws": "EC2 Reserved Instances",
+    "source": {
+      "title": "Committed use discounts (CUDs) for Compute Engine",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/committed-use-discounts-overview",
+      "evidence": "commit to use a minimum amount of Compute Engine resources in a specific region and with a specific machine configuration. These CUDs are ideal for predictable and steady state resource usage."
+    }
+  },
+  {
+    "id": "arch-f080",
+    "note": "4.2-cost-optimization",
+    "kind": "term",
+    "front": "Compute flexible CUD",
+    "back": "A 1-year or 3-year commitment to a minimum hourly spend across Compute Engine, GKE, and Cloud Run. Use it for steady spend that moves between regions, projects, or machine configurations. It does not apply to Spot VMs.",
+    "aws": "Compute Savings Plans",
+    "source": {
+      "title": "Committed use discounts (CUDs) for Compute Engine",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/committed-use-discounts-overview",
+      "evidence": "Compute flexible CUDs add flexibility to your Google Cloud spending capabilities by providing discounts for your spend across Compute Engine, GKE, and Cloud Run."
+    }
+  },
+  {
+    "id": "arch-f081",
+    "note": "4.2-cost-optimization",
+    "kind": "term",
+    "front": "FinOps hub",
+    "back": "A Cloud Billing dashboard that shows your active savings and optimization opportunities in one place. It uses data from Cloud Billing and Recommender, and it gives a FinOps score. Use it to track and plan cost optimization.",
+    "aws": null,
+    "source": {
+      "title": "Optimize costs with FinOps hub",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/finops-hub",
+      "evidence": "The FinOps hub presents all of your active savings and optimization opportunities in one dashboard."
+    }
+  },
+  {
+    "id": "arch-f082",
+    "note": "4.2-cost-optimization",
+    "kind": "concept",
+    "front": "What does an alerts-only budget do when actual spend passes the budget amount?",
+    "back": "It sends alerts only. It does not cap spend, and it does not stop the use or billing of services.",
+    "aws": null,
+    "source": {
+      "title": "Create, edit, or delete budgets and budget alerts",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/budgets",
+      "evidence": "Setting an alerts-only budget doesn't automatically cap Google Cloud or Google Maps Platform usage or spending."
+    }
+  },
+  {
+    "id": "arch-f083",
+    "note": "4.2-cost-optimization",
+    "kind": "concept",
+    "front": "Why is a budget response that disables billing wrong for a production project?",
+    "back": "Disabled billing stops all services in the project, including Free Tier services, and resources might be deleted for good. Stop only selected resources instead.",
+    "aws": null,
+    "source": {
+      "title": "Disable billing usage with notifications",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/disable-billing-with-notifications",
+      "evidence": "When you disable billing on a project, you terminate all Google Cloud services in the project, including Free Tier services."
+    }
+  },
+  {
+    "id": "arch-f084",
+    "note": "4.2-cost-optimization",
+    "kind": "term",
+    "front": "Spend cap budget",
+    "back": "A budget (Preview) that pauses new usage of one eligible service in one project when costs pass the budget amount. Usage stays paused until you lift the cap. Eligible services include the Gemini API, Agent Platform (formerly Vertex AI), and Cloud Run.",
+    "aws": null,
+    "source": {
+      "title": "Manage spend cap budgets",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/budgets-spend-caps",
+      "evidence": "When a spend cap budget is enforced, usage of your specified services is automatically paused until you manually lift the spend cap."
+    }
+  },
+  {
+    "id": "arch-f085",
+    "note": "4.2-cost-optimization",
+    "kind": "term",
+    "front": "Custom query quotas",
+    "back": "BigQuery daily limits on the bytes that queries process, for a project or for each user. They are proactive: a query that exceeds the quota does not run. They apply only to on-demand pricing and are approximate.",
+    "aws": null,
+    "source": {
+      "title": "Create custom query quotas",
+      "url": "https://docs.cloud.google.com/bigquery/docs/custom-quotas",
+      "evidence": "Custom quota is proactive, so you can't run an 11 TB query if you have a 10 TB quota."
+    }
+  },
+  {
+    "id": "arch-f086",
+    "note": "4.2-cost-optimization",
+    "kind": "concept",
+    "front": "Why can you not report last quarter's cost by a label that you add today?",
+    "back": "Billing reports show the cost for a label only from the time that you add the label to the resource.",
+    "aws": null,
+    "source": {
+      "title": "Analyze billing data and cost trends with Reports",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/reports",
+      "evidence": "The Cloud Billing report shows you the cost data for a specific label only after the label was added to a resource."
+    }
+  },
+  {
+    "id": "arch-f087",
+    "note": "4.2-cost-optimization",
+    "kind": "concept",
+    "front": "Why should you enable Cloud Billing export to BigQuery early?",
+    "back": "The export adds little past data. A regional dataset gets data only from the day that you enable the export. A multi-region (US or EU) dataset also gets data from the start of the previous month.",
+    "aws": null,
+    "source": {
+      "title": "Export Cloud Billing data to BigQuery",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/export-data-bigquery",
+      "evidence": "That is, Google Cloud billing data is not added retroactively for non-multi-region dataset locations, so you won't see Cloud Billing data from before you enable export."
+    }
+  },
+  {
+    "id": "arch-f088",
+    "note": "4.2-cost-optimization",
+    "kind": "concept",
+    "front": "Which Cloud Billing role should a finance team get to read cost data?",
+    "back": "Billing Account Viewer (`roles/billing.viewer`). It gives read access to cost and payment information. It does not let the team link projects or manage the billing account.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Billing access control and permissions",
+      "url": "https://docs.cloud.google.com/billing/docs/how-to/billing-access",
+      "evidence": "Billing Account Viewer access is usually granted to finance teams. It provides read access to cost and payment information"
+    }
+  }
+]

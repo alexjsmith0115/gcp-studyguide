@@ -24,6 +24,10 @@ const NOTES_ALSO = groupBy(NOTES.filter((n) => n.also.length), (n) => n.also);
 const LABS_BY_OBJ = groupBy(LABS, (l) => l.objectives);
 const QS_BY_OBJ = groupBy(QS, (q) => q.objective);
 const QS_BY_CASE = groupBy(QS.filter((q) => q.caseStudy), (q) => q.caseStudy);
+const CARDS = DATA.cards || [];
+const CARD = Object.fromEntries(CARDS.map((c) => [c.id, c]));
+const CARDS_BY_OBJ = groupBy(CARDS, (c) => c.objective);
+const CARDS_BY_NOTE = groupBy(CARDS, (c) => c.note);
 
 // ---------- helpers ----------
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -55,6 +59,7 @@ const ICON = {
   spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
   warn: '<path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.5v.5"/>',
   doc: '<path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h5"/>',
+  cards: '<rect x="3" y="7" width="13" height="14" rx="1.5"/><path d="M8 7V4.5A1.5 1.5 0 0 1 9.5 3h10A1.5 1.5 0 0 1 21 4.5v11a1.5 1.5 0 0 1-1.5 1.5H16"/><path d="M6.5 12h6M6.5 15.5h4"/>',
 };
 const icon = (name, cls = "") => `<svg class="ic${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ""}</svg>`;
 
@@ -69,6 +74,7 @@ const objConf = (id) => Store.data.state.objectives?.[id]?.c || 0;
 const noteRead = (id) => !!Store.data.state.notes?.[id];
 const labDone = (id) => !!Store.data.state.labs?.[id];
 const qstats = () => Store.data.qstats.q || {};
+const cstats = () => Store.data.cards?.c || {};
 
 // ---------- derived data ----------
 let dataVersion = 0;
@@ -77,6 +83,7 @@ function derived() {
   const now = Date.now();
   if (memo && memo.version === dataVersion && now - memo.at < 30000) return memo;
   const qs = qstats();
+  const cs = cstats();
   const st = Store.data.state;
   const ready = readiness(QS, qs, SECTIONS, now);
   const objStats = objectiveStats(QS, qs, now);
@@ -91,6 +98,12 @@ function derived() {
     flaggedCount: QS.filter((q) => qs[q.id]?.fl).length,
     unseenCount: QS.filter((q) => !qs[q.id]?.n).length,
     objDone,
+    cardObjStats: objectiveStats(CARDS, cs, now),
+    cardsDue: CARDS.filter((c) => isDue(cs[c.id], now)).length,
+    cardsNew: CARDS.filter((c) => !cs[c.id]?.n).length,
+    cardsNewRead: CARDS.filter((c) => !cs[c.id]?.n && st.notes?.[c.note]).length,
+    cardsMissed: CARDS.filter((c) => cs[c.id]?.n && !cs[c.id].l).length,
+    cardsLearned: CARDS.filter((c) => (cs[c.id]?.b || 0) >= 3).length,
     notesRead: NOTES.filter((n) => st.notes?.[n.id]).length,
     labsDone: LABS.filter((l) => st.labs?.[l.id]).length,
     verdict: readinessVerdict({ ready, objectivesDone: objDone, objectivesTotal: OBJECTIVES.length, mocks }),
@@ -102,7 +115,7 @@ function derived() {
 // ---------- routing ----------
 const ui = {
   routeStr: "home", route: { name: "home", id: null }, stack: [],
-  quiz: null, exam: null, caseTab: {}, practiceCount: 10, labNoOrg: false, resetStep: 0, importMsg: "",
+  quiz: null, exam: null, flash: null, caseTab: {}, practiceCount: 10, cardCount: 20, browseQ: "", labNoOrg: false, resetStep: 0, importMsg: "",
 };
 const VIEWS = {};
 function parseRoute(str) {
@@ -126,16 +139,17 @@ function back(fallback = "home") {
 
 // ---------- shell ----------
 const NAV = [
-  ["home", "Dashboard", "home"], ["study", "Study guide", "book"], ["practice", "Practice", "target"],
+  ["home", "Dashboard", "home"], ["study", "Study guide", "book"], ["practice", "Practice", "target"], ["cards", "Flashcards", "cards"],
   ["mock", "Mock exam", "timer"], ["cases", "Case studies", "case"], ["labs", "Labs", "flask"], ["progress", "Progress", "chart"],
 ];
-const NAV_OF = { objective: "study", note: "study", ref: "study", quiz: "practice", exam: "mock", result: "mock", case: "cases", lab: "labs" };
+const NAV_OF = { objective: "study", note: "study", ref: "study", quiz: "practice", flash: "cards", browse: "cards", exam: "mock", result: "mock", case: "cases", lab: "labs" };
+const NAV_COUNT_TITLE = { practice: "Questions due for review", cards: "Flashcards due for review", mock: "Mock exam in progress" };
 function renderNav() {
   const d = derived();
   const current = NAV_OF[ui.route.name] || ui.route.name;
-  const counts = { practice: d.dueCount ? String(d.dueCount) : "", mock: d.activeMock ? "•" : "" };
+  const counts = { practice: d.dueCount ? String(d.dueCount) : "", cards: d.cardsDue ? String(d.cardsDue) : "", mock: d.activeMock ? "•" : "" };
   $("#nav").innerHTML = NAV.map(([r, label, ic]) =>
-    `<a href="#/${r}" data-route="${r}"${current === r ? ' aria-current="page"' : ""}>${icon(ic)}<span>${label}</span>${counts[r] ? `<span class="count" title="${r === "practice" ? "Questions due for review" : "Mock exam in progress"}">${counts[r]}</span>` : ""}</a>`).join("");
+    `<a href="#/${r}" data-route="${r}"${current === r ? ' aria-current="page"' : ""}>${icon(ic)}<span>${label}</span>${counts[r] ? `<span class="count" title="${NAV_COUNT_TITLE[r]}">${counts[r]}</span>` : ""}</a>`).join("");
 }
 function renderSaveState() {
   const el = $("#save-state");
@@ -222,6 +236,7 @@ VIEWS.home = function () {
       ${tile("Objectives done", d.objDone, OBJECTIVES.length, "study")}
       ${tile("Notes pages read", d.notesRead, NOTES.length, "study")}
       ${tile("Questions tried", r.firstAttempts, QS.length, "practice")}
+      ${tile("Flashcards learned", d.cardsLearned, CARDS.length, "cards")}
       ${tile("Labs done", d.labsDone, LABS.length, "labs")}
     </div>
     <div class="grid-2">
@@ -284,6 +299,7 @@ function nextActions(d) {
   const last = st.last && NOTE[st.last.note];
   if (last && !noteRead(last.id)) acts.push({ icon: "book", title: `Continue reading: ${last.title}`, sub: `Objective ${last.objective} · ${last.minutes} min`, attrs: `href="#/note/${last.id}" data-route="note/${last.id}"` });
   if (d.dueCount >= 3) acts.push({ icon: "target", title: `Review ${plural(d.dueCount, "due question")}`, sub: "Spaced review brings back questions you missed", attrs: `data-action="start-practice" data-kind="due" data-count="20"` });
+  if (d.cardsDue >= 5) acts.push({ icon: "cards", title: `Review ${plural(d.cardsDue, "due flashcard")}`, sub: "Concepts and terms you missed or have not reviewed for a while", attrs: `data-action="start-cards" data-kind="due" data-count="20"` });
   const studying = OBJECTIVES.find((o) => objStatus(o.id) === 1);
   const nextObj = studying || OBJECTIVES.find((o) => objStatus(o.id) === 0);
   if (nextObj) {
@@ -296,6 +312,7 @@ function nextActions(d) {
   if (!d.activeMock && d.ready.coverage >= 0.3 && (!lastMock || d.now - lastMock.finishedAt > 7 * DAY)) acts.push({ icon: "timer", title: "Take a mock exam", sub: "50 questions · 2 hours · 2 case studies", attrs: `href="#/mock" data-route="mock"` });
   const weak = weakObjectives(d.objStats)[0];
   if (weak) acts.push({ icon: "target", title: `Practice your weakest objective: ${weak.id}`, sub: `${OBJ[weak.id].title} · latest ${pct(weak.lastAcc)}`, attrs: `data-action="start-practice" data-kind="objective" data-id="${weak.id}" data-count="10"` });
+  if (d.cardsNewRead >= 5) acts.push({ icon: "cards", title: "Learn the flashcards for pages you read", sub: `${plural(d.cardsNewRead, "new card")} from notes pages you marked as read`, attrs: `data-action="start-cards" data-kind="read" data-count="20"` });
   if (d.unseenCount) acts.push({ icon: "spark", title: "Practice 10 new questions", sub: `${d.unseenCount} questions you have not tried yet`, attrs: `data-action="start-practice" data-kind="mixed" data-count="10"` });
   return acts.slice(0, 4);
 }
@@ -366,10 +383,10 @@ function heatmap(days) {
     const area = `grid-area:${(i % 7) + 2}/${Math.floor(i / 7) + 2}`;
     if (t > today) { parts.push(`<i class="future" style="${area}"></i>`); continue; }
     const v = days[dayKey(t.getTime())] || {};
-    const pts = (v.a || 0) + 5 * (v.r || 0) + 10 * (v.l || 0);
+    const pts = (v.a || 0) + 5 * (v.r || 0) + 10 * (v.l || 0) + 0.5 * (v.f || 0);
     const lvl = pts <= 0 ? 0 : pts < 5 ? 1 : pts < 12 ? 2 : pts < 25 ? 3 : pts < 45 ? 4 : 5;
     if (pts > 0) active++;
-    const tip = `<b>${esc(fmtDateLong(t.getTime()))}</b>${plural(v.a || 0, "question")} answered${v.a ? ` (${v.k || 0} right)` : ""}${v.r ? `<br>${plural(v.r, "notes page")} read` : ""}${v.l ? `<br>${plural(v.l, "lab")} done` : ""}`;
+    const tip = `<b>${esc(fmtDateLong(t.getTime()))}</b>${plural(v.a || 0, "question")} answered${v.a ? ` (${v.k || 0} right)` : ""}${v.f ? `<br>${plural(v.f, "flashcard")} reviewed` : ""}${v.r ? `<br>${plural(v.r, "notes page")} read` : ""}${v.l ? `<br>${plural(v.l, "lab")} done` : ""}`;
     parts.push(`<i data-l="${lvl}" style="${area}" data-tip="${esc(tip)}"></i>`);
   }
   return `<div class="stack"><div class="heat" role="img" aria-label="Study activity: ${active} active days in the last 12 weeks">${parts.join("")}</div>
@@ -441,6 +458,7 @@ VIEWS.objective = function ({ id }) {
   const also = (NOTES_ALSO[id] || []).filter((n) => n.objective !== id);
   const labs = LABS_BY_OBJ[id] || [];
   const os = d.objStats[id] || { total: 0, seen: 0, due: 0, firstAcc: null, lastAcc: null };
+  const cos = d.cardObjStats[id] || { total: 0, seen: 0, due: 0, mastered: 0 };
   const caseQs = (QS_BY_OBJ[id] || []).filter((q) => q.caseStudy).length;
   const status = objStatus(id), conf = objConf(id);
   const pageItem = (n) => `<a class="page-item" href="#/note/${n.id}" data-route="note/${n.id}">
@@ -474,6 +492,14 @@ VIEWS.objective = function ({ id }) {
         ${caseQs ? `<span class="hint">${plural(caseQs, "case-study question")} included</span>` : ""}
       </div>
     </section>
+    ${cos.total ? `<section class="panel">
+      <div class="panel-head"><h2>Flashcards</h2><span class="hint">${cos.seen}/${cos.total} seen · ${cos.mastered} learned${cos.due ? ` · ${cos.due} due` : ""}</span></div>
+      <div class="row">
+        <button type="button" class="btn" data-action="start-cards" data-kind="objective" data-id="${id}" data-count="20">${icon("cards")}Study ${Math.min(20, cos.total)} cards</button>
+        ${cos.due ? `<button type="button" class="btn" data-action="start-cards" data-kind="objective-due" data-id="${id}" data-count="${cos.due}">Review ${cos.due} due</button>` : ""}
+        <a class="btn ghost" href="#/browse/${id}" data-route="browse/${id}">Browse all ${cos.total}</a>
+      </div>
+    </section>` : ""}
     ${labs.length ? `<section class="panel"><h2>Hands-on</h2><div class="card-list">${labs.map(labRow).join("")}</div></section>` : ""}
   </div>`;
 };
@@ -486,6 +512,7 @@ VIEWS.note = function ({ id }) {
   const idx = siblings.findIndex((x) => x.id === id);
   const next = siblings[idx + 1] || NOTES[NOTES.indexOf(n) + 1];
   const read = noteRead(id);
+  const nCards = (CARDS_BY_NOTE[id] || []).length;
   if (Store.data.state.last?.note !== id) queueMicrotask(() => Store.patch("state", { last: { note: id, t: Date.now() } }));
   return `<div class="page">
     ${crumbs([["Study guide", "study"], [`${o.id} ${shortTitle(o.title)}`, `objective/${o.id}`], [`Page ${idx + 1} of ${siblings.length}`, null]])}
@@ -498,6 +525,7 @@ VIEWS.note = function ({ id }) {
       <div class="row">
         <button type="button" class="btn ${read ? "" : "primary"}" data-action="note-read" data-id="${id}" aria-pressed="${read}">${icon(read ? "s2" : "check")}${read ? "Read" : "Mark as read"}</button>
         <button type="button" class="btn" data-action="start-practice" data-kind="objective" data-id="${o.id}" data-count="10">Practice ${o.id}</button>
+        ${nCards ? `<button type="button" class="btn" data-action="start-cards" data-kind="note" data-id="${id}" data-count="${nCards}">${icon("cards")}${plural(nCards, "flashcard")}</button>` : ""}
       </div>
       ${next ? `<a class="btn ghost" href="#/note/${next.id}" data-route="note/${next.id}">Next: ${esc(shortTitle(next.title))} ${icon("arrow")}</a>` : `<a class="btn ghost" href="#/study" data-route="study">Back to the study guide</a>`}
     </div>
@@ -542,10 +570,10 @@ VIEWS.practice = function () {
   </div>`;
 };
 
-function startPractice({ kind, id, count }) {
+function startPractice({ kind, id, ids, count }) {
   const now = Date.now();
   const qs = qstats();
-  let scope = { kind, id };
+  let scope = { kind, id, ids };
   if (kind === "objective-due") scope = { kind: "ids", ids: (QS_BY_OBJ[id] || []).filter((q) => isDue(qs[q.id], now)).map((q) => q.id) };
   const picked = pickPractice(QS, qs, scope, Number(count) || 10, now);
   if (!picked.length) { toast("No questions match this choice yet."); return; }
@@ -667,6 +695,163 @@ function recordAnswer(qid, ok) {
   const prev = qstats()[qid];
   Store.patch("qstats", { q: { [qid]: applyAnswer(prev, ok, now) } });
   logActivity({ a: 1, k: ok ? 1 : 0 });
+}
+
+// ---------- flashcards ----------
+VIEWS.cards = function () {
+  const d = derived();
+  const n = ui.cardCount;
+  const quick = [
+    ["due", "Due for review", d.cardsDue, "Cards you missed or have not reviewed for a while.", "target"],
+    ["read", "New from pages you read", d.cardsNewRead, "Cards you have not seen, from notes pages you marked as read.", "book"],
+    ["new", "All new cards", d.cardsNew, "Cards you have not seen, from every notes page.", "spark"],
+    ["missed", "Missed last time", d.cardsMissed, "Your latest grade was “Again”.", "x"],
+  ];
+  return `<div class="page narrow">
+    <div class="page-head"><div><h1>Flashcards</h1><p>Concepts and terms from the notes pages. Answer in your head, show the answer, then grade yourself. Cards you miss come back for spaced review.</p></div>
+      <div class="seg" role="group" aria-label="Cards per session">${[10, 20, 30].map((c) => `<button type="button" data-action="set-card-count" data-n="${c}" aria-pressed="${n === c}">${c} cards</button>`).join("")}</div>
+    </div>
+    <div class="tiles two">
+      ${tile("Cards seen", CARDS.length - d.cardsNew, CARDS.length, "browse")}
+      ${tile("Cards learned", d.cardsLearned, CARDS.length, "browse")}
+    </div>
+    <div class="grid-2">${quick.map(([k, label, count, sub, ic]) => `<button type="button" class="action" data-action="start-cards" data-kind="${k}" data-count="${n}"${count ? "" : " disabled"}><span class="ico">${icon(ic)}</span><span><b>${esc(label)} · ${count}</b><span>${esc(sub)}</span></span><span class="go">${icon("arrow")}</span></button>`).join("")}</div>
+    <section class="panel">
+      <div class="panel-head"><h2>By objective</h2><a class="btn small" href="#/browse" data-route="browse">Browse all ${CARDS.length} cards</a></div>
+      <div class="scroll-x"><table class="data-table"><thead><tr><th>Objective</th><th class="n">Cards</th><th class="n">Seen</th><th class="n">Learned</th><th class="n">Due</th><th></th></tr></thead><tbody>
+      ${OBJECTIVES.map((o) => { const cs = d.cardObjStats[o.id] || { total: 0, seen: 0, mastered: 0, due: 0 }; return `<tr><td><a href="#/browse/${o.id}" data-route="browse/${o.id}"><span class="objid">${o.id}</span></a> ${esc(o.title)}</td><td class="n">${cs.total}</td><td class="n">${cs.seen}</td><td class="n">${cs.mastered}</td><td class="n">${cs.due || ""}</td><td class="n"><button type="button" class="btn small" data-action="start-cards" data-kind="objective" data-id="${o.id}" data-count="${n}"${cs.total ? "" : " disabled"}>Study</button></td></tr>`; }).join("")}
+      </tbody></table></div>
+      <p class="hint">A card is learned when it reaches the ${BOX_DAYS[3]}-day review interval. Flashcards do not change the predicted score.</p>
+    </section>
+  </div>`;
+};
+
+function startCards({ kind, id, ids, count }) {
+  const now = Date.now();
+  const cs = cstats();
+  let scope = { kind, id, ids };
+  if (kind === "new") scope = { kind: "unseen" };
+  if (kind === "read") scope = { kind: "ids", ids: CARDS.filter((c) => !cs[c.id]?.n && noteRead(c.note)).map((c) => c.id) };
+  if (kind === "note") scope = { kind: "ids", ids: (CARDS_BY_NOTE[id] || []).map((c) => c.id) };
+  if (kind === "objective-due") scope = { kind: "ids", ids: (CARDS_BY_OBJ[id] || []).filter((c) => isDue(cs[c.id], now)).map((c) => c.id) };
+  const picked = pickPractice(CARDS, cs, scope, Number(count) || 20, now);
+  if (!picked.length) { toast("No cards match this choice yet."); return; }
+  const label = { due: "Spaced review", read: "New from pages you read", new: "New cards", missed: "Missed last time", objective: `Objective ${id}`, "objective-due": `Objective ${id} · due`, note: NOTE[id]?.title || "Notes page", ids: "Missed cards" }[kind] || "Flashcards";
+  ui.flash = { label, ids: picked.map((c) => c.id), i: 0, shown: false, grades: {}, finished: false };
+  go("flash");
+}
+
+VIEWS.flash = function () {
+  const f = ui.flash;
+  if (!f) return VIEWS.cards();
+  const c = CARD[f.ids[f.i]];
+  if (f.finished || !c) return flashSummary(f);
+  const graded = Object.keys(f.grades).length;
+  const known = Object.values(f.grades).filter(Boolean).length;
+  const o = OBJ[c.objective], n = NOTE[c.note];
+  const st = cstats()[c.id];
+  const now = Date.now();
+  const nextIn = (ok) => { const days = Math.round((applyAnswer(st, ok, now).d - now) / DAY); return days ? `Next in ${plural(days, "day")}` : "Due again now"; };
+  return `<div class="page narrow quiz">
+    <div class="quiz-bar">
+      <span class="pos">${f.i + 1} / ${f.ids.length}</span>
+      <div class="progress-line" aria-hidden="true"><i style="width:${(graded / f.ids.length) * 100}%"></i></div>
+      <span class="muted">${esc(f.label)} · ${known}/${graded} known</span>
+      <button type="button" class="btn small" data-action="end-flash">End session</button>
+    </div>
+    <article class="fcard${f.shown ? " shown" : ""}" aria-label="Flashcard ${f.i + 1} of ${f.ids.length}">
+      <header class="fcard-head">
+        <span class="fcard-kind">${c.kind === "term" ? "Term" : "Concept"}</span>
+        <a class="objid" href="#/objective/${o.id}" data-route="objective/${o.id}" title="${esc(o.title)}">${o.id}</a>
+        <span class="spacer"></span>
+        ${st?.n ? `<span class="hint">Seen ${plural(st.n, "time")}${st.l ? "" : " · missed last time"}</span>` : `<span class="chip accent">New</span>`}
+      </header>
+      <div class="fcard-face">
+        <div class="fcard-front ${c.kind}">${c.front}</div>
+        ${f.shown ? "" : `<p class="fcard-cue">${c.kind === "term" ? "What is it, and when do you use it?" : "Answer in your head, then show the answer."}</p>`}
+      </div>
+      ${f.shown ? `<div class="fcard-back">
+          <p class="fcard-answer">${c.back}</p>
+          ${c.aws ? `<p class="fcard-aws"><span class="eyebrow">AWS</span><span>${c.aws}</span></p>` : ""}
+          ${c.source ? `<div class="source">${c.source.evidence ? `<q>${esc(c.source.evidence)}</q>` : ""}<a class="ext" href="${esc(c.source.url)}" target="_blank" rel="noopener">${esc(c.source.title)}</a></div>` : ""}
+          <div class="row"><span class="hint">Study:</span><a href="#/note/${n.id}" data-route="note/${n.id}">${esc(n.title)}</a></div>
+        </div>
+        <div class="fcard-grade" role="group" aria-label="Grade yourself">
+          <button type="button" class="grade again" data-action="grade-card" data-ok="0"><span class="g-top"><kbd>1</kbd><b>Again</b></span><span class="g-sub">${nextIn(false)}</span></button>
+          <button type="button" class="grade good" data-action="grade-card" data-ok="1"><span class="g-top"><kbd>2</kbd><b>Got it</b></span><span class="g-sub">${nextIn(true)}</span></button>
+        </div>`
+      : `<div class="fcard-actions"><button type="button" class="btn primary" data-action="flip-card">Show answer</button><span class="kbd-hint">Keys: <kbd>Space</kbd> show the answer, then <kbd>1</kbd> again or <kbd>2</kbd> got it</span></div>`}
+    </article>
+  </div>`;
+};
+
+function flashSummary(f) {
+  const ids = f.ids.filter((id) => f.grades[id] != null && CARD[id]);
+  const missed = ids.filter((id) => !f.grades[id]);
+  const known = ids.length - missed.length;
+  return `<div class="page narrow">
+    <div class="page-head"><div><div class="eyebrow">${esc(f.label)}</div><h1>${ids.length ? `${known} of ${plural(ids.length, "card")} known` : "No cards graded"}</h1><p>${!ids.length ? "" : missed.length ? "The cards you missed are due again now. They stay in spaced review until you know them." : "You knew every card. Each one comes back after a longer interval."}</p></div></div>
+    ${missed.length ? `<section class="panel"><h2>Missed</h2><div class="fc-list">${missed.map((id) => cardItem(CARD[id])).join("")}</div>
+      <div class="row"><button type="button" class="btn primary" data-action="retry-cards">Review the missed cards again</button></div></section>` : ""}
+    <div class="row"><a class="btn" href="#/cards" data-route="cards">Back to flashcards</a><a class="btn ghost" href="#/home" data-route="home">Dashboard</a></div>
+  </div>`;
+}
+
+function recordCard(id, ok) {
+  Store.patch("cards", { c: { [id]: applyAnswer(cstats()[id], ok, Date.now()) } });
+  logActivity({ f: 1 });
+}
+
+// Card state marks in the card list: the shape carries the state, not only the color.
+const CARD_MARK = { new: ["s0", "New"], seen: ["s1", "Seen"], due: ["timer", "Due"], learned: ["s2", "Learned"] };
+function cardItem(c, { status = false } = {}) {
+  let mark = "";
+  if (status) {
+    const st = cstats()[c.id];
+    const k = !st?.n ? "new" : (st.b || 0) >= 3 ? "learned" : isDue(st, Date.now()) ? "due" : "seen";
+    mark = `<span class="fc-mark ${k}" title="${CARD_MARK[k][1]}">${icon(CARD_MARK[k][0])}<span class="sr-only">${CARD_MARK[k][1]}</span></span>`;
+  }
+  return `<div class="fc-item">
+    <div class="fc-item-front">${mark}<span>${c.front}</span></div>
+    <div class="fc-item-back"><span>${c.back}</span>${c.aws ? `<span class="fc-item-aws"><span class="eyebrow">AWS</span> ${c.aws}</span>` : ""}</div>
+  </div>`;
+}
+
+// Plain text of each card for search, built on first use.
+const CARD_TEXT = {};
+const textBox = document.createElement("div");
+function cardText(c) {
+  if (!(c.id in CARD_TEXT)) { textBox.innerHTML = `${c.front} ${c.back} ${c.aws || ""}`; CARD_TEXT[c.id] = textBox.textContent.toLowerCase(); }
+  return CARD_TEXT[c.id];
+}
+
+VIEWS.browse = function ({ id }) {
+  const o = id ? OBJ[id] : null;
+  if (id && !o) return notFound("objective");
+  return `<div class="page narrow">
+    ${crumbs([["Flashcards", "cards"], [o ? `Objective ${o.id}` : "All cards", null]])}
+    <div class="page-head"><div><h1>${o ? `${esc(o.id)} · ${esc(o.title)}` : "All cards"}</h1><p>Each card with its answer, grouped by notes page. The search looks at both sides of each card.</p></div></div>
+    <div class="browse-bar">
+      <div class="field"><label for="card-search">Search</label><input type="search" id="card-search" data-input="card-search" value="${esc(ui.browseQ)}" placeholder="For example: Private Service Connect" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label for="card-obj">Objective</label><select id="card-obj" data-change="browse-obj"><option value="">All objectives</option>${OBJECTIVES.map((x) => `<option value="${x.id}"${x.id === id ? " selected" : ""}>${x.id} · ${esc(shortTitle(x.title))}</option>`).join("")}</select></div>
+    </div>
+    <div id="card-results">${browseResults(id, ui.browseQ)}</div>
+  </div>`;
+};
+
+function browseResults(objId, query) {
+  const words = String(query || "").toLowerCase().split(/\s+/).filter(Boolean);
+  const list = (objId ? CARDS_BY_OBJ[objId] || [] : CARDS).filter((c) => words.every((w) => cardText(c).includes(w)));
+  if (!list.length) return `<p class="empty">${words.length ? "No cards match this search." : "No flashcards for this objective yet."}</p>`;
+  const legend = Object.entries(CARD_MARK).map(([k, [ic, label]]) => `<span class="fc-mark ${k}">${icon(ic)}</span>${label}`).join("");
+  return `<div class="row fc-legend"><span class="hint" role="status">${plural(list.length, "card")}${words.length ? " match" + (list.length === 1 ? "es" : "") : ""}</span><span class="spacer"></span><span class="hint fc-key">${legend}</span></div>` + Object.entries(groupBy(list, (c) => c.note)).map(([nid, cs]) => {
+    const n = NOTE[nid];
+    const all = (CARDS_BY_NOTE[nid] || []).length;
+    return `<section class="fc-group" aria-label="${esc(n.title)}">
+      <div class="fc-group-head"><span class="objid">${n.objective}</span><a href="#/note/${n.id}" data-route="note/${n.id}">${esc(n.title)}</a><span class="spacer"></span><button type="button" class="btn small" data-action="start-cards" data-kind="note" data-id="${n.id}" data-count="${all}">Study ${plural(all, "card")}</button></div>
+      <div class="fc-list">${cs.map((c) => cardItem(c, { status: true })).join("")}</div>
+    </section>`;
+  }).join("");
 }
 
 // ---------- mock exam ----------
@@ -951,8 +1136,8 @@ VIEWS.progress = function () {
     </section>
     <section class="panel">
       <h2>Objectives</h2>
-      <div class="scroll-x"><table class="data-table"><thead><tr><th>Objective</th><th>Status</th><th class="n">Confidence</th><th class="n">Pages read</th><th class="n">Tried</th><th class="n">First try</th><th class="n">Latest</th><th class="n">Due</th></tr></thead><tbody>
-      ${OBJECTIVES.map((o) => { const os = d.objStats[o.id] || { total: 0, seen: 0, due: 0 }; const notes = NOTES_BY_OBJ[o.id] || []; return `<tr><td><a href="#/objective/${o.id}" data-route="objective/${o.id}"><span class="objid">${o.id}</span></a> ${esc(o.title)}</td><td>${statusChip(objStatus(o.id))}</td><td class="n">${objConf(o.id) || "–"}</td><td class="n">${notes.filter((n) => noteRead(n.id)).length}/${notes.length}</td><td class="n">${os.seen}/${os.total}</td><td class="n">${os.seen ? pct(os.firstAcc) : "–"}</td><td class="n">${os.seen ? pct(os.lastAcc) : "–"}</td><td class="n">${os.due || ""}</td></tr>`; }).join("")}
+      <div class="scroll-x"><table class="data-table"><thead><tr><th>Objective</th><th>Status</th><th class="n">Confidence</th><th class="n">Pages read</th><th class="n">Tried</th><th class="n">First try</th><th class="n">Latest</th><th class="n">Due</th><th class="n">Cards learned</th></tr></thead><tbody>
+      ${OBJECTIVES.map((o) => { const os = d.objStats[o.id] || { total: 0, seen: 0, due: 0 }; const cos = d.cardObjStats[o.id] || { total: 0, mastered: 0 }; const notes = NOTES_BY_OBJ[o.id] || []; return `<tr><td><a href="#/objective/${o.id}" data-route="objective/${o.id}"><span class="objid">${o.id}</span></a> ${esc(o.title)}</td><td>${statusChip(objStatus(o.id))}</td><td class="n">${objConf(o.id) || "–"}</td><td class="n">${notes.filter((n) => noteRead(n.id)).length}/${notes.length}</td><td class="n">${os.seen}/${os.total}</td><td class="n">${os.seen ? pct(os.firstAcc) : "–"}</td><td class="n">${os.seen ? pct(os.lastAcc) : "–"}</td><td class="n">${os.due || ""}</td><td class="n">${cos.total ? `${cos.mastered}/${cos.total}` : "–"}</td></tr>`; }).join("")}
       </tbody></table></div>
     </section>
     <section class="panel" id="settings">
@@ -966,6 +1151,7 @@ VIEWS.progress = function () {
         <p>For each exam section, the app takes the share of first answers you got right. Recent answers count more: an answer from ${READINESS.halfLifeDays} days ago counts half as much as one from today. Each section starts at ${pct(READINESS.priorMean)} with the weight of ${READINESS.priorWeight} answers, so a few lucky answers cannot move it far. The overall score weights the sections by the official exam guide (25%, 17.5%, 17.5%, 15%, 12.5%, 12.5%). The ± value is a 95% interval.</p>
         <p>Google does not publish the passing score. “Ready” in this app means: predicted score of 80% or more, at least 60% of the bank tried, 90% of objectives done, and a latest mock exam score of 80% or more. The bar is high on purpose.</p>
         <p>Spaced review: a wrong answer makes a question due again at once. Each right answer moves it to a longer interval: ${BOX_DAYS.slice(1).join(", ")} days.</p>
+        <p>Flashcards use the same intervals. “Again” makes a card due at once, and each “Got it” moves it to a longer interval. A card is learned when it reaches the ${BOX_DAYS[3]}-day interval. Flashcards do not change the predicted score.</p>
       </div>
     </section>
     <section class="panel">
@@ -979,8 +1165,8 @@ VIEWS.progress = function () {
         <div class="row"><button type="button" class="btn" data-action="import-data">Import and replace my progress</button>${ui.importMsg ? `<span class="hint">${esc(ui.importMsg)}</span>` : ""}</div></div>
       <hr class="rule">
       ${ui.resetStep === 0 ? `<div class="row"><button type="button" class="btn danger" data-action="reset-1">Reset all progress…</button></div>`
-        : `<div class="callout warn"><b>Delete all progress?</b><span>This deletes objective status, notes read, labs done, every answer, and every mock exam. It cannot be undone.</span><div class="row"><button type="button" class="btn danger" data-action="reset-2">Delete everything</button><button type="button" class="btn" data-action="reset-cancel">Cancel</button></div></div>`}
-      <p class="hint">Content built ${esc(fmtDateLong(Date.parse(DATA.builtAt)))} from exam guide ${esc(EXAM.guideVersion)} (retrieved ${esc(EXAM.retrieved)}): ${NOTES.length} notes pages, ${QS.length} questions, ${LABS.length} labs.</p>
+        : `<div class="callout warn"><b>Delete all progress?</b><span>This deletes objective status, notes read, labs done, every answer, every flashcard grade, and every mock exam. It cannot be undone.</span><div class="row"><button type="button" class="btn danger" data-action="reset-2">Delete everything</button><button type="button" class="btn" data-action="reset-cancel">Cancel</button></div></div>`}
+      <p class="hint">Content built ${esc(fmtDateLong(Date.parse(DATA.builtAt)))} from exam guide ${esc(EXAM.guideVersion)} (retrieved ${esc(EXAM.retrieved)}): ${NOTES.length} notes pages, ${QS.length} questions, ${CARDS.length} flashcards, ${LABS.length} labs.</p>
     </section>
   </div>`;
 };
@@ -1039,6 +1225,30 @@ const ACTIONS = {
     const z = ui.quiz;
     const ids = z.qids.filter((id) => z.done[id] && !z.right[id]);
     startPractice({ kind: "ids", ids, count: ids.length });
+  },
+  "set-card-count": ({ n }) => { ui.cardCount = Number(n); render(); },
+  "start-cards": (ds) => startCards(ds),
+  "flip-card": () => {
+    if (!ui.flash || ui.flash.finished) return;
+    ui.flash.shown = true;
+    render();
+    document.querySelector(".fcard-grade")?.scrollIntoView({ block: "nearest" });
+  },
+  "grade-card": ({ ok }) => {
+    const f = ui.flash;
+    if (!f || !f.shown || f.finished) return;
+    const id = f.ids[f.i];
+    f.grades[id] = ok === "1";
+    recordCard(id, f.grades[id]);
+    f.shown = false;
+    if (f.i + 1 < f.ids.length) f.i++; else f.finished = true;
+    render(); window.scrollTo(0, 0);
+  },
+  "end-flash": () => { ui.flash.finished = true; render(); },
+  "retry-cards": () => {
+    const f = ui.flash;
+    const ids = f.ids.filter((id) => f.grades[id] === false);
+    startCards({ kind: "ids", ids, count: ids.length });
   },
   "toggle-case": () => { if (ui.route.name === "quiz") ui.quiz.showCase = !ui.quiz.showCase; else if (ui.exam) ui.exam.showCase = !ui.exam.showCase; render(); },
   "toggle-flag": ({ id }) => { const cur = !!qstats()[id]?.fl; Store.patch("qstats", { q: { [id]: { fl: !cur } } }); render(); },
@@ -1125,12 +1335,26 @@ document.addEventListener("click", (e) => {
 document.addEventListener("change", (e) => {
   const el = e.target;
   if (el.matches('input[type="checkbox"][data-action]')) { const fn = ACTIONS[el.dataset.action]; if (fn) fn(el.dataset, el, e); }
+  if (el.dataset.change === "browse-obj") go(el.value ? `browse/${el.value}` : "browse", { replace: true });
   if (el.dataset.change === "exam-date") { Store.patch("state", { settings: { examDate: el.value || null } }); toast(el.value ? "Exam date saved" : "Exam date cleared"); }
+});
+document.addEventListener("input", (e) => {
+  if (e.target.dataset.input !== "card-search") return;
+  ui.browseQ = e.target.value;
+  const box = document.getElementById("card-results");
+  if (box) box.innerHTML = browseResults(ui.route.id, ui.browseQ);
 });
 document.addEventListener("keydown", (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.target.closest("input, textarea, select")) return;
   const name = ui.route.name;
+  if (name === "flash") {
+    const f = ui.flash;
+    if (!f || f.finished) return;
+    if (!f.shown && (e.key === " " || e.key === "Enter") && !e.target.closest("button, a")) { e.preventDefault(); ACTIONS["flip-card"](); }
+    else if (f.shown && (e.key === "1" || e.key === "2")) { e.preventDefault(); ACTIONS["grade-card"]({ ok: e.key === "2" ? "1" : "0" }); }
+    return;
+  }
   if (name !== "quiz" && name !== "exam") return;
   const key = e.key.toUpperCase();
   let q, order;
@@ -1174,7 +1398,7 @@ Store.onChange((kind) => {
   if (kind === "data") dataVersion++;
   renderSaveState();
   renderNav();
-  const passive = ["home", "study", "objective", "practice", "mock", "cases", "labs", "progress"];
+  const passive = ["home", "study", "objective", "practice", "cards", "browse", "mock", "cases", "labs", "progress"];
   const waiting = !!document.querySelector("#main [data-waiting]");
   if ((kind === "data" || waiting) && (passive.includes(ui.route.name) || waiting) && !document.activeElement?.closest?.("input, textarea, select")) {
     const y = window.scrollY;
@@ -1186,15 +1410,16 @@ Store.onChange((kind) => {
 // ---------- boot ----------
 // The open quiz or mock exam survives a reload (a republish reloads the page).
 function saveSession() {
-  lsSetStr("pca-session", JSON.stringify({ quiz: ui.quiz, exam: ui.exam, caseTab: ui.caseTab, practiceCount: ui.practiceCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter }));
+  lsSetStr("pca-session", JSON.stringify({ quiz: ui.quiz, exam: ui.exam, flash: ui.flash, caseTab: ui.caseTab, practiceCount: ui.practiceCount, cardCount: ui.cardCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter }));
 }
 function start() {
   let saved = {};
   try { saved = JSON.parse(lsGetStr("pca-session") || "{}") || {}; } catch { saved = {}; }
-  for (const k of ["quiz", "exam", "caseTab", "practiceCount", "labNoOrg", "resultFilter"]) if (saved[k] != null) ui[k] = saved[k];
+  for (const k of ["quiz", "exam", "flash", "caseTab", "practiceCount", "cardCount", "labNoOrg", "resultFilter"]) if (saved[k] != null) ui[k] = saved[k];
+  if (ui.flash && !(ui.flash.ids || []).every((id) => CARD[id])) ui.flash = null; // a card left the deck in a new build
   let initial = lsGetStr("pca-route") || "home";
   const r = parseRoute(initial);
-  if ((r.name === "quiz" && !ui.quiz) || (r.name === "exam" && !ui.exam) || !VIEWS[r.name]) initial = "home";
+  if ((r.name === "quiz" && !ui.quiz) || (r.name === "exam" && !ui.exam) || (r.name === "flash" && !ui.flash) || !VIEWS[r.name]) initial = "home";
   ui.routeStr = initial;
   ui.route = parseRoute(initial);
   Store.init(); // loads this browser's cache at once, then connects to the db

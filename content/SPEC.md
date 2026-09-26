@@ -206,10 +206,61 @@ For each case study `<id>` (`altostrat`, `cymbal`, `ehr`, `knightmotives`):
 - `<id>.md` — the official case study text, transcribed faithfully from the PDF in `sources/`. Frontmatter: `id`, `name`, `pdf` (official URL). Keep the original headings and bullet lists. Do not add commentary. The app shows this text next to case-study questions, as the exam does.
 - `<id>.analysis.md` — the analysis. Frontmatter: `id: <id>-analysis`, `caseStudy: <id>`, `minutes`. Sections: `## Summary`, `## Requirements map` (table: requirement → Google Cloud solution → why → source), `## Key design decisions`, `## Likely exam angles`, `## Read in the docs`.
 
-## 8. Definition of done (per author)
+## 8. Flashcards (`content/flashcards/<domain>.json`)
+
+Flashcards drill the concepts and terms of the notes pages. Each card comes from one notes page, and the facts on it come from that page. Each file is a JSON array of card objects for one author domain (the owners in `content/PLAN.md`). Card IDs use the domain, `f`, and a 3-digit number: `net-f001`, `net-f002`, …
+
+### Schema
+
+```json
+{
+  "id": "net-f007",
+  "note": "2.1-hybrid-multicloud",
+  "kind": "concept",
+  "front": "What does HA VPN need to get the 99.99% availability SLA?",
+  "back": "A tunnel on each of the two interfaces of the HA VPN gateway. A gateway with only one active interface has no SLA.",
+  "aws": null,
+  "source": {
+    "title": "HA VPN topologies",
+    "url": "https://docs.cloud.google.com/network-connectivity/docs/vpn/concepts/topologies",
+    "evidence": "A verbatim quote (8-40 words) from this page that supports the back of the card."
+  }
+}
+```
+
+Field rules:
+
+- `note`: the ID of the notes page that teaches the fact. The app shows the card with that page's primary objective, and links to the page.
+- `kind`: `"term"` or `"concept"`.
+  - `term`: `front` is the exact name of a product, feature, or term, as the notes page writes it (8 words or fewer, no question mark). `back` says what it is and when an architect uses it.
+  - `concept`: `front` is one question of 20 words or fewer that ends with `?`. The question has one clear answer: a decision rule, a requirement, a limit, a difference, or a cause. `back` gives that answer.
+- `back`: 1 to 3 sentences, 60 words or fewer. Inline Markdown only (code and bold). No links: the app shows the source below the answer.
+- `aws`: optional. For a `term` card, the AWS equivalent from the page's `## AWS mapping` table (12 words or fewer). Otherwise `null` or omit it.
+- `source`: one page that the notes page cites for this fact. The `url` must appear in the notes page. `evidence` is a verbatim quote of 8 to 40 words from that page, as `tools/fetch_doc.py` prints it, that supports the back. The same matching rules as for questions apply (section 5).
+
+### Card style
+
+- Test one fact per card. Split a card that needs "and" to join two unrelated facts.
+- Pick the facts that decide exam answers: the Google-recommended choice, the qualifier that changes it, the SLA topology, the limit, the former product name, the difference from AWS. Skip trivia that the exam does not test (prices, exact quotas, console click paths).
+- The front must not give away the back. A `concept` front does not name the answer.
+- Use the product names of the exam guide v6.1. Put a former name in parentheses on the back when older questions use it.
+- Write about 8 to 12 cards for each notes page: about half `term` cards and half `concept` cards.
+- Do not write two cards with the same front. A term belongs to the domain whose notes page teaches it as a main topic.
+- Keep cards in reading order: by notes page (the order in `content/PLAN.md`), then in the order that the page teaches them.
+
+### Validate before you finish
+
+```bash
+python3 tools/check_flashcards.py content/flashcards/<domain>.json
+```
+
+Fix every error. The check confirms the schema, the note, that the note cites the source, and the evidence quote (from the docs cache).
+
+## 9. Definition of done (per author)
 
 - [ ] Every notes page has valid frontmatter and the required sections.
 - [ ] Every fact has a citation to a page you fetched.
 - [ ] `python3 tools/check_questions.py content/questions/<domain>.json` reports 0 errors.
+- [ ] `python3 tools/check_flashcards.py content/flashcards/<domain>.json` reports 0 errors.
 - [ ] `python3 tools/check_labs.py labs/<NN>-<slug>` reports 0 problems for each of your labs.
 - [ ] No resources were created in any cloud project.

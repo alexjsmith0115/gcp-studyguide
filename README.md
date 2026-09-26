@@ -1,13 +1,14 @@
 # PCA study guide
 
-A study system for the Google Cloud **Professional Cloud Architect** exam (exam guide v6.1). It has four parts:
+A study system for the Google Cloud **Professional Cloud Architect** exam (exam guide v6.1). It has five parts:
 
 | Part | Where | What it gives you |
 |---|---|---|
 | Notes | `content/notes/` | 1–3 pages for each of the 22 exam guide objectives, written for a reader who knows AWS and holds the Professional Cloud Developer certification. Each fact cites the Google Cloud documentation page it comes from. |
 | Question bank | `content/questions/` | Exam-style scenario questions. Each answer has an explanation, a reason why each wrong option is wrong, and a verbatim quote from the docs. |
+| Flashcards | `content/flashcards/` | Concepts and terms from the notes pages. Each card links its notes page and shows a verbatim quote from the docs. |
 | Labs | `labs/` | Hands-on practice in your own sandbox project, with cost notes and a teardown script. |
-| Study app | [PCA Workbook](https://claude.ai/artifact/TPcb1cyHLyPXTyEkZbcYqz) | Reader, practice sessions with spaced review, timed mock exams, and a readiness dashboard. Built from this repo. |
+| Study app | [PCA Workbook](https://claude.ai/artifact/TPcb1cyHLyPXTyEkZbcYqz) | Reader, practice sessions and flashcards with spaced review, timed mock exams, and a readiness dashboard. Built from this repo. |
 
 All content follows `content/SPEC.md`: official Google sources only, every page read before it is cited, and product names from the v6.1 exam guide.
 
@@ -17,9 +18,10 @@ All content follows `content/SPEC.md`: official Google sources only, every page 
 2. **Work through the objectives.** Go to **Study guide**. For each objective:
    1. Read its notes pages. Mark each page as read.
    2. Do its lab if it has one.
-   3. Practice its questions (10 at a time).
-   4. Set the objective to **Done** when you can explain the "Exam traps" section without notes.
-3. **Review every day.** **Practice → Due for review** brings back questions that you missed or have not seen for a while (spaced review: 1, 3, 7, 16, then 35 days).
+   3. Study the flashcards for each page (the **Flashcards** button at the end of the page).
+   4. Practice its questions (10 at a time).
+   5. Set the objective to **Done** when you can explain the "Exam traps" section without notes.
+3. **Review every day.** **Practice → Due for review** brings back questions that you missed or have not seen for a while (spaced review: 1, 3, 7, 16, then 35 days). **Flashcards → Due for review** does the same for the cards. The flashcards do not change the predicted score.
 4. **Read the case studies early.** Each exam uses two of the four case studies, and case-study questions are 20–30% of the exam. Read each case study and its analysis, then practice its questions.
 5. **Take mock exams.** Start after about a third of the objectives. A mock exam has 50 questions, 2 hours, and two case studies, with no feedback until the end. Take one each week after that.
 6. **Book the exam** when the dashboard verdict says **Ready**: predicted score of 80% or more, at least 60% of the bank tried, 90% of objectives done, and a latest mock exam score of 80% or more.
@@ -51,6 +53,7 @@ Every lab runs in one dedicated project whose ID starts with `pca-lab-`. [Lab 00
 | `content/exam.json` | The exam guide v6.1 structure: sections, weights, objectives, and their considerations (verbatim). |
 | `content/notes/<id>.md` | Notes pages. The ID starts with the objective, for example `2.1-hybrid-multicloud`. |
 | `content/questions/<domain>.json` | The question bank, one file for each author domain. |
+| `content/flashcards/<domain>.json` | The flashcards, one file for each author domain. |
 | `content/case-studies/` | The four official case studies (verbatim) and an analysis for each. |
 | `content/reference/` | Reference tables, for example the AI product name changes. |
 | `content/SPEC.md`, `content/PLAN.md` | Authoring rules and the content plan. |
@@ -65,6 +68,7 @@ Every lab runs in one dedicated project whose ID starts with `pca-lab-`. [Lab 00
 npm install                  # once
 npm test                     # scoring and scheduling logic
 npm run check:questions      # schema, style rules, and docs quotes for every question
+npm run check:flashcards     # schema, style limits, notes citation, and docs quote for every card
 npm run check:labs           # every gcloud and bq command and flag exists in the local SDK
 npm run check:links          # every cited link returns HTTP 200
 npm run build                # writes dist/index.html (the app) and dist/pca-workbook.html (a standalone copy)
@@ -84,7 +88,8 @@ In the published app, progress saves to the app's database in your Claude accoun
 |---|---|
 | `progress/state` | Objective status (0 not started, 1 studying, 2 done) and confidence (1–5), notes pages read, labs done, settings. |
 | `progress/qstats` | For each question: tries, right answers, first-try result, latest result, spaced-review box, due time, flag. |
-| `progress/activity` | For each day: questions answered and right, pages read, labs done. |
+| `progress/cards` | For each flashcard: the same fields as for a question ("Got it" counts as right), without the flag. |
+| `progress/activity` | For each day: questions answered and right, pages read, labs done, flashcards reviewed. |
 | `mocks/<id>` | One document for each mock exam: questions, answers, time, score by section and objective. |
 
 **Progress → Copy progress as JSON** exports the same data. **Import progress** restores it.
