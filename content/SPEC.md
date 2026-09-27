@@ -284,7 +284,46 @@ Grounding: every fact in `def` and `aws` comes from the linked notes page, which
 
 The build marks only the first use of a term in each section of a page. It skips links, code, headings, AWS product names, and the front of flashcards. `node app/build.mjs` reports a missing note, a note that does not mention the term, a string that two terms claim, and a term that no page uses.
 
-## 10. Definition of done (per author)
+## 10. Services (`content/services.json`)
+
+The **Services** tab has one profile for each Google Cloud service that the exam guide or the questions name. The file has two arrays: `categories` and `services`.
+
+```json
+{
+  "id": "cloud-run",
+  "name": "Cloud Run",
+  "category": "containers",
+  "patterns": ["Cloud Run(?! functions)"],
+  "guidePatterns": ["(?i)serverless computing"],
+  "what": "Cloud Run is a serverless platform that runs containers as services, jobs, and worker pools.",
+  "cues": ["A stateless containerized API has spiky traffic, and a small team has no Kubernetes skills or need."],
+  "traps": ["A service request stops at 60 minutes, so multi-hour work belongs in a Cloud Run job."],
+  "confused": [{ "with": "gke", "tell": "Pick GKE Autopilot when the app needs Helm, custom resources, or the Kubernetes API." }],
+  "aws": "AWS Fargate, AWS App Runner",
+  "docs": { "title": "What is Cloud Run", "url": "https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run" },
+  "sources": ["1.3-compute-choice", "2.3-serverless"]
+}
+```
+
+Field rules:
+
+- `category`: a category `id`. `formerly`: optional, the former product name (for example `Cloud Composer`).
+- `patterns`: JavaScript regular expressions that find the service in the text that the reader sees. A leading `(?i)` makes a pattern case-insensitive. Add former names. Use a negative lookahead to keep a longer name out (`Cloud Run(?! functions)`).
+- `guidePatterns`: optional extra patterns, used only to find the exam guide lines that name the service (objective titles and considerations).
+- `what`: 1 or 2 sentences. What the service is and what it is for.
+- `cues`: 2 to 4 scenario signals that point to the service, written as the situation.
+- `traps`: 0 to 2 common wrong uses or exam traps.
+- `confused`: 1 to 3 look-alike services (`with` is a service `id`) and one sentence on how to tell them apart.
+- `aws`: the AWS equivalent, only when the glossary or a notes page's AWS mapping names one.
+- `docs`: one official docs page that a notes page cites.
+- `sources`: the notes pages (or `case:<id>`) that the profile restates.
+- A category has `intro` (1 or 2 sentences) and `decide`: 3 to 7 rows of `{ "if": scenario signal, "then": [service ids], "why": one sentence }`.
+
+Grounding: a profile restates facts from its `sources` pages and from question explanations. Do not add facts that no notes page or question states. Plain text only, and the writing style rules in section 3 apply.
+
+The build counts, for each service, the questions that name it in a correct option, only in wrong options, or only in the stem or explanation. It also finds the exam guide lines, case studies, notes pages, and flashcards that name it. `node app/build.mjs` reports an unknown category, service, or source, and a pattern that does not compile.
+
+## 11. Definition of done (per author)
 
 - [ ] Every notes page has valid frontmatter and the required sections.
 - [ ] Every fact has a citation to a page you fetched.

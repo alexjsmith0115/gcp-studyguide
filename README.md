@@ -1,6 +1,6 @@
 # PCA study guide
 
-A study system for the Google Cloud **Professional Cloud Architect** exam (exam guide v6.1). It has five parts:
+A study system for the Google Cloud **Professional Cloud Architect** exam (exam guide v6.1). It has these parts:
 
 | Part | Where | What it gives you |
 |---|---|---|
@@ -10,6 +10,7 @@ A study system for the Google Cloud **Professional Cloud Architect** exam (exam 
 | Labs | `labs/` | Hands-on practice in your own sandbox project, with cost notes and a teardown script. |
 | Study app | [PCA Workbook](https://claude.ai/artifact/TPcb1cyHLyPXTyEkZbcYqz) | Reader, practice sessions and flashcards with spaced review, timed mock exams, and a readiness dashboard. Built from this repo. |
 | Glossary | `content/glossary.json` | Short definitions of acronyms and key terms, with AWS equivalents. In the app, point at a term with a dotted underline (or tap it) to see its definition. |
+| Services | `content/services.json` | A profile for each Google Cloud service that the exam guide or the questions name: what it is, the scenario cues that point to it, the look-alikes it gets confused with, and where it shows up in the exam guide and the question bank. |
 
 All content follows `content/SPEC.md`: official Google sources only, every page read before it is cited, and product names from the v6.1 exam guide.
 
@@ -23,10 +24,11 @@ All content follows `content/SPEC.md`: official Google sources only, every page 
    4. Practice its questions (10 at a time).
    5. Set the objective to **Done** when you can explain the "Exam traps" section without notes.
 3. **Use the term definitions.** A dotted underline marks an acronym or key term. Point at it, or tap it on a phone, to see a short definition, the AWS equivalent, and the notes page that explains it. Mock exams do not show them. **Progress → Settings** turns them off.
-4. **Review every day.** **Practice → Due for review** brings back questions that you missed or have not seen for a while (spaced review: 1, 3, 7, 16, then 35 days). **Flashcards → Due for review** does the same for the cards. The flashcards do not change the predicted score.
-5. **Read the case studies early.** Each exam uses two of the four case studies, and case-study questions are 20–30% of the exam. Read each case study and its analysis, then practice its questions.
-6. **Take mock exams.** Start after about a third of the objectives. A mock exam has 50 questions, 2 hours, and two case studies, with no feedback until the end. Take one each week after that.
-7. **Book the exam** when the dashboard verdict says **Ready**: predicted score of 80% or more, at least 60% of the bank tried, 90% of objectives done, and a latest mock exam score of 80% or more.
+4. **Learn the look-alike services.** Go to **Services**. Each category has a **How to choose** list of scenario signals, and each service page lists its cues, traps, and the services it gets confused with. **Practice** on a service page runs every question that names the service. After you answer a practice question, the explanation links the services in it.
+5. **Review every day.** **Practice → Due for review** brings back questions that you missed or have not seen for a while (spaced review: 1, 3, 7, 16, then 35 days). **Flashcards → Due for review** does the same for the cards. The flashcards do not change the predicted score.
+6. **Read the case studies early.** Each exam uses two of the four case studies, and case-study questions are 20–30% of the exam. Read each case study and its analysis, then practice its questions.
+7. **Take mock exams.** Start after about a third of the objectives. A mock exam has 50 questions, 2 hours, and two case studies, with no feedback until the end. Take one each week after that.
+8. **Book the exam** when the dashboard verdict says **Ready**: predicted score of 80% or more, at least 60% of the bank tried, 90% of objectives done, and a latest mock exam score of 80% or more.
 
 Google does not publish a passing score. The 80% target is this guide's choice, and it is high on purpose.
 
@@ -59,6 +61,7 @@ Every lab runs in one dedicated project whose ID starts with `pca-lab-`. [Lab 00
 | `content/case-studies/` | The four official case studies (verbatim) and an analysis for each. |
 | `content/reference/` | Reference tables, for example the AI product name changes. |
 | `content/glossary.json` | Glossary terms for the term definitions and the Glossary page. |
+| `content/services.json` | Service profiles and categories for the Services tab, and the patterns that find each service in the content. |
 | `content/SPEC.md`, `content/PLAN.md` | Authoring rules and the content plan. |
 | `labs/` | Labs, `labs/env.sh`, and the teardown scripts. |
 | `app/` | The study app: `src/` (UI, storage, scoring logic), `build.mjs`, and tests. |

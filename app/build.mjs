@@ -13,6 +13,7 @@ import matter from "gray-matter";
 import { Marked } from "marked";
 import hljs from "highlight.js";
 import { buildMatcher, glossify, checkGlossary, glossaryId } from "./glossary.mjs";
+import { buildServices, checkServices } from "./services.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const P = (...p) => path.join(ROOT, ...p);
@@ -258,6 +259,17 @@ for (const [from, kind, id] of internalRefs) {
 }
 for (const n of notes) for (const l of n.labs) if (!labIds.has(l)) warn(`note:${n.id}: frontmatter lab ${l} not found`);
 
+// ---------- services ----------
+// content/services.json: one profile per service. The build finds where each service
+// appears in the questions, notes, case studies, flashcards, and exam guide.
+let serviceSpec = { categories: [], services: [] };
+const servicesFile = P("content", "services.json");
+if (fs.existsSync(servicesFile)) {
+  try { serviceSpec = JSON.parse(read(servicesFile)); } catch (e) { warn(`content/services.json: invalid JSON (${e.message})`); }
+}
+const serviceProblems = checkServices(serviceSpec, { noteIds, caseIds });
+for (const p of serviceProblems) warn(`content/${p}`);
+
 // ---------- glossary checks ----------
 for (const p of checkGlossary(glossary, noteText)) warn(p);
 const glossUnused = glossary.filter((e) => !glossUsed.has(e.id)).map((e) => e.term);
@@ -280,6 +292,9 @@ const data = {
     .sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: "base" })),
   notes, cases, labs, questions, refs, cards,
 };
+let serviceData = { services: [], serviceCats: [], serviceGloss: {} };
+try { serviceData = buildServices(serviceSpec, { exam, notes, questions, cases, cards, glossary: data.glossary }); } catch (e) { warn(`content/services.json: ${e.message}`); }
+Object.assign(data, serviceData);
 const json = JSON.stringify(data).replace(/</g, "\\u003c");
 const css = read(P("app", "src", "styles.css"));
 const stripExports = (s) => s.replace(/^export\s+(?=(async\s+)?function|const|let|class)/gm, "").replace(/^export\s*\{[^}]*\};?\s*$/gm, "");
@@ -320,6 +335,7 @@ console.log(`  labs: ${labs.length}`);
 console.log(`  reference pages: ${refs.length}`);
 console.log(`  glossary: ${glossary.length} terms, ${[...glossUsed.values()].reduce((a, b) => a + b, 0).toLocaleString()} marked uses`);
 console.log(`  questions: ${questions.length} (${questions.filter((q) => q.caseStudy).length} case study)`);
+console.log(`  services: ${data.services.length} in ${data.serviceCats.length} categories, ${data.services.filter((s) => s.guide.length).length} in the exam guide wording`);
 console.log(`  flashcards: ${cards.length} (${cards.filter((c) => c.kind === "term").length} term, ${cards.filter((c) => c.kind === "concept").length} concept)`);
 console.log(`  per objective: ${Object.entries(byObj).sort((a, b) => a[0].localeCompare(b[0], undefined, { numeric: true })).map(([k, v]) => `${k}:${v}`).join(" ")}`);
 if (problems.length) {

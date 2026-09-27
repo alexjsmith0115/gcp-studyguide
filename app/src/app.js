@@ -30,6 +30,11 @@ const CARDS_BY_OBJ = groupBy(CARDS, (c) => c.objective);
 const CARDS_BY_NOTE = groupBy(CARDS, (c) => c.note);
 const GLOSSARY = DATA.glossary || [];
 const GLOSS = Object.fromEntries(GLOSSARY.map((g) => [g.id, g]));
+const SVC_CATS = DATA.serviceCats || [];
+const SVC_CAT = Object.fromEntries(SVC_CATS.map((c) => [c.id, c]));
+const SVCS = DATA.services || [];
+const SVC = Object.fromEntries(SVCS.map((s) => [s.id, s]));
+const SVC_BY_GLOSS = DATA.serviceGloss || {};
 
 // ---------- helpers ----------
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -61,6 +66,7 @@ const ICON = {
   spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
   warn: '<path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.5v.5"/>',
   doc: '<path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h5"/>',
+  layers: '<path d="m12 3.5 9 4.75-9 4.75-9-4.75z"/><path d="m3 12.5 9 4.75 9-4.75"/><path d="m3 16.5 9 4.75 9-4.75"/>',
   cards: '<rect x="3" y="7" width="13" height="14" rx="1.5"/><path d="M8 7V4.5A1.5 1.5 0 0 1 9.5 3h10A1.5 1.5 0 0 1 21 4.5v11a1.5 1.5 0 0 1-1.5 1.5H16"/><path d="M6.5 12h6M6.5 15.5h4"/>',
 };
 const icon = (name, cls = "") => `<svg class="ic${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ""}</svg>`;
@@ -118,6 +124,7 @@ function derived() {
 const ui = {
   routeStr: "home", route: { name: "home", id: null }, stack: [], origin: null,
   quiz: null, exam: null, flash: null, caseTab: {}, practiceCount: 10, cardCount: 20, browseQ: "", labNoOrg: false, resetStep: 0, importMsg: "",
+  svcSort: "cat", svcGuideOnly: false, svcQ: "",
 };
 const VIEWS = {};
 function parseRoute(str) {
@@ -126,13 +133,19 @@ function parseRoute(str) {
 }
 // A quiz, flashcard session, lab, or card list opened from a study page remembers that page,
 // so those views can link back to it and the reader lands at the same scroll position.
-const STUDY_ROUTES = new Set(["note", "objective", "ref", "glossary"]);
+const STUDY_ROUTES = new Set(["note", "objective", "ref", "glossary", "service", "services"]);
+// A service profile opened from a practice question or a mock exam review links back to it.
+const RETURN_ROUTES = new Set(["quiz", "result"]);
 const AID_ROUTES = new Set(["quiz", "flash", "lab", "browse"]);
 function go(path, { replace = false, keepScroll = false } = {}) {
   const to = parseRoute(path).name;
+  const from = ui.route.name;
   let restoreY = null;
-  if (STUDY_ROUTES.has(ui.route.name) && AID_ROUTES.has(to) && ui.routeStr) ui.origin = { route: ui.routeStr, y: Math.round(window.scrollY) };
-  else if (!AID_ROUTES.has(to)) { if (ui.origin?.route === path) restoreY = ui.origin.y; ui.origin = null; }
+  if (RETURN_ROUTES.has(from) && to === "service" && ui.routeStr) ui.origin = { route: ui.routeStr, y: Math.round(window.scrollY) };
+  else if (ui.origin && ui.origin.route === path) { restoreY = ui.origin.y; ui.origin = null; }
+  else if (STUDY_ROUTES.has(from) && AID_ROUTES.has(to) && ui.routeStr) ui.origin = { route: ui.routeStr, y: Math.round(window.scrollY) };
+  else if (from === "service" && to === "service" && ui.origin && RETURN_ROUTES.has(parseRoute(ui.origin.route).name)) { /* keep the way back */ }
+  else if (!AID_ROUTES.has(to)) ui.origin = null;
   if (!replace && ui.routeStr && ui.routeStr !== path) ui.stack.push(ui.routeStr);
   if (ui.stack.length > 50) ui.stack.shift();
   ui.routeStr = path;
@@ -150,10 +163,10 @@ function back(fallback = "home") {
 
 // ---------- shell ----------
 const NAV = [
-  ["home", "Dashboard", "home"], ["study", "Study guide", "book"], ["practice", "Practice", "target"], ["cards", "Flashcards", "cards"],
+  ["home", "Dashboard", "home"], ["study", "Study guide", "book"], ["services", "Services", "layers"], ["practice", "Practice", "target"], ["cards", "Flashcards", "cards"],
   ["mock", "Mock exam", "timer"], ["cases", "Case studies", "case"], ["labs", "Labs", "flask"], ["progress", "Progress", "chart"],
 ];
-const NAV_OF = { objective: "study", note: "study", ref: "study", glossary: "study", quiz: "practice", flash: "cards", browse: "cards", exam: "mock", result: "mock", case: "cases", lab: "labs" };
+const NAV_OF = { service: "services", objective: "study", note: "study", ref: "study", glossary: "study", quiz: "practice", flash: "cards", browse: "cards", exam: "mock", result: "mock", case: "cases", lab: "labs" };
 const NAV_COUNT_TITLE = { practice: "Questions due for review", cards: "Flashcards due for review", mock: "Mock exam in progress" };
 function renderNav() {
   const d = derived();
@@ -189,6 +202,7 @@ function render() {
   renderNav();
   renderSaveState();
   if (ui.route.name === "exam") startExamTimer();
+  if (ui.route.name === "services") filterServices();
   saveSession();
 }
 
@@ -210,6 +224,10 @@ function originLabel() {
   if (name === "objective") return OBJ[id] ? `${id} ${shortTitle(OBJ[id].title)}` : "";
   if (name === "ref") return REF[id]?.title || "";
   if (name === "glossary") return "the glossary";
+  if (name === "service") return SVC[id]?.name || "";
+  if (name === "services") return "Services";
+  if (name === "quiz") return ui.quiz && !ui.quiz.finished ? "the practice question" : "";
+  if (name === "result") return "the mock exam review";
   return "";
 }
 // The link back to the study page this view was opened from; empty when there is none.
@@ -451,9 +469,13 @@ VIEWS.study = function () {
       </section>`;
     }).join("")}
     ${REFS.length || GLOSSARY.length ? `<section class="section-block" aria-labelledby="sec-ref">
-      <div class="section-head"><span class="n">${icon("book")}</span><h2 id="sec-ref">Reference</h2><span class="w">${plural(REFS.length + (GLOSSARY.length ? 1 : 0), "page")}</span></div>
+      <div class="section-head"><span class="n">${icon("book")}</span><h2 id="sec-ref">Reference</h2><span class="w">${plural(REFS.length + (GLOSSARY.length ? 1 : 0) + (SVCS.length ? 1 : 0), "page")}</span></div>
       <p class="hint">Product names change often, and exam questions can use the old names.</p>
-      <div class="obj-list">${GLOSSARY.length ? `<a class="obj-row" href="#/glossary" data-route="glossary">
+      <div class="obj-list">${SVCS.length ? `<a class="obj-row" href="#/services" data-route="services">
+        <span class="id">Ref</span>
+        <span><span class="title">Services</span><span class="meta"><span>${plural(SVCS.length, "service")}</span><span>Exam cues, look-alikes, and question counts for each service</span></span></span>
+        <span class="end">${icon("arrow")}</span>
+      </a>` : ""}${GLOSSARY.length ? `<a class="obj-row" href="#/glossary" data-route="glossary">
         <span class="id">Ref</span>
         <span><span class="title">Glossary</span><span class="meta"><span>${plural(GLOSSARY.length, "term")}</span><span>Acronyms and key terms, with AWS equivalents</span></span></span>
         <span class="end">${icon("arrow")}</span>
@@ -498,7 +520,7 @@ VIEWS.glossary = function () {
       <h2>${l}</h2>
       <dl class="gloss-list">${groups[l].map((g) => `<div class="gloss-item" data-find="${esc([g.term, g.expansion, g.def, g.aws].join(" ").toLowerCase())}">
         <dt><b>${esc(g.term)}</b>${g.expansion ? `<span>${esc(g.expansion)}</span>` : ""}</dt>
-        <dd><span>${esc(g.def)}</span>${awsLine(g)}${g.note && NOTE[g.note] ? `<a class="note-link" href="#/note/${g.note}" data-route="note/${g.note}">Notes: ${esc(NOTE[g.note].title)}</a>` : ""}</dd>
+        <dd><span>${esc(g.def)}</span>${awsLine(g)}${g.note && NOTE[g.note] ? `<a class="note-link" href="#/note/${g.note}" data-route="note/${g.note}">Notes: ${esc(NOTE[g.note].title)}</a>` : ""}${SVC_BY_GLOSS[g.id] ? `<a class="note-link" href="#/service/${SVC_BY_GLOSS[g.id]}" data-route="service/${SVC_BY_GLOSS[g.id]}">Service: ${esc(SVC[SVC_BY_GLOSS[g.id]].name)}</a>` : ""}</dd>
       </div>`).join("")}</dl>
     </section>`).join("")}
     <p class="empty" id="gloss-none" hidden>No term matches this filter.</p>
@@ -520,6 +542,215 @@ function filterGlossary(text) {
   }
   const none = document.getElementById("gloss-none");
   if (none) none.hidden = shown > 0;
+}
+
+// ---------- services ----------
+// One profile per Google Cloud service. Counts come from this workbook's question bank:
+// q.a = questions where the service is in a correct option, q.d = only in wrong options,
+// q.c = only in the scenario or the explanation.
+const SVC_ROLE_LABEL = { a: "In the right answer", d: "Only in wrong options", c: "Only in the scenario or explanation" };
+const svcTotal = (s) => s.q.a.length + s.q.d.length + s.q.c.length;
+const SVC_QIDS = Object.fromEntries(SVCS.map((s) => [s.id, [...s.q.a, ...s.q.d, ...s.q.c]]));
+const SVC_MAX = Math.max(1, ...SVCS.map(svcTotal));
+// Services named in each question, right-answer services first.
+const QSVC = {};
+for (const role of ["a", "d", "c"]) for (const s of SVCS) for (const qid of s.q[role]) (QSVC[qid] ||= []).push({ id: s.id, role });
+const SVCS_BY_CAT = groupBy(SVCS, (s) => s.cat);
+const svcCatNo = (catId) => String(SVC_CATS.findIndex((c) => c.id === catId) + 1).padStart(2, "0");
+
+function svcUserStats(s) {
+  const qs = qstats();
+  let seen = 0, first = 0, last = 0;
+  for (const id of SVC_QIDS[s.id]) { const st = qs[id]; if (!st || !st.n) continue; seen++; if (st.f) first++; if (st.l) last++; }
+  return { seen, total: SVC_QIDS[s.id].length, firstAcc: seen ? first / seen : null, lastAcc: seen ? last / seen : null };
+}
+function weakServices(limit = 6) {
+  return SVCS.map((s) => ({ s, u: svcUserStats(s) }))
+    .filter(({ u }) => u.seen >= 3)
+    .map((x) => ({ ...x, score: 0.6 * x.u.lastAcc + 0.4 * x.u.firstAcc }))
+    .filter((x) => x.score < 0.7)
+    .sort((a, b) => a.score - b.score || b.u.seen - a.u.seen)
+    .slice(0, limit);
+}
+const svcGuideObjs = (s) => s.guide.map(([o]) => o);
+
+function svcTip(s) {
+  return `<b>${esc(s.name)} · ${plural(svcTotal(s), "question")}</b>${s.q.a.length} in the right answer<br>${s.q.d.length} only in wrong options<br>${s.q.c.length} only in the scenario or explanation`;
+}
+// A stacked bar. `scale` sets its length against the most-tested service; 0 fills the track.
+function svcBar(s, { scale = true, big = false, focus = true } = {}) {
+  const t = svcTotal(s);
+  if (!t) return `<span class="hint">None yet</span>`;
+  const seg = ["a", "d", "c"].filter((k) => s.q[k].length).map((k) => `<i class="${k}" style="flex-grow:${s.q[k].length}"></i>`).join("");
+  const a11y = focus
+    ? `tabindex="0" role="img" aria-label="${esc(`${s.name}: ${t} questions. ${s.q.a.length} in the right answer, ${s.q.d.length} only in wrong options, ${s.q.c.length} only in the scenario or explanation.`)}"`
+    : `aria-hidden="true"`;
+  return `<span class="sbar${big ? " big" : ""}" ${a11y} data-tip="${esc(svcTip(s))}"><span class="sbar-fill" style="width:${scale ? (t / SVC_MAX) * 100 : 100}%">${seg}</span></span>`;
+}
+function svcLegend() {
+  return `<div class="svc-legend" aria-hidden="true">${["a", "d", "c"].map((k) => `<span><i class="${k}"></i>${SVC_ROLE_LABEL[k]}</span>`).join("")}</div>`;
+}
+function svcChip(id, extra = "") {
+  const s = SVC[id];
+  return s ? `<a class="chip plain svc-chip" href="#/service/${s.id}" data-route="service/${s.id}"${extra}>${esc(s.name)}</a>` : "";
+}
+const firstSentence = (t) => { const m = /^(.+?[.!?])(\s|$)/.exec(t); return m ? m[1] : t; };
+const svcFind = (s) => [s.name, s.formerly, s.what, s.aws, SVC_CAT[s.cat]?.name].join(" ").toLowerCase();
+
+function svcRow(s, rank) {
+  const u = svcUserStats(s);
+  const g = svcGuideObjs(s);
+  return `<a class="svc-row" href="#/service/${s.id}" data-route="service/${s.id}" data-find="${esc(svcFind(s))}"${ui.svcGuideOnly && !g.length ? " hidden" : ""}>
+    ${rank ? `<span class="svc-rank">${rank}</span>` : ""}
+    <span class="svc-main">
+      <span class="svc-name">${esc(s.name)}${s.formerly ? ` <span class="svc-was">formerly ${esc(s.formerly)}</span>` : ""}</span>
+      <span class="svc-what">${esc(firstSentence(s.what))}</span>
+      <span class="svc-meta">${g.length ? `<span class="chip accent">Exam guide ${g.join(" · ")}</span>` : ""}${rank ? `<span>${esc(SVC_CAT[s.cat]?.name || "")}</span>` : ""}${u.seen ? `<span>You: ${u.seen}/${u.total} tried · ${pct(u.lastAcc)} latest</span>` : ""}</span>
+    </span>
+    <span class="svc-count"><span class="num">${svcTotal(s) || "–"}</span>${svcBar(s, { focus: false })}</span>
+  </a>`;
+}
+
+VIEWS.services = function () {
+  const sort = ui.svcSort || "cat";
+  const top = SVCS.slice().sort((a, b) => svcTotal(b) - svcTotal(a) || a.name.localeCompare(b.name));
+  const weak = weakServices();
+  const inGuide = SVCS.filter((s) => s.guide.length).length;
+  const list = sort === "rank"
+    ? `<div class="svc-list">${top.map((s, i) => svcRow(s, i + 1)).join("")}</div>`
+    : SVC_CATS.map((c) => {
+      const items = SVCS_BY_CAT[c.id] || [];
+      return `<section class="section-block svc-cat" id="svc-${c.id}" aria-labelledby="svch-${c.id}">
+        <div class="section-head"><span class="n">${svcCatNo(c.id)}</span><h2 id="svch-${c.id}">${esc(c.name)}</h2><span class="w">${plural(items.length, "service")}</span></div>
+        <p class="svc-intro">${esc(c.intro)}</p>
+        ${c.decide.length ? `<details class="decide"><summary>How to choose · ${plural(c.decide.length, "scenario signal")}</summary>${decideList(c.decide)}</details>` : ""}
+        <div class="svc-list">${items.map((s) => svcRow(s)).join("")}</div>
+      </section>`;
+    }).join("");
+  return `<div class="page narrow">
+    <div class="page-head"><div><h1>Services</h1><p>${SVCS.length} Google Cloud services that the exam guide and this workbook's questions name, grouped by what they do. Open one to see the scenario cues that point to it, the look-alikes it gets confused with, and where it shows up.</p></div></div>
+    <section class="panel">
+      <div class="panel-head"><h2>Most tested in the question bank</h2><button type="button" class="btn small" data-action="svc-sort" data-sort="rank">See all, ranked</button></div>
+      ${svcLegend()}
+      <div class="sb-rows">${top.slice(0, 12).map((s) => `<div class="sb-row"><a href="#/service/${s.id}" data-route="service/${s.id}">${esc(s.name)}</a>${svcBar(s)}<span class="bar-val">${svcTotal(s)}</span></div>`).join("")}</div>
+      <p class="hint">Counts are questions in this workbook's bank of ${QS.length}, written against exam guide ${esc(EXAM.guideVersion)}. Google does not publish how often each service appears on the real exam. ${inGuide} services appear in the exam guide's own wording; the filter below can show only those.</p>
+    </section>
+    ${weak.length ? `<section class="panel"><div class="panel-head"><h2>Your weak services</h2><span class="hint">3+ questions tried, weakest first</span></div>
+      <div class="weak">${weak.map(({ s, u }) => `<div class="weak-row"><span class="objid">${pct(u.lastAcc)}</span><a class="t" href="#/service/${s.id}" data-route="service/${s.id}">${esc(s.name)}</a><button type="button" class="btn small" data-action="start-practice" data-kind="service" data-id="${s.id}" data-count="10">Practice</button></div>`).join("")}</div></section>` : ""}
+    <div class="svc-tools">
+      <div class="row">
+        <label for="svc-filter" class="sr-only">Filter services</label>
+        <input type="search" id="svc-filter" data-input="svc-filter" placeholder="Filter: a service, an old name, or an AWS service" autocomplete="off" spellcheck="false" value="${esc(ui.svcQ || "")}">
+        <div class="seg" role="group" aria-label="Order">${[["cat", "By category"], ["rank", "Most tested"]].map(([k, l]) => `<button type="button" data-action="svc-sort" data-sort="${k}" aria-pressed="${sort === k}">${l}</button>`).join("")}</div>
+        <label class="check"><input type="checkbox" data-change="svc-guide"${ui.svcGuideOnly ? " checked" : ""}>Only services in the exam guide</label>
+      </div>
+      ${sort === "cat" ? `<nav class="gloss-letters svc-jump" aria-label="Jump to category">${SVC_CATS.map((c) => `<a href="#svc-${c.id}" title="${esc(c.name)}">${esc(c.short || c.name)}</a>`).join("")}</nav>` : ""}
+    </div>
+    <div id="svc-results">${list}</div>
+    <p class="empty" id="svc-none" hidden>No service matches this filter.</p>
+  </div>`;
+};
+
+function decideList(rows) {
+  return `<ul class="decide-list">${rows.map((r) => `<li><span class="if">${esc(r.if)}</span><span class="then">${icon("arrow")}${r.then.map((id) => svcChip(id)).join("")}</span><span class="why">${esc(r.why)}</span></li>`).join("")}</ul>`;
+}
+
+function filterServices() {
+  const q = (ui.svcQ || "").trim().toLowerCase();
+  let shown = 0;
+  for (const row of document.querySelectorAll("#svc-results .svc-row")) {
+    const s = SVC[row.getAttribute("href").split("/").pop()];
+    const hit = (!q || row.dataset.find.includes(q)) && (!ui.svcGuideOnly || s.guide.length);
+    row.hidden = !hit;
+    if (hit) shown++;
+  }
+  for (const sec of document.querySelectorAll("#svc-results .svc-cat")) sec.hidden = !sec.querySelector(".svc-row:not([hidden])");
+  const none = document.getElementById("svc-none");
+  if (none) none.hidden = shown > 0;
+}
+
+VIEWS.service = function ({ id }) {
+  const s = SVC[id];
+  if (!s) return notFound("service");
+  const c = SVC_CAT[s.cat];
+  const sibs = SVCS_BY_CAT[s.cat] || [];
+  const idx = sibs.indexOf(s);
+  const next = sibs[idx + 1];
+  const u = svcUserStats(s);
+  const t = svcTotal(s);
+  const asOption = s.q.a.length + s.q.d.length;
+  const objs = {};
+  for (const qid of SVC_QIDS[s.id]) { const o = Q[qid]?.objective; if (o) objs[o] = (objs[o] || 0) + 1; }
+  const objRows = Object.entries(objs).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], undefined, { numeric: true }));
+  const caseIds = [...new Set([...Object.keys(s.cases), ...s.caseNamed])].filter((k) => CASE[k]);
+  const notes = s.notes.map((n) => NOTE[n]).filter(Boolean);
+  const nCards = s.cards.filter((cid) => CARD[cid]).length;
+  const guideCell = s.guide.length ? s.guide.map(([o]) => `<a href="#/objective/${o}" data-route="objective/${o}">${o}</a>`).join(" ") : "Not named";
+  const pageItem = (n) => `<a class="page-item" href="#/note/${n.id}" data-route="note/${n.id}">
+      <span class="${noteRead(n.id) ? "read" : "unread"}">${icon(noteRead(n.id) ? "s2" : "s0")}</span>
+      <span><span class="t">${esc(n.title)}</span><span class="s"> · ${n.minutes} min</span></span>
+      <span class="objid">${n.objective}</span></a>`;
+  return `<div class="page narrow">
+    ${crumbs([["Services", "services"], [c?.name || "", null]])}
+    ${titleBlock({ sheet: `${svcCatNo(s.cat)}.${idx + 1}`, title: s.name, cells: [["Questions", String(t)], ["Exam guide", guideCell], ["You", u.seen ? `${u.seen}/${u.total} · ${pct(u.lastAcc)}` : "–"]] })}
+    <section class="panel">
+      <h2>What it is</h2>
+      <p class="svc-lede">${esc(s.what)}</p>
+      ${s.formerly ? `<p class="hint">Formerly ${esc(s.formerly)}. Older questions and training material can use that name.</p>` : ""}
+      <div class="row">
+        ${s.aws ? `<div class="gcard-aws"><span class="aws-tag">AWS</span><span>${esc(s.aws)}</span></div>` : ""}
+        <span class="spacer"></span>
+        ${s.docs?.url ? `<a class="ext" href="${esc(s.docs.url)}" target="_blank" rel="noopener">${esc(s.docs.title || "Documentation")}</a>` : ""}
+      </div>
+    </section>
+    <div class="grid-2">
+      <section class="panel"><h2>Pick it when</h2>
+        <ul class="guide-list">${s.cues.map((x) => `<li><span>${esc(x)}</span></li>`).join("")}</ul>
+      </section>
+      <section class="panel"><h2>Traps</h2>
+        ${s.traps.length ? `<ul class="trap-list">${s.traps.map((x) => `<li>${icon("warn")}<span>${esc(x)}</span></li>`).join("")}</ul>` : `<p class="empty">No common traps in the notes.</p>`}
+      </section>
+    </div>
+    ${s.confused.length ? `<section class="panel"><h2>Commonly confused with</h2>
+      <div class="confused">${s.confused.filter((x) => SVC[x.with]).map((x) => `<div class="confused-row">${svcChip(x.with)}<span>${esc(x.tell)}</span></div>`).join("")}</div>
+    </section>` : ""}
+    <section class="panel">
+      <div class="panel-head"><h2>On the exam</h2>${u.seen ? `<span class="hint">You: ${u.seen}/${u.total} tried · first try ${pct(u.firstAcc)} · latest ${pct(u.lastAcc)}</span>` : ""}</div>
+      <div class="stack">
+        <div class="eyebrow">Exam guide</div>
+        ${s.guide.length ? `<ul class="guide-lines">${s.guide.map(([o, lines]) => `<li><a class="objid" href="#/objective/${o}" data-route="objective/${o}">${o}</a><span>${lines.map((l) => `“${esc(l)}”`).join(" · ")}</span></li>`).join("")}</ul>`
+          : `<p class="muted" style="margin:0">The exam guide does not name it. It comes up through the objectives below.</p>`}
+      </div>
+      <div class="stack">
+        <div class="eyebrow">Question bank</div>
+        ${t ? `${svcLegend()}${svcBar(s, { scale: false, big: true })}
+        <p class="muted" style="margin:0">It appears in ${plural(t, "question")}. ${asOption ? `It is an answer option in ${asOption} of them and the right answer, or part of it, in ${s.q.a.length}.` : "It is never an answer option; it comes up in the scenario or the explanation."}${s.q.d.length > s.q.a.length ? " It is more often a distractor than the answer, so learn when it does not fit." : ""}</p>` : `<p class="muted" style="margin:0">No practice question names it yet. The notes pages below cover it.</p>`}
+      </div>
+      ${objRows.length ? `<div class="scroll-x"><table class="data-table"><thead><tr><th>Objective</th><th class="n">Questions</th></tr></thead><tbody>${objRows.slice(0, 6).map(([o, n]) => `<tr><td><a href="#/objective/${o}" data-route="objective/${o}"><span class="objid">${o}</span></a> ${esc(OBJ[o]?.title || "")}</td><td class="n">${n}</td></tr>`).join("")}</tbody></table></div>` : ""}
+      ${caseIds.length ? `<div class="row svc-case-chips"><span class="hint">Case studies:</span>${caseIds.map((k) => `<a class="chip accent" href="#/case/${k}" data-route="case/${k}">${icon("case")}${esc(CASE[k].name)}${s.cases[k] ? ` · ${plural(s.cases[k], "question")}` : ""}${s.caseNamed.includes(k) ? " · in the analysis" : ""}</a>`).join("")}</div>` : ""}
+      <div class="row">
+        ${t ? `<button type="button" class="btn primary" data-action="start-practice" data-kind="service" data-id="${s.id}" data-count="${Math.min(20, t)}">Practice ${plural(Math.min(20, t), "question")}</button>` : ""}
+        ${nCards ? `<button type="button" class="btn" data-action="start-cards" data-kind="service" data-id="${s.id}" data-count="${nCards}">${icon("cards")}${plural(nCards, "flashcard")}</button>` : ""}
+      </div>
+    </section>
+    ${notes.length ? `<section class="panel"><h2>Read</h2><div class="page-list">${notes.map(pageItem).join("")}</div></section>` : ""}
+    <div class="reader-foot panel">
+      <div class="row">${returnLink("btn")}<a class="btn ghost" href="#/services" data-route="services">All services</a></div>
+      ${next ? `<a class="btn ghost" href="#/service/${next.id}" data-route="service/${next.id}">Next: ${esc(next.name)} ${icon("arrow")}</a>` : ""}
+    </div>
+  </div>`;
+};
+
+// Services named in a question, for the explanation after an answer.
+function svcChipsFor(q) {
+  const list = (QSVC[q.id] || []).slice(0, 8);
+  if (!list.length) return "";
+  return `<div class="row svc-in-q"><span class="hint">Services:</span>${list.map(({ id, role }) => svcChip(id, ` title="${esc(SVC_ROLE_LABEL[role])}"${role === "a" ? ' data-role="a"' : ""}`)).join("")}</div>`;
+}
+// Services most tied to an objective or a case study.
+function svcChipsWhere(pred, min = 2, limit = 12) {
+  return SVCS.map((s) => ({ s, n: SVC_QIDS[s.id].filter((qid) => Q[qid] && pred(Q[qid])).length }))
+    .filter((x) => x.n >= min).sort((a, b) => b.n - a.n || a.s.name.localeCompare(b.s.name)).slice(0, limit);
 }
 
 VIEWS.objective = function ({ id }) {
@@ -573,6 +804,7 @@ VIEWS.objective = function ({ id }) {
         <a class="btn ghost" href="#/browse/${id}" data-route="browse/${id}">Browse all ${cos.total}</a>
       </div>
     </section>` : ""}
+    ${(() => { const top = svcChipsWhere((q) => q.objective === id); return top.length ? `<section class="panel"><div class="panel-head"><h2>Services on this objective</h2><span class="hint">By practice questions that name them</span></div><div class="row svc-in-q">${top.map(({ s, n }) => svcChip(s.id, ` title="${plural(n, "question")}"`)).join("")}</div></section>` : ""; })()}
     ${labs.length ? `<section class="panel"><h2>Hands-on</h2><div class="card-list">${labs.map(labRow).join("")}</div></section>` : ""}
   </div>`;
 };
@@ -640,6 +872,11 @@ VIEWS.practice = function () {
       <h2>By case study</h2>
       <div class="row">${CASES.map((cs) => `<button type="button" class="btn" data-action="start-practice" data-kind="case" data-id="${cs.id}" data-count="${c}"${(QS_BY_CASE[cs.id] || []).length ? "" : " disabled"}>${esc(cs.name)} · ${(QS_BY_CASE[cs.id] || []).length}</button>`).join("")}</div>
     </section>
+    <section class="panel">
+      <div class="panel-head"><h2>By service</h2><a class="btn small" href="#/services" data-route="services">Browse services</a></div>
+      <p class="muted" style="margin:0">Each service profile has a button that practices every question that names the service.</p>
+      ${(() => { const weak = weakServices(4); return weak.length ? `<div class="row"><span class="hint">Your weakest:</span>${weak.map(({ s }) => `<button type="button" class="btn small" data-action="start-practice" data-kind="service" data-id="${s.id}" data-count="${c}">${esc(s.name)}</button>`).join("")}</div>` : ""; })()}
+    </section>
   </div>`;
 };
 
@@ -648,9 +885,11 @@ function startPractice({ kind, id, ids, count }) {
   const qs = qstats();
   let scope = { kind, id, ids };
   if (kind === "objective-due") scope = { kind: "ids", ids: (QS_BY_OBJ[id] || []).filter((q) => isDue(qs[q.id], now)).map((q) => q.id) };
-  const picked = pickPractice(QS, qs, scope, Number(count) || 10, now);
+  let pool = QS;
+  if (kind === "service") { const set = new Set(SVC_QIDS[id] || []); pool = QS.filter((q) => set.has(q.id)); scope = { kind: "mixed" }; }
+  const picked = pickPractice(pool, qs, scope, Number(count) || 10, now);
   if (!picked.length) { toast("No questions match this choice yet."); return; }
-  const label = { due: "Spaced review", mixed: "New questions", missed: "Missed last time", flagged: "Flagged", objective: `Objective ${id}`, "objective-due": `Objective ${id} · due`, section: `Section ${id} · ${SHORT[id] || ""}`, case: CASE[id]?.name || "Case study" }[kind] || "Practice";
+  const label = { due: "Spaced review", mixed: "New questions", missed: "Missed last time", flagged: "Flagged", objective: `Objective ${id}`, "objective-due": `Objective ${id} · due`, section: `Section ${id} · ${SHORT[id] || ""}`, case: CASE[id]?.name || "Case study", service: `Service · ${SVC[id]?.name || ""}` }[kind] || "Practice";
   const seed = (now % 2147483647) >>> 0;
   const rng = mulberry32(seed);
   ui.quiz = {
@@ -684,7 +923,8 @@ function explanationBlock(q, order) {
   return `<div class="explain">${q.explanation}</div>
     ${wrong.length ? `<div class="stack"><div class="eyebrow">Why the other options are wrong</div><ul class="why">${wrong.map((oid) => `<li><span class="letter">${letterOf(oid)}</span><span>${q.whyWrong[oid] || ""}</span></li>`).join("")}</ul></div>` : ""}
     ${q.sources.length ? `<div class="stack"><div class="eyebrow">Grounded in the docs</div><div class="sources">${q.sources.map((s) => `<div class="source">${s.evidence ? `<q>${esc(s.evidence)}</q>` : ""}<a class="ext" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></div>`).join("")}</div></div>` : ""}
-    ${notes.length ? `<div class="row"><span class="hint">Study:</span>${notes.map((n) => `<a href="#/note/${n.id}" data-route="note/${n.id}">${esc(n.title)}</a>`).join('<span class="faint">·</span>')}</div>` : ""}`;
+    ${notes.length ? `<div class="row"><span class="hint">Study:</span>${notes.map((n) => `<a href="#/note/${n.id}" data-route="note/${n.id}">${esc(n.title)}</a>`).join('<span class="faint">·</span>')}</div>` : ""}
+    ${svcChipsFor(q)}`;
 }
 
 function qMeta(q, extra = "") {
@@ -807,10 +1047,11 @@ function startCards({ kind, id, ids, count }) {
   if (kind === "new") scope = { kind: "unseen" };
   if (kind === "read") scope = { kind: "ids", ids: CARDS.filter((c) => !cs[c.id]?.n && noteRead(c.note)).map((c) => c.id) };
   if (kind === "note") scope = { kind: "ids", ids: (CARDS_BY_NOTE[id] || []).map((c) => c.id) };
+  if (kind === "service") scope = { kind: "ids", ids: (SVC[id]?.cards || []).filter((c) => CARD[c]) };
   if (kind === "objective-due") scope = { kind: "ids", ids: (CARDS_BY_OBJ[id] || []).filter((c) => isDue(cs[c.id], now)).map((c) => c.id) };
   const picked = pickPractice(CARDS, cs, scope, Number(count) || 20, now);
   if (!picked.length) { toast("No cards match this choice yet."); return; }
-  const label = { due: "Spaced review", read: "New from pages you read", new: "New cards", missed: "Missed last time", objective: `Objective ${id}`, "objective-due": `Objective ${id} · due`, note: NOTE[id]?.title || "Notes page", ids: "Missed cards" }[kind] || "Flashcards";
+  const label = { due: "Spaced review", read: "New from pages you read", new: "New cards", missed: "Missed last time", objective: `Objective ${id}`, "objective-due": `Objective ${id} · due`, note: NOTE[id]?.title || "Notes page", service: `Service · ${SVC[id]?.name || ""}`, ids: "Missed cards" }[kind] || "Flashcards";
   ui.flash = { label, ids: picked.map((c) => c.id), i: 0, shown: false, grades: {}, finished: false };
   go("flash");
 }
@@ -1155,6 +1396,7 @@ VIEWS.case = function ({ id }) {
       <article class="prose">${html || `<p>Not written yet.</p>`}</article>
       ${tab === "analysis" && c.toc.length ? `<nav class="toc" aria-label="On this page"><span class="eyebrow">On this page</span>${c.toc.map((t) => `<a href="#${esc(t.id)}">${esc(t.text)}</a>`).join("")}</nav>` : ""}
     </div>
+    ${(() => { const inQs = svcChipsWhere((q) => q.caseStudy === id, 1, 14); const named = SVCS.filter((s) => s.caseNamed.includes(id) && !inQs.some((x) => x.s.id === s.id)).slice(0, Math.max(0, 20 - inQs.length)); return inQs.length || named.length ? `<section class="panel"><div class="panel-head"><h2>Services in this case study</h2><span class="hint">From its practice questions, then its analysis</span></div><div class="row svc-in-q">${inQs.map(({ s, n }) => svcChip(s.id, ` title="${plural(n, "question")}"`)).join("")}${named.map((s) => svcChip(s.id, ' title="Named in the analysis"')).join("")}</div></section>` : ""; })()}
     <div class="row"><button type="button" class="btn primary" data-action="start-practice" data-kind="case" data-id="${id}" data-count="15"${(QS_BY_CASE[id] || []).length ? "" : " disabled"}>Practice this case study</button></div>
   </div>`;
 };
@@ -1242,7 +1484,7 @@ VIEWS.progress = function () {
       <hr class="rule">
       ${ui.resetStep === 0 ? `<div class="row"><button type="button" class="btn danger" data-action="reset-1">Reset all progress…</button></div>`
         : `<div class="callout warn"><b>Delete all progress?</b><span>This deletes objective status, notes read, labs done, every answer, every flashcard grade, and every mock exam. It cannot be undone.</span><div class="row"><button type="button" class="btn danger" data-action="reset-2">Delete everything</button><button type="button" class="btn" data-action="reset-cancel">Cancel</button></div></div>`}
-      <p class="hint">Content built ${esc(fmtDateLong(Date.parse(DATA.builtAt)))} from exam guide ${esc(EXAM.guideVersion)} (retrieved ${esc(EXAM.retrieved)}): ${NOTES.length} notes pages, ${QS.length} questions, ${CARDS.length} flashcards, ${LABS.length} labs.</p>
+      <p class="hint">Content built ${esc(fmtDateLong(Date.parse(DATA.builtAt)))} from exam guide ${esc(EXAM.guideVersion)} (retrieved ${esc(EXAM.retrieved)}): ${NOTES.length} notes pages, ${QS.length} questions, ${CARDS.length} flashcards, ${LABS.length} labs, ${SVCS.length} service profiles.</p>
     </section>
   </div>`;
 };
@@ -1348,6 +1590,7 @@ const ACTIONS = {
     startPractice({ kind: "ids", ids, count: ids.length });
   },
   "case-tab": ({ id, tab }) => { ui.caseTab[id] = tab; render(); },
+  "svc-sort": ({ sort }) => { ui.svcSort = sort; render(); document.querySelector(".svc-tools")?.scrollIntoView({ block: "start" }); },
   "copy-code": (_, el) => {
     const pre = el.closest(".code")?.querySelector("pre");
     if (pre) copyText(pre.innerText, "Copied");
@@ -1418,11 +1661,13 @@ document.addEventListener("click", (e) => {
 });
 document.addEventListener("input", (e) => {
   if (e.target.dataset?.input === "gloss-filter") filterGlossary(e.target.value);
+  if (e.target.dataset?.input === "svc-filter") { ui.svcQ = e.target.value; filterServices(); }
 });
 document.addEventListener("change", (e) => {
   const el = e.target;
   if (el.matches('input[type="checkbox"][data-action]')) { const fn = ACTIONS[el.dataset.action]; if (fn) fn(el.dataset, el, e); }
   if (el.dataset.change === "browse-obj") go(el.value ? `browse/${el.value}` : "browse", { replace: true });
+  if (el.dataset.change === "svc-guide") { ui.svcGuideOnly = el.checked; filterServices(); saveSession(); }
   if (el.dataset.change === "hints") { Store.patch("state", { settings: { hints: el.checked } }); applyPrefs(); toast(el.checked ? "Term definitions on" : "Term definitions off"); }
   if (el.dataset.change === "exam-date") { Store.patch("state", { settings: { examDate: el.value || null } }); toast(el.value ? "Exam date saved" : "Exam date cleared"); }
 });
@@ -1498,7 +1743,7 @@ function glossCard(g) {
   return `<div class="gcard-head"><span class="gcard-term">${esc(g.term)}</span>${g.expansion ? `<span class="gcard-exp">${esc(g.expansion)}</span>` : ""}</div>
     <p class="gcard-def">${esc(g.def)}</p>
     ${awsLine(g)}
-    <div class="gcard-foot">${note ? (here ? `<span class="here">Explained on this page</span>` : `<a href="#/note/${g.note}" data-route="note/${g.note}">Read: ${esc(shortTitle(note.title))}</a>`) : ""}<a href="#/glossary" data-route="glossary">Glossary</a></div>`;
+    <div class="gcard-foot">${note ? (here ? `<span class="here">Explained on this page</span>` : `<a href="#/note/${g.note}" data-route="note/${g.note}">Read: ${esc(shortTitle(note.title))}</a>`) : ""}${SVC_BY_GLOSS[g.id] && !(ui.route.name === "service" && ui.route.id === SVC_BY_GLOSS[g.id]) ? `<a href="#/service/${SVC_BY_GLOSS[g.id]}" data-route="service/${SVC_BY_GLOSS[g.id]}">Service: ${esc(SVC[SVC_BY_GLOSS[g.id]].name)}</a>` : ""}<a href="#/glossary" data-route="glossary">Glossary</a></div>`;
 }
 function showGloss(el) {
   clearTimeout(glossShowTimer); clearTimeout(glossHideTimer);
@@ -1555,11 +1800,12 @@ Store.onChange((kind) => {
   applyPrefs();
   renderSaveState();
   renderNav();
-  const passive = ["home", "study", "objective", "practice", "cards", "browse", "mock", "cases", "labs", "progress"];
+  const passive = ["home", "study", "services", "service", "objective", "practice", "cards", "browse", "mock", "cases", "labs", "progress"];
   const waiting = !!document.querySelector("#main [data-waiting]");
   if ((kind === "data" || waiting) && (passive.includes(ui.route.name) || waiting) && !document.activeElement?.closest?.("input, textarea, select")) {
     const y = window.scrollY;
     $("#main").innerHTML = (VIEWS[ui.route.name] || VIEWS.home)(ui.route);
+    if (ui.route.name === "services") filterServices();
     window.scrollTo(0, y);
   }
 });
@@ -1567,12 +1813,12 @@ Store.onChange((kind) => {
 // ---------- boot ----------
 // The open quiz or mock exam survives a reload (a republish reloads the page).
 function saveSession() {
-  lsSetStr("pca-session", JSON.stringify({ quiz: ui.quiz, exam: ui.exam, flash: ui.flash, origin: ui.origin, caseTab: ui.caseTab, practiceCount: ui.practiceCount, cardCount: ui.cardCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter }));
+  lsSetStr("pca-session", JSON.stringify({ quiz: ui.quiz, exam: ui.exam, flash: ui.flash, origin: ui.origin, caseTab: ui.caseTab, practiceCount: ui.practiceCount, cardCount: ui.cardCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter, svcSort: ui.svcSort, svcGuideOnly: ui.svcGuideOnly }));
 }
 function start() {
   let saved = {};
   try { saved = JSON.parse(lsGetStr("pca-session") || "{}") || {}; } catch { saved = {}; }
-  for (const k of ["quiz", "exam", "flash", "origin", "caseTab", "practiceCount", "cardCount", "labNoOrg", "resultFilter"]) if (saved[k] != null) ui[k] = saved[k];
+  for (const k of ["quiz", "exam", "flash", "origin", "caseTab", "practiceCount", "cardCount", "labNoOrg", "resultFilter", "svcSort", "svcGuideOnly"]) if (saved[k] != null) ui[k] = saved[k];
   if (ui.flash && !(ui.flash.ids || []).every((id) => CARD[id])) ui.flash = null; // a card left the deck in a new build
   let initial = lsGetStr("pca-route") || "home";
   const r = parseRoute(initial);
