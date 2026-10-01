@@ -1,0 +1,86 @@
+# Lab 60: the namespace, the app (a Deployment and a Service), and a test client Pod.
+# Step 6 replaces LAB60_IMAGE with the image in Artifact Registry.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab60
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab60-app
+  namespace: lab60
+spec:
+  # No replicas field (default 1): later the HPA sets the number of Pods.
+  selector:
+    matchLabels:
+      app: lab60-app
+  template:
+    metadata:
+      labels:
+        app: lab60-app
+    spec:
+      containers:
+      - name: app
+        image: LAB60_IMAGE
+        env:
+        - name: STARTUP_SECONDS
+          value: "20"
+        - name: WARMUP_SECONDS
+          value: "30"
+        ports:
+        - name: http
+          containerPort: 8080
+        resources:
+          requests:          # Autopilot bills the requests. The HPA needs the CPU request.
+            cpu: 100m
+            memory: 128Mi
+          limits:            # limits = requests: the Guaranteed QoS class
+            cpu: 100m
+            memory: 128Mi
+        startupProbe:        # up to 30 x 2 = 60 seconds to start. The other probes wait for it.
+          httpGet:
+            path: /healthz
+            port: http
+          periodSeconds: 2
+          failureThreshold: 30
+        livenessProbe:       # 3 failures in a row: the kubelet restarts the container
+          httpGet:
+            path: /healthz
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 3  # default 1. A slow answer under load must not restart the container.
+          failureThreshold: 3
+        readinessProbe:      # 1 failure: the Pod leaves the Service endpoints, with no restart
+          httpGet:
+            path: /ready
+            port: http
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab60-app
+  namespace: lab60
+spec:                        # type ClusterIP (default): reachable only in the cluster
+  selector:
+    app: lab60-app
+  ports:
+  - port: 80
+    targetPort: http
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lab60-client
+  namespace: lab60
+spec:
+  containers:
+  - name: client
+    image: LAB60_IMAGE
+    command: ["sleep", "infinity"]   # you run load.py in it with kubectl exec
+    resources:
+      requests: {cpu: 50m, memory: 64Mi}
+      limits: {cpu: 50m, memory: 64Mi}

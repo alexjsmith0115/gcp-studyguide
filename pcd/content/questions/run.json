@@ -1,0 +1,2719 @@
+[
+  {
+    "id": "run-001",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "source-deploy",
+      "buildpacks",
+      "cloud-build"
+    ],
+    "stem": "A developer has a Node.js web app in a local folder. The folder has no `Dockerfile`, and Docker is not installed on the laptop. The developer wants to deploy the app to Cloud Run with the fewest steps. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud builds submit --pack image=IMAGE_URL`, and then run `gcloud run deploy SERVICE --image IMAGE_URL`."
+      },
+      {
+        "id": "B",
+        "text": "Install Docker, build and push the image, and then run `gcloud run deploy SERVICE --image IMAGE_URL`."
+      },
+      {
+        "id": "C",
+        "text": "Run `gcloud run deploy SERVICE --source .` in the app folder, and answer the prompts."
+      },
+      {
+        "id": "D",
+        "text": "Add a `cloudbuild.yaml` file, create a Cloud Build trigger, and push the code to a repository."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "`gcloud run deploy --source` builds the image with Cloud Build and Google Cloud's buildpacks, and then deploys it. It needs **no Docker on the laptop and no `Dockerfile`**. It also removes the separate `gcloud builds submit` step, so it has the **fewest steps**.",
+    "whyWrong": {
+      "A": "This works without Docker, but it takes two commands. A source deploy builds and deploys with one command.",
+      "B": "The developer must install Docker and run more steps. A source deploy needs no Docker on the laptop.",
+      "D": "A build config file and a trigger add setup work. The developer wants the fewest steps for this deploy."
+    },
+    "sources": [
+      {
+        "title": "Deploy services from source code",
+        "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+        "evidence": "This option uses Google Cloud's buildpacks and Cloud Build to automatically build container images from your source code without having to install Docker on your machine or set up buildpacks or Cloud Build."
+      },
+      {
+        "title": "Deploy services from source code",
+        "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+        "evidence": "Running `gcloud run deploy --source` also eliminates the need to run the `gcloud builds submit` command."
+      }
+    ]
+  },
+  {
+    "id": "run-002",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "source-deploy",
+      "cloud-build",
+      "deploy-image"
+    ],
+    "stem": "Your team deploys a Python service to Cloud Run with `gcloud run deploy --source .`. A new security policy requires three steps before any deploy: run the unit tests, scan the image for vulnerabilities, and sign the image. The team wants full control of each build step. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Build the image in a Cloud Build pipeline that runs these steps, and then deploy it with `gcloud run deploy --image`."
+      },
+      {
+        "id": "B",
+        "text": "Keep the source deploy, and pass the test and scan settings to the build with `--set-build-env-vars`."
+      },
+      {
+        "id": "C",
+        "text": "Add a `Dockerfile` to the source folder, and keep `gcloud run deploy --source .` for each deploy."
+      },
+      {
+        "id": "D",
+        "text": "Deploy with `gcloud beta run deploy --source . --no-build` (Preview), and run the tests and scans after the deploy."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A source deploy is a convenience feature, and it does not allow full customization of the build. When you need **full control of each build step**, such as tests, scans, and signing **before the deploy**, build the image with Cloud Build. Then deploy the image with `--image`.",
+    "whyWrong": {
+      "B": "Build environment variables pass values to buildpacks at build time. They do not add test, scan, or signing steps.",
+      "C": "A `Dockerfile` controls the contents of the image. The source deploy still builds and deploys in one step, so you cannot add scan and signing steps before the deploy.",
+      "D": "A deploy without build skips Cloud Build. The tests and scans then run after the deploy, which the policy does not allow."
+    },
+    "sources": [
+      {
+        "title": "Deploy services from source code",
+        "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+        "evidence": "Deploying from source is a convenience feature, and does not allow full customization of the build."
+      },
+      {
+        "title": "Deploy services from source code",
+        "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+        "evidence": "For more control, build the container image using Cloud Build, for example, using `gcloud builds submit`, and then deploy the container image using, for example, `gcloud run deploy --image`."
+      },
+      {
+        "title": "Set build environment variables (source deploy)",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/build-environment-variables",
+        "evidence": "Build environment variables are key-value pairs that let you pass configuration information to buildpacks when deploying from source code."
+      }
+    ]
+  },
+  {
+    "id": "run-003",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "environment-variables",
+      "gcloud-run"
+    ],
+    "stem": "A Cloud Run service named `orders` has three environment variables: `DB_HOST`, `LOG_LEVEL`, and `FEATURE_X`. You must add `FEATURE_Y=on`. You must not rebuild the image, and you must not list the existing variables again. Which command should you run?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`gcloud run services update orders --set-env-vars FEATURE_Y=on`"
+      },
+      {
+        "id": "B",
+        "text": "`gcloud run services update orders --update-env-vars FEATURE_Y=on`"
+      },
+      {
+        "id": "C",
+        "text": "`gcloud run deploy orders --source . --set-build-env-vars FEATURE_Y=on`"
+      },
+      {
+        "id": "D",
+        "text": "Add `ENV FEATURE_Y=on` to the `Dockerfile`, and run `gcloud run deploy orders --source .`"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "`--update-env-vars` is **non-destructive**. It adds or changes only the variables that you name, and it **keeps the other variables**. It changes only the service configuration, so it needs **no new image**.",
+    "whyWrong": {
+      "A": "`--set-env-vars` deletes the variables that are not in the new list. `DB_HOST`, `LOG_LEVEL`, and `FEATURE_X` would be removed.",
+      "C": "Build environment variables are for buildpacks at build time, not for the running service. The command also rebuilds the image.",
+      "D": "A `Dockerfile` `ENV` value sets a default in the image. This approach rebuilds the image, which the requirement does not allow."
+    },
+    "sources": [
+      {
+        "title": "Configure environment variables for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/environment-variables",
+        "evidence": "Note that the `--set-env-vars` flag is a destructive action that deletes previously set environment variables not included in the new list of environment variables."
+      },
+      {
+        "title": "Configure environment variables for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/environment-variables",
+        "evidence": "This is a non-destructive approach that changes or adds environment variables, but doesn't delete previously set environment variables."
+      },
+      {
+        "title": "Set build environment variables (source deploy)",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/build-environment-variables",
+        "evidence": "Build environment variables are key-value pairs that let you pass configuration information to buildpacks when deploying from source code."
+      }
+    ]
+  },
+  {
+    "id": "run-004",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "secrets",
+      "secret-manager",
+      "rotation"
+    ],
+    "stem": "A Cloud Run service calls a partner API with a key that is stored in Secret Manager. The app reads the key again before each call. The security team rotates the key every week, and each rotation adds a new secret version. The service must use the new version within minutes, without a new deployment or a new revision. How should you give the secret to the service?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mount the secret as a volume, and reference the `latest` version of the secret."
+      },
+      {
+        "id": "B",
+        "text": "Expose the secret as an environment variable that is pinned to the current version number."
+      },
+      {
+        "id": "C",
+        "text": "Expose the secret as an environment variable that references the `latest` version."
+      },
+      {
+        "id": "D",
+        "text": "Copy the key into a plain environment variable with `--update-env-vars` after each rotation."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "When the app reads a secret from a **volume**, Cloud Run fetches the value of the latest version from Secret Manager. This method works well with **secret rotation**, and it needs **no new deployment or revision**.",
+    "whyWrong": {
+      "B": "A pinned version never changes. Each new version needs a new deployment, which creates a new revision.",
+      "C": "Cloud Run resolves an environment variable at instance startup. Running instances keep the old value until they restart.",
+      "D": "Each change of an environment variable creates a new revision. Google also does not recommend environment variables for secrets."
+    },
+    "sources": [
+      {
+        "title": "Configure secrets for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/secrets",
+        "evidence": "When reading a volume, Cloud Run always fetches the secret value from the Secret Manager to use the value with the latest version. This method also works well with secret rotation."
+      },
+      {
+        "title": "Configure secrets for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/secrets",
+        "evidence": "Environment variables are resolved at instance startup time, so if you use this method, Google recommends that you pin the secret to a particular version instead of using `latest` as the version."
+      },
+      {
+        "title": "Configure environment variables for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/environment-variables",
+        "evidence": "You can use environment variables for service configuration, but we don't recommend them as a way to store secrets such as database credentials or API keys."
+      }
+    ]
+  },
+  {
+    "id": "run-005",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "secrets",
+      "secret-manager",
+      "revisions"
+    ],
+    "stem": "A Cloud Run service gets a database password from Secret Manager. The password is in an environment variable that references the `latest` version. After a password rotation, logs show that instances of the same revision use different passwords. You want all instances of a revision to use one known value. You also want to control when a new value goes live. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mount the secret as a volume, and reference the `latest` version."
+      },
+      {
+        "id": "B",
+        "text": "Disable the old secret version right after each rotation."
+      },
+      {
+        "id": "C",
+        "text": "Pin the environment variable to a version number, and deploy a new revision for each new version."
+      },
+      {
+        "id": "D",
+        "text": "Reference the secret with `--set-secrets` instead of `--update-secrets`, and keep the `latest` version."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Cloud Run resolves a secret in an environment variable **at instance startup**. With `latest`, instances that start after a rotation get the new value, and older instances keep the old one. Google recommends that you **pin a version**. Each revision then has one value, and your next deployment **controls when the new value goes live**.",
+    "whyWrong": {
+      "A": "A volume returns the latest version each time the app reads it. The value changes without a deployment, so you cannot control when it goes live.",
+      "B": "Running instances keep the value that they read at startup. The instances of the revision still use different values.",
+      "D": "`--set-secrets` replaces the full list of secrets. The variable still resolves `latest` when each instance starts."
+    },
+    "sources": [
+      {
+        "title": "Configure secrets for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/secrets",
+        "evidence": "Environment variables are resolved at instance startup time, so if you use this method, Google recommends that you pin the secret to a particular version instead of using `latest` as the version."
+      },
+      {
+        "title": "Configure secrets for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/secrets",
+        "evidence": "When reading a volume, Cloud Run always fetches the secret value from the Secret Manager to use the value with the latest version. This method also works well with secret rotation."
+      }
+    ]
+  },
+  {
+    "id": "run-006",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "service-identity",
+      "iam",
+      "authentication"
+    ],
+    "stem": "You deploy an internal API to Cloud Run. Only other services in your organization call it, and they authenticate with IAM. The API reads data from one Firestore database. Your security team requires least privilege and forbids service account keys. Which two actions should you take when you run `gcloud run deploy`? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `--service-account` to a user-managed service account with only the Firestore role that it needs."
+      },
+      {
+        "id": "B",
+        "text": "Set `--allow-unauthenticated`, and check an API key in the application code."
+      },
+      {
+        "id": "C",
+        "text": "Set `--no-allow-unauthenticated`, so that each caller needs the Cloud Run Invoker role."
+      },
+      {
+        "id": "D",
+        "text": "Omit `--service-account`, so that the service uses the Compute Engine default service account."
+      },
+      {
+        "id": "E",
+        "text": "Set `GOOGLE_APPLICATION_CREDENTIALS` to the path of a key file that a secret volume provides."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Google recommends a **user-managed service account** with the minimum permissions as the service identity. This gives the API **least privilege** without keys. `--no-allow-unauthenticated` keeps the service private, so only callers with the Cloud Run Invoker role can call it.",
+    "whyWrong": {
+      "B": "This flag grants Cloud Run Invoker to `allUsers` and makes the API public. Callers then do not authenticate with IAM.",
+      "D": "The Compute Engine default service account is not a minimal identity. Google recommends a user-managed service account.",
+      "E": "This uses a service account key, which the security team forbids. Never set `GOOGLE_APPLICATION_CREDENTIALS` on a service that uses its service identity."
+    },
+    "sources": [
+      {
+        "title": "Introduction to service identity",
+        "url": "https://docs.cloud.google.com/run/docs/securing/service-identity",
+        "evidence": "User-managed service account (recommended): You manually create this service account and determine the most minimal set of permissions that the service account needs to access specific Google Cloud resources."
+      },
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "If you are creating a public API or website, allow public access of your service using the `--allow-unauthenticated` flag. This assigns the Cloud Run Invoker IAM role to `allUsers`. You can also specify `--no-allow-unauthenticated` to disallow public access."
+      },
+      {
+        "title": "Configure environment variables for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/environment-variables",
+        "evidence": "If your Cloud Run service uses service identity to authenticate access to Google Cloud APIs, never set `GOOGLE_APPLICATION_CREDENTIALS` as an environment variable on a Cloud Run service."
+      }
+    ]
+  },
+  {
+    "id": "run-007",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "service-identity",
+      "iam",
+      "act-as"
+    ],
+    "stem": "A CI service account deploys a Cloud Run service from source. It has the Cloud Run Source Developer and Service Usage Consumer roles on the project. The deploy sets `orders-sa` as the service identity, and it fails with this error:\n\n```text\nPermission 'iam.serviceAccounts.actAs' denied on service account orders-sa@my-proj.iam.gserviceaccount.com\n```\n\nWhat should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the CI service account the Cloud Run Invoker role on the service."
+      },
+      {
+        "id": "B",
+        "text": "Grant the CI service account the Cloud Run Builder role on the project."
+      },
+      {
+        "id": "C",
+        "text": "Grant `orders-sa` the Service Account User role on the CI service account."
+      },
+      {
+        "id": "D",
+        "text": "Grant the CI service account the Service Account User role on `orders-sa`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "To attach a service identity, the **deployer** needs the `iam.serviceAccounts.actAs` permission **on that service account**. The Service Account User role contains this permission. Grant the role to the CI service account on `orders-sa`.",
+    "whyWrong": {
+      "A": "Cloud Run Invoker lets a principal call the service. It does not contain the `iam.serviceAccounts.actAs` permission.",
+      "B": "Cloud Run Builder is the role for the build service account. The error is about the service identity.",
+      "C": "This grant goes in the wrong direction. The deployer needs the role on the service identity."
+    },
+    "sources": [
+      {
+        "title": "Configure service identity for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/service-identity",
+        "evidence": "you or your administrator must grant your deployer account the Service Account User role (`roles/iam.serviceAccountUser`) on the service account that is used as the service identity."
+      },
+      {
+        "title": "Configure service identity for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/service-identity",
+        "evidence": "This predefined role contains the `iam.serviceAccounts.actAs` permission, which is required to attach a service account on the service or revision."
+      }
+    ]
+  },
+  {
+    "id": "run-008",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "build-service-account",
+      "source-deploy",
+      "least-privilege"
+    ],
+    "stem": "You deploy a service with `gcloud run deploy --source .`. Your organization policy stops the automatic Editor grant to default service accounts. The build fails with a permission error for the Compute Engine default service account. The security team does not allow new roles on that account. You want to follow the Google recommendation for least privilege in builds. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a service account with the Cloud Run Builder role, and pass it with `--build-service-account`."
+      },
+      {
+        "id": "B",
+        "text": "Create a service account with the Cloud Run Builder role, and pass it with `--service-account`."
+      },
+      {
+        "id": "C",
+        "text": "Grant the Editor role to the Compute Engine default service account on the project."
+      },
+      {
+        "id": "D",
+        "text": "Grant the Cloud Run Builder role to your own user account, so that the build runs as you."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "For a source deploy, Google recommends that you **specify your own service account to run your builds**. Give it Cloud Run Builder, and set it with `--build-service-account`. You then need **no new roles on the default account**.",
+    "whyWrong": {
+      "B": "`--service-account` sets the runtime identity of the service. The build still uses the Compute Engine default service account.",
+      "C": "The security team does not allow new roles on that account. Editor also gives far more access than the build needs.",
+      "D": "Cloud Build does not run the build as the deployer. It uses the Compute Engine default service account unless you choose another one."
+    },
+    "sources": [
+      {
+        "title": "Set build service account (source deploy)",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/build-service-account",
+        "evidence": "As a best practice for following the principle of least privilege to improve the security posture of your service, we recommend that you specify your own service account to run your builds when deploying a service from source."
+      },
+      {
+        "title": "Set build service account (source deploy)",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/build-service-account",
+        "evidence": "To specify the Cloud Build service account when deploying a service from source code, use the `--build-service-account` flag"
+      },
+      {
+        "title": "Deploy services from source code",
+        "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+        "evidence": "Cloud Build automatically uses the Compute Engine default service account as the default Cloud Build service account to build your source code and Cloud Run resource, unless you override this behavior."
+      }
+    ]
+  },
+  {
+    "id": "run-009",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run-functions",
+      "deploy-functions",
+      "authentication"
+    ],
+    "stem": "You write a Python function, `handle_order`. An Eventarc trigger will call it when a file arrives in Cloud Storage. The function must not be public. You want to use the API that Google recommends for Cloud Run functions (formerly Cloud Functions). Which command should you run in the source folder?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`gcloud functions deploy orders-fn --gen2 --runtime python314 --entry-point handle_order --source . --region us-central1`"
+      },
+      {
+        "id": "B",
+        "text": "`gcloud run deploy orders-fn --source . --function handle_order --base-image python314 --region us-central1`"
+      },
+      {
+        "id": "C",
+        "text": "`gcloud run deploy orders-fn --source . --function handle_order --base-image python314 --region us-central1 --allow-unauthenticated`"
+      },
+      {
+        "id": "D",
+        "text": "`gcloud run deploy orders-fn --source . --function handle_order --base-image python314 --region us-central1 --no-invoker-iam-check`"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The **Cloud Run Admin API is the recommended API** for functions, and `gcloud run deploy --function` uses it. An event-triggered function **must not be public**, so you omit `--allow-unauthenticated`.",
+    "whyWrong": {
+      "A": "`gcloud functions deploy` uses the Cloud Functions API, which remains for backward compatibility. Google recommends the Cloud Run Admin API.",
+      "C": "`--allow-unauthenticated` grants Cloud Run Invoker to `allUsers`, so the function becomes public. Omit it for an event-triggered function.",
+      "D": "`--no-invoker-iam-check` turns off the IAM check, which is the recommended way to make a service public. The function must not be public."
+    },
+    "sources": [
+      {
+        "title": "Compare Cloud Run functions",
+        "url": "https://docs.cloud.google.com/run/docs/functions/comparison",
+        "evidence": "Cloud Run Admin API (Recommended): Functions created with this API (for example, by using Google Cloud console, `gcloud run`, the REST API, or Terraform) can be managed exclusively using the Cloud Run Admin API."
+      },
+      {
+        "title": "Deploy a Cloud Run function",
+        "url": "https://docs.cloud.google.com/run/docs/deploy-functions",
+        "evidence": "If you are creating an event-triggered function or authenticated service, you can omit this flag."
+      },
+      {
+        "title": "Allowing public (unauthenticated) access",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/public",
+        "evidence": "The recommended way to make a public service is to disable the Cloud Run Invoker IAM check."
+      }
+    ]
+  },
+  {
+    "id": "run-010",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "automatic-base-image-updates",
+      "security-patches"
+    ],
+    "stem": "You deploy a Python service to Cloud Run from source. The security team wants OS and language runtime patches to reach the running service quickly. The team does not want to rebuild or redeploy the service for each patch, and it does not want new revisions. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Cloud Scheduler job that rebuilds and redeploys the service every night."
+      },
+      {
+        "id": "B",
+        "text": "Use the `latest` tag of the base image, so that each new instance gets the newest patches."
+      },
+      {
+        "id": "C",
+        "text": "Deploy with `--base-image` and `--automatic-updates`, so that Google updates the base image."
+      },
+      {
+        "id": "D",
+        "text": "Turn on Artifact Analysis (formerly Container Analysis) scanning for the image repository."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "With **automatic base image updates**, Google patches the OS and the language runtime in the base image. You **do not rebuild or redeploy** the service, and Cloud Run **creates no new revision**.",
+    "whyWrong": {
+      "A": "Each nightly rebuild and redeploy creates a new revision. The team wants no rebuilds and no new revisions.",
+      "B": "Cloud Run does not pull the image again when it starts a new instance. A new base image also needs a rebuild.",
+      "D": "Scanning finds vulnerabilities, but it does not patch the running service."
+    },
+    "sources": [
+      {
+        "title": "Configure automatic base image updates",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/automatic-base-image-updates",
+        "evidence": "You don't have to rebuild or redeploy your service for the base image to be updated. No new revision is created when the base image is updated."
+      },
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "Container images are not pulled from their container repository when a new Cloud Run instance is started."
+      }
+    ]
+  },
+  {
+    "id": "run-011",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "automatic-base-image-updates",
+      "dockerfile",
+      "scratch-image"
+    ],
+    "stem": "Your Node.js service on Cloud Run uses a `Dockerfile` that starts with `FROM node:24-slim`. You must keep the `Dockerfile`, because it runs custom build steps. You also want automatic base image updates, so that Google patches the OS and the runtime without a redeploy. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep `FROM node:24-slim` as it is, and deploy the image with `--base-image nodejs24 --automatic-updates`."
+      },
+      {
+        "id": "B",
+        "text": "Copy the app onto a `scratch` image in a multi-stage build, and deploy with `--base-image nodejs24 --automatic-updates`."
+      },
+      {
+        "id": "C",
+        "text": "Change the first line to `FROM gcr.io/buildpacks/builder:latest`, and deploy the image with `--automatic-updates`."
+      },
+      {
+        "id": "D",
+        "text": "Keep the `Dockerfile`, and add a weekly Cloud Build trigger that rebuilds and redeploys the service image."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "With automatic updates, Cloud Run supplies the OS and the runtime from a managed base image at runtime. The **application image must omit the base OS layers**. A multi-stage build copies the app and its dependencies onto `scratch`, so you can **keep the `Dockerfile`**.",
+    "whyWrong": {
+      "A": "The application image still contains the OS layers of `node:24-slim`. Automatic updates need an image without them.",
+      "C": "The builder image contains a full OS. Automatic updates need an application image that omits the OS layers.",
+      "D": "Each rebuild and redeploy creates a new revision. The team wants Google to patch the service without a redeploy."
+    },
+    "sources": [
+      {
+        "title": "Configure automatic base image updates",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/automatic-base-image-updates",
+        "evidence": "Services with automatic updates enabled will need to provide an application image that omits the base operating system layers."
+      },
+      {
+        "title": "Configure automatic base image updates",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/automatic-base-image-updates",
+        "evidence": "This Dockerfile uses a multi-stage build to copy the application source code and dependencies onto a `scratch` image that omits the operating system, packages, and runtime components that will be supplied at runtime by the Cloud Run managed base image."
+      }
+    ]
+  },
+  {
+    "id": "run-012",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "services-replace",
+      "service-yaml",
+      "revisions"
+    ],
+    "stem": "Your team keeps the `service.yaml` file of a Cloud Run service in Git and applies it with `gcloud run services replace`. During an incident last week, an operator raised the maximum number of instances in the Google Cloud console. After today's `replace`, that change is gone. You want to follow the Google-recommended practice. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Make incident changes with `gcloud run services update`, because `replace` keeps changes made with gcloud."
+      },
+      {
+        "id": "B",
+        "text": "Make all configuration changes in the YAML file in Git, and apply them with `replace`."
+      },
+      {
+        "id": "C",
+        "text": "Set a fixed revision name in the YAML file, so that `replace` keeps changes made in the console."
+      },
+      {
+        "id": "D",
+        "text": "Export the live service with `gcloud run services describe --format export` before each `replace`."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "`replace` applies the whole service configuration from the file. Google recommends that, **when you use YAML**, you **avoid configuration changes in the console or the gcloud CLI**, because the next `replace` can overwrite them. Make every change in the YAML file.",
+    "whyWrong": {
+      "A": "`replace` can also overwrite changes made with the gcloud CLI. Only the YAML file is the source of the configuration.",
+      "C": "A revision name does not change what `replace` does. It still applies the full configuration in the file.",
+      "D": "This copies the live settings over the file in Git. Git stops being the source of the configuration, and changes in Git can be lost."
+    },
+    "sources": [
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "So if you use YAML to make revision changes, you should avoid also using the Google Cloud console or gcloud CLI to make configuration changes because those can be overwritten when you use YAML."
+      },
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "The following instructions replaces your existing service configuration with the one specified in the YAML file."
+      }
+    ]
+  },
+  {
+    "id": "run-013",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 1,
+    "tags": [
+      "source-deploy",
+      "dockerfile",
+      "artifact-registry"
+    ],
+    "stem": "You run `gcloud run deploy web --source .` in a folder that contains a `Dockerfile`. The region has no Artifact Registry repository yet. Which two statements describe what happens? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Google Cloud's buildpacks build the image and ignore the `Dockerfile`."
+      },
+      {
+        "id": "B",
+        "text": "Cloud Build builds the image from the `Dockerfile`."
+      },
+      {
+        "id": "C",
+        "text": "Docker on your workstation builds the image, and `gcloud` pushes it."
+      },
+      {
+        "id": "D",
+        "text": "The command creates a repository named `cloud-run-source-deploy` and stores the image there."
+      },
+      {
+        "id": "E",
+        "text": "Cloud Run pulls the image from the repository each time it starts a new instance."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "**If a `Dockerfile` is present**, the source deploy builds with it, and Cloud Build runs the build. If the region has **no repository named `cloud-run-source-deploy`**, the command creates it and stores the image there.",
+    "whyWrong": {
+      "A": "Buildpacks build the image only when the folder has no `Dockerfile`.",
+      "C": "A source deploy builds the image with Cloud Build. You do not need Docker on your workstation.",
+      "E": "Cloud Run imports the image when you deploy. It does not pull the image when a new instance starts."
+    },
+    "sources": [
+      {
+        "title": "Deploy services from source code",
+        "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+        "evidence": "If a Dockerfile is present in the source code directory, the uploaded source code is built using that Dockerfile."
+      },
+      {
+        "title": "Deploy services from source code",
+        "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+        "evidence": "If your project doesn't already have an Artifact Registry repository with the name `cloud-run-source-deploy` in the region you are deploying to, this feature automatically creates an Artifact Registry repository with the name `cloud-run-source-deploy`."
+      },
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "Container images are not pulled from their container repository when a new Cloud Run instance is started."
+      }
+    ]
+  },
+  {
+    "id": "run-014",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run-probes",
+      "readiness-probe",
+      "session-affinity"
+    ],
+    "stem": "You created a Cloud Run service last month and turned on session affinity. You added an HTTP readiness probe, so that an instance that cannot serve gets no new requests. In a test, one instance fails its readiness probe. Some users still get errors from that instance. What is the cause?",
+    "options": [
+      {
+        "id": "A",
+        "text": "With session affinity, Cloud Run still routes requests to an instance that fails readiness."
+      },
+      {
+        "id": "B",
+        "text": "A readiness probe takes effect only when the service also has a liveness probe."
+      },
+      {
+        "id": "C",
+        "text": "Cloud Run runs the readiness probe only once, when the instance starts up."
+      },
+      {
+        "id": "D",
+        "text": "Readiness probe endpoints must use HTTP/2, so Cloud Run ignores an HTTP/1 endpoint."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "This is a documented limit of Cloud Run readiness probes. **With session affinity**, Cloud Run continues to send requests to the same instance, **even if its readiness check fails**.",
+    "whyWrong": {
+      "B": "Readiness checks start after the startup probe passes. They do not need a liveness probe.",
+      "C": "Cloud Run keeps checking readiness. It sends traffic to the instance again when the instance passes the probe.",
+      "D": "Cloud Run HTTP health check endpoints use HTTP/1."
+    },
+    "sources": [
+      {
+        "title": "Configure container health checks for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/healthchecks",
+        "evidence": "If you enable session affinity, Cloud Run continues to send requests to the same instance, even if its readiness check fails."
+      },
+      {
+        "title": "Configure container health checks for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/healthchecks",
+        "evidence": "Cloud Run doesn't terminate the instance and sends traffic back to the instance when it starts passing its readiness probe again."
+      },
+      {
+        "title": "Configure container health checks for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/healthchecks",
+        "evidence": "The readiness checks begin after the container's startup probe successfully passes."
+      }
+    ]
+  },
+  {
+    "id": "run-015",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run-probes",
+      "startup-probe",
+      "readiness-probe"
+    ],
+    "stem": "A Cloud Run service opens its port at once, but it needs about 20 seconds to load data before it can serve requests. The service uses the default TCP startup probe and an HTTP readiness probe on `/ready`. After each scale-out, some requests to the new instances fail. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the `failureThreshold` value of the readiness probe."
+      },
+      {
+        "id": "B",
+        "text": "Add a liveness probe that checks the `/ready` endpoint."
+      },
+      {
+        "id": "C",
+        "text": "Configure an HTTP startup probe on an endpoint that succeeds only after the data is loaded."
+      },
+      {
+        "id": "D",
+        "text": "Remove the startup probe, so that only the readiness probe controls traffic to new instances."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Cloud Run **can route traffic to a new instance before the first readiness probe completes**. When the startup probe succeeds, Cloud Run treats the container as ready. Google recommends that **the startup probe also ensures readiness**, so use an HTTP startup probe that passes only after the data loads.",
+    "whyWrong": {
+      "A": "A higher threshold makes the readiness probe slower to fail. It does not stop traffic before the first readiness probe completes.",
+      "B": "A liveness probe finds an instance that is stuck. It does not control when a new instance gets its first requests.",
+      "D": "If you configure no startup probe, Cloud Run adds a default TCP startup probe. The port opens at once, so the problem stays."
+    },
+    "sources": [
+      {
+        "title": "Configure container health checks for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/healthchecks",
+        "evidence": "Since Cloud Run can route traffic to a new instance before the first readiness probe completes, make sure that passing the startup probe also ensures readiness to safely serve traffic immediately."
+      },
+      {
+        "title": "Configure container health checks for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/healthchecks",
+        "evidence": "If you don't explicitly configure a TCP startup probe for a new Cloud Run service, Cloud Run automatically configures a TCP startup probe"
+      }
+    ]
+  },
+  {
+    "id": "run-016",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "configmap",
+      "rollout",
+      "deployment"
+    ],
+    "stem": "A Deployment with 6 replicas reads `LOG_LEVEL` from a ConfigMap through an environment variable. You changed the value in the ConfigMap an hour ago, but the running Pods still use the old value. The app must stay available while the Pods get the new value. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Wait for the kubelet to sync the new ConfigMap value into the running containers."
+      },
+      {
+        "id": "B",
+        "text": "Scale the Deployment to 0 replicas, and then scale it back to 6 replicas."
+      },
+      {
+        "id": "C",
+        "text": "Scale the Deployment to 7 replicas, so that a new Pod reads the new value."
+      },
+      {
+        "id": "D",
+        "text": "Change the Pod template, for example an annotation, so that a rolling update starts."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "ConfigMap values in **environment variables need a Pod restart**. A Deployment starts a rollout **only when its Pod template changes**. A template change replaces the Pods with a rolling update, so the app **stays available**.",
+    "whyWrong": {
+      "A": "The kubelet updates mounted ConfigMap files over time. Environment variables change only when the Pod restarts.",
+      "B": "Scaling to 0 stops all Pods, so the app is not available for a time.",
+      "C": "Scaling does not start a rollout. The new Pod gets the new value, but the 6 old Pods keep the old value."
+    },
+    "sources": [
+      {
+        "title": "ConfigMaps | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/configuration/configmap/",
+        "evidence": "ConfigMaps consumed as environment variables are not updated automatically and require a pod restart."
+      },
+      {
+        "title": "Deployments | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "evidence": "A Deployment's rollout is triggered if and only if the Deployment's Pod template (that is, `.spec.template`) is changed, for example if the labels or container images of the template are updated."
+      }
+    ]
+  },
+  {
+    "id": "run-017",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "rollback",
+      "deployment",
+      "kubectl"
+    ],
+    "stem": "A Deployment ran image `v1` with 3 replicas. During a sale, an operator ran `kubectl scale deployment web --replicas=8`. Later, a developer changed the image to `v2`, and the new Pods failed. The developer then ran `kubectl rollout undo deployment web`. What does the Deployment run after the rollback?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pods with image `v1`, and 3 replicas"
+      },
+      {
+        "id": "B",
+        "text": "Pods with image `v1`, and 8 replicas"
+      },
+      {
+        "id": "C",
+        "text": "Pods with image `v2`, and 8 replicas"
+      },
+      {
+        "id": "D",
+        "text": "Pods with image `v2`, and 3 replicas"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A **rollback restores only the Pod template**, so the image goes back to `v1`. Scaling **does not create a revision** and is not rolled back, so the Deployment keeps 8 replicas.",
+    "whyWrong": {
+      "A": "A rollback does not restore the replica count. Only the Pod template goes back to the earlier revision.",
+      "C": "Scaling does not create a revision, so the previous revision has the `v1` Pod template. The rollback changes the image back to `v1`.",
+      "D": "A rollback restores the Pod template, not the replica count. The image goes back to `v1`, and the count stays at 8."
+    },
+    "sources": [
+      {
+        "title": "Deployments | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "evidence": "Other updates, such as scaling the Deployment, do not create a Deployment revision, so that you can facilitate simultaneous manual- or auto-scaling."
+      },
+      {
+        "title": "Deployments | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "evidence": "This means that when you roll back to an earlier revision, only the Deployment's Pod template part is rolled back."
+      }
+    ]
+  },
+  {
+    "id": "run-018",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "rolling-update",
+      "max-surge",
+      "max-unavailable"
+    ],
+    "stem": "A Deployment runs 4 replicas. During a rollout, at least 4 Pods must be available at all times. The cluster has room for only 1 extra Pod. Which rolling update settings should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`maxUnavailable: 1` and `maxSurge: 0`"
+      },
+      {
+        "id": "B",
+        "text": "`maxUnavailable: 0` and `maxSurge: 0`"
+      },
+      {
+        "id": "C",
+        "text": "`maxUnavailable: 25%` and `maxSurge: 25%`, the default values"
+      },
+      {
+        "id": "D",
+        "text": "`maxUnavailable: 0` and `maxSurge: 1`"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "`maxUnavailable: 0` keeps **all 4 Pods available** during the update. `maxSurge: 1` lets the rollout create **one extra Pod** at a time, which fits the spare room.",
+    "whyWrong": {
+      "A": "`maxUnavailable: 1` lets the number of available Pods drop to 3.",
+      "B": "`maxUnavailable` cannot be 0 if `maxSurge` is 0, so this combination is not valid.",
+      "C": "With 4 replicas, 25% `maxUnavailable` is 1 Pod, so the available Pods can drop to 3."
+    },
+    "sources": [
+      {
+        "title": "Deployments | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "evidence": "`.spec.strategy.rollingUpdate.maxUnavailable` is an optional field that specifies the maximum number of Pods that can be unavailable during the update process."
+      },
+      {
+        "title": "Deployments | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "evidence": "The absolute number is calculated from percentage by rounding down. The value cannot be 0 if `.spec.strategy.rollingUpdate.maxSurge` is 0. The default value is 25%."
+      },
+      {
+        "title": "Deployments | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "evidence": "`.spec.strategy.rollingUpdate.maxSurge` is an optional field that specifies the maximum number of Pods that can be created over the desired number of Pods."
+      }
+    ]
+  },
+  {
+    "id": "run-019",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gateway-api",
+      "httproute",
+      "load-balancing"
+    ],
+    "stem": "You are designing how to expose a new app on GKE. Requests for `/api` must go to the `api` Service, and all other requests must go to the `web` Service. Both paths must share one external IP address. You want the approach that Google recommends for new designs. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Gateway with the `gke-l7-global-external-managed` GatewayClass, and an HTTPRoute with a path match for `/api`."
+      },
+      {
+        "id": "B",
+        "text": "Create a LoadBalancer Service with `loadBalancerClass: \"networking.gke.io/l4-regional-external\"` for each app."
+      },
+      {
+        "id": "C",
+        "text": "Create an Ingress with path rules for `/api` and `/`, and let GKE create the Application Load Balancer."
+      },
+      {
+        "id": "D",
+        "text": "Create one LoadBalancer Service that selects the Pods of both apps, and add path rules in a BackendConfig."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Path routing needs an Application Load Balancer. **GKE Ingress is in maintenance mode**, and Google **recommends the GKE Gateway API**. One Gateway has one IP address, and an HTTPRoute sends `/api` to one Service and other paths to another.",
+    "whyWrong": {
+      "B": "A LoadBalancer Service creates a passthrough Network Load Balancer. It cannot route by path, and each Service gets its own IP address.",
+      "C": "Ingress can route by path, but it is in maintenance mode. Google recommends the Gateway API.",
+      "D": "A passthrough Network Load Balancer cannot route by path. A BackendConfig does not define routes."
+    },
+    "sources": [
+      {
+        "title": "GKE Ingress for Application Load Balancers",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress",
+        "evidence": "GKE Ingress is in maintenance mode. No new functionality will be added except as needed to fix bugs. We recommend that you use GKE Gateway API."
+      },
+      {
+        "title": "About LoadBalancer Services",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer",
+        "evidence": "External LoadBalancer Services are implemented by using regional external passthrough Network Load Balancers."
+      }
+    ]
+  },
+  {
+    "id": "run-020",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gateway-api",
+      "referencegrant",
+      "namespaces"
+    ],
+    "stem": "A Gateway and an HTTPRoute are in the `frontend` namespace. The HTTPRoute sends `/api` requests to the `api` Service in the `backend` namespace. Requests for `/api` fail. The route status says that the reference to the Service is not permitted. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a ReferenceGrant in the `frontend` namespace that allows references to Services in `backend`."
+      },
+      {
+        "id": "B",
+        "text": "Change the type of the `api` Service in the `backend` namespace from ClusterIP to LoadBalancer."
+      },
+      {
+        "id": "C",
+        "text": "Create a ReferenceGrant in the `backend` namespace that allows references from HTTPRoutes in `frontend`."
+      },
+      {
+        "id": "D",
+        "text": "Create a HealthCheckPolicy for the `api` Service in the `backend` namespace."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A cross-namespace reference needs a **ReferenceGrant in the namespace of the resource being referenced**. The HTTPRoute refers to a Service in `backend`, so the ReferenceGrant goes in `backend`.",
+    "whyWrong": {
+      "A": "The ReferenceGrant must be in the namespace of the referenced resource, which is `backend`.",
+      "B": "The Service type does not allow a cross-namespace reference. The route still needs a ReferenceGrant.",
+      "D": "A HealthCheckPolicy configures the load balancer health check. It does not allow references from another namespace."
+    },
+    "sources": [
+      {
+        "title": "About Gateway API",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/gateway-api",
+        "evidence": "To enable cross-namespace references, you need a ReferenceGrant in the namespace of the resource being referenced."
+      },
+      {
+        "title": "About Gateway API",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/gateway-api",
+        "evidence": "ReferenceGrant acts as a permission provider, specifying which resources (`from`) are allowed to reference other resources (`to`)."
+      }
+    ]
+  },
+  {
+    "id": "run-021",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "gateway-api",
+      "proxy-only-subnet",
+      "internal-load-balancer"
+    ],
+    "stem": "You have a VPC-native GKE Standard cluster. The `HttpLoadBalancing` add-on is enabled, but the Gateway API is not. You want to expose an app inside the VPC network with a Gateway that uses the `gke-l7-rilb` GatewayClass. Which two actions must you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Update the cluster with the `--gateway-api=standard` flag."
+      },
+      {
+        "id": "B",
+        "text": "Create a BackendConfig for each Service that the Gateway routes to."
+      },
+      {
+        "id": "C",
+        "text": "Create a LoadBalancer Service for each backend before you create the Gateway."
+      },
+      {
+        "id": "D",
+        "text": "Create a new routes-based cluster, because a Gateway needs routes-based networking."
+      },
+      {
+        "id": "E",
+        "text": "Create a proxy-only subnet in the region of the cluster."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "On a Standard cluster, `--gateway-api=standard` **installs the Gateway API CRDs**. `gke-l7-rilb` creates an **internal Application Load Balancer**, and a Gateway of this kind needs a **proxy-only subnet** in its region.",
+    "whyWrong": {
+      "B": "BackendConfig is an Ingress configuration resource. A Gateway uses Policy resources instead.",
+      "C": "A Gateway sends traffic to the Services in its HTTPRoutes. It does not need LoadBalancer Services.",
+      "D": "The Gateway API is supported on VPC-native clusters only."
+    },
+    "sources": [
+      {
+        "title": "Deploying Gateways",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways",
+        "evidence": "The `--gateway-api=standard` flag instructs GKE to install the CRDs of the Gateway API Standard Channel with the cluster."
+      },
+      {
+        "title": "Deploying Gateways",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways",
+        "evidence": "You must configure a proxy-only subnet before you create a Gateway that uses an internal Application Load Balancer."
+      },
+      {
+        "title": "Configure Gateway resources using Policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+        "evidence": "You don't need to create a BackendConfig, because BackendConfig is an Ingress configuration resource."
+      }
+    ]
+  },
+  {
+    "id": "run-022",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "artifact-registry",
+      "image-pull",
+      "node-service-account"
+    ],
+    "stem": "Pods in a GKE Standard cluster in project `apps-prod` show `ImagePullBackOff`. The image is in an Artifact Registry repository in project `shared-images`. The nodes use the Compute Engine default service account. The Kubernetes ServiceAccount of the Pods already has Artifact Registry Reader on the repository. You must not use service account keys. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant Artifact Registry Reader on the repository to the service account of the nodes."
+      },
+      {
+        "id": "B",
+        "text": "Grant Artifact Registry Reader on the `shared-images` project to the Kubernetes ServiceAccount."
+      },
+      {
+        "id": "C",
+        "text": "Create an `imagePullSecret` from a service account key, and add it to the Pod spec."
+      },
+      {
+        "id": "D",
+        "text": "Copy the image to Container Registry in the `apps-prod` project, and change the image path."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "**Nodes pull images as the node service account**, not as the Kubernetes ServiceAccount of the Pod. When the repository is **in a different project**, grant Artifact Registry permissions to the service account that the nodes use.",
+    "whyWrong": {
+      "B": "The node pulls the image, not the Pod. A role on the Kubernetes ServiceAccount does not apply to image pulls.",
+      "C": "This uses a service account key, which the requirement does not allow.",
+      "D": "Container Registry is shut down, and you cannot write images to it."
+    },
+    "sources": [
+      {
+        "title": "Deploying to Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/integrate-gke",
+        "evidence": "If GKE is in a different project than Artifact Registry, grant Artifact Registry permissions to the service account that your GKE node use. By default, nodes use the Compute Engine default service account."
+      },
+      {
+        "title": "Deploying to Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/integrate-gke",
+        "evidence": "The Compute Engine default service account is the identity for nodes."
+      },
+      {
+        "title": "Transition from Container Registry",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/transition/transition-from-gcr",
+        "evidence": "Effective March 18, 2025, Container Registry is shut down and writing images to Container Registry is unavailable."
+      }
+    ]
+  },
+  {
+    "id": "run-023",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "workload-identity-federation",
+      "kubernetes-serviceaccount",
+      "iam"
+    ],
+    "stem": "An app on a GKE Autopilot cluster must read objects from a Cloud Storage bucket. Other apps in the cluster must not get this access. Your security team forbids service account keys. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Workload Identity Federation for GKE on the cluster with `gcloud container clusters update`."
+      },
+      {
+        "id": "B",
+        "text": "Create a Kubernetes ServiceAccount for the app, and set it in `serviceAccountName` in the Pod spec."
+      },
+      {
+        "id": "C",
+        "text": "Grant a Cloud Storage read role on the bucket to the principal identifier of that Kubernetes ServiceAccount."
+      },
+      {
+        "id": "D",
+        "text": "Store a service account key in a Kubernetes Secret, and mount the Secret in the Pods of the app."
+      },
+      {
+        "id": "E",
+        "text": "Grant a Cloud Storage read role on the bucket to the service account of the cluster nodes."
+      }
+    ],
+    "answer": [
+      "B",
+      "C"
+    ],
+    "explanation": "Workload Identity Federation for GKE is **always enabled in Autopilot**. You grant IAM roles to the **principal identifier of a Kubernetes ServiceAccount**, and only the Pods that use it get the access. This needs **no key files**.",
+    "whyWrong": {
+      "A": "Workload Identity Federation for GKE is always enabled in Autopilot. Enabling it also grants no IAM permissions.",
+      "D": "The security team forbids service account keys. Workload Identity Federation for GKE needs no key files.",
+      "E": "With Workload Identity Federation for GKE, Pods call Google Cloud APIs as their Kubernetes ServiceAccount, not as the node service account."
+    },
+    "sources": [
+      {
+        "title": "Authenticate to Google Cloud APIs from GKE workloads",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/workload-identity",
+        "evidence": "In Autopilot, Workload Identity Federation for GKE is always enabled."
+      },
+      {
+        "title": "Authenticate to Google Cloud APIs from GKE workloads",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/workload-identity",
+        "evidence": "The principal in these policies is an IAM principal identifier that corresponds to the workloads, namespaces, or Kubernetes ServiceAccounts."
+      },
+      {
+        "title": "About Workload Identity Federation for GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+        "evidence": "Workload Identity Federation for GKE lets you use IAM policies to grant Kubernetes workloads in your GKE cluster access to specific Google Cloud APIs without needing manual configuration or less secure methods like service account key files."
+      }
+    ]
+  },
+  {
+    "id": "run-024",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "secret-manager-add-on",
+      "secrets",
+      "iam"
+    ],
+    "stem": "An app on GKE needs a database password. The security team requires that IAM, not in-cluster RBAC, controls access to the password. The password must not be stored in a Kubernetes Secret. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Store the password in a Kubernetes Secret, and turn on application-layer secrets encryption with a Cloud KMS key."
+      },
+      {
+        "id": "B",
+        "text": "Store the password in a ConfigMap, and limit access to that ConfigMap with namespace RBAC rules."
+      },
+      {
+        "id": "C",
+        "text": "Store the password in Secret Manager, and use the Secret Manager add-on with the Sync as Kubernetes Secret feature."
+      },
+      {
+        "id": "D",
+        "text": "Store the password in Secret Manager, mount it with the Secret Manager add-on, and grant access with IAM."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Secrets outside the cluster let you **control access with IAM instead of in-cluster RBAC rules**. The Secret Manager add-on mounts the password as a file in a CSI volume, so **no Kubernetes Secret** holds it. Grant `roles/secretmanager.secretAccessor` to the Kubernetes ServiceAccount of the Pod.",
+    "whyWrong": {
+      "A": "Encryption protects the Secret at rest. The password is still in a Kubernetes Secret, and RBAC controls access to it.",
+      "B": "A ConfigMap gives no secrecy or encryption, and RBAC, not IAM, controls access to it.",
+      "C": "The Secret Manager add-on does not support the Sync as Kubernetes Secret feature. That feature also stores the password in a Kubernetes Secret."
+    },
+    "sources": [
+      {
+        "title": "Access secrets stored outside GKE clusters using client libraries",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/workload-identity-secrets",
+        "evidence": "lets you control access to your secrets using Identity and Access Management (IAM) instead of in-cluster RBAC rules."
+      },
+      {
+        "title": "Use Secret Manager add-on with Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/secret-manager-managed-csi-component",
+        "evidence": "The Secret Manager add-on doesn't support the Sync as Kubernetes Secret feature, which is available in the open source Secrets Store CSI Driver."
+      },
+      {
+        "title": "Use Secret Manager add-on with Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/secret-manager-managed-csi-component",
+        "evidence": "Pods that use the configured Kubernetes ServiceAccount automatically authenticate as the IAM principal identifier that corresponds to the Kubernetes ServiceAccount when accessing the Secret Manager API."
+      }
+    ]
+  },
+  {
+    "id": "run-025",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "autopilot",
+      "resource-requests"
+    ],
+    "stem": "A team moves a small workload from a GKE Standard cluster to a GKE Autopilot cluster. The CPU request in the Pod spec is less than the minimum that Autopilot allows for the compute class. What happens when the team deploys the workload?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Autopilot rejects the workload and shows an error message."
+      },
+      {
+        "id": "B",
+        "text": "Autopilot raises the request to the allowed range, and then runs the Pod."
+      },
+      {
+        "id": "C",
+        "text": "Autopilot runs the Pod with the CPU request that the Pod spec sets."
+      },
+      {
+        "id": "D",
+        "text": "Autopilot ignores the request and applies the default requests of the compute class."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Autopilot validates requests against a **minimum and a maximum** for each compute class. If the requests are **less than the minimum**, Autopilot **modifies the workload configuration** to bring them into the allowed range. The Pod then runs with the larger request.",
+    "whyWrong": {
+      "A": "For a request that is less than the minimum, Autopilot raises the request to the allowed range instead.",
+      "C": "Autopilot enforces the minimum for the compute class. It changes a request that is less than the minimum.",
+      "D": "Autopilot assigns default requests only to containers that do not specify requests. This container specifies a CPU request."
+    },
+    "sources": [
+      {
+        "title": "Resource requests in Autopilot",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-resource-requests",
+        "evidence": "If your requests are less than the minimum, Autopilot automatically modifies your workload configuration to bring your requests within the allowed range."
+      },
+      {
+        "title": "Resource requests in Autopilot",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-resource-requests",
+        "evidence": "If you don't specify requests for some containers, Autopilot assigns default values to let those containers run correctly."
+      }
+    ]
+  },
+  {
+    "id": "run-026",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-deploy",
+      "promotion",
+      "approval"
+    ],
+    "stem": "Your team builds a container image in Cloud Build and deploys it to `dev`, `staging`, and `prod` GKE clusters. A deploy to production needs a manual approval. The team must deploy to production the exact image that it tested in `staging`. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Cloud Build trigger for each environment that rebuilds the image from the branch and runs `kubectl apply`."
+      },
+      {
+        "id": "B",
+        "text": "Create a Cloud Deploy pipeline with the three targets, set `requireApproval` on `prod`, and promote one release."
+      },
+      {
+        "id": "C",
+        "text": "Create a Cloud Deploy pipeline, and create a new release with a new image build for each target."
+      },
+      {
+        "id": "D",
+        "text": "Deploy the three environments to namespaces in one cluster, and have a reviewer run `kubectl apply` for production."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Cloud Deploy **promotes one release**, with its exact images, through the targets in order. `requireApproval` on the `prod` target **holds the promotion until someone approves it**. Google recommends that you **build once and promote** the same image.",
+    "whyWrong": {
+      "A": "A rebuild for each environment can add untested changes. Google recommends that you build once and promote.",
+      "C": "A new build for each target deploys an image that was not tested in `staging`.",
+      "D": "This gives no promotion sequence or approval control. Google also recommends separate clusters for each environment."
+    },
+    "sources": [
+      {
+        "title": "Overview of Cloud Deploy",
+        "url": "https://docs.cloud.google.com/deploy/docs/overview",
+        "evidence": "To require approval for a target, set the `requireApproval` property in the target definition."
+      },
+      {
+        "title": "Best practices for continuous integration and delivery to Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/best-practices-continuous-integration-delivery-kubernetes",
+        "evidence": "To ensure that the container image you tested is the container image you deploy, it's best to build once and promote along your environments."
+      },
+      {
+        "title": "Overview of Cloud Deploy",
+        "url": "https://docs.cloud.google.com/deploy/docs/overview",
+        "evidence": "Cloud Deploy is a managed service that automates delivery of your applications to a series of target environments in a defined promotion sequence."
+      }
+    ]
+  },
+  {
+    "id": "run-027",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "startup-probe",
+      "liveness-probe",
+      "crashloopbackoff"
+    ],
+    "stem": "An app takes from 1 to 4 minutes to start, depending on the data that it loads. Pods often enter `CrashLoopBackOff` during slow starts. The app has this liveness probe:\n\n```yaml\nlivenessProbe:\n  httpGet:\n    path: /healthz\n    port: 8080\n  periodSeconds: 5\n  failureThreshold: 3\n```\n\nAfter the app starts, the liveness probe must still detect a deadlock in about 15 seconds. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `initialDelaySeconds: 240` on the liveness probe, so that it waits for the slowest start."
+      },
+      {
+        "id": "B",
+        "text": "Set `failureThreshold: 50` on the liveness probe, so that it allows for the slowest start."
+      },
+      {
+        "id": "C",
+        "text": "Add a startup probe on `/healthz` with `failureThreshold: 30` and `periodSeconds: 10`."
+      },
+      {
+        "id": "D",
+        "text": "Replace the liveness probe with a readiness probe on the same `/healthz` endpoint."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A **startup probe** gives the app time to start, and Kubernetes runs the liveness probe **only after the startup probe succeeds**. With 30 × 10 seconds, the app has 5 minutes to start. The **liveness settings stay the same**, so the probe still detects a deadlock in about 15 seconds.",
+    "whyWrong": {
+      "A": "The delay applies to every start, also to a fast one. A deadlock soon after a fast start stays undetected until the delay ends.",
+      "B": "This makes deadlock detection slow for the whole life of the container, about 250 seconds.",
+      "D": "A readiness failure does not restart the container. A deadlocked container would never restart."
+    },
+    "sources": [
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "Rather than set a long liveness interval, you can configure a separate configuration for probing the container as it starts up, allowing a time longer than the liveness interval would allow."
+      },
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "You should then set its `failureThreshold` high enough to allow the container to start, without changing the default values of the liveness probe. This helps to protect against deadlocks."
+      }
+    ]
+  },
+  {
+    "id": "run-028",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "liveness-probe",
+      "probe-design",
+      "cascading-failures"
+    ],
+    "stem": "A web app on GKE has a liveness probe on `/healthz`. The handler runs a query on the Cloud SQL database and returns HTTP 500 if the query fails. When the database is slow for a few minutes, all Pods restart at the same time, and the outage gets longer. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase `timeoutSeconds` on the liveness probe, so that slow queries can complete."
+      },
+      {
+        "id": "B",
+        "text": "Change `/healthz` to check only the app process, without calls to other services."
+      },
+      {
+        "id": "C",
+        "text": "Move the database query to a startup probe, and remove the liveness probe."
+      },
+      {
+        "id": "D",
+        "text": "Replace the HTTP check with an `exec` probe that runs the database query in the container."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Google says to **never make probe logic access other services**, because slow services can compromise the Pod lifecycle. A liveness probe must show only an **unrecoverable failure**, such as a deadlock. A local check stops the restarts when the database is slow.",
+    "whyWrong": {
+      "A": "The probe still depends on the database. A longer slowdown still restarts all Pods.",
+      "C": "The startup probe still accesses another service. Without a liveness probe, Kubernetes also no longer detects a deadlock.",
+      "D": "The probe still depends on the database. An `exec` probe also starts new processes each time it runs."
+    },
+    "sources": [
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "Never make any probe logic access other services. It can compromise the lifecycle of your Pod if these services don't respond promptly."
+      },
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "Liveness probes must be configured carefully to ensure that they truly indicate unrecoverable application failure, for example a deadlock."
+      }
+    ]
+  },
+  {
+    "id": "run-029",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "readiness-probe",
+      "cache-warmup"
+    ],
+    "stem": "A service on GKE loads a large cache when it starts. It returns errors until the cache is loaded, which takes about 90 seconds. During each rollout, clients get errors from the new Pods. The app does not deadlock. What should you add?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A readiness probe that passes only after the cache is fully loaded"
+      },
+      {
+        "id": "B",
+        "text": "A liveness probe that fails until the cache is fully loaded"
+      },
+      {
+        "id": "C",
+        "text": "`initialDelaySeconds: 90` on a new liveness probe for the app"
+      },
+      {
+        "id": "D",
+        "text": "`minReadySeconds: 90` on the Deployment, with no probes added"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Kubernetes sends traffic only to ready Pods. A **readiness probe that passes only after the cache is fully loaded** keeps the new Pods out of the Service endpoints until they can serve.",
+    "whyWrong": {
+      "B": "A liveness failure restarts the container. The cache load starts again, and the Pod can restart in a loop.",
+      "C": "A liveness probe does not control traffic. Without a readiness probe, Kubernetes considers the Pod ready at once.",
+      "D": "`minReadySeconds` only delays when a ready Pod counts as available. Without a readiness probe, the Pod is ready at once and gets traffic."
+    },
+    "sources": [
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "If your application depends on a cache to be loaded at startup, the readiness probe must say it's ready only after the cache is fully loaded."
+      },
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "If a container does not provide a particular probe, the kubelet always considers the result as `Success`."
+      }
+    ]
+  },
+  {
+    "id": "run-030",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "ingress",
+      "load-balancer-health-check",
+      "backendconfig"
+    ],
+    "stem": "You created a GKE Ingress when the Deployment had 0 replicas. Later, you scaled the Deployment up. The Pods have a readiness probe on `/healthz`. The load balancer marks all backends unhealthy, because `/` returns HTTP 404. You cannot recreate the Ingress. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change `periodSeconds` on the readiness probe, so that GKE copies the probe to the health check again."
+      },
+      {
+        "id": "B",
+        "text": "Delete the Pods, so that the Ingress controller reads the readiness probe from the new Pods."
+      },
+      {
+        "id": "C",
+        "text": "Create a HealthCheckPolicy that sets `requestPath: /healthz` for the Service."
+      },
+      {
+        "id": "D",
+        "text": "Create a BackendConfig with a `healthCheck` that uses `/healthz`, and reference it from the Service."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The Ingress controller uses the readiness probe **only if the Pods exist when you create the Ingress**. With 0 replicas, the default health check applies, and later probe changes do not affect the Ingress. Google recommends a **BackendConfig** for the most control over the load balancer health check.",
+    "whyWrong": {
+      "A": "Changes to the readiness probe do not affect the Ingress after you create it.",
+      "B": "The controller reads the probe only when you create the Ingress. New Pods do not change the health check.",
+      "C": "A HealthCheckPolicy configures the health check of a Gateway. An Ingress uses a BackendConfig."
+    },
+    "sources": [
+      {
+        "title": "GKE Ingress for Application Load Balancers",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress",
+        "evidence": "For the GKE Ingress controller to use your `readinessProbes` as health checks, the Pods for an Ingress must exist at the time of Ingress creation. If your replicas are scaled to 0, the default health check applies."
+      },
+      {
+        "title": "GKE Ingress for Application Load Balancers",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress",
+        "evidence": "Changes to a Pod's `readinessProbe` don't affect the Ingress after it is created."
+      },
+      {
+        "title": "About GKE Ingress routing and security",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress-routing-security",
+        "evidence": "Use a `BackendConfig` CRD to have the most control over the load balancer health check settings."
+      }
+    ]
+  },
+  {
+    "id": "run-031",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "gateway-api",
+      "healthcheckpolicy",
+      "load-balancer-health-check"
+    ],
+    "stem": "You expose an app with a GKE Gateway. Every path of the app, including `/` and `/healthz`, returns HTTP 401 without an `Authorization` header. The readiness probe on `/healthz` sends this header, so the Pods are ready. The load balancer marks all backends unhealthy. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add an `Authorization` header to the health check in a HealthCheckPolicy."
+      },
+      {
+        "id": "B",
+        "text": "Create a BackendConfig with a `healthCheck` section, and annotate the Service."
+      },
+      {
+        "id": "C",
+        "text": "Create a HealthCheckPolicy for the Service with `requestPath: /healthz`."
+      },
+      {
+        "id": "D",
+        "text": "Remove the header from the readiness probe, so that GKE copies the probe to the health check."
+      },
+      {
+        "id": "E",
+        "text": "Change the app so that `/healthz` returns HTTP 200 without authentication."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "**GKE Gateway does not infer health check settings** from probes, so you set the path in a **HealthCheckPolicy**. The health check needs **HTTP 200**, and it **cannot send custom headers** such as `Authorization`. The health check path must allow unauthenticated access.",
+    "whyWrong": {
+      "A": "A Gateway HealthCheckPolicy cannot send custom HTTP request headers, such as `Authorization`.",
+      "B": "BackendConfig is an Ingress configuration resource. It does not work with a Gateway.",
+      "D": "GKE Gateway does not read readiness or liveness probes. Without the header, the Pods would also fail the readiness probe."
+    },
+    "sources": [
+      {
+        "title": "Configure Gateway resources using Policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+        "evidence": "Unlike GKE Ingress, GKE Gateway does not automatically infer health check parameters (such as path, port, or protocol) from your Pod's readiness or liveness probes."
+      },
+      {
+        "title": "Configure Gateway resources using Policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+        "evidence": "You cannot configure custom HTTP request headers (such as `Authorization` headers) in GKE Gateway `HealthCheckPolicy` probes."
+      },
+      {
+        "title": "Configure Gateway resources using Policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+        "evidence": "If your backend requires authentication headers, you must configure your application to allow unauthenticated access specifically to your dedicated health check path (for example, `/healthz` or `/ping`) for Google Cloud health check IP ranges."
+      }
+    ]
+  },
+  {
+    "id": "run-032",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "graceful-shutdown",
+      "sigterm",
+      "prestop-hook"
+    ],
+    "stem": "During each rolling update of a Deployment, some clients get connection errors for a few seconds. The app stops listening as soon as it gets `SIGTERM`. Which two changes reduce these errors? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the app to keep serving requests for a few seconds after `SIGTERM`."
+      },
+      {
+        "id": "B",
+        "text": "Set `terminationGracePeriodSeconds: 5`, so that the old Pods stop and leave faster."
+      },
+      {
+        "id": "C",
+        "text": "Make the liveness probe fail as soon as the app receives `SIGTERM`."
+      },
+      {
+        "id": "D",
+        "text": "Add a `preStop` hook that sleeps for a few seconds before `SIGTERM`."
+      },
+      {
+        "id": "E",
+        "text": "Change the Deployment strategy type from `RollingUpdate` to `Recreate`."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Kubernetes updates kube-proxies and load balancers **asynchronously**, so new requests can still arrive after `SIGTERM`. Google says **not to stop accepting requests right after `SIGTERM`**. If you cannot change the app, a **`preStop` sleep** postpones `SIGTERM`.",
+    "whyWrong": {
+      "B": "A shorter grace period kills the Pods sooner. Requests that are still in progress then fail.",
+      "C": "A liveness failure restarts the container. It does not stop new requests from arriving.",
+      "E": "`Recreate` stops all Pods before it creates new ones, so all clients get errors during the update."
+    },
+    "sources": [
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "Don't stop accepting new requests right after `SIGTERM`. Your application must not stop immediately, but instead finish all requests that are in flight and still listen to incoming connections that arrive after the Pod termination begins."
+      },
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "One common strategy is to execute, in the `preStop` hook, a sleep of a few seconds to postpone the `SIGTERM`."
+      },
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "It might take a while for Kubernetes to update all kube-proxies and load balancers."
+      }
+    ]
+  },
+  {
+    "id": "run-033",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "graceful-shutdown",
+      "termination-grace-period",
+      "prestop-hook"
+    ],
+    "stem": "A Pod has a `preStop` hook that sleeps for 20 seconds. After the hook, the app needs about 25 seconds to drain its connections. The Pod uses the default grace period of 30 seconds. The app often gets `SIGKILL` before it finishes. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the sleep from the `preStop` hook to a `postStart` hook in the same container."
+      },
+      {
+        "id": "B",
+        "text": "Set a probe-level `terminationGracePeriodSeconds` of 60 seconds on the readiness probe."
+      },
+      {
+        "id": "C",
+        "text": "Increase `progressDeadlineSeconds` on the Deployment, so that the shutdown has more time."
+      },
+      {
+        "id": "D",
+        "text": "Increase `terminationGracePeriodSeconds` in the Pod spec to cover the hook and the drain."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The **grace period covers the `preStop` hook and the normal stop together**. Here they need about 45 seconds, but the grace period is 30 seconds. Increase `terminationGracePeriodSeconds` to suit the app.",
+    "whyWrong": {
+      "A": "A `postStart` hook runs when the container is created. It does not delay the shutdown.",
+      "B": "Probe-level `terminationGracePeriodSeconds` cannot be set for readiness probes.",
+      "C": "`progressDeadlineSeconds` sets how long a rollout can go without progress. It does not change the shutdown time."
+    },
+    "sources": [
+      {
+        "title": "Container Lifecycle Hooks | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/",
+        "evidence": "This grace period applies to the total time it takes for both the `PreStop` hook to execute and for the Container to stop normally."
+      },
+      {
+        "title": "Pod Lifecycle | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/",
+        "evidence": "If the `preStop` hook needs longer to complete than the default grace period allows, you must modify `terminationGracePeriodSeconds` to suit this."
+      },
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "Probe-level `terminationGracePeriodSeconds` cannot be set for readiness probes."
+      }
+    ]
+  },
+  {
+    "id": "run-034",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "readiness-gates",
+      "container-native-load-balancing",
+      "rollout"
+    ],
+    "stem": "A Deployment is behind a GKE Ingress with container-native load balancing. The new version serves its health endpoint at `/healthz`, and `/` now returns HTTP 404. The load balancer health check still uses `/`. After `kubectl apply`, the rollout stops after one new Pod. `kubectl get pods -o wide` shows `0/1` in the `READINESS GATES` column for that Pod. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase `progressDeadlineSeconds`, so that the rollout has more time to complete."
+      },
+      {
+        "id": "B",
+        "text": "Set `maxSurge: 100%` on the Deployment, so that all new Pods start at once."
+      },
+      {
+        "id": "C",
+        "text": "Fix the load balancer health check, for example with a BackendConfig that uses `/healthz`."
+      },
+      {
+        "id": "D",
+        "text": "Remove the readiness probe from the Pod spec, so that the new Pod becomes ready."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Container-native load balancing adds a **readiness gate**. A new Pod passes it only when it **passes the load balancer health check**. With a wrong health check, the rollout **stalls after one new Pod**, so fix the health check path.",
+    "whyWrong": {
+      "A": "More time does not help. The Pod never passes the health check, so its readiness gate never becomes true.",
+      "B": "The new Pods still fail the readiness gate, so GKE still does not remove the old Pods.",
+      "D": "The kubelet uses the readiness gate and the readiness probe together. Without the probe, the gate still stays false."
+    },
+    "sources": [
+      {
+        "title": "About GKE Ingress routing and security",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress-routing-security",
+        "evidence": "If such a failure occurs while rolling out an updated Deployment, the rollout stalls after attempting to create one new Pod because that Pod's readiness gate is never True."
+      },
+      {
+        "title": "About GKE Ingress routing and security",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress-routing-security",
+        "evidence": "A newly created Pod must at least pass its readiness gate before GKE removes an old Pod."
+      },
+      {
+        "title": "About GKE Ingress routing and security",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress-routing-security",
+        "evidence": "The kubelet running on each node then computes the Pod's effective readiness, considering both the value of this readiness gate and, if defined, the Pod's readiness probe."
+      }
+    ]
+  },
+  {
+    "id": "run-035",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "grpc-probe",
+      "exec-probe",
+      "probe-mechanisms"
+    ],
+    "stem": "A gRPC service on GKE implements the gRPC Health Checking Protocol. Its liveness probe is an `exec` probe that runs a health check binary every 5 seconds. On dense nodes, these probes add CPU load. You want a probe that checks the gRPC health status with less overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use a `grpc` probe on the port of the service."
+      },
+      {
+        "id": "B",
+        "text": "Use a `tcpSocket` probe on the port of the service."
+      },
+      {
+        "id": "C",
+        "text": "Use an `httpGet` probe on the port of the service."
+      },
+      {
+        "id": "D",
+        "text": "Keep the `exec` probe, and change `periodSeconds` to 30."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The built-in **`grpc` probe** calls the gRPC health check and succeeds when the status is `SERVING`. An `exec` probe **creates new processes each time it runs**, which adds CPU load on dense nodes.",
+    "whyWrong": {
+      "B": "A `tcpSocket` probe checks only that the port accepts a connection. It does not check the gRPC health status.",
+      "C": "An `httpGet` probe sends an HTTP GET request. It does not call the gRPC health check.",
+      "D": "The probe still creates new processes each time it runs. A longer period also makes failure detection slower."
+    },
+    "sources": [
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "Performs a remote procedure call using gRPC. The target should implement gRPC health checks. The diagnostic is considered successful if the `status` of the response is `SERVING`."
+      },
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "Unlike the other mechanisms, `exec` probe's implementation involves the creation/forking of multiple processes each time when executed."
+      },
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "In such scenarios, consider using the alternative probe mechanisms to avoid the overhead."
+      }
+    ]
+  },
+  {
+    "id": "run-036",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "liveness-probe",
+      "restart-policy"
+    ],
+    "stem": "A worker app on GKE exits with a non-zero code when it hits a fatal error. The app cannot hang. The Pod uses the default restart policy. A teammate wants to add a liveness probe, so that Kubernetes restarts the container after a fatal error. What should you tell the teammate?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add the liveness probe, because Kubernetes does not restart a container that exits."
+      },
+      {
+        "id": "B",
+        "text": "Do not add it, because the kubelet restarts the container under the Pod's `restartPolicy`."
+      },
+      {
+        "id": "C",
+        "text": "Add a readiness probe instead, because a readiness failure restarts the container."
+      },
+      {
+        "id": "D",
+        "text": "Add a startup probe instead, because only a startup probe restarts a container that exits."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "If the process **exits on its own when it fails**, you do not necessarily need a liveness probe. The kubelet takes the correct action under the Pod's `restartPolicy`.",
+    "whyWrong": {
+      "A": "The kubelet restarts a container that exits, as the `restartPolicy` sets.",
+      "C": "A readiness failure removes the Pod from the Service endpoints. It does not restart the container.",
+      "D": "A startup probe checks whether the app has started. The kubelet restarts an exited container without any probe."
+    },
+    "sources": [
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "you do not necessarily need a liveness probe; the kubelet will automatically perform the correct action in accordance with the Pod's `restartPolicy`."
+      },
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "For a failed readiness probe, the kubelet continues running the container that failed checks, and also continues to run more probes"
+      }
+    ]
+  },
+  {
+    "id": "run-037",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "load-balancer-health-check",
+      "gateway-api",
+      "healthcheckpolicy"
+    ],
+    "stem": "An app on GKE is behind a Gateway. A HealthCheckPolicy sets `requestPath: /healthz`. The app answers `/healthz` with an HTTP 301 redirect to `/healthz/`. The readiness probe on `/healthz` passes, but the load balancer marks all backends unhealthy. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase `unhealthyThreshold` in the HealthCheckPolicy, so that the backends stay healthy longer."
+      },
+      {
+        "id": "B",
+        "text": "Change the readiness probe to a `tcpSocket` probe on the port of the app."
+      },
+      {
+        "id": "C",
+        "text": "Create a BackendConfig with `requestPath: /healthz/`, and reference it from the Service."
+      },
+      {
+        "id": "D",
+        "text": "Set `requestPath: /healthz/` in the HealthCheckPolicy, so that the check gets HTTP 200."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The kubelet accepts **any status from 200 to 399**, so the readiness probe passes with a 301. A Google Cloud health check **strictly requires HTTP 200**, and a redirect marks the backend unhealthy. The health check path must return 200.",
+    "whyWrong": {
+      "A": "Every check still gets a 301, so the backends stay unhealthy.",
+      "B": "GKE Gateway does not read the readiness probe. The load balancer health check still gets a 301.",
+      "C": "BackendConfig is an Ingress configuration resource. It does not work with a Gateway."
+    },
+    "sources": [
+      {
+        "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+        "evidence": "The diagnostic is considered successful if the response has a status code greater than or equal to 200 and less than 400."
+      },
+      {
+        "title": "Configure Gateway resources using Policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+        "evidence": "Google Cloud health check probes strictly require an HTTP `200` (OK) response code."
+      },
+      {
+        "title": "Configure Gateway resources using Policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+        "evidence": "If your application returns redirects (for example, HTTP `301` or `302`) or client errors (for example, HTTP `401` or `403` on authenticated endpoints) on the probed path, the load balancer will mark the backend unhealthy"
+      }
+    ]
+  },
+  {
+    "id": "run-038",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "poddisruptionbudget",
+      "node-upgrades",
+      "availability"
+    ],
+    "stem": "A stateless service on GKE Standard runs 6 replicas. During node upgrades, GKE drains nodes, and sometimes 3 replicas stop at the same time. This leaves too little capacity. You want at most 1 replica to be down at a time during node drains. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `maxUnavailable: 1` in the `RollingUpdate` strategy of the service's Deployment."
+      },
+      {
+        "id": "B",
+        "text": "Increase `terminationGracePeriodSeconds` in the Pod spec of the service to 120 seconds."
+      },
+      {
+        "id": "C",
+        "text": "Increase `minReadySeconds` in the Deployment spec of the service to 120 seconds."
+      },
+      {
+        "id": "D",
+        "text": "Create a PodDisruptionBudget with `maxUnavailable: 1` for the Pods of the service."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A **PodDisruptionBudget** limits how many Pods of an app a **voluntary disruption**, such as a node drain, can take down at the same time. GKE node upgrades respect the PDB, so only one Pod is evicted at a time.",
+    "whyWrong": {
+      "A": "The Deployment strategy controls rolling updates of the Deployment. It does not limit evictions during a node drain.",
+      "B": "A longer grace period gives each Pod more time to stop. It does not limit how many Pods stop at the same time.",
+      "C": "`minReadySeconds` affects how a rollout counts new Pods as available. It does not limit evictions during a node drain."
+    },
+    "sources": [
+      {
+        "title": "Disruptions | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/pods/disruptions/",
+        "evidence": "A PDB limits the number of Pods of a replicated application that are down simultaneously from voluntary disruptions."
+      },
+      {
+        "title": "Node upgrade strategies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/node-pool-upgrade-strategies",
+        "evidence": "if you create a PDB with `maxUnavailable=1` for one or more workloads running on the node pool, then only one Pod of those workloads can be evicted at a time, limiting the parallelism of the entire upgrade."
+      }
+    ]
+  },
+  {
+    "id": "run-039",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "hpa",
+      "resource-requests",
+      "cpu-utilization"
+    ],
+    "stem": "You create an HPA with the `autoscaling/v2` API. It targets 60% average CPU utilization for a Deployment. Under heavy load, the HPA never adds Pods. The containers in the Deployment set no resource requests. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set CPU requests for each container in the Deployment."
+      },
+      {
+        "id": "B",
+        "text": "Change the HPA manifest to the `autoscaling/v1` API."
+      },
+      {
+        "id": "C",
+        "text": "Enable the cluster autoscaler on the node pool."
+      },
+      {
+        "id": "D",
+        "text": "Lower the target to 30% average CPU utilization."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A utilization target is a **percentage of the Pod's requests**. If the containers have no CPU requests, the HPA cannot do the calculation and **takes no action** for that metric. **Set CPU requests** for each container.",
+    "whyWrong": {
+      "B": "The `v1` API also needs requests for a utilization target. Google no longer recommends the `v1` API.",
+      "C": "The cluster autoscaler adds nodes for Pods that cannot be scheduled. It does not make the HPA add Pods.",
+      "D": "Any utilization target needs requests. The HPA takes no action at any target value."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "To use resource utilization percentage targets with horizontal Pod autoscaling, you must configure requests for that resource for each container running in each Pod in the workload."
+      },
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "Otherwise, the horizontal Pod autoscaler cannot perform the calculations it needs to, and takes no action related to that metric."
+      }
+    ]
+  },
+  {
+    "id": "run-040",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cluster-autoscaler",
+      "hpa",
+      "pending-pods"
+    ],
+    "stem": "An HPA on a GKE Standard cluster raises a Deployment from 4 to 12 replicas during a traffic peak. The node pool has a fixed size. Five new Pods stay `Pending`, because no node has room for their requests. The requests match the real use of the app. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase `maxReplicas` in the HPA, so that it can add more Pods."
+      },
+      {
+        "id": "B",
+        "text": "Enable the cluster autoscaler on the node pool, with a minimum and a maximum size."
+      },
+      {
+        "id": "C",
+        "text": "Turn on Compute Engine autoscaling for the managed instance group of the node pool."
+      },
+      {
+        "id": "D",
+        "text": "Lower the CPU requests of the Pods, so that more Pods fit on each node."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "**The HPA does not change the number of nodes.** The **cluster autoscaler** adds nodes when Pods cannot be scheduled, and it decides from Pod requests.",
+    "whyWrong": {
+      "A": "More replicas create more `Pending` Pods. The HPA does not add nodes.",
+      "C": "Compute Engine autoscaling conflicts with the cluster autoscaler. Google says not to turn it on for cluster nodes.",
+      "D": "The requests match real use, so smaller requests would overload the nodes. The cluster autoscaler also needs correct requests."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "Horizontal Pod autoscaling doesn't change the number of nodes in a GKE cluster. To automatically scale the number of nodes in the cluster based on changes in the number of Pods, you can use the cluster autoscaler."
+      },
+      {
+        "title": "About GKE cluster autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler",
+        "evidence": "Don't enable Compute Engine autoscaling for managed instance groups for your cluster nodes."
+      },
+      {
+        "title": "About GKE cluster autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler",
+        "evidence": "Cluster autoscaler makes these scaling decisions based on the resource requests (rather than actual resource utilization) of Pods running on that node pool's nodes."
+      }
+    ]
+  },
+  {
+    "id": "run-041",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "hpa",
+      "scaling-algorithm"
+    ],
+    "stem": "An HPA targets 50% average CPU utilization. The Deployment has 4 replicas, and the current average CPU utilization is 80%. The HPA allows up to 10 replicas, and no `behavior` policy limits the change. How many replicas does the HPA set?",
+    "options": [
+      {
+        "id": "A",
+        "text": "5"
+      },
+      {
+        "id": "B",
+        "text": "6"
+      },
+      {
+        "id": "C",
+        "text": "7"
+      },
+      {
+        "id": "D",
+        "text": "8"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The HPA uses `desiredReplicas = ceil[currentReplicas × currentMetricValue / desiredMetricValue]`. Here, ceil(4 × 80 / 50) = **ceil(6.4) = 7**.",
+    "whyWrong": {
+      "A": "With 5 replicas, the average utilization stays above the target. The calculation gives 6.4, which rounds up to 7.",
+      "B": "The HPA rounds 6.4 up, not down.",
+      "D": "8 doubles the replica count. The count doubles only when the current value is twice the target."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod Autoscaling | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/",
+        "evidence": "From the most basic perspective, the HorizontalPodAutoscaler controller operates on the ratio between desired metric value and current metric value"
+      },
+      {
+        "title": "Horizontal Pod Autoscaling | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/",
+        "evidence": "For example, if the current metric value is `200m`, and the desired value is `100m`, the number of replicas will be doubled"
+      }
+    ]
+  },
+  {
+    "id": "run-042",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "hpa",
+      "behavior",
+      "stabilization-window"
+    ],
+    "stem": "An HPA on GKE uses the default `behavior`. After traffic drops, the HPA waits about 5 minutes before it removes Pods. The team wants the HPA to remove Pods about 1 minute after the load drops. The team accepts more frequent changes of the replica count. What should you change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `behavior.scaleUp.stabilizationWindowSeconds` to 0."
+      },
+      {
+        "id": "B",
+        "text": "Lower `minReplicas` in the HPA, so that it can remove more Pods."
+      },
+      {
+        "id": "C",
+        "text": "Set `behavior.scaleDown.stabilizationWindowSeconds` to 60."
+      },
+      {
+        "id": "D",
+        "text": "Raise the CPU utilization target from 50% to 70%."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "To prevent thrashing, the HPA uses the highest recommendation in a **scale-down stabilization window**. In GKE, `scaleDown.stabilizationWindowSeconds` **defaults to 300 seconds**. A lower value makes the HPA **scale down sooner**.",
+    "whyWrong": {
+      "A": "This setting controls scale-up, and its default is already 0. Scale-down still uses its own window.",
+      "B": "`minReplicas` sets the lowest replica count. It does not change how long the HPA waits before it scales down.",
+      "D": "A higher target changes how many Pods the HPA wants. The HPA still waits for the scale-down window before it removes Pods."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "To prevent thrashing, the horizontal Pod autoscaler chooses the largest recommendation from a specified stabilization window. This behavior is controlled by the `scaleDown.stabilizationWindowSeconds` field in the HPA `behavior` specification, which defaults to 300 seconds (five minutes) in GKE."
+      },
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "scale-up defaults to `0` seconds (`scaleUp.stabilizationWindowSeconds: 0`) for immediate activation"
+      }
+    ]
+  },
+  {
+    "id": "run-043",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "hpa",
+      "external-metrics",
+      "pubsub"
+    ],
+    "stem": "A worker Deployment on GKE pulls messages from a Pub/Sub subscription. For each message, the worker waits on slow calls to other APIs, so its CPU use stays low while the backlog grows. The team must keep message latency low. How should you configure autoscaling?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create an HPA with a `Resource` metric for CPU, and set a much lower utilization target."
+      },
+      {
+        "id": "B",
+        "text": "Use vertical Pod autoscaling in `Auto` mode, so that the worker Pods get larger requests."
+      },
+      {
+        "id": "C",
+        "text": "Raise the maximum node count of the cluster autoscaler for the worker node pool."
+      },
+      {
+        "id": "D",
+        "text": "Create an HPA on the `External` metric `num_undelivered_messages`, with an `AverageValue` target."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "An **external metric** for the number of undelivered messages in the subscription can **reduce latency before it becomes a problem**. With an `AverageValue` target, the HPA divides the metric by the number of Pods before it compares the value with the target. CPU does not show this load.",
+    "whyWrong": {
+      "A": "CPU use stays low while the backlog grows, so a CPU target does not follow the load.",
+      "B": "Vertical Pod autoscaling changes Pod requests. It does not add Pods to process the backlog.",
+      "C": "The cluster autoscaler adds nodes for Pods that cannot be scheduled. Nothing adds worker Pods."
+    },
+    "sources": [
+      {
+        "title": "Optimize Pod autoscaling based on metrics",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/autoscaling-metrics",
+        "evidence": "Scale based on an external metric reporting the number of unacknowledged messages remaining in a Pub/Sub subscription. This can effectively reduce latency before it becomes a problem, but might use relatively more resources than autoscaling based on CPU utilization."
+      },
+      {
+        "title": "Horizontal Pod Autoscaling | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/",
+        "evidence": "In the `autoscaling/v2` API version, this value can optionally be divided by the number of Pods before the comparison is made."
+      }
+    ]
+  },
+  {
+    "id": "run-044",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "hpa",
+      "vertical-pod-autoscaling",
+      "custom-metrics"
+    ],
+    "stem": "A Deployment has an HPA on CPU utilization and a vertical Pod autoscaler in `Auto` mode for CPU and memory. The replica count and the requests change all the time and never settle. The team wants horizontal scaling and right-sized requests. The team uses only generally available (GA) features. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace both autoscalers with a `MultidimPodAutoscaler` that scales horizontally on CPU and vertically on memory."
+      },
+      {
+        "id": "B",
+        "text": "Set the vertical Pod autoscaler to `Initial` mode, and keep the HPA on CPU utilization."
+      },
+      {
+        "id": "C",
+        "text": "Increase the tolerance of the HPA, so that changes in requests do not trigger scaling."
+      },
+      {
+        "id": "D",
+        "text": "Change the HPA to a custom metric, such as requests per second, and keep vertical Pod autoscaling for CPU and memory."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google says **not to use the HPA and vertical Pod autoscaling together on CPU or memory**. You can combine them when the HPA uses **custom or external metrics**. Multidimensional Pod autoscaling is in **Beta**, so the **GA-only** rule excludes it.",
+    "whyWrong": {
+      "A": "Multidimensional Pod autoscaling is in Beta. The team uses only GA features.",
+      "B": "`Initial` mode still sets CPU requests, and the HPA still scales on CPU. Both autoscalers still act on CPU.",
+      "C": "Both autoscalers still act on CPU. A higher tolerance only ignores small changes."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "Don't use the horizontal Pod autoscaler together with the vertical Pod autoscaler on CPU or memory. You can use the horizontal Pod autoscaler with the vertical Pod autoscaler for other metrics."
+      },
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "You can configure multidimensional Pod autoscaling (in beta) in order to scale horizontally on CPU and vertically on memory at the same time."
+      },
+      {
+        "title": "Vertical Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler",
+        "evidence": "You can also use vertical Pod autoscaling with horizontal Pod autoscaling on custom and external metrics."
+      }
+    ]
+  },
+  {
+    "id": "run-045",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "hpa",
+      "spec-replicas",
+      "kubectl-apply"
+    ],
+    "stem": "A Deployment manifest in Git sets `replicas: 3`. An HPA scales the Deployment between 3 and 20 replicas. Each time the pipeline runs `kubectl apply` during a traffic peak, the Pod count drops to 3. Then the HPA scales it up again. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `replicas: 20` in the manifest, so that each `kubectl apply` starts at the maximum."
+      },
+      {
+        "id": "B",
+        "text": "Remove `spec.replicas` from the Deployment manifest, and let the HPA set the count."
+      },
+      {
+        "id": "C",
+        "text": "Raise `minReplicas` in the HPA to 10, so that each drop is smaller."
+      },
+      {
+        "id": "D",
+        "text": "Use `kubectl replace` instead of `kubectl apply` in the pipeline."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "When an HPA manages a Deployment, **remove `spec.replicas` from the manifest**. Otherwise, **each `kubectl apply` sets the Pod count back** to the value in the file.",
+    "whyWrong": {
+      "A": "Each `kubectl apply` then sets the count to 20, which wastes resources until the HPA scales down.",
+      "C": "Each `kubectl apply` still sets the count to 3. A higher minimum also keeps more Pods at quiet times.",
+      "D": "`kubectl replace` also sets the replica count from the file, so the count still drops to 3."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod Autoscaling | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/",
+        "evidence": "When an HPA is enabled, it is recommended that the value of `spec.replicas` of the Deployment and / or StatefulSet be removed from their manifest(s)."
+      },
+      {
+        "title": "Deployments | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "evidence": "If a HorizontalPodAutoscaler (or any similar API for horizontal scaling) is managing scaling for a Deployment, don't set `.spec.replicas`."
+      }
+    ]
+  },
+  {
+    "id": "run-046",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "hpa",
+      "scale-to-zero",
+      "external-metrics"
+    ],
+    "stem": "A worker Deployment on GKE processes messages from a Pub/Sub subscription. It gets no messages at night. To save cost, the team wants the HPA to scale the Deployment to zero replicas at night and to start Pods again when messages arrive. The cluster version supports HPA scaling to zero. The HPA has only a CPU utilization metric. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `minReplicas: 0`, and lower the CPU utilization target to 20%."
+      },
+      {
+        "id": "B",
+        "text": "Set `minReplicas: 0`, and add a memory `Resource` metric next to CPU."
+      },
+      {
+        "id": "C",
+        "text": "Set `minReplicas: 0`, and add an `External` metric for the subscription backlog."
+      },
+      {
+        "id": "D",
+        "text": "Set `minReplicas: 0`, and change the HPA manifest to the `autoscaling/v1` API."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "To scale to and from zero, the HPA needs `minReplicas: 0` and **at least one `External` or `Object` metric**. GKE **cannot collect CPU or memory metrics when a workload has zero Pods**, so `Resource` metrics alone cannot scale the workload to zero or back up. The subscription backlog shows the demand while no Pods run.",
+    "whyWrong": {
+      "A": "CPU is a `Resource` metric. With only `Resource` metrics, the HPA cannot scale to zero at any target.",
+      "B": "Memory is also a `Resource` metric. GKE cannot collect it when the workload has zero Pods.",
+      "D": "The `autoscaling/v1` API does not support scaling to and from zero, and Google no longer recommends it."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/troubleshooting/horizontal-pod-autoscaling",
+        "evidence": "Check metric types: the HPA cannot scale to zero if it uses only CPU or memory (`Resource`) metrics. You must configure at least one `External` or `Object` metric."
+      },
+      {
+        "title": "Scale GKE workloads to and from zero using HPA",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/scale-to-from-zero-hpa",
+        "evidence": "GKE cannot collect CPU or memory (`Resource`) metrics when a workload has zero Pods, so resource metrics alone cannot trigger scaling up from zero."
+      },
+      {
+        "title": "Configuring horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/horizontal-pod-autoscaling",
+        "evidence": "The `autoscaling/v1` API is still supported, but is no longer recommended, and does not support certain features such as scaling to and from zero using HPA."
+      }
+    ]
+  },
+  {
+    "id": "run-047",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "hpa",
+      "traffic-based-autoscaling",
+      "gcpbackendpolicy"
+    ],
+    "stem": "An app on GKE is behind a Gateway. Its CPU use does not follow its load, because it waits on other services. Load tests show that each Pod can serve about 50 requests per second. You want the HPA to scale on load balancer traffic, and you do not want to export custom metrics from the app. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `maxRatePerEndpoint: 50` in a GCPBackendPolicy, and scale on the `Object` metric `gclb-capacity-fullness`."
+      },
+      {
+        "id": "B",
+        "text": "Expose the app with a LoadBalancer Service instead, and scale on the request count of that load balancer."
+      },
+      {
+        "id": "C",
+        "text": "Set the rate in a BackendConfig for the Service, and add a `Pods` metric for requests per second to the HPA."
+      },
+      {
+        "id": "D",
+        "text": "Keep a `Resource` metric for CPU, and lower its target so that CPU follows the requests more closely."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "**Traffic-based autoscaling** uses traffic data from the load balancer, so the app exports no metrics. You set the capacity of each Pod with `maxRatePerEndpoint` in a **GCPBackendPolicy**. The HPA then scales on the `Object` metric `autoscaling.googleapis.com|gclb-capacity-fullness`.",
+    "whyWrong": {
+      "B": "Traffic-based autoscaling is not supported for traffic through Services of type `LoadBalancer`.",
+      "C": "BackendConfig is an Ingress configuration resource. A `Pods` metric also needs the app to export a custom metric.",
+      "D": "The CPU use of this app does not follow its load. A lower target does not change that."
+    },
+    "sources": [
+      {
+        "title": "Configuring horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/horizontal-pod-autoscaling",
+        "evidence": "It is configured using a `maxRatePerEndpoint` field on a GCPBackendPolicy associated with the Service, which defines the maximum traffic a Service should receive in requests per second, per Pod."
+      },
+      {
+        "title": "Configuring horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/horizontal-pod-autoscaling",
+        "evidence": "Not supported for traffic using Services of type `LoadBalancer`."
+      },
+      {
+        "title": "Configuring horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/horizontal-pod-autoscaling",
+        "evidence": "We recommend that you switch to the `autoscaling.googleapis.com|gclb-capacity-fullness` metric name instead."
+      }
+    ]
+  },
+  {
+    "id": "run-048",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "hpa",
+      "autoscaling-v2",
+      "scale-target"
+    ],
+    "stem": "You review this HPA manifest. The team wants the HPA to keep working after each rolling update. The team also wants a slower scale-down policy.\n\n```yaml\napiVersion: autoscaling/v1\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: web\nspec:\n  scaleTargetRef:\n    apiVersion: apps/v1\n    kind: ReplicaSet\n    name: web-7d9f8c6b5\n  minReplicas: 2\n  maxReplicas: 10\n  targetCPUUtilizationPercentage: 60\n```\n\nWhich two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep `autoscaling/v1`, and add a `behavior` section with a scale-down policy."
+      },
+      {
+        "id": "B",
+        "text": "Change `scaleTargetRef` to the `web` Deployment."
+      },
+      {
+        "id": "C",
+        "text": "Remove the CPU requests from the Pods, so that the HPA scales on actual CPU use."
+      },
+      {
+        "id": "D",
+        "text": "Create a new HPA for the new ReplicaSet after each rolling update."
+      },
+      {
+        "id": "E",
+        "text": "Move to `autoscaling/v2`, and add a `behavior` section with a scale-down policy."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "A rolling update replaces the ReplicaSet, so **target the Deployment**, not the ReplicaSet behind it. The `behavior` field sets **separate scale-up and scale-down behaviors**, and it needs the **`v2` API**.",
+    "whyWrong": {
+      "A": "The `behavior` field needs the `v2` HorizontalPodAutoscaler API.",
+      "C": "A utilization target is a percentage of requests. Without requests, the HPA takes no action for that metric.",
+      "D": "This adds manual work after each update. An HPA on the Deployment keeps working through each rolling update."
+    },
+    "sources": [
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "If you have a Deployment, don't configure horizontal Pod autoscaling on the ReplicaSet or Replication Controller backing it."
+      },
+      {
+        "title": "Horizontal Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+        "evidence": "When you perform a rolling update on the Deployment or Replication Controller, it is replaced by a new Replication Controller. Instead configure horizontal Pod autoscaling on the Deployment itself."
+      },
+      {
+        "title": "Horizontal Pod Autoscaling | Kubernetes",
+        "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/",
+        "evidence": "If you use the `v2` HorizontalPodAutoscaler API, you can use the `behavior` field (see the API reference) to configure separate scale-up and scale-down behaviors."
+      }
+    ]
+  },
+  {
+    "id": "run-049",
+    "objective": "3.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 1,
+    "tags": [
+      "hpa",
+      "vertical-pod-autoscaling",
+      "autoscaler-choice"
+    ],
+    "stem": "A GKE Standard cluster runs two workloads. A public API gets sudden traffic spikes during sales. A Go backend runs for weeks with steady CPU and memory use, but its requests were guesses and are too large. Which two autoscaling choices should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use vertical Pod autoscaling for the public API, so that each Pod gets more CPU during spikes."
+      },
+      {
+        "id": "B",
+        "text": "Use only the cluster autoscaler for the public API, so that it adds Pods during spikes."
+      },
+      {
+        "id": "C",
+        "text": "Turn on Compute Engine autoscaling on the node instance groups for the Go backend."
+      },
+      {
+        "id": "D",
+        "text": "Use the Horizontal Pod Autoscaler for the public API, so that it adds Pods during spikes."
+      },
+      {
+        "id": "E",
+        "text": "Use vertical Pod autoscaling for the Go backend, so that its requests match its real use."
+      }
+    ],
+    "answer": [
+      "D",
+      "E"
+    ],
+    "explanation": "Google recommends the **HPA for sudden spikes**, because it adds Pods quickly. **Vertical Pod autoscaling works best with long-running workloads** that have steady use, and it right-sizes requests from historical usage.",
+    "whyWrong": {
+      "A": "Vertical Pod autoscaling is for steady-state right-sizing. It is not a solution for sudden, short spikes.",
+      "B": "The cluster autoscaler adds nodes, not Pods. It adds nodes only for Pods that cannot be scheduled.",
+      "C": "Compute Engine autoscaling conflicts with the cluster autoscaler, and it does not change Pod requests."
+    },
+    "sources": [
+      {
+        "title": "Vertical Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler",
+        "evidence": "For rapid scaling needs in response to sudden resource usage, use the Horizontal Pod Autoscaler."
+      },
+      {
+        "title": "Vertical Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler",
+        "evidence": "Vertical Pod autoscaling is designed for steady-state rightsizing and is not a solution for sudden, short-lived resource spikes."
+      },
+      {
+        "title": "Vertical Pod autoscaling",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler",
+        "evidence": "Vertical Pod autoscaling works best with long-running homogenous workloads."
+      }
+    ]
+  }
+]

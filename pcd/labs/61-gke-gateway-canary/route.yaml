@@ -1,0 +1,29 @@
+# Lab 61: the routing rules of lab61-gateway. The set_weights function in the README
+# replaces V1_WEIGHT and V2_WEIGHT, then applies the result.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: lab61-route
+  namespace: lab61
+spec:
+  parentRefs:                 # attaches the route to the Gateway
+  - kind: Gateway
+    name: lab61-gateway
+  rules:
+  # Rule 1: testers send the header "env: canary", and always reach v2 (A/B test traffic).
+  - matches:
+    - headers:
+      - name: env
+        value: canary
+    backendRefs:
+    - name: lab61-v2
+      port: 8080
+  # Rule 2: all other requests. The weights are relative, not percentages:
+  # 90 and 10 send 90% of the requests to v1. Weight 0 sends no requests.
+  - backendRefs:
+    - name: lab61-v1
+      port: 8080
+      weight: V1_WEIGHT
+    - name: lab61-v2
+      port: 8080
+      weight: V2_WEIGHT

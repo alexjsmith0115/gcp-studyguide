@@ -1,4 +1,4 @@
-/* PCA Workbook — drafting-sheet theme.
+/* Study workbook (PCA and PCD) — drafting-sheet theme.
    Vellum paper, graphite ink, one Prussian-blue accent. Semantic colors are separate. */
 :root {
   color-scheme: light;
@@ -445,6 +445,7 @@ a.tile:hover { border-color: var(--rule-strong); }
   font: 400 18px/1.62 var(--font-read);
   font-optical-sizing: auto;
   min-width: 0;
+  overflow-wrap: break-word; /* a long link text or name wraps on a phone */
 }
 .prose > * { max-width: 70ch; }
 .prose > .table-wrap, .prose > .code, .prose > details { max-width: 100%; }
@@ -509,7 +510,7 @@ a.tile:hover { border-color: var(--rule-strong); }
 .stem { font: 400 17.5px/1.55 var(--font-ui); }
 .stem p { margin: 0 0 0.7em; }
 .stem p:last-child { margin: 0; }
-.stem code, .opt code, .feedback code { font-size: 0.85em; background: var(--surface-2); padding: 0.1em 0.3em; border-radius: 3px; }
+.stem code, .opt code, .feedback code { font-size: 0.85em; background: var(--surface-2); padding: 0.1em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
 .opts { display: grid; gap: 8px; }
 .opt {
   display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 12px; align-items: start;
@@ -575,7 +576,7 @@ kbd { font-size: 11px; border: 1px solid var(--rule-strong); border-bottom-width
 .fcard-back { display: grid; gap: 14px; padding: 20px clamp(18px, 4vw, 40px) 22px; border-top: 1.5px dashed var(--rule-strong); animation: fc-in 0.18s ease-out; }
 .fcard-answer { margin: 0; font: 400 19px/1.6 var(--font-read); max-width: 62ch; }
 .fcard-aws { margin: 0; display: flex; gap: 10px; align-items: baseline; font-size: 14.5px; color: var(--ink-2); }
-.fcard code, .fc-item code { font-size: 0.85em; background: var(--surface-2); padding: 0.1em 0.3em; border-radius: 3px; }
+.fcard code, .fc-item code { font-size: 0.85em; background: var(--surface-2); padding: 0.1em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
 .fcard-grade { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--rule-strong); }
 .grade { display: grid; gap: 3px; justify-items: center; padding: 14px 12px 15px; border: 0; background: transparent; cursor: pointer; transition: background-color 0.12s; }
 .grade + .grade { border-left: 1px solid var(--rule-strong); }

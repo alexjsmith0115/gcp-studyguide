@@ -1,11 +1,18 @@
-// PCA Workbook UI. Plain JS; renders views into #main from DATA + Store.
+// Workbook UI. Plain JS; renders views into #main from DATA + Store.
 // Uses logic.js and store.js globals (the build concatenates the files).
+// One app serves every guide in the repo; DATA.app holds the guide's names.
 
-const DATA = JSON.parse(document.getElementById("pca-data").textContent);
+const DATA = JSON.parse(document.getElementById("workbook-data").textContent);
 const EXAM = DATA.exam;
+const APP = DATA.app;
+const KEY = APP.id; // prefix of this guide's browser keys, for example "pca-route"
+Store.slug = APP.slug;
+Store.appName = APP.name;
 const SECTIONS = EXAM.sections.map((s) => ({ id: s.id, weight: s.weight, title: s.title }));
 const SEC = Object.fromEntries(SECTIONS.map((s) => [s.id, s]));
-const SHORT = { 1: "Design and planning", 2: "Managing and provisioning", 3: "Security and compliance", 4: "Technical and business processes", 5: "Managing implementation", 6: "Operations excellence" };
+const SHORT = APP.sectionShort || Object.fromEntries(SECTIONS.map((s) => [s.id, s.title]));
+// "exam guide v6.1", or the retrieval date when the guide has no version number.
+const GUIDE_REF = EXAM.guideVersion ? `exam guide ${EXAM.guideVersion}` : `the exam guide of ${EXAM.retrieved}`;
 const OBJECTIVES = EXAM.sections.flatMap((s) => s.objectives.map((o) => ({ ...o, section: s.id })));
 const OBJ = Object.fromEntries(OBJECTIVES.map((o) => [o.id, o]));
 const NOTES = DATA.notes;
@@ -150,7 +157,7 @@ function go(path, { replace = false, keepScroll = false } = {}) {
   if (ui.stack.length > 50) ui.stack.shift();
   ui.routeStr = path;
   ui.route = parseRoute(path);
-  lsSetStr("pca-route", path);
+  lsSetStr(`${KEY}-route`, path);
   render();
   if (restoreY != null) window.scrollTo(0, restoreY);
   else if (!keepScroll) window.scrollTo(0, 0);
@@ -165,7 +172,7 @@ function back(fallback = "home") {
 const NAV = [
   ["home", "Dashboard", "home"], ["study", "Study guide", "book"], ["services", "Services", "layers"], ["practice", "Practice", "target"], ["cards", "Flashcards", "cards"],
   ["mock", "Mock exam", "timer"], ["cases", "Case studies", "case"], ["labs", "Labs", "flask"], ["progress", "Progress", "chart"],
-];
+].filter(([r]) => r !== "cases" || CASES.length);
 const NAV_OF = { service: "services", objective: "study", note: "study", ref: "study", glossary: "study", quiz: "practice", flash: "cards", browse: "cards", exam: "mock", result: "mock", case: "cases", lab: "labs" };
 const NAV_COUNT_TITLE = { practice: "Questions due for review", cards: "Flashcards due for review", mock: "Mock exam in progress" };
 function renderNav() {
@@ -354,7 +361,7 @@ function nextActions(d) {
   const setup = LAB["00-setup"];
   if (setup && !labDone(setup.id)) acts.push({ icon: "flask", title: "Set up your lab project", sub: `Lab 00 · ${setup.minutes} min · all labs use it`, attrs: `href="#/lab/${setup.id}" data-route="lab/${setup.id}"` });
   const lastMock = d.mocks[d.mocks.length - 1];
-  if (!d.activeMock && d.ready.coverage >= 0.3 && (!lastMock || d.now - lastMock.finishedAt > 7 * DAY)) acts.push({ icon: "timer", title: "Take a mock exam", sub: "50 questions · 2 hours · 2 case studies", attrs: `href="#/mock" data-route="mock"` });
+  if (!d.activeMock && d.ready.coverage >= 0.3 && (!lastMock || d.now - lastMock.finishedAt > 7 * DAY)) acts.push({ icon: "timer", title: "Take a mock exam", sub: `50 questions · 2 hours${CASES.length ? " · 2 case studies" : ""}`, attrs: `href="#/mock" data-route="mock"` });
   const weak = weakObjectives(d.objStats)[0];
   if (weak) acts.push({ icon: "target", title: `Practice your weakest objective: ${weak.id}`, sub: `${OBJ[weak.id].title} · latest ${pct(weak.lastAcc)}`, attrs: `data-action="start-practice" data-kind="objective" data-id="${weak.id}" data-count="10"` });
   if (d.cardsNewRead >= 5) acts.push({ icon: "cards", title: "Learn the flashcards for pages you read", sub: `${plural(d.cardsNewRead, "new card")} from notes pages you marked as read`, attrs: `data-action="start-cards" data-kind="read" data-count="20"` });
@@ -450,7 +457,7 @@ function logActivity(delta) {
 VIEWS.study = function () {
   const d = derived();
   return `<div class="page narrow">
-    <div class="page-head"><div><h1>Study guide</h1><p>Organized by the official exam guide v6.1: 6 sections, 22 objectives. Each objective has notes pages grounded in Google Cloud documentation, labs, and practice questions.</p></div></div>
+    <div class="page-head"><div><h1>Study guide</h1><p>Organized by the official exam guide${EXAM.guideVersion ? ` ${esc(EXAM.guideVersion)}` : ""}: ${SECTIONS.length} sections, ${OBJECTIVES.length} objectives. Each objective has notes pages grounded in Google Cloud documentation, labs, and practice questions.</p></div></div>
     ${SECTIONS.map((s) => {
       const objs = EXAM.sections.find((x) => x.id === s.id).objectives;
       const done = objs.filter((o) => objStatus(o.id) === 2).length;
@@ -633,7 +640,7 @@ VIEWS.services = function () {
       <div class="panel-head"><h2>Most tested in the question bank</h2><button type="button" class="btn small" data-action="svc-sort" data-sort="rank">See all, ranked</button></div>
       ${svcLegend()}
       <div class="sb-rows">${top.slice(0, 12).map((s) => `<div class="sb-row"><a href="#/service/${s.id}" data-route="service/${s.id}">${esc(s.name)}</a>${svcBar(s)}<span class="bar-val">${svcTotal(s)}</span></div>`).join("")}</div>
-      <p class="hint">Counts are questions in this workbook's bank of ${QS.length}, written against exam guide ${esc(EXAM.guideVersion)}. Google does not publish how often each service appears on the real exam. ${inGuide} services appear in the exam guide's own wording; the filter below can show only those.</p>
+      <p class="hint">Counts are questions in this workbook's bank of ${QS.length}, written against ${esc(GUIDE_REF)}. Google does not publish how often each service appears on the real exam. ${inGuide} services appear in the exam guide's own wording; the filter below can show only those.</p>
     </section>
     ${weak.length ? `<section class="panel"><div class="panel-head"><h2>Your weak services</h2><span class="hint">3+ questions tried, weakest first</span></div>
       <div class="weak">${weak.map(({ s, u }) => `<div class="weak-row"><span class="objid">${pct(u.lastAcc)}</span><a class="t" href="#/service/${s.id}" data-route="service/${s.id}">${esc(s.name)}</a><button type="button" class="btn small" data-action="start-practice" data-kind="service" data-id="${s.id}" data-count="10">Practice</button></div>`).join("")}</div></section>` : ""}
@@ -868,10 +875,10 @@ VIEWS.practice = function () {
       ${OBJECTIVES.map((o) => { const os = d.objStats[o.id] || { total: 0, seen: 0, due: 0 }; return `<tr><td><span class="objid">${o.id}</span> ${esc(o.title)}</td><td class="n">${os.seen}/${os.total}</td><td class="n">${os.seen ? pct(os.firstAcc) : "–"}</td><td class="n">${os.seen ? pct(os.lastAcc) : "–"}</td><td class="n">${os.due || ""}</td><td class="n"><button type="button" class="btn small" data-action="start-practice" data-kind="objective" data-id="${o.id}" data-count="${c}"${os.total ? "" : " disabled"}>Start</button></td></tr>`; }).join("")}
       </tbody></table></div>
     </section>
-    <section class="panel">
+    ${CASES.length ? `<section class="panel">
       <h2>By case study</h2>
       <div class="row">${CASES.map((cs) => `<button type="button" class="btn" data-action="start-practice" data-kind="case" data-id="${cs.id}" data-count="${c}"${(QS_BY_CASE[cs.id] || []).length ? "" : " disabled"}>${esc(cs.name)} · ${(QS_BY_CASE[cs.id] || []).length}</button>`).join("")}</div>
-    </section>
+    </section>` : ""}
     <section class="panel">
       <div class="panel-head"><h2>By service</h2><a class="btn small" href="#/services" data-route="services">Browse services</a></div>
       <p class="muted" style="margin:0">Each service profile has a button that practices every question that names the service.</p>
@@ -916,13 +923,16 @@ function optionList(q, order, sel, { reveal = false, disabled = false } = {}) {
   }).join("")}</div>`;
 }
 
+// A docs quote keeps the code formatting of the docs page, which the fetch tool writes as `code`.
+const quoteHtml = (s) => esc(s).replace(/`([^`\n]+)`/g, "<code>$1</code>");
 function explanationBlock(q, order) {
   const letterOf = (oid) => LETTERS[order.indexOf(oid)] || oid;
   const wrong = order.filter((oid) => !q.answer.includes(oid));
-  const notes = (NOTES_BY_OBJ[q.objective] || []);
+  const cited = (q.notes || []).map((id) => NOTE[id]).filter(Boolean);
+  const notes = cited.length ? cited : (NOTES_BY_OBJ[q.objective] || []);
   return `<div class="explain">${q.explanation}</div>
     ${wrong.length ? `<div class="stack"><div class="eyebrow">Why the other options are wrong</div><ul class="why">${wrong.map((oid) => `<li><span class="letter">${letterOf(oid)}</span><span>${q.whyWrong[oid] || ""}</span></li>`).join("")}</ul></div>` : ""}
-    ${q.sources.length ? `<div class="stack"><div class="eyebrow">Grounded in the docs</div><div class="sources">${q.sources.map((s) => `<div class="source">${s.evidence ? `<q>${esc(s.evidence)}</q>` : ""}<a class="ext" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></div>`).join("")}</div></div>` : ""}
+    ${q.sources.length ? `<div class="stack"><div class="eyebrow">Grounded in the docs</div><div class="sources">${q.sources.map((s) => `<div class="source">${s.evidence ? `<q>${quoteHtml(s.evidence)}</q>` : ""}<a class="ext" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></div>`).join("")}</div></div>` : ""}
     ${notes.length ? `<div class="row"><span class="hint">Study:</span>${notes.map((n) => `<a href="#/note/${n.id}" data-route="note/${n.id}">${esc(n.title)}</a>`).join('<span class="faint">·</span>')}</div>` : ""}
     ${svcChipsFor(q)}`;
 }
@@ -1089,7 +1099,7 @@ VIEWS.flash = function () {
       ${f.shown ? `<div class="fcard-back">
           <p class="fcard-answer">${c.back}</p>
           ${c.aws ? `<p class="fcard-aws"><span class="eyebrow">AWS</span><span>${c.aws}</span></p>` : ""}
-          ${c.source ? `<div class="source">${c.source.evidence ? `<q>${esc(c.source.evidence)}</q>` : ""}<a class="ext" href="${esc(c.source.url)}" target="_blank" rel="noopener">${esc(c.source.title)}</a></div>` : ""}
+          ${c.source ? `<div class="source">${c.source.evidence ? `<q>${quoteHtml(c.source.evidence)}</q>` : ""}<a class="ext" href="${esc(c.source.url)}" target="_blank" rel="noopener">${esc(c.source.title)}</a></div>` : ""}
           <div class="row"><span class="hint">Study:</span><a href="#/note/${n.id}" data-route="note/${n.id}">${esc(n.title)}</a></div>
         </div>
         <div class="fcard-grade" role="group" aria-label="Grade yourself">
@@ -1177,7 +1187,7 @@ VIEWS.mock = function () {
   const size = set.mockSize || 50, minutes = set.mockMinutes ?? 120;
   const caseReady = CASES.filter((c) => (QS_BY_CASE[c.id] || []).length).length;
   return `<div class="page narrow">
-    <div class="page-head"><div><h1>Mock exam</h1><p>Like the real exam: ${size} questions, ${minutes ? `${minutes} minutes` : "no time limit"}, two case studies (about a quarter of the questions), and no feedback until you finish. New questions come first.</p></div></div>
+    <div class="page-head"><div><h1>Mock exam</h1><p>Like the real exam: ${size} questions, ${minutes ? `${minutes} minutes` : "no time limit"},${CASES.length ? " two case studies (about a quarter of the questions)," : ""} and no feedback until you finish. New questions come first.</p></div></div>
     ${d.activeMock ? `<div class="callout"><b>You have a mock exam in progress.</b><span class="muted">Started ${esc(fmtDateLong(d.activeMock.startedAt))} · ${Object.keys(d.activeMock.answers || {}).length} of ${d.activeMock.qids.length} answered.</span><div class="row"><button type="button" class="btn primary" data-action="resume-mock" data-id="${d.activeMock.id}">Resume</button><button type="button" class="btn danger" data-action="abandon-mock" data-id="${d.activeMock.id}">Discard it</button></div></div>` : ""}
     <section class="panel">
       <h2>Settings</h2>
@@ -1185,7 +1195,7 @@ VIEWS.mock = function () {
         <div class="seg" role="group" aria-label="Number of questions">${[50, 60].map((n) => `<button type="button" data-action="mock-size" data-n="${n}" aria-pressed="${size === n}">${n} questions</button>`).join("")}</div>
         <div class="seg" role="group" aria-label="Time limit">${[[120, "2 hours"], [0, "Untimed"]].map(([m, l]) => `<button type="button" data-action="mock-time" data-n="${m}" aria-pressed="${minutes === m}">${l}</button>`).join("")}</div>
       </div>
-      <p class="hint">The question bank has ${QS.length} questions (${QS.filter((q) => q.caseStudy).length} case-study questions across ${caseReady} case studies). You have not seen ${d.unseenCount} of them.</p>
+      <p class="hint">The question bank has ${QS.length} questions${CASES.length ? ` (${QS.filter((q) => q.caseStudy).length} case-study questions across ${caseReady} case studies)` : ""}. You have not seen ${d.unseenCount} of them.</p>
       <div class="row"><button type="button" class="btn primary" data-action="start-mock"${d.activeMock || QS.length < 10 ? " disabled" : ""}>${icon("timer")}Start the mock exam</button>${d.activeMock ? `<span class="hint">Finish or discard the exam in progress first.</span>` : ""}</div>
     </section>
     <section class="panel">
@@ -1329,7 +1339,7 @@ VIEWS.result = function ({ id }) {
         <div class="hero-num">${Math.round(m.score * 100)}%</div>
         <span class="verdict ${pass ? "ready" : "building"}">${icon(pass ? "check" : "spark")}${pass ? "At or above the 80% target" : "Below the 80% target"}</span>
         <p class="muted">${m.correct} of ${m.total} right · ${fmtDur(m.elapsedSec || 0)} used${m.minutes ? ` of ${m.minutes} min` : ""}${m.fresh && m.fresh.total ? ` · new questions: ${m.fresh.right}/${m.fresh.total} (${pct(m.fresh.right / m.fresh.total)})` : ""}</p>
-        <p class="hint">Case studies: ${(m.caseStudies || []).map((c) => esc(CASE[c]?.name || c)).join(", ") || "none"}</p>
+        ${CASES.length ? `<p class="hint">Case studies: ${(m.caseStudies || []).map((c) => esc(CASE[c]?.name || c)).join(", ") || "none"}</p>` : ""}
       </section>
       <section class="panel">
         <h2>By section</h2>
@@ -1415,7 +1425,7 @@ VIEWS.labs = function () {
   const list = LABS.filter((l) => !(ui.labNoOrg && l.requiresOrg));
   const setup = LAB["00-setup"];
   return `<div class="page narrow">
-    <div class="page-head"><div><h1>Labs</h1><p>Hands-on practice in your own sandbox project. Every lab starts with <code>source labs/env.sh</code>, which refuses any project whose ID does not start with <code>pca-lab-</code>. Run <code>teardown.sh</code> when you finish.</p></div>
+    <div class="page-head"><div><h1>Labs</h1><p>Hands-on practice in your own sandbox project. Every lab starts with <code>source ${esc(APP.labsDir)}/env.sh</code> in the repository root, which refuses any project whose ID does not start with <code>${esc(APP.labPrefix)}-</code>. Run <code>teardown.sh</code> when you finish.</p></div>
       <label class="check"><input type="checkbox" data-action="lab-filter"${ui.labNoOrg ? " checked" : ""}>Hide labs that need an organization</label>
     </div>
     ${setup && !labDone(setup.id) ? `<div class="callout"><b>Start with the setup lab.</b><span class="muted">It creates the lab project, a budget alert, and the gcloud configuration the other labs use.</span><div><a class="btn primary" href="#/lab/${setup.id}" data-route="lab/${setup.id}">Open ${esc(setup.title)}</a></div></div>` : ""}
@@ -1466,7 +1476,7 @@ VIEWS.progress = function () {
       <h2>How the predicted score works</h2>
       <div class="explain" style="font-size:15.5px">
         <p>The score estimates how you would do on questions you have not seen. It uses only your <b>first</b> answer to each question, because a repeat answer tests memory of that question.</p>
-        <p>For each exam section, the app takes the share of first answers you got right. Recent answers count more: an answer from ${READINESS.halfLifeDays} days ago counts half as much as one from today. Each section starts at ${pct(READINESS.priorMean)} with the weight of ${READINESS.priorWeight} answers, so a few lucky answers cannot move it far. The overall score weights the sections by the official exam guide (25%, 17.5%, 17.5%, 15%, 12.5%, 12.5%). The ± value is a 95% interval.</p>
+        <p>For each exam section, the app takes the share of first answers you got right. Recent answers count more: an answer from ${READINESS.halfLifeDays} days ago counts half as much as one from today. Each section starts at ${pct(READINESS.priorMean)} with the weight of ${READINESS.priorWeight} answers, so a few lucky answers cannot move it far. The overall score weights the sections by the official exam guide (${SECTIONS.map((s) => `${s.weight}%`).join(", ")}). The ± value is a 95% interval.</p>
         <p>Google does not publish the passing score. “Ready” in this app means: predicted score of 80% or more, at least 60% of the bank tried, 90% of objectives done, and a latest mock exam score of 80% or more. The bar is high on purpose.</p>
         <p>Spaced review: a wrong answer makes a question due again at once. Each right answer moves it to a longer interval: ${BOX_DAYS.slice(1).join(", ")} days.</p>
         <p>Flashcards use the same intervals. “Again” makes a card due at once, and each “Got it” moves it to a longer interval. A card is learned when it reaches the ${BOX_DAYS[3]}-day interval. Flashcards do not change the predicted score.</p>
@@ -1479,12 +1489,12 @@ VIEWS.progress = function () {
         <button type="button" class="btn" data-action="copy-export">Copy progress as JSON</button>
         ${d.mocks.length ? `<span class="hint">${plural(d.mocks.length, "mock exam")} saved</span>` : ""}
       </div>
-      <div class="field"><label for="import-box">Import progress</label><textarea id="import-box" placeholder='Paste a PCA Workbook export here ({"app":"pca-workbook", …})'></textarea>
+      <div class="field"><label for="import-box">Import progress</label><textarea id="import-box" placeholder='Paste a ${esc(APP.name)} export here ({"app":"${esc(APP.slug)}", …})'></textarea>
         <div class="row"><button type="button" class="btn" data-action="import-data">Import and replace my progress</button>${ui.importMsg ? `<span class="hint">${esc(ui.importMsg)}</span>` : ""}</div></div>
       <hr class="rule">
       ${ui.resetStep === 0 ? `<div class="row"><button type="button" class="btn danger" data-action="reset-1">Reset all progress…</button></div>`
         : `<div class="callout warn"><b>Delete all progress?</b><span>This deletes objective status, notes read, labs done, every answer, every flashcard grade, and every mock exam. It cannot be undone.</span><div class="row"><button type="button" class="btn danger" data-action="reset-2">Delete everything</button><button type="button" class="btn" data-action="reset-cancel">Cancel</button></div></div>`}
-      <p class="hint">Content built ${esc(fmtDateLong(Date.parse(DATA.builtAt)))} from exam guide ${esc(EXAM.guideVersion)} (retrieved ${esc(EXAM.retrieved)}): ${NOTES.length} notes pages, ${QS.length} questions, ${CARDS.length} flashcards, ${LABS.length} labs, ${SVCS.length} service profiles.</p>
+      <p class="hint">Content built ${esc(fmtDateLong(Date.parse(DATA.builtAt)))} from ${esc(GUIDE_REF)}${EXAM.guideVersion ? ` (retrieved ${esc(EXAM.retrieved)})` : ""}: ${NOTES.length} notes pages, ${QS.length} questions, ${CARDS.length} flashcards, ${LABS.length} labs, ${SVCS.length} service profiles.</p>
     </section>
   </div>`;
 };
@@ -1813,14 +1823,14 @@ Store.onChange((kind) => {
 // ---------- boot ----------
 // The open quiz or mock exam survives a reload (a republish reloads the page).
 function saveSession() {
-  lsSetStr("pca-session", JSON.stringify({ quiz: ui.quiz, exam: ui.exam, flash: ui.flash, origin: ui.origin, caseTab: ui.caseTab, practiceCount: ui.practiceCount, cardCount: ui.cardCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter, svcSort: ui.svcSort, svcGuideOnly: ui.svcGuideOnly }));
+  lsSetStr(`${KEY}-session`, JSON.stringify({ quiz: ui.quiz, exam: ui.exam, flash: ui.flash, origin: ui.origin, caseTab: ui.caseTab, practiceCount: ui.practiceCount, cardCount: ui.cardCount, labNoOrg: ui.labNoOrg, resultFilter: ui.resultFilter, svcSort: ui.svcSort, svcGuideOnly: ui.svcGuideOnly }));
 }
 function start() {
   let saved = {};
-  try { saved = JSON.parse(lsGetStr("pca-session") || "{}") || {}; } catch { saved = {}; }
+  try { saved = JSON.parse(lsGetStr(`${KEY}-session`) || "{}") || {}; } catch { saved = {}; }
   for (const k of ["quiz", "exam", "flash", "origin", "caseTab", "practiceCount", "cardCount", "labNoOrg", "resultFilter", "svcSort", "svcGuideOnly"]) if (saved[k] != null) ui[k] = saved[k];
   if (ui.flash && !(ui.flash.ids || []).every((id) => CARD[id])) ui.flash = null; // a card left the deck in a new build
-  let initial = lsGetStr("pca-route") || "home";
+  let initial = lsGetStr(`${KEY}-route`) || "home";
   const r = parseRoute(initial);
   if ((r.name === "quiz" && !ui.quiz) || (r.name === "exam" && !ui.exam) || (r.name === "flash" && !ui.flash) || !VIEWS[r.name]) initial = "home";
   ui.routeStr = initial;

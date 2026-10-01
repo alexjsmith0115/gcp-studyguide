@@ -1,0 +1,618 @@
+[
+  {
+    "id": "plat-001",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["platform-choice", "gke-autopilot", "non-http"],
+    "stem": "A team containerized a server for a legacy protocol that point-of-sale terminals use. The terminals connect to the server from the internet over raw TCP, not HTTP. The server needs no privileged mode and no node-level settings. The team wants the platform with the least infrastructure management. What should you do?",
+    "options": [
+      {"id": "A", "text": "Deploy the container as a Cloud Run service, and set the container port to the TCP port of the protocol."},
+      {"id": "B", "text": "Deploy the container as a Cloud Run worker pool, and give each instance a private IP address with Direct VPC."},
+      {"id": "C", "text": "Deploy the container to a GKE Autopilot cluster, and expose it with a Kubernetes Service of type `LoadBalancer`."},
+      {"id": "D", "text": "Deploy the container to a GKE Standard cluster, and expose it with a Kubernetes Service of type `LoadBalancer`."}
+    ],
+    "answer": ["C"],
+    "explanation": "Cloud Run services accept only HTTP, HTTP/2, WebSockets, and gRPC, so the **raw TCP** protocol rules out a Cloud Run service. On Autopilot, a Service of type `LoadBalancer` creates a regional external passthrough Network Load Balancer, which carries TCP traffic from the internet. The server needs no privileges or node settings, so Autopilot gives the **least infrastructure management** of the platforms that fit.",
+    "whyWrong": {
+      "A": "A Cloud Run service accepts only HTTP, HTTP/2, WebSockets, and gRPC. A different container port does not add support for raw TCP clients.",
+      "B": "A worker pool gets only a private IP address on the VPC network. Only resources in that network can connect to it, so terminals on the internet cannot reach it.",
+      "D": "Standard can run the server, but you manage the nodes and node pools. Google recommends Autopilot unless the workload needs the control of Standard, and this server does not."
+    },
+    "sources": [
+      {
+        "title": "GKE Autopilot overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview",
+        "evidence": "To load balance external traffic to a single Service, such as a Deployment running a public email server, use a LoadBalancer Service to create a regional external passthrough Network Load Balancer."
+      },
+      {
+        "title": "Is my app a good fit for a Cloud Run service?",
+        "url": "https://docs.cloud.google.com/run/docs/fit-for-run",
+        "evidence": "Serves requests, streams, or events delivered using HTTP, HTTP/2, WebSockets, or gRPC, or executes to completion."
+      },
+      {
+        "title": "Container runtime contract",
+        "url": "https://docs.cloud.google.com/run/docs/container-contract",
+        "evidence": "Only resources from your VPC network can connect to the worker pool private IP address endpoint."
+      }
+    ]
+  },
+  {
+    "id": "plat-002",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": ["platform-choice", "cloud-run-fit", "gke-autopilot"],
+    "stem": "A team chooses the platform for several containerized workloads. The team follows the Google guidance to consider serverless first. Which two requirements mean that a workload must run on GKE Autopilot instead of Cloud Run? (Choose two.)",
+    "options": [
+      {"id": "A", "text": "The service calls a native library that exists only for Arm CPUs."},
+      {"id": "B", "text": "The API streams responses to its clients over gRPC."},
+      {"id": "C", "text": "Each instance needs 16 GiB of memory for an in-memory dataset."},
+      {"id": "D", "text": "An operator in the app manages Kubernetes custom resources."},
+      {"id": "E", "text": "The service writes temporary files during a request, then deletes them."},
+      {"id": "F", "text": "The chat service keeps WebSocket connections open to browsers."}
+    ],
+    "answer": ["A", "D"],
+    "explanation": "Cloud Run does not support Arm processors, so a workload that **requires Arm** needs Autopilot. Cloud Run also does not support Kubernetes, so an app that **manages Kubernetes custom resources** needs Autopilot. The other requirements pass the Cloud Run fit test. gRPC and WebSockets are supported protocols, and an instance with 4 vCPU can have 16 GiB of memory. An ephemeral file system is enough for temporary files.",
+    "whyWrong": {
+      "B": "Cloud Run serves requests and streams over HTTP, HTTP/2, WebSockets, and gRPC. A gRPC streaming API fits Cloud Run.",
+      "C": "A Cloud Run instance with 4 vCPU can have from 2 to 16 GiB of memory, so 16 GiB fits.",
+      "E": "The fit test rules out only an app that needs a persistent local file system. Temporary files fit in the in-memory file system, which uses instance memory.",
+      "F": "Cloud Run services support WebSockets, so this requirement fits Cloud Run."
+    },
+    "sources": [
+      {
+        "title": "Select a managed container runtime environment",
+        "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+        "evidence": "Cloud Run doesn't support Arm architecture processors, but Autopilot supports managed nodes that are backed by Arm architecture. If your workload requires Arm architecture, you will need to use Autopilot."
+      },
+      {
+        "title": "Select a managed container runtime environment",
+        "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+        "evidence": "In these scenarios, Autopilot is the target runtime environment because Cloud Run doesn't support Kubernetes."
+      },
+      {
+        "title": "Is my app a good fit for a Cloud Run service?",
+        "url": "https://docs.cloud.google.com/run/docs/fit-for-run",
+        "evidence": "Serves requests, streams, or events delivered using HTTP, HTTP/2, WebSockets, or gRPC, or executes to completion."
+      }
+    ]
+  },
+  {
+    "id": "plat-003",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": ["cloud-run-scaling", "min-instances", "max-instances"],
+    "stem": "A Python API runs on Cloud Run with request-based billing and the default scaling settings. It connects to a Cloud SQL instance that accepts a limited number of connections. The first requests after a quiet period take several seconds. During traffic spikes, the database rejects new connections. Which two changes should you make? (Choose two.)",
+    "options": [
+      {"id": "A", "text": "Rebuild the image from a smaller base image, so that cold starts are shorter."},
+      {"id": "B", "text": "Set the maximum concurrency to 1, so that each instance opens fewer connections."},
+      {"id": "C", "text": "Set a minimum number of instances, so that warm instances wait for requests."},
+      {"id": "D", "text": "Switch to instance-based billing, so that idle instances stay running."},
+      {"id": "E", "text": "Set a maximum number of instances that keeps the connections under the database limit."}
+    ],
+    "answer": ["C", "E"],
+    "explanation": "Each problem has its own setting. **Minimum instances** keep instances warm, so the **first requests after a quiet period** do not wait for a cold start. **Maximum instances** limit the scale-out, so they also limit the **connections to the database** during spikes.",
+    "whyWrong": {
+      "A": "Cloud Run streams container images, so the image size does not change the startup time.",
+      "B": "A concurrency of 1 makes Cloud Run start more instances for the same traffic. More instances open more connections, and scaling gets slower.",
+      "D": "Instance-based billing does not stop autoscaling. Cloud Run still removes idle instances unless minimum instances keep them."
+    },
+    "sources": [
+      {
+        "title": "Set minimum instances for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/min-instances",
+        "evidence": "If you need more control over your service's autoscaling behavior, you can set a minimum number of instances to avoid slow container start times and reduce service latency."
+      },
+      {
+        "title": "Set maximum instances for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/max-instances",
+        "evidence": "You can use this setting as a way to control your costs or to limit the number of connections to a backing service, such as to a database."
+      },
+      {
+        "title": "General development tips",
+        "url": "https://docs.cloud.google.com/run/docs/tips/general",
+        "evidence": "Because of Cloud Run's container image streaming technology, the size of your container image does not affect container startup times or request processing time."
+      }
+    ]
+  },
+  {
+    "id": "plat-004",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["cloud-run-concurrency", "vcpu-hotspot", "autoscaling"],
+    "stem": "A Node.js service on Cloud Run runs CPU-bound code in a single thread. Each instance has 4 vCPU and 16 GiB of memory, because the service keeps a large dataset in memory. The service uses the default maximum concurrency. Under load, latency increases, but the CPU utilization metric stays near 25%. Cloud Run does not add instances, and the service is below its maximum instances. What should you do?",
+    "options": [
+      {"id": "A", "text": "Lower the maximum concurrency per instance, so that the request count drives scaling and Cloud Run adds instances."},
+      {"id": "B", "text": "Raise the CPU limit to 8 vCPU, so that each instance has more CPU for the requests that it serves."},
+      {"id": "C", "text": "Set the CPU limit to 1 vCPU and keep 16 GiB of memory, so that the CPU metric shows the real load."},
+      {"id": "D", "text": "Turn on startup CPU boost, so that each instance gets more CPU while it serves requests."}
+    ],
+    "answer": ["A"],
+    "explanation": "This is a **vCPU hotspot**. The single thread keeps one vCPU busy while the other three stay idle. The CPU autoscaler uses the average of all vCPUs, so the average stays low and CPU-based scaling does not start. Google recommends a **lower maximum concurrency** in this case, so that request throughput drives scaling.",
+    "whyWrong": {
+      "B": "The single thread can keep only one vCPU busy. More vCPUs make the average utilization even lower, so scaling stalls more.",
+      "C": "Each CPU value allows a fixed memory range. An instance with 1 vCPU can have up to 4 GiB of memory, so 16 GiB is not possible.",
+      "D": "Startup CPU boost adds CPU only during startup and for 10 seconds after. It does not change how the service scales under steady load."
+    },
+    "sources": [
+      {
+        "title": "Maximum concurrent requests for services",
+        "url": "https://docs.cloud.google.com/run/docs/about-concurrency",
+        "evidence": "If CPU-based autoscaling is ineffective due to vCPU hotspots, lowering maximum concurrency becomes an important tool. vCPU hotspots often occur where multi-vCPU is chosen for a single-threaded application due to high memory needs."
+      },
+      {
+        "title": "Maximum concurrent requests for services",
+        "url": "https://docs.cloud.google.com/run/docs/about-concurrency",
+        "evidence": "A single-threaded application on a multi-vCPU instance may max out one vCPU while others idle. The Cloud Run CPU autoscaler measures average CPU utilization across all vCPUs."
+      },
+      {
+        "title": "Configure memory limits for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/memory-limits",
+        "evidence": "If your single-threaded application's memory needs require you to select a configuration with 2 or more vCPUs, be aware that this can lead to potential \"vCPU hotspots,\" resulting in inefficient CPU-based autoscaling."
+      }
+    ]
+  },
+  {
+    "id": "plat-005",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["cloud-run-billing", "background-work", "instance-based-billing"],
+    "stem": "A Python service on Cloud Run returns `202 Accepted` at once. Then a background thread resizes the uploaded image and writes the result to Cloud Storage. The service uses the default billing setting. In production, many resize jobs stop partway or take much longer than in local tests. You must fix this without code changes. What should you do?",
+    "options": [
+      {"id": "A", "text": "Turn on startup CPU boost, so that new instances get more CPU for the background thread."},
+      {"id": "B", "text": "Send each resize job to a Cloud Tasks queue that calls a new endpoint of the service."},
+      {"id": "C", "text": "Raise the CPU limit to 4 vCPU per instance, so that the background thread gets more CPU."},
+      {"id": "D", "text": "Switch the service to instance-based billing with `--no-cpu-throttling`, so that CPU stays allocated after responses."}
+    ],
+    "answer": ["D"],
+    "explanation": "The default is **request-based billing**, which allocates CPU only while an instance processes a request. After the `202` response, the background thread gets no CPU. **Instance-based billing** allocates CPU for the whole instance lifetime, so work after the response can finish. It is only a configuration change, so it meets the **without code changes** requirement.",
+    "whyWrong": {
+      "A": "Startup CPU boost adds CPU only while an instance starts and for 10 seconds after. The thread still gets no CPU after the response.",
+      "B": "Cloud Tasks is a good pattern for asynchronous work, and it retries failed tasks. But it needs new code to create the tasks and to serve the new endpoint.",
+      "C": "With request-based billing, an instance gets CPU only during requests, whatever its CPU limit."
+    },
+    "sources": [
+      {
+        "title": "Billing settings for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+        "evidence": "Selecting instance-based billing allocates CPU even outside of request processing, letting you execute short-lived background tasks and other asynchronous processing work after returning responses."
+      },
+      {
+        "title": "Billing settings for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+        "evidence": "With request-based billing, CPU is only allocated during request processing."
+      },
+      {
+        "title": "Billing settings for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+        "evidence": "Consider using Cloud Tasks for executing asynchronous tasks. Cloud Tasks automatically retries failed tasks and supports running times up to 30 minutes."
+      }
+    ]
+  },
+  {
+    "id": "plat-006",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["gke-resources", "requests-and-limits", "cost-optimization"],
+    "stem": "A Deployment runs on a GKE Standard cluster. The app uses up to about 900 MiB of memory at peak. When a node runs low on memory, Kubernetes takes down some of the Pods, and users get errors. The container has these resource settings:\n\n```yaml\nresources:\n  requests:\n    memory: \"256Mi\"\n    cpu: \"250m\"\n  limits:\n    memory: \"1Gi\"\n    cpu: \"250m\"\n```\n\nWhich settings follow the Google guidance for stable and cost-efficient Pods?",
+    "options": [
+      {"id": "A", "text": "A memory request of `256Mi` and no memory limit; a CPU request of `250m` and no CPU limit."},
+      {"id": "B", "text": "A memory request and limit of `1Gi`; a CPU request of `250m` and no CPU limit."},
+      {"id": "C", "text": "A memory request and limit of `1Gi`; a CPU request and limit of `250m`."},
+      {"id": "D", "text": "A memory request and limit of `256Mi`; no CPU request and no CPU limit."}
+    ],
+    "answer": ["B"],
+    "explanation": "Memory cannot be compressed. When a node runs out of memory, Kubernetes must take down Pods, so Google recommends a **memory request equal to the memory limit**. Here, `1Gi` covers the 900 MiB peak. For CPU, request the minimum that the app needs and set **no CPU limit**. When CPU is short, Kubernetes throttles Pods down to their requests.",
+    "whyWrong": {
+      "A": "The memory request stays below the real use, so the Pod is still at risk when the node runs out of memory. Google recommends a memory request equal to the limit.",
+      "C": "The memory settings are correct, but the CPU limit caps the Pod even when the node has free CPU. Google recommends an unbounded CPU limit.",
+      "D": "A `256Mi` limit is below the 900 MiB that the app needs at peak. Google also recommends a CPU request at the minimum that the app needs."
+    },
+    "sources": [
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "Memory: Set the same amount of memory for the request and limit."
+      },
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "CPU: For the request, specify the minimum CPU needed to ensure correct operation, according to your own SLOs. Set an unbounded CPU limit."
+      },
+      {
+        "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+        "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+        "evidence": "When the CPU is contended, these Pods can be throttled down to its requests. However, because memory is an incompressible resource, when memory is exhausted, the Pod needs to be taken down."
+      }
+    ]
+  },
+  {
+    "id": "plat-007",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["container-contract", "port", "cloud-run"],
+    "stem": "A developer deploys a Flask app to Cloud Run. The Dockerfile starts the app with `CMD [\"python\", \"main.py\"]`. The deployment fails with this error:\n\n```\nContainer failed to start. Failed to start and then listen on the port defined by the PORT environment variable.\n```\n\nThe end of `main.py` has this code:\n\n```python\nif __name__ == \"__main__\":\n    app.run(host=\"127.0.0.1\", port=8080)\n```\n\nWhat should the developer do?",
+    "options": [
+      {"id": "A", "text": "Add `EXPOSE 8080` to the Dockerfile, so that Cloud Run opens port 8080 on the container."},
+      {"id": "B", "text": "Change the code to listen on host `0.0.0.0` at the port in the `PORT` environment variable."},
+      {"id": "C", "text": "Turn on startup CPU boost, so that the app starts listening within the startup time limit."},
+      {"id": "D", "text": "Allow unauthenticated invocations, so that Cloud Run can reach the container at startup."}
+    ],
+    "answer": ["B"],
+    "explanation": "The ingress container must listen on `0.0.0.0`, not on `127.0.0.1`. It must use the port that Cloud Run injects in the `PORT` environment variable (8080 by default). The app listens only on the loopback address, so Cloud Run cannot reach it, and the startup check fails.",
+    "whyWrong": {
+      "A": "The port number is not the problem. The app listens only on the loopback address, which Cloud Run cannot reach.",
+      "C": "The app starts in time, but it listens on `127.0.0.1`. More CPU does not change the address.",
+      "D": "Invoker access controls who can call the service. It does not change the address that the container listens on."
+    },
+    "sources": [
+      {
+        "title": "Container runtime contract",
+        "url": "https://docs.cloud.google.com/run/docs/container-contract",
+        "evidence": "The ingress container within an instance must listen for requests on `0.0.0.0` on the port to which requests are sent. Notably, the ingress container should not listen on `127.0.0.1`."
+      },
+      {
+        "title": "Troubleshoot Cloud Run issues",
+        "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+        "evidence": "Check if your container is listening on all network interfaces, commonly denoted as `0.0.0.0`. Notably, your container should not listen on `127.0.0.1`."
+      }
+    ]
+  },
+  {
+    "id": "plat-008",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["graceful-shutdown", "sigterm", "dockerfile"],
+    "stem": "A Node.js service on Cloud Run uses the second generation execution environment. Its code has a `SIGTERM` handler that flushes trace spans and closes database connections. The logs show that the handler never runs when Cloud Run shuts down an instance. This is the Dockerfile:\n\n```dockerfile\nFROM node:22-slim\nWORKDIR /app\nCOPY . .\nRUN npm ci --omit=dev\nENTRYPOINT node server.js\n```\n\nWhat should you do?",
+    "options": [
+      {"id": "A", "text": "Switch the service to instance-based billing, so that the handler gets CPU after the last request."},
+      {"id": "B", "text": "Set one minimum instance, so that Cloud Run does not shut down the instance with the handler."},
+      {"id": "C", "text": "Increase the request timeout, so that the handler has more time before Cloud Run sends `SIGKILL`."},
+      {"id": "D", "text": "Change the last line to the exec form, `ENTRYPOINT [\"node\", \"server.js\"]`, and redeploy."}
+    ],
+    "answer": ["D"],
+    "explanation": "The shell form `ENTRYPOINT node server.js` runs the app under `/bin/sh -c`. The shell runs as PID 1, and it does not forward `SIGTERM` to the app, so the handler never runs. The **exec form** starts `node` directly as PID 1, so the app gets the signal.",
+    "whyWrong": {
+      "A": "Cloud Run already allocates CPU during the 10 seconds after `SIGTERM`. The problem is that the signal never reaches the app.",
+      "B": "Cloud Run can shut down idle instances at any time, including instances that minimum instances keep warm. The signal still does not reach the app.",
+      "C": "The request timeout limits how long a request can run. It does not change the 10 seconds between `SIGTERM` and `SIGKILL`."
+    },
+    "sources": [
+      {
+        "title": "Graceful shutdowns on Cloud Run: Deep dive",
+        "url": "https://cloud.google.com/blog/topics/developers-practitioners/graceful-shutdowns-cloud-run-deep-dive",
+        "evidence": "Most notably, the GNU /bin/sh and other shells like bash do not forward signals to child processes by default."
+      },
+      {
+        "title": "Container runtime contract",
+        "url": "https://docs.cloud.google.com/run/docs/container-contract",
+        "evidence": "indicating the start of a 10 second period before the actual shutdown occurs, at which point Cloud Run sends a `SIGKILL` signal. During this period, the instance is allocated CPU and billed."
+      },
+      {
+        "title": "Container runtime contract",
+        "url": "https://docs.cloud.google.com/run/docs/container-contract",
+        "evidence": "For Cloud Run services, an idle instance can be shut down at any time, including instances kept warm due to a configured minimum number of instances."
+      }
+    ]
+  },
+  {
+    "id": "plat-009",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["environment-variables", "gcloud-run", "configuration"],
+    "stem": "A Cloud Run service named `orders` has 12 environment variables. A developer must add the variable `LOG_LEVEL=debug` and keep the other variables unchanged. The developer must not rebuild the container image. Which command should the developer run?",
+    "options": [
+      {"id": "A", "text": "`gcloud run services update orders --update-env-vars LOG_LEVEL=debug`"},
+      {"id": "B", "text": "`gcloud run services update orders --set-env-vars LOG_LEVEL=debug`"},
+      {"id": "C", "text": "`gcloud run deploy orders --image IMAGE_URL --set-env-vars LOG_LEVEL=debug`"},
+      {"id": "D", "text": "`gcloud run services update orders --update-secrets LOG_LEVEL=log-level:latest`"}
+    ],
+    "answer": ["A"],
+    "explanation": "`--update-env-vars` adds or changes the listed variables and **keeps all the others**. It changes only the service configuration, so **no image rebuild** is necessary.",
+    "whyWrong": {
+      "B": "`--set-env-vars` is destructive. It deletes every variable that is not in the new list, so the 12 other variables are lost.",
+      "C": "The `--set-env-vars` flag on `deploy` also replaces the full list, so the 12 other variables are lost.",
+      "D": "This flag sets the variable from a Secret Manager secret, not to the value `debug`. Secret Manager is for sensitive values, not for plain configuration such as a log level."
+    },
+    "sources": [
+      {
+        "title": "Configure environment variables for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/environment-variables",
+        "evidence": "Note that the `--set-env-vars` flag is a destructive action that deletes previously set environment variables not included in the new list of environment variables."
+      },
+      {
+        "title": "Configure environment variables for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/environment-variables",
+        "evidence": "This is a non-destructive approach that changes or adds environment variables, but doesn't delete previously set environment variables."
+      }
+    ]
+  },
+  {
+    "id": "plat-010",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["monolith-refactoring", "microservices", "data-ownership"],
+    "stem": "A team splits a monolithic web app into services on GKE. The monolith has five modules that share one Cloud SQL database. The app must stay in production during the change. The team wants to stop a failure in one service from spreading to the others. Which approach should you take?",
+    "options": [
+      {"id": "A", "text": "Rewrite all five modules as services, each with its own data, and move all traffic to them in one release."},
+      {"id": "B", "text": "Move one module at a time into a service, and let each new service read and write the shared database directly."},
+      {"id": "C", "text": "Move one module at a time into a service with its own data, and test it before you move the next one."},
+      {"id": "D", "text": "Package the five modules in one container image as five separate processes, and run the image in one Deployment."}
+    ],
+    "answer": ["C"],
+    "explanation": "For production, Google recommends that you modularize **one component at a time**. You integrate each new module with the monolith and test it before you start the next one. Each module also gets **its own data source**, because a shared database couples the modules and lets a failure in one module disrupt the others.",
+    "whyWrong": {
+      "A": "A move of all modules in one release puts the whole app at risk at the same time. In production, you modularize one component at a time.",
+      "B": "Shared data is a frequent mistake in modularization. A schema change affects every module, and a failure in one module can disrupt the others.",
+      "D": "Google recommends one application with one parent process per container. One image with five processes does not give separate services that scale on their own."
+    },
+    "sources": [
+      {
+        "title": "Learning Path: Transform a monolith into a GKE app - Modularize the monolith",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/learn/cymbal-books/lp1/modular",
+        "evidence": "In production environments, you typically modularize one component at a time. You modularize the component, integrate the module with the monolith, and make sure that everything works before you work on the next component."
+      },
+      {
+        "title": "Learning Path: Transform a monolith into a GKE app - Modularize the monolith",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/learn/cymbal-books/lp1/modular",
+        "evidence": "A frequent mistake people make during modularization is allowing multiple modules to access the same data, such as a single database."
+      },
+      {
+        "title": "Learning Path: Transform a monolith into a GKE app - Modularize the monolith",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/learn/cymbal-books/lp1/modular",
+        "evidence": "To avoid these problems, each module should have its own data source."
+      }
+    ]
+  },
+  {
+    "id": "plat-011",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["latency", "multi-region", "global-load-balancer"],
+    "stem": "A retail app runs on Cloud Run in `us-central1`. Its users are in North America, Europe, and Asia, and users in Europe and Asia report slow page loads. The frontend service serves most pages from a cache. It calls the backend only to place orders, and it sends orders asynchronously. The backend uses a Cloud SQL database in `us-central1`. You must lower latency for users in Europe and Asia without replicating the database to other regions. What should you do?",
+    "options": [
+      {"id": "A", "text": "Move the frontend, the backend, and the database to `europe-west1`, closer to the users in Europe and Asia."},
+      {"id": "B", "text": "Deploy the frontend to regions in Europe and Asia behind one global external Application Load Balancer, and keep the backend in `us-central1`."},
+      {"id": "C", "text": "Deploy the frontend and the backend to regions in all three areas, and move the data to a Spanner multi-region instance."},
+      {"id": "D", "text": "Keep the app in `us-central1`, and add a standby copy of the app in `europe-west1` for disaster recovery."}
+    ],
+    "answer": ["B"],
+    "explanation": "Most requests need no call to the backend, because the frontend serves pages from a cache and sends orders asynchronously. For this kind of app, Google describes a **frontend in several regions with the backend in one region**. Users get low latency to a nearby frontend, and **no data sync between regions** is necessary. A global external Application Load Balancer sends each user to the closest region with capacity.",
+    "whyWrong": {
+      "A": "One region in Europe adds latency for users in North America. Also, traffic between Europe and Asia can flow through the US, so users in Asia gain little.",
+      "C": "This design answers every request locally, but all data must be replicated to all regions. The requirement rules out replication of the database.",
+      "D": "A standby region for disaster recovery is not in the serving path, so it does not change user latency."
+    },
+    "sources": [
+      {
+        "title": "Best practices for Compute Engine regions selection",
+        "url": "https://docs.cloud.google.com/solutions/best-practices-compute-engine-region-selection",
+        "evidence": "This deployment model provides low user latency in scenarios where the average user request involves no data requests or involves just a few data requests to the central backend before the app can produce a result."
+      },
+      {
+        "title": "Best practices for Compute Engine regions selection",
+        "url": "https://docs.cloud.google.com/solutions/best-practices-compute-engine-region-selection",
+        "evidence": "You can choose to use a second region for backup and disaster recovery reasons, but this does not affect the app's serving path and therefore, won't affect user latency."
+      },
+      {
+        "title": "Best practices for Compute Engine regions selection",
+        "url": "https://docs.cloud.google.com/solutions/best-practices-compute-engine-region-selection",
+        "evidence": "Although there is direct connectivity between many continents, there are cases where it is missing, for instance, between Europe and Asia, so traffic between Europe and Asia flows through the US."
+      }
+    ]
+  },
+  {
+    "id": "plat-012",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": ["cloud-sql-ha", "regional-failover", "read-replica"],
+    "stem": "An order service runs on Cloud Run in `us-east1`. It uses a Cloud SQL for PostgreSQL instance in the same region with the high availability (HA) configuration. A new requirement says that the database must recover in another region if `us-east1` has an outage. What should you do?",
+    "options": [
+      {"id": "A", "text": "Do nothing more, because the HA standby instance takes over during a region outage."},
+      {"id": "B", "text": "Add a read replica in a second zone of `us-east1`, and promote it during a region outage."},
+      {"id": "C", "text": "Move the HA standby instance to a zone in another region, so that it survives the outage."},
+      {"id": "D", "text": "Add a cross-region read replica in another region, and promote it during a region outage."}
+    ],
+    "answer": ["D"],
+    "explanation": "Cloud SQL HA puts the primary and standby instances in two zones of **one region**, so HA protects against a **zone** outage only. For a region outage, add a cross-region read replica. During the outage, you promote the replica manually and point the app to it. Replication to the replica is asynchronous, so the newest transactions can be lost.",
+    "whyWrong": {
+      "A": "The HA standby instance is in the same region as the primary instance. A region outage stops both.",
+      "B": "A replica in the same region also stops during a region outage.",
+      "C": "The HA configuration puts the standby instance in a second zone of the same region. A cross-region read replica gives protection in another region."
+    },
+    "sources": [
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "It offers a high availability configuration for regional redundancy, protecting the database from a zone outage. Cross-region replicas can be provisioned to protect the database from a region outage."
+      },
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "In the event of a regional outage, you must decide whether to manually promote a read replica."
+      }
+    ]
+  },
+  {
+    "id": "plat-013",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": ["regional-mig", "overprovisioning", "zonal-failover"],
+    "stem": "A stateless web app runs in a regional managed instance group (MIG) in `us-east1`. The MIG spreads its VMs evenly across three zones. Load tests show that the app needs at least 12 VMs at peak. The team sets the group size manually and does not use autoscaling. The app must keep its peak capacity if one zone fails. Which group size is the most cost-effective?",
+    "options": [
+      {"id": "A", "text": "12 VMs, because the MIG recreates the VMs of a failed zone in the two other zones."},
+      {"id": "B", "text": "16 VMs, because one third more capacity covers the loss of one zone."},
+      {"id": "C", "text": "18 VMs, because two zones with 6 VMs each still give 12 VMs."},
+      {"id": "D", "text": "24 VMs, because the group needs double the capacity to survive a zone outage."}
+    ],
+    "answer": ["C"],
+    "explanation": "After a zone fails, a regional MIG keeps serving from the VMs in the remaining zones. It adds no VMs there unless you set up autoscaling. With three zones, Google recommends overprovisioning to **150%** of the need. 18 VMs put 6 VMs in each zone, so 12 VMs remain after the loss of one zone. A larger group also works, but it is not the **most cost-effective**.",
+    "whyWrong": {
+      "A": "Without autoscaling, the MIG adds no VMs in the remaining zones. Only 8 VMs remain after the loss of one zone.",
+      "B": "16 VMs put 5 or 6 VMs in each zone. If a zone with 6 VMs fails, only 10 VMs remain.",
+      "D": "Double capacity is the guidance for a MIG in two zones. With three zones, 18 VMs are enough, so 24 VMs add cost with no benefit."
+    },
+    "sources": [
+      {
+        "title": "About regional MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+        "evidence": "The number of instances that are part of the regional MIG in the remaining zones continue to serve traffic. No new instances are added and no instances are redistributed (unless you set up autoscaling)."
+      },
+      {
+        "title": "About regional MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+        "evidence": "By overprovisioning to 150%, you can ensure that if 1/3 of the capacity is lost, 100% of traffic is supported by the remaining zones."
+      },
+      {
+        "title": "About regional MIGs",
+        "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+        "evidence": "To provision your instances in two zones instead of three, Google recommends doubling the number of instances."
+      }
+    ]
+  },
+  {
+    "id": "plat-014",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["cloud-run-multi-region", "service-health", "readiness-probe"],
+    "stem": "A Cloud Run service runs in `us-central1` and `europe-west1` behind a global external Application Load Balancer, with a serverless NEG for each region. Each region keeps two minimum instances. The revisions have no probes. During an incident, the `europe-west1` service returned `503` errors for 20 minutes, and the load balancer kept sending European users there. You must make the load balancer move traffic away from an unhealthy region automatically. What should you do?",
+    "options": [
+      {"id": "A", "text": "Add a readiness probe to the service, so that service health tells the load balancer which regions are healthy."},
+      {"id": "B", "text": "Add a liveness probe to the service, so that Cloud Run restarts the instances that fail in the unhealthy region."},
+      {"id": "C", "text": "Add a startup probe to the service, so that Cloud Run sends no requests to instances that are not ready."},
+      {"id": "D", "text": "Raise the maximum instances in `us-central1`, so that one region can serve all users during an incident."}
+    ],
+    "answer": ["A"],
+    "explanation": "The load balancer alone does not move traffic away from a region that returns errors. **Cloud Run service health** adds this function. Each instance runs a **readiness probe**, and a region is healthy when 60% or more of its instances pass. The service already keeps minimum instances in each region, which service health needs. When a region is unhealthy, the load balancer sends its traffic to a healthy region.",
+    "whyWrong": {
+      "B": "A liveness probe restarts a failing container in place. Service health comes from readiness probes, so the load balancer still gets no health status for the region.",
+      "C": "A startup probe checks only whether a new container has started. It does not give the load balancer a health status for the region.",
+      "D": "More capacity in one region does not change the routing. The load balancer still sends European users to the failing region."
+    },
+    "sources": [
+      {
+        "title": "Automate cross-region failover with Cloud Run service health",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/configure-service-health",
+        "evidence": "A Cloud Run service in a region is healthy and receives traffic if 60% or more of its instances pass their readiness probes."
+      },
+      {
+        "title": "Serve traffic from multiple regions",
+        "url": "https://docs.cloud.google.com/run/docs/multiple-regions",
+        "evidence": "The architecture described in the following sections does not automatically route requests to a different region when a regional Cloud Run service becomes unresponsive or returns errors."
+      },
+      {
+        "title": "Automate cross-region failover with Cloud Run service health",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/configure-service-health",
+        "evidence": "Individual container instances run readiness probes, which Cloud Run aggregates to determine the overall health status of each regional service."
+      }
+    ]
+  },
+  {
+    "id": "plat-015",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": ["cloud-run-multi-region", "min-instances", "service-health"],
+    "stem": "A team deploys a multi-region Cloud Run service with this command:\n\n```bash\ngcloud run deploy api \\\n  --image=IMAGE_URL \\\n  --regions=us-central1,europe-west1,asia-northeast1 \\\n  --min=12 \\\n  --readiness-probe httpGet.path=\"/ready\"\n```\n\nA global external Application Load Balancer uses Cloud Run service health for failover. The team expected 12 warm instances in total, but Cloud Monitoring shows 36 idle instances at night. The team wants about 12 warm instances in total and must keep automatic failover. What should you do?",
+    "options": [
+      {"id": "A", "text": "Deploy again with `--min=0`, and let each region start instances when traffic arrives."},
+      {"id": "B", "text": "Deploy again with `--min=4`, because the minimum instances value applies in each region."},
+      {"id": "C", "text": "Deploy again with `--max=12`, so that all regions together run no more than 12 instances."},
+      {"id": "D", "text": "Switch the service to instance-based billing, so that the idle instances cost less."}
+    ],
+    "answer": ["B"],
+    "explanation": "In a multi-region deployment, the minimum instances value applies **in each region**, so `--min=12` keeps 36 instances in three regions. `--min=4` keeps 12 in total. Each region still keeps at least one minimum instance, which service health needs to calculate health, so **automatic failover** continues to work.",
+    "whyWrong": {
+      "A": "Service health needs at least one minimum instance in each region. With zero, it cannot calculate health, and automatic failover stops working.",
+      "C": "A maximum does not lower the minimum. The `--min=12` value still keeps 12 warm instances in each region, so the idle count does not go down.",
+      "D": "Idle instances bill at a lower rate with request-based billing and at the full rate with instance-based billing. The switch adds cost and keeps all 36 instances."
+    },
+    "sources": [
+      {
+        "title": "Serve traffic from multiple regions",
+        "url": "https://docs.cloud.google.com/run/docs/multiple-regions",
+        "evidence": "In a multi-region deployment, for example, the minimum instances value applies for each of the multiple regions."
+      },
+      {
+        "title": "Automate cross-region failover with Cloud Run service health",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/configure-service-health",
+        "evidence": "You must configure at least one service-level or revision-level minimum instance per region to calculate health."
+      },
+      {
+        "title": "Set minimum instances for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/min-instances",
+        "evidence": "For request-based billing, you are billed at a lower rate when instances are idle and waiting to process requests."
+      }
+    ]
+  },
+  {
+    "id": "plat-016",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": ["regional-failover", "multi-region-databases", "replication"],
+    "stem": "An app must continue to read and write its data during a full region outage. The team wants no manual failover step. Which two data stores meet these requirements? (Choose two.)",
+    "options": [
+      {"id": "A", "text": "A Cloud SQL for PostgreSQL instance with the high availability (HA) configuration"},
+      {"id": "B", "text": "A Spanner instance with a multi-region configuration"},
+      {"id": "C", "text": "A BigQuery dataset in the `US` multi-region location"},
+      {"id": "D", "text": "A Memorystore for Redis instance in the Standard Tier"},
+      {"id": "E", "text": "A Cloud Storage bucket in the `us-central1` region"},
+      {"id": "F", "text": "A Firestore database in a multi-region location"}
+    ],
+    "answer": ["B", "F"],
+    "explanation": "A Spanner multi-region configuration and a Firestore multi-region location **replicate data synchronously across regions**. If one region fails, they continue to serve reads and writes with all committed data, and you take **no failover action**.",
+    "whyWrong": {
+      "A": "HA puts the primary and standby instances in two zones of one region. A region outage needs a manual promotion of a cross-region read replica.",
+      "C": "A BigQuery multi-region stores the data in one region. It has no cross-region redundancy unless you use managed disaster recovery.",
+      "D": "Memorystore for Redis is a regional product. A Standard Tier instance fails over between zones, but not between regions.",
+      "E": "A regional bucket is offline during an outage of its region. Dual-region and multi-region buckets fail over automatically."
+    },
+    "sources": [
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "If a zone or region fails, Spanner accesses all data (including the latest writes) and serves read-write requests"
+      },
+      {
+        "title": "Architecting disaster recovery for cloud infrastructure outages",
+        "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+        "evidence": "Firestore multi-regional instances synchronously replicate data across five zones in three regions (two serving regions and one witness region), and they are robust against zonal and regional failure."
+      },
+      {
+        "title": "BigQuery locations",
+        "url": "https://docs.cloud.google.com/bigquery/docs/locations",
+        "evidence": "Selecting a multi-region location does not provide cross-region replication or regional redundancy, so there is no increase in dataset availability in the event of a regional outage."
+      }
+    ]
+  }
+]

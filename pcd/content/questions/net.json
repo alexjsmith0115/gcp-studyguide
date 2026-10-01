@@ -1,0 +1,775 @@
+[
+  {
+    "id": "net-001",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "session-affinity",
+      "cloud-run",
+      "serverless-neg"
+    ],
+    "stem": "Your team runs a Cloud Run service behind a global external Application Load Balancer with a serverless NEG. Each instance keeps the recent search results of each user in memory, so repeat searches are faster. Firestore keeps the source data, so a cache miss is slower but still correct. A developer set `GENERATED_COOKIE` session affinity on the backend service, but the requests of one user still go to different instances. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the backend service affinity to `HTTP_COOKIE`, and set a cookie name and a TTL."
+      },
+      {
+        "id": "B",
+        "text": "Turn on Cloud Run session affinity with `gcloud run services update SERVICE --session-affinity`."
+      },
+      {
+        "id": "C",
+        "text": "Change the backend service affinity to `CLIENT_IP`, so that the affinity does not use cookies."
+      },
+      {
+        "id": "D",
+        "text": "Set the Cloud Run ingress to `internal-and-cloud-load-balancing`, so that all requests use the load balancer."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A backend service with a serverless NEG does not support load balancer session affinity of any type. Cloud Run has its own session affinity, and it works when the service is behind a load balancer. It sends the later requests of a client to the same instance, so the cache in each instance gets more hits. This affinity is best effort, which is acceptable here because a cache miss still returns correct data.",
+    "whyWrong": {
+      "A": "`HTTP_COOKIE` is also load balancer session affinity. A serverless NEG does not support any load balancer session affinity type.",
+      "C": "`CLIENT_IP` is also load balancer session affinity. A serverless NEG does not support any load balancer session affinity type.",
+      "D": "The ingress setting controls which network paths can reach the service. It does not send the requests of one user to the same instance."
+    },
+    "sources": [
+      {
+        "title": "Set session affinity for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/session-affinity",
+        "evidence": "You can enable Cloud Run's session affinity on a Cloud Run service, even if it's behind a load balancer. However, you shouldn't enable Cloud Load Balancing session affinity on a serverless network endpoint group, since it's not supported."
+      },
+      {
+        "title": "Serverless network endpoint groups overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts",
+        "evidence": "Specifying a session affinity on a backend service with a serverless NEG backend won't work. As a workaround for Cloud Run, use its specific session affinity feature."
+      }
+    ]
+  },
+  {
+    "id": "net-002",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "load-balancer-choice",
+      "cross-region-internal",
+      "failover"
+    ],
+    "stem": "Your company runs an internal HTTP inventory API on Compute Engine managed instance groups in `us-east1` and `europe-west1`. Internal apps in both regions call the API over the same VPC network. The API must not be reachable from the internet. If the backends in one region fail, requests must go to the backends in the other region automatically. Which load balancer should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A cross-region internal Application Load Balancer with one backend service for both instance groups."
+      },
+      {
+        "id": "B",
+        "text": "A global external Application Load Balancer with a Cloud Armor policy that allows only internal ranges."
+      },
+      {
+        "id": "C",
+        "text": "A regional internal Application Load Balancer in each region, with global access on each forwarding rule."
+      },
+      {
+        "id": "D",
+        "text": "An internal passthrough Network Load Balancer with one backend service for both instance groups."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Two requirements decide the answer: only internal clients, and automatic failover between regions. Only external load balancers can be global. For internal clients and backends in several regions, use a cross-region internal load balancer. Cross-region failover works only with the global external, classic, and cross-region internal Application Load Balancers, so the cross-region internal Application Load Balancer meets both requirements.",
+    "whyWrong": {
+      "B": "An external load balancer has an IP address on the internet, so the API is reachable from the internet. Cloud Armor filters requests, but it does not make the load balancer internal.",
+      "C": "Global access lets clients in other regions reach each load balancer. But each regional load balancer has backends in its own region only, so it cannot fail over to the other region.",
+      "D": "An internal passthrough Network Load Balancer is always regional. It cannot send requests to backends in a second region, so it cannot fail over."
+    },
+    "sources": [
+      {
+        "title": "Choose a load balancer",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+        "evidence": "Only external load balancers are available as global load balancers. For internal load balancers with backends in multiple regions, choose the cross-region load balancer."
+      },
+      {
+        "title": "Application Load Balancer overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/application-load-balancer",
+        "evidence": "Cross-region failover is only available with global external Application Load Balancers, classic Application Load Balancers, and cross-region internal Application Load Balancers."
+      }
+    ]
+  },
+  {
+    "id": "net-003",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke-gateway",
+      "gke-ingress",
+      "load-balancer-choice"
+    ],
+    "stem": "Your team is moving a public web store to GKE. The store has three Services, `catalog`, `cart`, and `checkout`, and clients reach each Service by URL path on one HTTPS address. Next quarter, the team plans canary releases that send a small percentage of requests to a new version. You want the Google-recommended approach. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Service of type `LoadBalancer` in front of an NGINX Deployment that routes each path to a Service."
+      },
+      {
+        "id": "B",
+        "text": "Create an Ingress of class `gce` with a path rule for each of the three Services."
+      },
+      {
+        "id": "C",
+        "text": "Create a Gateway of class `gke-l7-global-external-managed` and an HTTPRoute with a path match for each Service."
+      },
+      {
+        "id": "D",
+        "text": "Create a Gateway of class `gke-l7-gxlb` and an HTTPRoute with a path match for each Service."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Google recommends the Gateway API for new deployments that need advanced traffic management. The `gke-l7-global-external-managed` class creates a global external Application Load Balancer. The HTTPRoute routes requests by path now, and it can split traffic by weight for the canary releases later. Google recommends this class over `gke-l7-gxlb` for advanced security and traffic management.",
+    "whyWrong": {
+      "A": "A `LoadBalancer` Service creates a Layer 4 passthrough Network Load Balancer, which cannot route by path. You must then run and scale the NGINX proxy yourself, and Google recommends the Gateway API.",
+      "B": "GKE Ingress is in maintenance mode and gets no new features. Google recommends the Gateway API for new deployments that need advanced traffic management, such as canary weights.",
+      "D": "The `gke-l7-gxlb` class creates a classic Application Load Balancer. It does not support advanced traffic management, such as the weighted traffic splitting that the canary releases need."
+    },
+    "sources": [
+      {
+        "title": "About load balancing in GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-load-balancing",
+        "evidence": "GKE Gateway is the recommended choice for new deployments and applications that require advanced traffic management, multi-protocol support, or better multi-tenancy."
+      },
+      {
+        "title": "About Gateway API",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/gateway-api",
+        "evidence": "we do recommend to use the `gke-l7-global-external-managed(-mc)` GatewayClasses over the `gke-l7-gxlb(-mc)` GatewayClasses to benefit from the advanced security and traffic management capabilities."
+      },
+      {
+        "title": "GKE Ingress for Application Load Balancers",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress",
+        "evidence": "GKE Ingress is in maintenance mode. No new functionality will be added except as needed to fix bugs. We recommend that you use GKE Gateway API."
+      }
+    ]
+  },
+  {
+    "id": "net-004",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "session-affinity",
+      "managed-instance-groups",
+      "autoscaling"
+    ],
+    "stem": "Your company runs a web app on an autoscaled managed instance group behind a global external Application Load Balancer (`EXTERNAL_MANAGED`). Each VM keeps a large in-memory cache for each signed-in user, so the backend service uses `CLIENT_IP` session affinity. Hundreds of users of one customer share one corporate NAT address, and they overload one VM. Users also move to a VM with a cold cache each time the autoscaler adds a VM. You must fix both problems without changes to the app code. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the session affinity to `GENERATED_COOKIE`, and set the balancing mode to `RATE`."
+      },
+      {
+        "id": "B",
+        "text": "Change the session affinity to `HTTP_COOKIE`, with a cookie name and a TTL of one day."
+      },
+      {
+        "id": "C",
+        "text": "Move the per-user cache to Memorystore, and set the session affinity to `NONE`."
+      },
+      {
+        "id": "D",
+        "text": "Change the session affinity to `STRONG_COOKIE_AFFINITY`, with a cookie name and a TTL of one day."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Two requirements decide the answer: many users behind one NAT address, and affinity that survives autoscaling. A cookie identifies each user, so the users behind one NAT address spread across VMs. `STRONG_COOKIE_AFFINITY` (stateful cookie-based affinity) encodes the selected backend in the cookie value, so it is not affected when the autoscaler adds a VM. The global external Application Load Balancer supports it, and it needs no change to the app code.",
+    "whyWrong": {
+      "A": "Generated cookie affinity fixes the NAT problem. But it can break when the number of backends changes, so users still move to a cold VM when the autoscaler adds a VM.",
+      "B": "HTTP cookie affinity also fixes the NAT problem. But like all types except stateful cookie-based affinity, it can break when the autoscaler adds a VM.",
+      "C": "A shared cache in Memorystore removes the need for affinity. But the app must change to use it, and the requirement does not allow changes to the app code."
+    },
+    "sources": [
+      {
+        "title": "Request distribution for external Application Load Balancers",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/request-distribution",
+        "evidence": "Stateful cookie-based affinity is not affected when autoscaling adds a new instance to a managed instance group."
+      },
+      {
+        "title": "Request distribution for external Application Load Balancers",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/request-distribution",
+        "evidence": "Session affinity, except for stateful cookie-based session affinity, can break whenever the number of serving and healthy backends changes."
+      },
+      {
+        "title": "Request distribution for external Application Load Balancers",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/request-distribution",
+        "evidence": "In situations where many clients share the same effective source IP address, some backend VMs might receive more connections or requests than others."
+      }
+    ]
+  },
+  {
+    "id": "net-005",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "serverless-neg",
+      "outlier-detection",
+      "multi-region"
+    ],
+    "stem": "Your team serves a Cloud Run service from `us-central1` and `europe-west1`. A global external Application Load Balancer has one serverless NEG in each region. To keep costs low, both services must scale to zero instances when idle. During an incident, the `europe-west1` service returned HTTP 503 errors, and the load balancer kept sending European users there. A developer tried to attach an HTTP health check to the backend service, and the command failed. What should you do to move traffic away from a failing region automatically?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Attach the HTTP health check to each serverless NEG instead of to the backend service."
+      },
+      {
+        "id": "B",
+        "text": "Add readiness probes to both services, and turn on Cloud Run service health."
+      },
+      {
+        "id": "C",
+        "text": "Enable outlier detection on the backend service, for example for consecutive 5xx errors."
+      },
+      {
+        "id": "D",
+        "text": "Replace the load balancer with a proxy Network Load Balancer that uses a TCP health check."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Serverless NEGs do not support health checks, so the load balancer cannot detect a failing region by itself. Outlier detection finds unhealthy serverless NEGs from their HTTP response patterns, and it sends most new requests to a healthy region. The global external Application Load Balancer supports it. Cloud Run service health also automates failover, but it needs at least one minimum instance in each region, which breaks the scale-to-zero requirement.",
+    "whyWrong": {
+      "A": "Serverless backends do not support health checks, so no health check can watch a serverless NEG.",
+      "B": "Cloud Run service health needs at least one minimum instance in each region to calculate health. The services must scale to zero, so this breaks the cost requirement.",
+      "D": "Proxy and passthrough Network Load Balancers do not support serverless NEGs, so a Network Load Balancer cannot send traffic to Cloud Run."
+    },
+    "sources": [
+      {
+        "title": "Serverless network endpoint groups overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts",
+        "evidence": "Therefore, backend services that contain serverless NEG backends can't be configured with health checks. However, you can optionally enable outlier detection to identify unhealthy serverless resources and route new requests to a healthy serverless resource."
+      },
+      {
+        "title": "Automate cross-region failover with Cloud Run service health",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/configure-service-health",
+        "evidence": "You must configure at least one service-level or revision-level minimum instance per region to calculate health."
+      },
+      {
+        "title": "Serverless network endpoint groups overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts",
+        "evidence": "Serverless NEGs are not supported by proxy Network Load Balancers and passthrough Network Load Balancers."
+      }
+    ]
+  },
+  {
+    "id": "net-006",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "memorystore",
+      "eviction",
+      "ttl"
+    ],
+    "stem": "A Cloud Run service uses a Memorystore for Redis instance as a cache-aside cache in front of Cloud SQL. The instance uses the default eviction policy. After a few days, cache writes fail with out-of-memory errors, and the evicted keys metric stays at zero. The app fills the cache with this code:\n\n```python\nredis_client.set(f\"product:{product_id}\", json.dumps(product))\n```\n\nWhat should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set a TTL on each key when the app writes it, for example with the `ex=300` argument."
+      },
+      {
+        "id": "B",
+        "text": "Change the eviction policy to `noeviction`, so that Redis keeps every key in memory."
+      },
+      {
+        "id": "C",
+        "text": "Turn on RDB snapshots, so that Redis can move the keys that are not in use to disk."
+      },
+      {
+        "id": "D",
+        "text": "Add read replicas to the instance, so that the instance has more memory for keys."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The default eviction policy of Memorystore is `volatile-lru`. A `volatile-*` policy evicts only keys that have a TTL. The code writes keys with no TTL, so Redis has no keys to evict, and memory fills up. Set a TTL when the app writes each cached key, as the cache-aside pattern does.",
+    "whyWrong": {
+      "B": "With `noeviction`, Redis never evicts keys. A full instance still rejects writes, so the errors continue.",
+      "C": "RDB snapshots copy the data to disk for persistence. They do not free memory, so keys without a TTL still fill the instance.",
+      "D": "Read replicas copy the data of the primary to scale reads. They do not add memory for keys, so the primary still fills up."
+    },
+    "sources": [
+      {
+        "title": "Memory management best practices",
+        "url": "https://docs.cloud.google.com/memorystore/docs/redis/memory-management-best-practices",
+        "evidence": "The default eviction policy of a Memorystore instance is `volatile-lru`. If you are using a `volatile-*` eviction policy, make sure you are setting TTLs on keys that you want to expire, otherwise Redis has no keys to evict."
+      },
+      {
+        "title": "Memory management best practices",
+        "url": "https://docs.cloud.google.com/memorystore/docs/redis/memory-management-best-practices",
+        "evidence": "In such cases, when your instance data reaches the `maxmemory-gb` limit, there are no keys to evict which can result in an out of memory condition if you're using a `volatile-*` eviction policy."
+      }
+    ]
+  },
+  {
+    "id": "net-007",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "memorystore",
+      "high-availability",
+      "scaling"
+    ],
+    "stem": "Your team is designing the cache for a new retail API on GKE. The cache must keep serving during a zone outage, with automatic failover. Before each sales event, the team adds capacity, and the cache must stay available while it scales. Which two Memorystore products meet these requirements? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Memorystore for Redis, Standard Tier"
+      },
+      {
+        "id": "B",
+        "text": "Memorystore for Redis, Basic Tier"
+      },
+      {
+        "id": "C",
+        "text": "Memorystore for Valkey"
+      },
+      {
+        "id": "D",
+        "text": "Memorystore for Memcached"
+      },
+      {
+        "id": "E",
+        "text": "Memorystore for Redis Cluster"
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Two requirements decide the answer: automatic failover across zones, and scaling without downtime. Memorystore for Valkey and Memorystore for Redis Cluster distribute replicas across zones, fail over automatically, and scale without downtime.",
+    "whyWrong": {
+      "A": "The Standard Tier replicates across zones and fails over automatically. But when you scale a Standard Tier instance, applications have downtime of less than a minute.",
+      "B": "The Basic Tier has no replication and no automatic failover, so a zone outage stops the cache.",
+      "D": "Memorystore for Memcached divides keys across nodes and does not replicate them, so a failed node loses its keys. It is also deprecated, and Google recommends migration to Memorystore for Valkey."
+    },
+    "sources": [
+      {
+        "title": "Memorystore",
+        "url": "https://cloud.google.com/memorystore",
+        "evidence": "Memorystore for Valkey and Redis Cluster have zero-downtime scaling, automatically distributed replicas across availability zones, and automated failover."
+      },
+      {
+        "title": "Memorystore for Redis overview",
+        "url": "https://docs.cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview",
+        "evidence": "When scaling a Standard Tier instance, your applications experience downtime of less than a minute."
+      },
+      {
+        "title": "Memorystore for Memcached overview",
+        "url": "https://docs.cloud.google.com/memorystore/docs/memcached/memcached-overview",
+        "evidence": "Keys written to your instance are divided across all nodes in your cluster, and are not replicated."
+      }
+    ]
+  },
+  {
+    "id": "net-008",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-cdn",
+      "cache-modes",
+      "cache-control"
+    ],
+    "stem": "Your team serves a public product catalog from a Cloud Run service behind a global external Application Load Balancer. You enable Cloud CDN on the backend service with the default cache mode. Images and JavaScript files now come from the cache, but `GET /api/catalog` responses (`application/json`) always go to the origin. The catalog is the same for all users. The same service also returns the cart of each user at `/api/cart`. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the cache mode of the backend service to `FORCE_CACHE_ALL`."
+      },
+      {
+        "id": "B",
+        "text": "Set the cache mode of the backend service to `USE_ORIGIN_HEADERS`."
+      },
+      {
+        "id": "C",
+        "text": "Raise the default TTL of the backend service to 300 seconds."
+      },
+      {
+        "id": "D",
+        "text": "Return a `Cache-Control: public, max-age=300` header in the catalog responses."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The default cache mode, `CACHE_ALL_STATIC`, caches static content types such as images and JavaScript without headers. It does not cache `application/json` responses unless they have explicit cache directives. A `Cache-Control: public, max-age=300` header makes only the catalog responses cacheable, and the cart responses stay out of the cache.",
+    "whyWrong": {
+      "A": "`FORCE_CACHE_ALL` caches all successful responses, so Cloud CDN also caches the cart responses. It can then serve the cart of one user to other users.",
+      "B": "`USE_ORIGIN_HEADERS` caches only responses with valid cache directives. The catalog responses have none, so they stay uncached.",
+      "C": "The default TTL applies only to static content types that have no TTL from origin headers. A JSON response without cache directives stays uncached."
+    },
+    "sources": [
+      {
+        "title": "Caching overview",
+        "url": "https://docs.cloud.google.com/cdn/docs/caching",
+        "evidence": "If you want to cache `text/html` and `application/json` content types, you must set explicit `Cache-Control` headers in the response, being careful not to accidentally cache one user's data and serve it to all users."
+      },
+      {
+        "title": "Caching overview",
+        "url": "https://docs.cloud.google.com/cdn/docs/caching",
+        "evidence": "This mode might not be appropriate if the backend serves private, per-user (user identifiable) content, such as dynamic HTML or API responses."
+      }
+    ]
+  },
+  {
+    "id": "net-009",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-cdn",
+      "cache-keys",
+      "versioned-urls"
+    ],
+    "stem": "A global external Application Load Balancer serves your static web app from a Cloud Storage backend bucket with Cloud CDN enabled. Your build adds a version parameter to asset URLs, for example `/js/app.js?v=42`, and the assets have a max-age of 30 days. After each release, many users still get the old `app.js` from Cloud CDN. The team must keep the current asset file names. You want the Google-recommended fix. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Invalidate the `/js/*` path in Cloud CDN at the end of each release."
+      },
+      {
+        "id": "B",
+        "text": "Add `v` to the query string include list of the backend bucket cache key."
+      },
+      {
+        "id": "C",
+        "text": "Change the cache mode of the backend bucket to `USE_ORIGIN_HEADERS`."
+      },
+      {
+        "id": "D",
+        "text": "Lower the max-age of the assets from 30 days to 5 minutes."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "For a backend bucket, the default cache key includes only the query parameters that Cloud Storage knows. Cloud CDN ignores `v`, so a request for `app.js?v=42` gets the cached copy of the old file. Google recommends versioned URLs as the default way to update cached content. The file names must stay the same, so the version stays in the query string. For a backend bucket, a query parameter for versioning must be in the include list of the cache key.",
+    "whyWrong": {
+      "A": "Invalidation removes the old file, but Google recommends invalidation sparingly and only as a last resort. Versioned URLs are the recommended default.",
+      "C": "The cache mode controls which responses Cloud CDN caches. It does not change the cache key, so Cloud CDN still ignores `v`.",
+      "D": "A short max-age still serves the old file until the cached copy expires. Cloud CDN also revalidates the assets at the origin much more often."
+    },
+    "sources": [
+      {
+        "title": "Content delivery best practices",
+        "url": "https://docs.cloud.google.com/cdn/docs/best-practices",
+        "evidence": "For backend buckets, any query strings used for versioning must be specified in the configuration for the backend bucket."
+      },
+      {
+        "title": "Caching overview",
+        "url": "https://docs.cloud.google.com/cdn/docs/caching",
+        "evidence": "By default, only query parameters that are known to Cloud Storage are included as part of the cache key (for example, \"generation\")."
+      },
+      {
+        "title": "Content delivery best practices",
+        "url": "https://docs.cloud.google.com/cdn/docs/best-practices",
+        "evidence": "We recommend that you use invalidation sparingly and only as a last resort."
+      }
+    ]
+  },
+  {
+    "id": "net-010",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-cdn",
+      "iap",
+      "load-balancer-choice"
+    ],
+    "stem": "Your team serves an internal tools app from Cloud Run in `europe-west1`. A regional external Application Load Balancer sends all paths to one backend service with a serverless NEG, and IAP is enabled on that backend service. The team wants Cloud CDN to cache the public files under `/assets/*`. All other paths must stay behind IAP. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace the regional load balancer with a global external Application Load Balancer."
+      },
+      {
+        "id": "B",
+        "text": "Enable Cloud CDN on the existing backend service, and keep IAP enabled on it."
+      },
+      {
+        "id": "C",
+        "text": "Enable Cloud CDN on the serverless NEG, so that IAP stays on the backend service."
+      },
+      {
+        "id": "D",
+        "text": "Route `/assets/*` to a second backend service that has Cloud CDN on and IAP off."
+      },
+      {
+        "id": "E",
+        "text": "Set the Cloud Run ingress to `internal`, so that no client can bypass IAP."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Two facts decide the answer. Cloud CDN works only with the global external and the classic Application Load Balancer, so the regional load balancer must change. You cannot enable IAP and Cloud CDN on the same backend service. So `/assets/*` needs its own backend service with Cloud CDN, and the other paths keep the backend service with IAP. The URL map sends each path to its backend service.",
+    "whyWrong": {
+      "B": "IAP and Cloud CDN are not compatible. You cannot enable both on the same backend service.",
+      "C": "You enable Cloud CDN on a backend service or a backend bucket, not on a network endpoint group.",
+      "E": "The `internal` setting does not accept requests from an external Application Load Balancer, so users lose access to the app. To block direct calls and keep the load balancer, the setting is `internal-and-cloud-load-balancing`."
+    },
+    "sources": [
+      {
+        "title": "Cloud CDN overview",
+        "url": "https://docs.cloud.google.com/cdn/docs/overview",
+        "evidence": "Cloud CDN works with the global external Application Load Balancer or the classic Application Load Balancer to deliver content to your users."
+      },
+      {
+        "title": "Serverless network endpoint groups overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts",
+        "evidence": "IAP and Cloud CDN are incompatible with each other. They can't be enabled on the same backend service."
+      },
+      {
+        "title": "Cloud CDN overview",
+        "url": "https://docs.cloud.google.com/cdn/docs/overview",
+        "evidence": "If the load balancer URL map routes traffic to a backend service or backend bucket that has Cloud CDN configured, the GFE uses Cloud CDN."
+      }
+    ]
+  },
+  {
+    "id": "net-011",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "traffic-splitting",
+      "no-traffic"
+    ],
+    "stem": "Your team released two versions of the `checkout` Cloud Run service with these commands:\n\n```bash\n# Release 2, last month\ngcloud run deploy checkout --image=$REPO/checkout:2.0 --no-traffic --tag=beta\ngcloud run services update-traffic checkout --to-tags=beta=100\n\n# Release 3, today\ngcloud run deploy checkout --image=$REPO/checkout:3.0\n```\n\nRelease 3 deploys without errors, but it gets no traffic. You want release 3 and every later deployment to get all traffic when it deploys. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud run services update-traffic checkout --to-revisions=checkout-00003-xyz=100`."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud run services update-traffic checkout --remove-tags=beta`."
+      },
+      {
+        "id": "C",
+        "text": "Delete the revision of release 2, so that its traffic moves to the newest revision."
+      },
+      {
+        "id": "D",
+        "text": "Run `gcloud run services update-traffic checkout --to-latest`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "After a deployment with `--no-traffic`, the latest revision does not get traffic on future deployments. The service keeps the traffic on a named revision, here the revision of release 2. The `update-traffic` command with `--to-latest` sends all traffic to the latest revision, now and after each later deployment.",
+    "whyWrong": {
+      "A": "This command sends all traffic to the release 3 revision by name. The traffic stays on that revision, so later deployments still get no traffic.",
+      "B": "A change to tags does not change the traffic percentage of any revision. The revision of release 2 keeps all the traffic.",
+      "C": "Cloud Run does not let you delete a revision that can receive traffic, and the revision of release 2 has all the traffic."
+    },
+    "sources": [
+      {
+        "title": "gcloud run deploy",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/run/deploy",
+        "evidence": "After a deployment with this flag the LATEST revision will not receive traffic on future deployments. To restore sending traffic to the LATEST revision by default, run the `gcloud run services update-traffic` command with `--to-latest`."
+      },
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "If you split traffic between multiple revisions or assigned traffic to a previous revision, all subsequent deployments use that traffic split pattern going forward."
+      },
+      {
+        "title": "gcloud run services update-traffic",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/run/services/update-traffic",
+        "evidence": "Changing tags does not affect the traffic percentage assigned to revisions."
+      }
+    ]
+  },
+  {
+    "id": "net-012",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "ab-testing",
+      "gke-gateway",
+      "session-affinity"
+    ],
+    "stem": "Your team runs an A/B test of a new recommendations API on GKE. The web front end puts each user in group `a` or `b`, and it sends the group in an `x-test-group` header on each call. A Gateway of class `gke-l7-global-external-managed` uses this HTTPRoute rule:\n\n```yaml\nrules:\n- backendRefs:\n  - name: recs-a\n    port: 8080\n    weight: 50\n  - name: recs-b\n    port: 8080\n    weight: 50\n```\n\nA `GCPTrafficDistributionPolicy` sets `GENERATED_COOKIE` session affinity on both Services. Analytics show that users get responses from both versions. Each user must get only the version of their group. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the weights, route requests with `x-test-group: b` to `recs-b`, and route all others to `recs-a`."
+      },
+      {
+        "id": "B",
+        "text": "Change the policy to `HEADER_FIELD` affinity on the `x-test-group` header, with `localityLbAlgorithm: MAGLEV`."
+      },
+      {
+        "id": "C",
+        "text": "Change the policy to `STRONG_COOKIE_AFFINITY`, which keeps stickiness during backend scaling events."
+      },
+      {
+        "id": "D",
+        "text": "Move the `GENERATED_COOKIE` affinity from the `GCPTrafficDistributionPolicy` to a `GCPBackendPolicy`."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "On GKE Gateway, weighted traffic splitting takes precedence over session affinity. Google says not to put weights on a route rule that needs session stickiness. An HTTPRoute header match sends every request that has the header value to one Service. So each user stays on the version of their group, whatever affinity the Services have.",
+    "whyWrong": {
+      "B": "`HEADER_FIELD` affinity is still session affinity. It keeps a client on the same Pod of a Service, but the weights take precedence and still send one user to both Services.",
+      "C": "Stateful cookie affinity is still session affinity, so the 50/50 weights take precedence over it. Users still get both versions.",
+      "D": "`GCPBackendPolicy` is an older place to set session affinity. The weights take precedence over session affinity there too."
+    },
+    "sources": [
+      {
+        "title": "Configure Gateway resources using Policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+        "evidence": "Weighted traffic splitting takes precedence over session affinity. If limited session affinity is incompatible with your workload, don't configure weighted traffic splitting on the same route rule where session stickiness is required."
+      },
+      {
+        "title": "Deploying Gateways",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways",
+        "evidence": "Traffic to `store.example.com` with the HTTP header `\"env: canary\"` goes to the Service `store-v2`."
+      }
+    ]
+  },
+  {
+    "id": "net-013",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-deploy",
+      "canary",
+      "gke-gateway"
+    ],
+    "stem": "Your team uses Cloud Deploy to release an `orders` service to a GKE cluster, where the Deployment runs 4 Pods. The delivery pipeline uses this strategy for the production target:\n\n```yaml\nstrategy:\n  canary:\n    runtimeConfig:\n      kubernetes:\n        serviceNetworking:\n          service: \"orders\"\n          deployment: \"orders\"\n    canaryDeployment:\n      percentages: [10]\n```\n\nThe release manager requires that the canary phase sends exactly 10% of requests to the new version. Monitoring shows a larger share. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `disablePodOverprovisioning: true`, so that Cloud Deploy does not add extra Pods for the canary."
+      },
+      {
+        "id": "B",
+        "text": "Scale the Deployment to 10 Pods, so that one canary Pod is exactly 10% of all Pods."
+      },
+      {
+        "id": "C",
+        "text": "Add a Gateway and an HTTPRoute for the Service, and replace `serviceNetworking` with `gatewayServiceMesh`."
+      },
+      {
+        "id": "D",
+        "text": "Use the standard strategy instead, and set `maxSurge: 10%` in the Deployment."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "With service-based networking, Cloud Deploy creates canary Pods and changes the Service selector. The split is based on the number of Pods, not on traffic, so it can be inexact. For a split based on traffic, Cloud Deploy needs the Gateway API. With `gatewayServiceMesh`, Cloud Deploy changes the HTTPRoute weights in each canary phase.",
+    "whyWrong": {
+      "A": "Without overprovisioning, Cloud Deploy scales down the original Deployment instead of adding Pods. The split is still based on the number of Pods, not on traffic.",
+      "B": "More Pods bring the Pod ratio closer to 10%, but the split is still based on the number of Pods, not on requests. It does not give an exact traffic split.",
+      "D": "A rolling update controls how many Pods change at one time. It has no canary phase that holds a share of traffic while you verify the release."
+    },
+    "sources": [
+      {
+        "title": "Canary Deployments to GKE and GKE attached clusters using service-based networking",
+        "url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/canary/gke/service-networking",
+        "evidence": "This is based on the number of pods, not traffic to the pods. If you want your canary to be based on traffic, you need to use Gateway API."
+      },
+      {
+        "title": "Canary Deployments to GKE and GKE attached clusters using Gateway API networking",
+        "url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/canary/gke/gateway-api",
+        "evidence": "For each canary phase Cloud Deploy modifies the HTTPRoute to update the weighting between the original Deployment's pods and the canary Deployment's pods, based on the percentage for that phase."
+      }
+    ]
+  },
+  {
+    "id": "net-014",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-run",
+      "rollback",
+      "revisions"
+    ],
+    "stem": "Your team deployed revision `orders-00042-qeb` of a Cloud Run service, and it got 100% of the traffic. Ten minutes later, the error rate is high. The previous revision, `orders-00041-tox`, had no errors. You must restore service as fast as possible. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rebuild the previous commit with Cloud Build, and deploy the new image with `gcloud run deploy`."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud run services update-traffic orders --to-revisions=orders-00041-tox=100`."
+      },
+      {
+        "id": "C",
+        "text": "Run `gcloud run services update-traffic orders --to-latest`."
+      },
+      {
+        "id": "D",
+        "text": "Run `gcloud run deploy orders` with the image of `orders-00041-tox` and the `--no-traffic` flag."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Each Cloud Run deployment creates an immutable revision, and earlier revisions stay available. To roll back, send all traffic to the earlier revision with `update-traffic`. You do not rebuild or redeploy, so the rollback is fast.",
+    "whyWrong": {
+      "A": "A rebuild and a new deployment take much longer than a traffic change, and the earlier revision already exists.",
+      "C": "`--to-latest` sends all traffic to the latest revision, which is the failing revision `orders-00042-qeb`.",
+      "D": "The `--no-traffic` flag deploys a new revision that gets no traffic, so the failing revision keeps all the traffic."
+    },
+    "sources": [
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "This feature lets you rollback to a previous revision, gradually deploy a revision, and split traffic between multiple revisions."
+      },
+      {
+        "title": "Manage revisions",
+        "url": "https://docs.cloud.google.com/run/docs/managing/revisions",
+        "evidence": "When you deploy to a service or change the configuration of a service, an immutable revision is created."
+      }
+    ]
+  }
+]

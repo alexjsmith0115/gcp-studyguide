@@ -1,0 +1,24 @@
+# Lab 60: scale lab60-app on CPU use. It follows the autoscaling/v2 sample in
+# https://docs.cloud.google.com/kubernetes-engine/docs/how-to/horizontal-pod-autoscaling
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: lab60-app
+  namespace: lab60
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: lab60-app
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization        # a percentage of the CPU request (100m), not of the node
+        averageUtilization: 50
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 60   # the GKE default is 300 seconds

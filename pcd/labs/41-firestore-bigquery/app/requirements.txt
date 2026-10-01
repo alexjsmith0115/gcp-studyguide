@@ -1,0 +1,4 @@
+google-cloud-firestore>=2.29.0
+google-cloud-bigquery>=3.44.0
+google-cloud-bigquery-storage>=2.41.0
+pyarrow

@@ -1,0 +1,470 @@
+[
+  {
+    "id": "iam-f001",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "term",
+    "front": "Application Default Credentials (ADC)",
+    "back": "The strategy that the authentication libraries use to find credentials in the environment. ADC checks the `GOOGLE_APPLICATION_CREDENTIALS` variable, then the local ADC file, then the attached service account. Code that uses a client library needs no credential logic.",
+    "aws": "SDK default credential chain",
+    "source": {
+      "title": "How Application Default Credentials works",
+      "url": "https://docs.cloud.google.com/docs/authentication/application-default-credentials",
+      "evidence": "Application Default Credentials (ADC) is a strategy used by the authentication libraries to automatically find credentials based on the application environment."
+    }
+  },
+  {
+    "id": "iam-f002",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "concept",
+    "front": "Which gcloud command makes your user credentials available to client libraries in local code?",
+    "back": "`gcloud auth application-default login`. It stores your credentials in the local ADC file. `gcloud auth login` sets only the credentials of the gcloud CLI, which does not use ADC.",
+    "aws": null,
+    "source": {
+      "title": "Set up Application Default Credentials",
+      "url": "https://docs.cloud.google.com/docs/authentication/provide-credentials-adc",
+      "evidence": "You can provide credentials to ADC by using the `gcloud auth application-default login` command. This makes credentials available to the Cloud Client Libraries and Google API Client Libraries."
+    }
+  },
+  {
+    "id": "iam-f003",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "term",
+    "front": "Service account impersonation",
+    "back": "A principal uses its own credentials to get short-lived credentials for a service account. On a workstation, use it to test with the permissions of a production workload. It is more secure than a service account key, because its credentials do not persist.",
+    "aws": "AWS STS `AssumeRole`",
+    "source": {
+      "title": "Use service account impersonation",
+      "url": "https://docs.cloud.google.com/docs/authentication/use-service-account-impersonation",
+      "evidence": "When you use service account impersonation, you start with an authenticated principal (your user account or a service account) and request short-lived credentials for a service account that has the authorization that your use case requires."
+    }
+  },
+  {
+    "id": "iam-f004",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "concept",
+    "front": "Which role must a user with the project Owner role get to impersonate a service account?",
+    "back": "Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`) on the service account. Impersonation needs its `iam.serviceAccounts.getAccessToken` permission, and the Owner role does not include it.",
+    "aws": null,
+    "source": {
+      "title": "Authenticate with REST",
+      "url": "https://docs.cloud.google.com/docs/authentication/rest",
+      "evidence": "If you are using your user account, you need to add this permission even if you have the Owner role (`roles/owner`) on the project."
+    }
+  },
+  {
+    "id": "iam-f005",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "concept",
+    "front": "Which token type must code send to call a Cloud Run service that requires authentication?",
+    "back": "An ID token, with the URL of the receiving service as the audience. Access tokens are for calls to Google APIs, such as Cloud Storage.",
+    "aws": null,
+    "source": {
+      "title": "Authentication and authorization use cases",
+      "url": "https://docs.cloud.google.com/docs/authentication/use-cases",
+      "evidence": "Applications hosted on Cloud Run and Cloud Run functions require ID tokens for authentication."
+    }
+  },
+  {
+    "id": "iam-f006",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "concept",
+    "front": "A VM's service account has Storage Object Admin, but object writes fail. What is a likely cause?",
+    "back": "The access scope of the VM, for example `devstorage.read_only`. Both the access scopes and the IAM roles must allow a request. Set the `cloud-platform` scope, and control access with IAM roles.",
+    "aws": null,
+    "source": {
+      "title": "Service accounts (Compute Engine)",
+      "url": "https://docs.cloud.google.com/compute/docs/access/service-accounts",
+      "evidence": "Both of these configurations must allow access before the application running on the instance can access a resource."
+    }
+  },
+  {
+    "id": "iam-f007",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "term",
+    "front": "AlloyDB Auth Proxy",
+    "back": "A separate process that connects apps to AlloyDB over mutual TLS (mTLS) 1.3 and authorizes each connection with IAM. The principal needs Cloud AlloyDB Client (`roles/alloydb.client`) and Service Usage Consumer (`roles/serviceusage.serviceUsageConsumer`). It finds credentials with ADC.",
+    "aws": null,
+    "source": {
+      "title": "About the AlloyDB Auth Proxy",
+      "url": "https://docs.cloud.google.com/alloydb/docs/auth-proxy/overview",
+      "evidence": "the Auth Proxy client authenticates to Google Cloud using IAM principal credentials on the client, and then validates that the IAM principal has the Cloud AlloyDB Client (`roles/alloydb.client`) and Service Usage Consumer (`roles/serviceusage.serviceUsageConsumer`) IAM roles."
+    }
+  },
+  {
+    "id": "iam-f008",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "concept",
+    "front": "A service account has Cloud SQL Client, but its IAM database login fails. Which role is missing?",
+    "back": "Cloud SQL Instance User (`roles/cloudsql.instanceUser`), which has the `cloudsql.instances.login` permission. Cloud SQL Client only lets the principal connect to the instance.",
+    "aws": null,
+    "source": {
+      "title": "Log in using IAM database authentication",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/iam-logins",
+      "evidence": "Add the `roles/cloudsql.instanceUser` IAM role to your IAM user, service account, or group. It's a predefined role that contains the necessary Cloud SQL IAM `cloudsql.instances.login` permission."
+    }
+  },
+  {
+    "id": "iam-f009",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "concept",
+    "front": "What is the default state of IAM authentication on an AlloyDB instance?",
+    "back": "Disabled. To use it, set the `alloydb.iam_authentication` flag to `on`.",
+    "aws": null,
+    "source": {
+      "title": "Manage IAM authentication",
+      "url": "https://docs.cloud.google.com/alloydb/docs/database-users/manage-iam-auth",
+      "evidence": "IAM authentication is disabled on AlloyDB instances by default."
+    }
+  },
+  {
+    "id": "iam-f010",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "term",
+    "front": "Workload Identity Federation",
+    "back": "An IAM feature for workloads on AWS, Azure, on premises, or in deployment pipelines. The workload exchanges a credential from its own identity provider for a federated Google Cloud token. Use it instead of a service account key.",
+    "aws": "IAM OIDC identity provider for GitHub Actions",
+    "source": {
+      "title": "Workload Identity Federation",
+      "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation",
+      "evidence": "Using Workload Identity Federation, you can provide on-premises or multicloud workloads with access to Google Cloud resources by using federated identities instead of a service account key."
+    }
+  },
+  {
+    "id": "iam-f011",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "term",
+    "front": "Workload Identity Federation for GKE",
+    "back": "The recommended way for GKE workloads to call Google Cloud APIs (formerly Workload Identity, the name that the console still uses). You grant IAM roles to a Kubernetes ServiceAccount. The GKE metadata server gets short-lived tokens for the Pods that use it.",
+    "aws": "IAM roles for service accounts on Amazon EKS",
+    "source": {
+      "title": "About Workload Identity Federation for GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+      "evidence": "In most cases, Workload Identity Federation for GKE is the recommended way to help secure and manage how your workloads that run on GKE access Google Cloud services."
+    }
+  },
+  {
+    "id": "iam-f012",
+    "note": "1.2-authenticating-to-google-cloud",
+    "kind": "concept",
+    "front": "Why is an untrusted GKE cluster in your project a risk with Workload Identity Federation for GKE?",
+    "back": "Identity sameness. All clusters in a project share one workload identity pool, so IAM treats the same namespace and Kubernetes ServiceAccount name in any cluster as the same identity. Put untrusted clusters in another project.",
+    "aws": null,
+    "source": {
+      "title": "About Workload Identity Federation for GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+      "evidence": "If the metadata in your principal identifier is the same for workloads in multiple clusters that share a workload identity pool because they belong to the same Google Cloud project, IAM identifies those workloads as the same."
+    }
+  },
+  {
+    "id": "iam-f013",
+    "note": "1.2-user-authentication",
+    "kind": "term",
+    "front": "Identity Platform",
+    "back": "A customer identity and access management (CIAM) platform that adds sign-up and sign-in to your apps. It supports email and password, phone, social providers, SAML, OIDC, and custom sign-in. Use it for the customers of your app.",
+    "aws": "Amazon Cognito",
+    "source": {
+      "title": "Authentication and authorization use cases",
+      "url": "https://docs.cloud.google.com/docs/authentication/use-cases",
+      "evidence": "Identity Platform is a customer identity and access management (CIAM) platform that helps organizations add enterprise-grade identity management capability to their applications."
+    }
+  },
+  {
+    "id": "iam-f014",
+    "note": "1.2-user-authentication",
+    "kind": "concept",
+    "front": "An app uses Firebase Authentication and now needs SAML sign-in and MFA. What should you do?",
+    "back": "Upgrade to Identity Platform. It adds MFA, SAML and OIDC providers, multi-tenancy, blocking functions, IAP integration, and an SLA. The apps need no change.",
+    "aws": null,
+    "source": {
+      "title": "Differences between Identity Platform and Firebase Authentication",
+      "url": "https://docs.cloud.google.com/identity-platform/docs/product-comparison",
+      "evidence": "You do not need to change your apps when upgrading from Firebase Authentication to Identity Platform (or Firebase Authentication with Identity Platform) and your app continues to work with existing Firebase services."
+    }
+  },
+  {
+    "id": "iam-f015",
+    "note": "1.2-user-authentication",
+    "kind": "term",
+    "front": "Identity Platform multi-tenancy",
+    "back": "Tenants are separate silos of users and configuration inside one Identity Platform project. Each tenant has its own users, identity providers, IAM configuration, and quota. Use it in business-to-business (B2B) apps.",
+    "aws": null,
+    "source": {
+      "title": "Identity Platform multi-tenancy",
+      "url": "https://docs.cloud.google.com/identity-platform/docs/multi-tenancy",
+      "evidence": "Using tenants, you can create unique silos of users and configurations within a single Identity Platform project."
+    }
+  },
+  {
+    "id": "iam-f016",
+    "note": "1.2-user-authentication",
+    "kind": "term",
+    "front": "Blocking functions",
+    "back": "Cloud Run functions code that customizes the Identity Platform sign-up and sign-in flow. `beforeCreate` runs before a new user is saved, and `beforeSignIn` runs before the ID token goes to the client. The function must respond within seven seconds, or the operation fails.",
+    "aws": "Amazon Cognito Lambda triggers",
+    "source": {
+      "title": "Customize the authentication flow using blocking functions",
+      "url": "https://docs.cloud.google.com/identity-platform/docs/blocking-functions",
+      "evidence": "Your function must respond within seven seconds. After seven seconds, Identity Platform returns an error, and the client operation fails."
+    }
+  },
+  {
+    "id": "iam-f017",
+    "note": "1.2-user-authentication",
+    "kind": "term",
+    "front": "Firebase Admin SDK",
+    "back": "The server-side library for Identity Platform and Firebase Authentication. Your backend uses it to manage users, create custom tokens, verify ID tokens, and set custom claims for access control.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to the Admin Auth API",
+      "url": "https://docs.cloud.google.com/identity-platform/docs/concepts-admin-auth-api",
+      "evidence": "The Firebase Admin SDK provides methods for accomplishing the authentication tasks above by enabling you to manage your users, generate custom tokens, and verify ID tokens."
+    }
+  },
+  {
+    "id": "iam-f018",
+    "note": "1.2-user-authentication",
+    "kind": "concept",
+    "front": "How should a Cloud Run service authenticate end users who register their own accounts?",
+    "back": "Use Identity Platform. Deploy the service publicly, and verify the user's ID token in the service code. End users usually have no IAM permission on the project or the service.",
+    "aws": null,
+    "source": {
+      "title": "Authenticating users",
+      "url": "https://docs.cloud.google.com/run/docs/authenticating/end-users",
+      "evidence": "Users do not typically have IAM permission on your Google Cloud project or Cloud Run service."
+    }
+  },
+  {
+    "id": "iam-f019",
+    "note": "1.2-user-authentication",
+    "kind": "concept",
+    "front": "Which checks must a backend make on a Google ID token before it trusts the claims?",
+    "back": "Verify the signature with Google's public keys. Then check that `iss` is Google, that `aud` is your app's client ID, and that `exp` has not passed.",
+    "aws": null,
+    "source": {
+      "title": "OpenID Connect",
+      "url": "https://developers.google.com/identity/openid-connect/openid-connect",
+      "evidence": "Verify that the ID token is properly signed by the issuer. Google-issued tokens are signed using one of the certificates found at the URI specified in the `jwks_uri` metadata value of the Discovery document."
+    }
+  },
+  {
+    "id": "iam-f020",
+    "note": "1.2-user-authentication",
+    "kind": "concept",
+    "front": "What must a backend add to `verify_id_token` to reject ID tokens from revoked sessions?",
+    "back": "`check_revoked=True`. ID tokens are stateless JWTs, so only the authentication backend knows about a revocation. The check costs an extra network round trip.",
+    "aws": null,
+    "source": {
+      "title": "Manage User Sessions",
+      "url": "https://firebase.google.com/docs/auth/admin/manage-sessions",
+      "evidence": "Because Firebase ID tokens are stateless JWTs, you can determine a token has been revoked only by requesting the token's status from the Firebase Authentication backend."
+    }
+  },
+  {
+    "id": "iam-f021",
+    "note": "1.2-user-authentication",
+    "kind": "term",
+    "front": "`access_type=offline`",
+    "back": "An OAuth 2.0 authorization request parameter. It tells Google to return a refresh token the first time that the app exchanges an authorization code. Use it when the app must call Google APIs while the user is not present.",
+    "aws": null,
+    "source": {
+      "title": "Using OAuth 2.0 for Web Server Applications",
+      "url": "https://developers.google.com/identity/protocols/oauth2/web-server",
+      "evidence": "This value instructs the Google authorization server to return a refresh token and an access token the first time that your application exchanges an authorization code for tokens."
+    }
+  },
+  {
+    "id": "iam-f022",
+    "note": "1.2-user-authentication",
+    "kind": "term",
+    "front": "OAuth 2.0 `state` parameter",
+    "back": "A random value that the app sends in the authorization request. Google returns it unchanged with the authorization code, and the app checks that it matches. It protects against cross-site request forgery (CSRF).",
+    "aws": null,
+    "source": {
+      "title": "Using OAuth 2.0 for Web Server Applications",
+      "url": "https://developers.google.com/identity/protocols/oauth2/web-server",
+      "evidence": "You can use this parameter for several purposes, such as directing the user to the correct resource in your application, sending nonces, and mitigating cross-site request forgery."
+    }
+  },
+  {
+    "id": "iam-f023",
+    "note": "1.2-user-authentication",
+    "kind": "concept",
+    "front": "Why do an app's OAuth refresh tokens stop working seven days after the user consents?",
+    "back": "The publishing status of the app is Testing. Authorizations by test users, and their refresh tokens, expire seven days after consent. Set the publishing status to In production.",
+    "aws": null,
+    "source": {
+      "title": "Manage App Audience",
+      "url": "https://support.google.com/cloud/answer/15549945",
+      "evidence": "Authorizations by a test user will expire seven days from the time of consent. If your OAuth client requests an `offline` access type and receives a refresh token, that token will also expire."
+    }
+  },
+  {
+    "id": "iam-f024",
+    "note": "1.2-user-authentication",
+    "kind": "concept",
+    "front": "When IAP signs users in through Identity Platform, what controls access to the app?",
+    "back": "Not IAM. The JWT from IAP carries the claims of the Identity Platform ID token, and the app filters access on those claims.",
+    "aws": null,
+    "source": {
+      "title": "External identities",
+      "url": "https://docs.cloud.google.com/iap/docs/external-identities",
+      "evidence": "Although you can't use IAM to manage access control with external identities, the JSON Web Token generated by IAP carries the claims from the Identity Platform ID token, and the application can filter access based on these claims."
+    }
+  },
+  {
+    "id": "iam-f025",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "concept",
+    "front": "Which service account does a Cloud Run service use when you do not specify one?",
+    "back": "The Compute Engine default service account, which can have the Editor role on the project. Attach a dedicated user-managed service account with only the roles that the service needs.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to service identity",
+      "url": "https://docs.cloud.google.com/run/docs/securing/service-identity",
+      "evidence": "By default, the Compute Engine default service account is automatically created. If you don't specify a service account when the Cloud Run resource is created, Cloud Run uses this service account."
+    }
+  },
+  {
+    "id": "iam-f026",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "concept",
+    "front": "Why should each application have its own service account instead of a shared one?",
+    "back": "Cloud Audit Logs show the service account, not the application, so with a shared account you might not be able to trace an action to the correct application. A shared account also gets more access as the needs of the applications grow apart.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for using service accounts securely",
+      "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts",
+      "evidence": "Cloud Audit Logs include the name of the service account that performed a change or accessed data, but they don't show the name of the application that used the service account."
+    }
+  },
+  {
+    "id": "iam-f027",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "term",
+    "front": "Service Account User role",
+    "back": "`roles/iam.serviceAccountUser`, with the `iam.serviceAccounts.actAs` permission. It lets a principal attach a service account to a resource, for example when it deploys a Cloud Run service. It does not let the principal create short-lived credentials or use `--impersonate-service-account`.",
+    "aws": "`iam:PassRole`",
+    "source": {
+      "title": "Roles for service account authentication",
+      "url": "https://docs.cloud.google.com/iam/docs/service-account-permissions",
+      "evidence": "The Service Account User role (`roles/iam.serviceAccountUser`) lets a principal attach a service account to a resource. When the code running on that resource needs to authenticate, it can get credentials for the attached service account."
+    }
+  },
+  {
+    "id": "iam-f028",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "term",
+    "front": "Service Account Token Creator role",
+    "back": "`roles/iam.serviceAccountTokenCreator`. It lets a principal create short-lived credentials for a service account: OAuth 2.0 access tokens, ID tokens, and signed JWTs and blobs. Impersonation with `--impersonate-service-account` needs it.",
+    "aws": null,
+    "source": {
+      "title": "Roles for service account authentication",
+      "url": "https://docs.cloud.google.com/iam/docs/service-account-permissions",
+      "evidence": "The Service Account Token Creator role (`roles/iam.serviceAccountTokenCreator`) lets principals create short-lived credentials for a service account."
+    }
+  },
+  {
+    "id": "iam-f029",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "concept",
+    "front": "What can a user do with Service Account Token Creator granted on a whole project?",
+    "back": "Impersonate every service account in the project, and so reach every resource that those service accounts can access, also outside the project. Grant the role on each service account instead.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for using service accounts securely",
+      "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts",
+      "evidence": "For example, if you grant a user the Service Account Token Creator role in a Google Cloud project, the user can impersonate any service account in the Google Cloud project."
+    }
+  },
+  {
+    "id": "iam-f030",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "term",
+    "front": "Legacy basic roles",
+    "back": "Owner, Editor, and Viewer, which existed before IAM (formerly primitive roles). They include thousands of permissions across all Google Cloud services. Do not grant them in production unless there is no alternative.",
+    "aws": null,
+    "source": {
+      "title": "Roles overview",
+      "url": "https://docs.cloud.google.com/iam/docs/roles-overview",
+      "evidence": "Legacy basic roles existed prior to the introduction of IAM. They were originally known as primitive roles."
+    }
+  },
+  {
+    "id": "iam-f031",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "term",
+    "front": "Custom role",
+    "back": "A role with permissions that you choose and maintain, because Google does not update it. Use it when every predefined role with the permission also grants permissions that the principal does not need. You can create it only in an organization or a project, not in a folder.",
+    "aws": "Customer managed policies",
+    "source": {
+      "title": "Choose which type of role to use",
+      "url": "https://docs.cloud.google.com/iam/docs/choose-role-type",
+      "evidence": "A principal needs a permission, but each predefined role that includes that permission also includes permissions that the principal doesn't need and shouldn't have."
+    }
+  },
+  {
+    "id": "iam-f032",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "concept",
+    "front": "A service publishes to one Pub/Sub topic. Where should you grant it the Pub/Sub Publisher role?",
+    "back": "On that topic, not on the project. A role on the project applies to every topic in it, because child resources inherit the allow policies of their parents.",
+    "aws": null,
+    "source": {
+      "title": "Use IAM securely",
+      "url": "https://docs.cloud.google.com/iam/docs/using-iam-securely",
+      "evidence": "Grant roles at the smallest scope needed. For example, if a user only needs access to publish Pub/Sub topics, grant the Publisher role to the user for that topic."
+    }
+  },
+  {
+    "id": "iam-f033",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "term",
+    "front": "IAM Conditions",
+    "back": "A Common Expression Language (CEL) expression on a role binding that limits when the binding applies, for example until an expiry time or only for resources with a name prefix. You cannot add conditions to legacy basic roles, or to grants to `allUsers` or `allAuthenticatedUsers`.",
+    "aws": "IAM policy condition keys",
+    "source": {
+      "title": "Overview of IAM Conditions",
+      "url": "https://docs.cloud.google.com/iam/docs/conditions-overview",
+      "evidence": "You cannot use conditions when you grant legacy basic roles, including Owner (`roles/owner`), Editor (`roles/editor`), and Viewer (`roles/viewer`)."
+    }
+  },
+  {
+    "id": "iam-f034",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "concept",
+    "front": "A principal has a role without a condition. What effect does a conditional binding for the same role have?",
+    "back": "None. A conditional binding does not override a binding without a condition, so the principal keeps the role. Remove the unconditional binding to limit access.",
+    "aws": null,
+    "source": {
+      "title": "Overview of IAM Conditions",
+      "url": "https://docs.cloud.google.com/iam/docs/conditions-overview",
+      "evidence": "Conditional role bindings do not override role bindings with no conditions. If a principal is bound to a role, and the role binding does not have a condition, then the principal always has that role."
+    }
+  },
+  {
+    "id": "iam-f035",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "term",
+    "front": "Role recommendations",
+    "back": "IAM recommender suggestions to revoke a role, or to replace it with a role that has fewer permissions. They compare the permissions of a principal with the permissions that it used in the last 90 days. Except for service agents, they never increase access.",
+    "aws": null,
+    "source": {
+      "title": "Overview of role recommendations",
+      "url": "https://docs.cloud.google.com/policy-intelligence/docs/role-recommendations-overview",
+      "evidence": "The IAM recommender generates policy insights by comparing a principal's total number of permissions with the permissions that the principal used in the last 90 days."
+    }
+  },
+  {
+    "id": "iam-f036",
+    "note": "1.2-service-accounts-least-privilege",
+    "kind": "term",
+    "front": "Service agent",
+    "back": "A service account that Google creates and manages, so that a Google Cloud service can act on your resources. It is not in the list of service accounts of your project. Do not revoke its roles unless a role recommendation suggests it, or the service can stop working.",
+    "aws": "Service-linked roles",
+    "source": {
+      "title": "Types of service accounts",
+      "url": "https://docs.cloud.google.com/iam/docs/service-account-types",
+      "evidence": "Unless a role recommendation suggests it, don't revoke the roles that are granted to service agents. If you revoke these roles in a way that is not suggested by a role recommendation, some Google Cloud services will no longer work."
+    }
+  }
+]

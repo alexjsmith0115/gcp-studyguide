@@ -1,0 +1,626 @@
+[
+  {
+    "id": "run-f001",
+    "note": "3.1-deploy-from-source",
+    "kind": "term",
+    "front": "`gcloud run deploy --source`",
+    "back": "One command that builds a container image from your source code with Cloud Build and Google Cloud's buildpacks, and then deploys it to Cloud Run. You do not need Docker on your machine. Use it when you do not need full control of the build.",
+    "aws": "AWS App Runner",
+    "source": {
+      "title": "Deploy services from source code",
+      "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+      "evidence": "This option uses Google Cloud's buildpacks and Cloud Build to automatically build container images from your source code without having to install Docker on your machine or set up buildpacks or Cloud Build."
+    }
+  },
+  {
+    "id": "run-f002",
+    "note": "3.1-deploy-from-source",
+    "kind": "concept",
+    "front": "What does a Cloud Run source deploy use to build the image when the source directory has no Dockerfile?",
+    "back": "Google Cloud's buildpacks. They detect the language, get the dependencies, and build the image. If the source directory has a Dockerfile, the build uses that Dockerfile instead.",
+    "aws": null,
+    "source": {
+      "title": "Deploy services from source code",
+      "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+      "evidence": "If a Dockerfile is present in the source code directory, the uploaded source code is built using that Dockerfile. If no Dockerfile is present in the source code directory, Google Cloud's buildpacks automatically detects the language you are using"
+    }
+  },
+  {
+    "id": "run-f003",
+    "note": "3.1-deploy-from-source",
+    "kind": "term",
+    "front": "`cloud-run-source-deploy` repository",
+    "back": "The Artifact Registry repository where a Cloud Run source deploy stores the images that it builds. If the repository does not exist in the deploy region, the command creates it.",
+    "aws": "Amazon ECR",
+    "source": {
+      "title": "Deploy services from source code",
+      "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+      "evidence": "If your project doesn't already have an Artifact Registry repository with the name `cloud-run-source-deploy` in the region you are deploying to, this feature automatically creates an Artifact Registry repository with the name `cloud-run-source-deploy`."
+    }
+  },
+  {
+    "id": "run-f004",
+    "note": "3.1-deploy-from-source",
+    "kind": "concept",
+    "front": "How do you get full control of the image build for a Cloud Run service?",
+    "back": "Build the image with Cloud Build, for example with `gcloud builds submit`. Then deploy that image with `gcloud run deploy --image`. A source deploy is a convenience feature, and it does not give full control of the build.",
+    "aws": null,
+    "source": {
+      "title": "Deploy services from source code",
+      "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+      "evidence": "For more control, build the container image using Cloud Build, for example, using `gcloud builds submit`, and then deploy the container image using, for example, `gcloud run deploy --image`."
+    }
+  },
+  {
+    "id": "run-f005",
+    "note": "3.1-deploy-from-source",
+    "kind": "term",
+    "front": "Cloud Run Builder (`roles/run.builder`)",
+    "back": "The IAM role that the build service account needs for a Cloud Run source deploy. By default, Cloud Build uses the Compute Engine default service account. Grant the role to that account, or to your own build service account.",
+    "aws": null,
+    "source": {
+      "title": "Deploy services from source code",
+      "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+      "evidence": "For Cloud Build to build your sources, ask your administrator to grant Cloud Run Builder (`roles/run.builder`) to the Compute Engine default service account on your project"
+    }
+  },
+  {
+    "id": "run-f006",
+    "note": "3.1-deploy-from-source",
+    "kind": "concept",
+    "front": "Why can a Cloud Run source deploy fail with the default build service account in a new organization?",
+    "back": "Organizations created after May 3, 2024 enforce the `iam.automaticIamGrantsForDefaultServiceAccounts` constraint by default. Default service accounts then do not get the Editor role. Grant Cloud Run Builder to the build service account yourself.",
+    "aws": null,
+    "source": {
+      "title": "Deploy services from source code",
+      "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+      "evidence": "The `iam.automaticIamGrantsForDefaultServiceAccounts` organization policy constraint prevents the Editor role from being automatically granted to default service accounts. If you created your organization after May 3, 2024, this constraint is enforced by default."
+    }
+  },
+  {
+    "id": "run-f007",
+    "note": "3.1-deploy-from-source",
+    "kind": "term",
+    "front": "`gcloud run deploy --function`",
+    "back": "Deploys a Cloud Run function (formerly Cloud Functions 2nd gen) from source code. A function is a Cloud Run service that is deployed from source code. The flag value is the entry point of the function.",
+    "aws": "AWS Lambda",
+    "source": {
+      "title": "Compare Cloud Run functions",
+      "url": "https://docs.cloud.google.com/run/docs/functions/comparison",
+      "evidence": "A function is a Cloud Run service that is deployed from source code"
+    }
+  },
+  {
+    "id": "run-f008",
+    "note": "3.1-deploy-from-source",
+    "kind": "term",
+    "front": "Automatic base image updates",
+    "back": "A Cloud Run setting that lets Google apply security patches to the operating system and language runtime of the base image. You do not rebuild or redeploy the service, and Cloud Run creates no new revision. It needs a Google Cloud's buildpacks base image.",
+    "aws": null,
+    "source": {
+      "title": "Configure automatic base image updates",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/automatic-base-image-updates",
+      "evidence": "You don't have to rebuild or redeploy your service for the base image to be updated. No new revision is created when the base image is updated."
+    }
+  },
+  {
+    "id": "run-f009",
+    "note": "3.1-deploy-from-source",
+    "kind": "concept",
+    "front": "Which `gcloud run` flag changes one environment variable and keeps the other variables?",
+    "back": "`--update-env-vars`. The `--set-env-vars` flag deletes every variable that is not in its new list.",
+    "aws": null,
+    "source": {
+      "title": "Configure environment variables for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/environment-variables",
+      "evidence": "Note that the `--set-env-vars` flag is a destructive action that deletes previously set environment variables not included in the new list of environment variables."
+    }
+  },
+  {
+    "id": "run-f010",
+    "note": "3.1-deploy-from-source",
+    "kind": "concept",
+    "front": "How should a Cloud Run service read a secret so that it gets new versions after rotation?",
+    "back": "Mount the secret as a volume. Each time the app reads the file, Cloud Run fetches the value from Secret Manager, so this works well with secret rotation.",
+    "aws": null,
+    "source": {
+      "title": "Configure secrets for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/secrets",
+      "evidence": "When reading a volume, Cloud Run always fetches the secret value from the Secret Manager to use the value with the latest version. This method also works well with secret rotation."
+    }
+  },
+  {
+    "id": "run-f011",
+    "note": "3.1-deploy-from-source",
+    "kind": "term",
+    "front": "`gcloud run services replace`",
+    "back": "Deploys a Cloud Run service from a YAML file in the Knative format, so you can keep the whole service specification in version control. The command replaces the whole configuration, so it can overwrite changes that someone made in the console or with `gcloud`.",
+    "aws": null,
+    "source": {
+      "title": "Deploy container images to Cloud Run services",
+      "url": "https://docs.cloud.google.com/run/docs/deploying",
+      "evidence": "So if you use YAML to make revision changes, you should avoid also using the Google Cloud console or gcloud CLI to make configuration changes because those can be overwritten when you use YAML."
+    }
+  },
+  {
+    "id": "run-f012",
+    "note": "3.1-deploy-from-source",
+    "kind": "concept",
+    "front": "What does Google recommend instead of deploying a Cloud Run service by hand from local source?",
+    "back": "Deploy automatically each time someone pushes changes to your Git repository. This best practice stops deploys of unversioned local changes. The Cloud Run console can set it up with a Cloud Build trigger.",
+    "aws": null,
+    "source": {
+      "title": "Deploy services from source code",
+      "url": "https://docs.cloud.google.com/run/docs/deploying-source-code",
+      "evidence": "As a best practice for avoiding unversioned changes in local source, Google recommends that you automatically deploy when changes are pushed to your Git repository."
+    }
+  },
+  {
+    "id": "run-f013",
+    "note": "3.2-gke-deployments",
+    "kind": "concept",
+    "front": "Which change to a Deployment starts a new rollout?",
+    "back": "Only a change to the Pod template (`.spec.template`), for example a new container image or new labels. Other updates, such as scaling the Deployment, do not start a rollout.",
+    "aws": null,
+    "source": {
+      "title": "Deployments | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+      "evidence": "A Deployment's rollout is triggered if and only if the Deployment's Pod template (that is, `.spec.template`) is changed, for example if the labels or container images of the template are updated."
+    }
+  },
+  {
+    "id": "run-f014",
+    "note": "3.2-gke-deployments",
+    "kind": "term",
+    "front": "`rollingUpdate.maxUnavailable`",
+    "back": "The maximum number of Pods that can be unavailable during a Deployment rolling update, as a number or a percentage of the desired Pods. The default is 25%, and a percentage rounds down. It cannot be 0 when `maxSurge` is 0.",
+    "aws": null,
+    "source": {
+      "title": "Deployments | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+      "evidence": "The absolute number is calculated from percentage by rounding down. The value cannot be 0 if `.spec.strategy.rollingUpdate.maxSurge` is 0. The default value is 25%."
+    }
+  },
+  {
+    "id": "run-f015",
+    "note": "3.2-gke-deployments",
+    "kind": "term",
+    "front": "`kubectl rollout undo`",
+    "back": "Rolls a Deployment back to its previous revision, or to a named revision with `--to-revision`. It works on a rollout in progress or on a completed one. It restores only the Pod template, not the replica count.",
+    "aws": null,
+    "source": {
+      "title": "Deploying a stateless Linux application",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/stateless-apps",
+      "evidence": "You can roll back an in-progress or completed update to its previous revision"
+    }
+  },
+  {
+    "id": "run-f016",
+    "note": "3.2-gke-deployments",
+    "kind": "concept",
+    "front": "Which load balancer does GKE create for a Service of type LoadBalancer?",
+    "back": "A passthrough Network Load Balancer, regional external or internal. It is not an Application Load Balancer, so use a Gateway and an HTTPRoute for HTTP(S) routing by host or path.",
+    "aws": null,
+    "source": {
+      "title": "About LoadBalancer Services",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/service-load-balancer",
+      "evidence": "External LoadBalancer Services are implemented by using regional external passthrough Network Load Balancers."
+    }
+  },
+  {
+    "id": "run-f017",
+    "note": "3.2-gke-deployments",
+    "kind": "concept",
+    "front": "What does Google recommend instead of GKE Ingress for HTTP(S) load balancing?",
+    "back": "The GKE Gateway API. GKE Ingress is in maintenance mode, so it gets only bug fixes and no new features.",
+    "aws": null,
+    "source": {
+      "title": "GKE Ingress for Application Load Balancers",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress",
+      "evidence": "GKE Ingress is in maintenance mode. No new functionality will be added except as needed to fix bugs. We recommend that you use GKE Gateway API."
+    }
+  },
+  {
+    "id": "run-f018",
+    "note": "3.2-gke-deployments",
+    "kind": "term",
+    "front": "GatewayClass",
+    "back": "A cluster-scoped GKE resource that is the template for the Application Load Balancer that a Gateway creates. A cluster operator picks one, for example `gke-l7-global-external-managed` (recommended over the classic `gke-l7-gxlb`) or `gke-l7-rilb` for an internal load balancer.",
+    "aws": null,
+    "source": {
+      "title": "About Gateway API",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/gateway-api",
+      "evidence": "A GatewayClass is a resource that defines a template for HTTP(S) (Layer 7) load balancers in a Kubernetes cluster. GKE provides GatewayClasses as cluster-scoped resources. Cluster operators specify a GatewayClass when creating Gateways in their clusters."
+    }
+  },
+  {
+    "id": "run-f019",
+    "note": "3.2-gke-deployments",
+    "kind": "term",
+    "front": "GCPBackendPolicy",
+    "back": "A GKE Gateway policy that sets how the load balancer backend services send traffic to the endpoints. It is similar to a BackendConfig for an Ingress. It replaced `LbPolicy`, which is still supported but gets no new attributes.",
+    "aws": null,
+    "source": {
+      "title": "About Gateway API",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/gateway-api",
+      "evidence": "Google Cloud has replaced the LbPolicy policy with the GCPBackendPolicy policy. The LbPolicy is still supported, but without additional attributes."
+    }
+  },
+  {
+    "id": "run-f020",
+    "note": "3.2-gke-deployments",
+    "kind": "concept",
+    "front": "When does a Pod see a new ConfigMap value that it reads as an environment variable?",
+    "back": "Only after the Pod restarts. Kubernetes does not update environment variables from a ConfigMap automatically. Files from a ConfigMap volume update eventually without a restart.",
+    "aws": null,
+    "source": {
+      "title": "ConfigMaps | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/configuration/configmap/",
+      "evidence": "ConfigMaps consumed as environment variables are not updated automatically and require a pod restart."
+    }
+  },
+  {
+    "id": "run-f021",
+    "note": "3.2-gke-deployments",
+    "kind": "term",
+    "front": "Secret Manager add-on",
+    "back": "A GKE add-on that mounts Secret Manager secrets as files in Pods through a CSI volume. Use it to keep secrets outside the cluster, where IAM, not in-cluster RBAC, controls access. It works on Standard and Autopilot clusters.",
+    "aws": "AWS Secrets Manager",
+    "source": {
+      "title": "Use Secret Manager add-on with Google Kubernetes Engine",
+      "url": "https://docs.cloud.google.com/secret-manager/docs/secret-manager-managed-csi-component",
+      "evidence": "This page explains how you can use the Secret Manager add-on to access the secrets stored in Secret Manager as volumes mounted in Kubernetes Pods."
+    }
+  },
+  {
+    "id": "run-f022",
+    "note": "3.2-gke-deployments",
+    "kind": "concept",
+    "front": "Which IAM permissions does a Pod get when you enable Workload Identity Federation for GKE on the cluster?",
+    "back": "None. Enabling the feature grants no IAM permissions. Grant IAM roles to the principal of the Pod's Kubernetes ServiceAccount, and set `serviceAccountName` in the Pod spec.",
+    "aws": null,
+    "source": {
+      "title": "About Workload Identity Federation for GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+      "evidence": "Enabling Workload Identity Federation for GKE on the cluster doesn't grant your workloads any additional IAM permissions."
+    }
+  },
+  {
+    "id": "run-f023",
+    "note": "3.2-gke-deployments",
+    "kind": "concept",
+    "front": "Which identity pulls container images from Artifact Registry when GKE starts a Pod?",
+    "back": "The node service account. By default, this is the Compute Engine default service account. For a repository in another project, grant Artifact Registry access to that account, not to the Pod's Kubernetes ServiceAccount.",
+    "aws": null,
+    "source": {
+      "title": "Deploying to Google Kubernetes Engine",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/integrate-gke",
+      "evidence": "If GKE is in a different project than Artifact Registry, grant Artifact Registry permissions to the service account that your GKE node use. By default, nodes use the Compute Engine default service account."
+    }
+  },
+  {
+    "id": "run-f024",
+    "note": "3.2-gke-deployments",
+    "kind": "concept",
+    "front": "What does Google recommend for container images as a release moves from one environment to the next?",
+    "back": "Build the image once, and promote the same image through the environments. A rebuild for each environment can add small differences or untested code to the production image.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for continuous integration and delivery to Google Kubernetes Engine",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/best-practices-continuous-integration-delivery-kubernetes",
+      "evidence": "To ensure that the container image you tested is the container image you deploy, it's best to build once and promote along your environments."
+    }
+  },
+  {
+    "id": "run-f025",
+    "note": "3.2-health-checks",
+    "kind": "term",
+    "front": "Startup probe",
+    "back": "A probe that checks whether the app in a container has started. Until it succeeds, Kubernetes does not run the liveness and readiness probes. Use it for a slow-starting app instead of a long liveness delay.",
+    "aws": null,
+    "source": {
+      "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+      "evidence": "If a startup probe is configured, Kubernetes does not execute liveness or readiness probes until the startup probe succeeds, allowing the application time to finish its initialization."
+    }
+  },
+  {
+    "id": "run-f026",
+    "note": "3.2-health-checks",
+    "kind": "term",
+    "front": "Liveness probe",
+    "back": "A probe that decides when the kubelet restarts a container, for example after a deadlock where the app runs but makes no progress. Use it only for failures that a restart fixes.",
+    "aws": null,
+    "source": {
+      "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+      "evidence": "Liveness probes determine when to restart a container. For example, liveness probes could catch a deadlock, where an application is running, but unable to make progress."
+    }
+  },
+  {
+    "id": "run-f027",
+    "note": "3.2-health-checks",
+    "kind": "term",
+    "front": "Readiness probe",
+    "back": "A probe that decides when a container can take traffic. When it fails, Kubernetes removes the Pod from the endpoints of its Services, but the container keeps running. Use it, for example, while the app loads a cache.",
+    "aws": null,
+    "source": {
+      "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+      "evidence": "If the readiness probe returns a failed state, the EndpointSlice controller removes the Pod's IP address from the EndpointSlices of all Services that match the Pod."
+    }
+  },
+  {
+    "id": "run-f028",
+    "note": "3.2-health-checks",
+    "kind": "concept",
+    "front": "What can a badly designed liveness probe cause when the app is under high load?",
+    "back": "Cascading failures: containers restart under high load, client requests fail, and the other Pods get more load. A liveness probe must show only an unrecoverable failure, such as a deadlock.",
+    "aws": null,
+    "source": {
+      "title": "Liveness, Readiness, and Startup Probes | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/probes/",
+      "evidence": "Incorrect implementation of liveness probes can lead to cascading failures. This results in restarting of container under high load; failed client requests as your application became less scalable; and increased workload on remaining pods due to some failed pods."
+    }
+  },
+  {
+    "id": "run-f029",
+    "note": "3.2-health-checks",
+    "kind": "concept",
+    "front": "What happens to a GKE Ingress health check when you change the readiness probe after the Ingress exists?",
+    "back": "Nothing. GKE copies readiness probe settings only when it creates the load balancer, and it does not keep them in sync. To change the health check, use a BackendConfig.",
+    "aws": null,
+    "source": {
+      "title": "About GKE Ingress routing and security",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress-routing-security",
+      "evidence": "When a backend service's health check parameters are inferred from a serving Pod's readiness probe, GKE does not keep the readiness probe and health check synchronized"
+    }
+  },
+  {
+    "id": "run-f030",
+    "note": "3.2-health-checks",
+    "kind": "concept",
+    "front": "Which HTTP response must a GKE backend return to pass a Google Cloud load balancer health check?",
+    "back": "HTTP 200 only. A redirect, such as 301 or 302, or a client error, such as 401 or 403, marks the backend unhealthy. Allow unauthenticated access to the health check path.",
+    "aws": null,
+    "source": {
+      "title": "Configure Gateway resources using Policies",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+      "evidence": "Google Cloud health check probes strictly require an HTTP `200` (OK) response code."
+    }
+  },
+  {
+    "id": "run-f031",
+    "note": "3.2-health-checks",
+    "kind": "term",
+    "front": "BackendConfig",
+    "back": "A GKE custom resource that sets the load balancer health check of an Ingress backend, for example the path, port, and interval. Google recommends it for the most control. It does not work with a Gateway.",
+    "aws": null,
+    "source": {
+      "title": "About GKE Ingress routing and security",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress-routing-security",
+      "evidence": "Use a `BackendConfig` CRD to have the most control over the load balancer health check settings."
+    }
+  },
+  {
+    "id": "run-f032",
+    "note": "3.2-health-checks",
+    "kind": "term",
+    "front": "HealthCheckPolicy",
+    "back": "A GKE Gateway policy that sets the load balancer health check for a Service, such as the request path and the interval. A Gateway does not copy settings from readiness probes, so you need one when `/` does not return HTTP 200.",
+    "aws": null,
+    "source": {
+      "title": "Configure Gateway resources using Policies",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+      "evidence": "Unlike GKE Ingress, GKE Gateway does not automatically infer health check parameters (such as path, port, or protocol) from your Pod's readiness or liveness probes."
+    }
+  },
+  {
+    "id": "run-f033",
+    "note": "3.2-health-checks",
+    "kind": "concept",
+    "front": "How long does Kubernetes wait by default between the start of Pod termination and the KILL signal?",
+    "back": "30 seconds, the default `terminationGracePeriodSeconds`. The `preStop` hook and the normal stop after TERM must both fit in this period, so increase it for a long hook.",
+    "aws": null,
+    "source": {
+      "title": "Pod Lifecycle | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/",
+      "evidence": "If one of the Pod's containers has defined a `preStop` hook and the `terminationGracePeriodSeconds` in the Pod spec is not set to 0, the kubelet runs that hook inside of the container. The default `terminationGracePeriodSeconds` setting is 30 seconds."
+    }
+  },
+  {
+    "id": "run-f034",
+    "note": "3.2-health-checks",
+    "kind": "concept",
+    "front": "What should an app on GKE do right after it receives `SIGTERM`?",
+    "back": "Keep accepting new requests, and finish the requests in progress. Kubernetes updates endpoints and load balancers asynchronously, so new requests can still arrive for a short time.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+      "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+      "evidence": "Don't stop accepting new requests right after `SIGTERM`. Your application must not stop immediately, but instead finish all requests that are in flight and still listen to incoming connections that arrive after the Pod termination begins."
+    }
+  },
+  {
+    "id": "run-f035",
+    "note": "3.2-health-checks",
+    "kind": "term",
+    "front": "PodDisruptionBudget (PDB)",
+    "back": "An object that limits how many Pods of a replicated app go down at the same time from voluntary disruptions, such as node drains. It does not limit a Deployment rolling update, which `maxUnavailable` controls.",
+    "aws": null,
+    "source": {
+      "title": "Disruptions | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/pods/disruptions/",
+      "evidence": "A PDB limits the number of Pods of a replicated application that are down simultaneously from voluntary disruptions."
+    }
+  },
+  {
+    "id": "run-f036",
+    "note": "3.2-health-checks",
+    "kind": "concept",
+    "front": "How does Cloud Run differ from Kubernetes when a container has no startup probe?",
+    "back": "Cloud Run adds a TCP startup probe with default values. The Kubernetes kubelet treats a missing probe as a success.",
+    "aws": null,
+    "source": {
+      "title": "Configure container health checks for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/healthchecks",
+      "evidence": "If you don't explicitly configure a TCP startup probe for a new Cloud Run service, Cloud Run automatically configures a TCP startup probe"
+    }
+  },
+  {
+    "id": "run-f037",
+    "note": "3.2-autoscaling",
+    "kind": "term",
+    "front": "Horizontal Pod Autoscaler (HPA)",
+    "back": "Changes the number of Pods of a workload, such as a Deployment, based on CPU or memory use, custom metrics, or external metrics. It does not change the number of nodes. The cluster autoscaler or Autopilot adds nodes.",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+      "evidence": "Horizontal Pod autoscaling doesn't change the number of nodes in a GKE cluster. To automatically scale the number of nodes in the cluster based on changes in the number of Pods, you can use the cluster autoscaler."
+    }
+  },
+  {
+    "id": "run-f038",
+    "note": "3.2-autoscaling",
+    "kind": "term",
+    "front": "Vertical Pod autoscaling",
+    "back": "Changes the CPU and memory requests and limits of containers from their usage over time. It works best for long-running workloads whose Pods have similar usage. For sudden spikes, use the HPA instead.",
+    "aws": null,
+    "source": {
+      "title": "Vertical Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/verticalpodautoscaler",
+      "evidence": "By analyzing your workload's resource usage over time, you can get optimization recommendations and automatically adjust CPU and memory requests, and limits for containers within the Pods."
+    }
+  },
+  {
+    "id": "run-f039",
+    "note": "3.2-autoscaling",
+    "kind": "concept",
+    "front": "Which missing setting makes an HPA with a CPU utilization target take no action?",
+    "back": "CPU requests on the containers. A utilization target is a percentage of the Pod's requests. Without requests, the HPA cannot calculate it and takes no action for that metric.",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+      "evidence": "you must configure requests for that resource for each container running in each Pod in the workload. Otherwise, the horizontal Pod autoscaler cannot perform the calculations it needs to, and takes no action related to that metric."
+    }
+  },
+  {
+    "id": "run-f040",
+    "note": "3.2-autoscaling",
+    "kind": "term",
+    "front": "`scaleTargetRef`",
+    "back": "The HPA field that names the workload to scale. Point it at the Deployment, not at the ReplicaSet behind it, because a rolling update replaces the ReplicaSet. You cannot autoscale a DaemonSet.",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+      "evidence": "If you have a Deployment, don't configure horizontal Pod autoscaling on the ReplicaSet or Replication Controller backing it. When you perform a rolling update on the Deployment or Replication Controller, it is replaced by a new Replication Controller."
+    }
+  },
+  {
+    "id": "run-f041",
+    "note": "3.2-autoscaling",
+    "kind": "concept",
+    "front": "Why should you remove `spec.replicas` from a Deployment manifest when an HPA manages the Deployment?",
+    "back": "Each `kubectl apply` of the manifest sets the Pod count back to the `spec.replicas` value. This works against the HPA and can make the replica count move up and down.",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod Autoscaling | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/",
+      "evidence": "If this isn't done, any time a change to that object is applied, for example via `kubectl apply -f deployment.yaml`, this will instruct Kubernetes to scale the current number of Pods to the value of the `spec.replicas` key."
+    }
+  },
+  {
+    "id": "run-f042",
+    "note": "3.2-autoscaling",
+    "kind": "concept",
+    "front": "How does the HPA calculate the desired number of replicas?",
+    "back": "`desiredReplicas = ceil[currentReplicas × currentMetricValue / desiredMetricValue]`. For example, a current value of `200m` with a `100m` target doubles the replicas.",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod Autoscaling | Kubernetes",
+      "url": "https://kubernetes.io/docs/concepts/workloads/autoscaling/horizontal-pod-autoscale/",
+      "evidence": "For example, if the current metric value is `200m`, and the desired value is `100m`, the number of replicas will be doubled"
+    }
+  },
+  {
+    "id": "run-f043",
+    "note": "3.2-autoscaling",
+    "kind": "term",
+    "front": "`stabilizationWindowSeconds`",
+    "back": "An HPA `behavior` setting that stops the replica count from moving up and down too often. For scale-down, the HPA uses the highest recommendation in the window. In GKE, the scale-down window is 300 seconds by default, so scale-down after a spike is slow.",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+      "evidence": "To prevent thrashing, the horizontal Pod autoscaler chooses the largest recommendation from a specified stabilization window. This behavior is controlled by the `scaleDown.stabilizationWindowSeconds` field in the HPA `behavior` specification, which defaults to 300 seconds (five minutes) in GKE."
+    }
+  },
+  {
+    "id": "run-f044",
+    "note": "3.2-autoscaling",
+    "kind": "term",
+    "front": "External metric",
+    "back": "An HPA metric from a service outside the cluster, for example any Cloud Monitoring metric, such as the undelivered messages of a Pub/Sub subscription. Use it to scale a queue worker on its backlog.",
+    "aws": null,
+    "source": {
+      "title": "About autoscaling workloads based on metrics",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/custom-and-external-metrics",
+      "evidence": "An external metric is reported from an application or service not running on your cluster, but whose performance impacts your Kubernetes application. For example, you can autoscale on any metric in Cloud Monitoring, including Pub/Sub or Dataflow."
+    }
+  },
+  {
+    "id": "run-f045",
+    "note": "3.2-autoscaling",
+    "kind": "term",
+    "front": "`autoscaling.googleapis.com|gclb-capacity-fullness`",
+    "back": "The `Object` metric for HPA scaling on load balancer traffic through a GKE Gateway. The Service capacity comes from `maxRatePerEndpoint` in a GCPBackendPolicy. It replaces the earlier name `gclb-capacity-utilization`.",
+    "aws": null,
+    "source": {
+      "title": "Configuring horizontal Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/horizontal-pod-autoscaling",
+      "evidence": "An earlier version of this product used the metric name `autoscaling.googleapis.com|gclb-capacity-utilization`. We recommend that you switch to the `autoscaling.googleapis.com|gclb-capacity-fullness` metric name instead."
+    }
+  },
+  {
+    "id": "run-f046",
+    "note": "3.2-autoscaling",
+    "kind": "concept",
+    "front": "What must an HPA have to scale a GKE workload up from zero replicas?",
+    "back": "At least one `External` or `Object` metric, such as a queue depth. GKE cannot collect CPU or memory metrics when a workload has zero Pods.",
+    "aws": null,
+    "source": {
+      "title": "Scale GKE workloads to and from zero using HPA",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/scale-to-from-zero-hpa",
+      "evidence": "You must configure at least one `External` or `Object` metric (such as a queue depth) in your horizontal Pod autoscaler. GKE cannot collect CPU or memory (`Resource`) metrics when a workload has zero Pods"
+    }
+  },
+  {
+    "id": "run-f047",
+    "note": "3.2-autoscaling",
+    "kind": "concept",
+    "front": "How can one workload use the HPA and vertical Pod autoscaling together?",
+    "back": "Not both on CPU or memory. Use the HPA on custom or external metrics and vertical Pod autoscaling on CPU and memory. Or use multidimensional Pod autoscaling (Beta).",
+    "aws": null,
+    "source": {
+      "title": "Horizontal Pod autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/horizontalpodautoscaler",
+      "evidence": "Don't use the horizontal Pod autoscaler together with the vertical Pod autoscaler on CPU or memory. You can use the horizontal Pod autoscaler with the vertical Pod autoscaler for other metrics."
+    }
+  },
+  {
+    "id": "run-f048",
+    "note": "3.2-autoscaling",
+    "kind": "concept",
+    "front": "When does the GKE cluster autoscaler add nodes to a node pool?",
+    "back": "When Pods cannot be scheduled on the current nodes, up to the maximum size of the node pool. It decides from Pod requests, not from actual resource use.",
+    "aws": null,
+    "source": {
+      "title": "About GKE cluster autoscaling",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler",
+      "evidence": "If Pods fail to be scheduled on any of the current nodes, the cluster autoscaler adds nodes, up to the maximum size of the node pool."
+    }
+  }
+]

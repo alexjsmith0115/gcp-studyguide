@@ -1,0 +1,626 @@
+[
+  {
+    "id": "dio-f001",
+    "note": "1.3-signed-urls",
+    "kind": "term",
+    "front": "Signed URL",
+    "back": "A Cloud Storage URL that gives anyone who has it time-limited access to one resource. The person needs no account. Use it when your app decides who can upload or download an object.",
+    "aws": "Amazon S3 presigned URLs",
+    "source": {
+      "title": "Signed URLs",
+      "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+      "evidence": "Anyone in possession of the signed URL can use it while it's active, regardless of whether they have a valid account."
+    }
+  },
+  {
+    "id": "dio-f002",
+    "note": "1.3-signed-urls",
+    "kind": "concept",
+    "front": "Does public access prevention on a bucket stop signed URLs from working?",
+    "back": "No. Signed URLs get access through scoped service account permissions, so public access prevention does not affect them.",
+    "aws": null,
+    "source": {
+      "title": "Public access prevention",
+      "url": "https://docs.cloud.google.com/storage/docs/public-access-prevention",
+      "evidence": "Public access prevention doesn't apply to the creation and sharing of Signed URLs or to private buckets, because access for these features is granted through scoped service account permissions."
+    }
+  },
+  {
+    "id": "dio-f003",
+    "note": "1.3-signed-urls",
+    "kind": "term",
+    "front": "Cloud CDN signed cookies",
+    "back": "Cookies that give time-limited access to content that Cloud CDN serves. Use them instead of signed URLs when you must sign tens or hundreds of URLs for each user, for example video segments.",
+    "aws": "Amazon CloudFront signed cookies",
+    "source": {
+      "title": "Content access control",
+      "url": "https://docs.cloud.google.com/cdn/docs/authenticate-content",
+      "evidence": "Signed cookies also let you access a resource for a limited time. They are helpful when you need to sign tens or hundreds of URLs for each user."
+    }
+  },
+  {
+    "id": "dio-f004",
+    "note": "1.3-signed-urls",
+    "kind": "concept",
+    "front": "What is the longest expiration time that a V4 signed URL allows?",
+    "back": "604,800 seconds (7 days). The `X-Goog-Expires` query string parameter sets the expiration, in seconds from `X-Goog-Date`.",
+    "aws": null,
+    "source": {
+      "title": "Signed URLs",
+      "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+      "evidence": "`X-Goog-Expires`: The length of time the signed URL remained valid, measured in seconds from the value in `X-Goog-Date`. In this example the Signed URL expires in 15 minutes. The longest expiration value is 604800 seconds (7 days)."
+    }
+  },
+  {
+    "id": "dio-f005",
+    "note": "1.3-signed-urls",
+    "kind": "term",
+    "front": "`signBlob`",
+    "back": "The IAM method that signs data as a service account. The gcloud CLI and most client libraries use it to create signed URLs, so you need no downloaded service account key.",
+    "aws": null,
+    "source": {
+      "title": "Signatures",
+      "url": "https://docs.cloud.google.com/storage/docs/authentication/signatures",
+      "evidence": "The RSA-SHA256 signing algorithm can be run using the IAM `signBlob` method. Tools such as the gcloud CLI and most Google Cloud client libraries let you create signed URLs using the `signBlob` method."
+    }
+  },
+  {
+    "id": "dio-f006",
+    "note": "1.3-signed-urls",
+    "kind": "concept",
+    "front": "Which role should a signing service account have so that signed upload URLs cannot overwrite objects?",
+    "back": "Storage Object Creator (`roles/storage.objectCreator`). An upload that overwrites an object also needs `storage.objects.delete`, for example through Storage Object User.",
+    "aws": null,
+    "source": {
+      "title": "V4 signing process with Cloud Storage tools",
+      "url": "https://docs.cloud.google.com/storage/docs/access-control/signing-urls-with-helpers",
+      "evidence": "Storage Object Creator (`roles/storage.objectCreator`): Use this role if you only want to create signed URLs for uploading objects and the uploaded object won't overwrite an existing object in the bucket."
+    }
+  },
+  {
+    "id": "dio-f007",
+    "note": "1.3-signed-urls",
+    "kind": "concept",
+    "front": "Which IAM role lets a caller sign URLs through `signBlob` as a service account?",
+    "back": "Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`). The project must also have the Service Account Credentials API enabled.",
+    "aws": null,
+    "source": {
+      "title": "V4 signing process with Cloud Storage tools",
+      "url": "https://docs.cloud.google.com/storage/docs/access-control/signing-urls-with-helpers",
+      "evidence": "Have sufficient permission to sign blobs with the service account. Ask your administrator to grant the Service Account Token Creator role (`roles/iam.serviceAccountTokenCreator`)."
+    }
+  },
+  {
+    "id": "dio-f008",
+    "note": "1.3-signed-urls",
+    "kind": "concept",
+    "front": "What is the maximum duration of a URL from `gcloud storage sign-url` with service account impersonation?",
+    "back": "12 hours, because the system-managed key that signs the URL may not stay valid longer. The 7-day maximum needs a private key file or an account activated with `gcloud auth activate-service-account`.",
+    "aws": null,
+    "source": {
+      "title": "gcloud storage sign-url",
+      "url": "https://docs.cloud.google.com/sdk/gcloud/reference/storage/sign-url",
+      "evidence": "The max duration allowed is 12 hours. This limitation exists because the system-managed key used to sign the URL may not remain valid after 12 hours."
+    }
+  },
+  {
+    "id": "dio-f009",
+    "note": "1.3-signed-urls",
+    "kind": "term",
+    "front": "Resumable upload session URI",
+    "back": "The URI that Cloud Storage returns when a resumable upload starts. The client sends the object data to it, and it acts as an authentication token. So the later upload requests need no signed URL.",
+    "aws": null,
+    "source": {
+      "title": "Signed URLs",
+      "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+      "evidence": "Generally, creating signed URLs for resumable uploads is unnecessary, because after the request to initiate the upload, subsequent `PUT` requests to upload the object data use a session URI, which acts as an authentication token."
+    }
+  },
+  {
+    "id": "dio-f010",
+    "note": "1.3-signed-urls",
+    "kind": "term",
+    "front": "Signed policy document",
+    "back": "A signed JSON document with the conditions that an HTML form upload must meet, for example the size and content type. Use it for browser form uploads, because HTML forms do not support signed URLs.",
+    "aws": null,
+    "source": {
+      "title": "Upload an object with HTML forms",
+      "url": "https://docs.cloud.google.com/storage/docs/xml-api/post-object-forms",
+      "evidence": "Signatures are used in HTML forms that have an associated policy document. HTML forms do not support signed URLs."
+    }
+  },
+  {
+    "id": "dio-f011",
+    "note": "1.3-signed-urls",
+    "kind": "concept",
+    "front": "What must a bucket have before a browser can upload to it with a signed URL?",
+    "back": "A CORS configuration. Signed URLs work only with XML API endpoints, and these endpoints allow CORS requests only from the bucket's CORS configuration.",
+    "aws": null,
+    "source": {
+      "title": "Cross-origin resource sharing (CORS)",
+      "url": "https://docs.cloud.google.com/storage/docs/cross-origin",
+      "evidence": "XML API endpoints only allow CORS requests based on the configuration on the bucket and return specific CORS header values in response to that configuration."
+    }
+  },
+  {
+    "id": "dio-f012",
+    "note": "1.3-bigquery-writes",
+    "kind": "concept",
+    "front": "Which BigQuery write path costs least for files that arrive in batches in Cloud Storage?",
+    "back": "A batch load job. BigQuery does not charge for batch loads that use the shared slot pool. You pay for the storage after the load.",
+    "aws": null,
+    "source": {
+      "title": "BigQuery pricing",
+      "url": "https://cloud.google.com/bigquery/pricing",
+      "evidence": "By default, you are not charged for batch loading data from Cloud Storage or from local files into BigQuery."
+    }
+  },
+  {
+    "id": "dio-f013",
+    "note": "1.3-bigquery-writes",
+    "kind": "term",
+    "front": "Storage Write API (gRPC)",
+    "back": "The BigQuery API for streaming and batch writes that Google recommends for new projects. It costs less than the Storage Write API (REST) and supports exactly-once delivery.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to the Storage Write API (gRPC)",
+      "url": "https://docs.cloud.google.com/bigquery/docs/write-api-grpc",
+      "evidence": "For new projects, we recommend using the Storage Write API (gRPC) instead of the Storage Write API (REST). The Storage Write API (gRPC) has lower pricing and more robust features, including exactly-once delivery semantics."
+    }
+  },
+  {
+    "id": "dio-f014",
+    "note": "1.3-bigquery-writes",
+    "kind": "term",
+    "front": "Storage Write API default stream",
+    "back": "A built-in stream that you do not create. It gives at-least-once delivery, and rows are available for query at once. Use it for continuous streaming that can accept duplicate rows.",
+    "aws": null,
+    "source": {
+      "title": "Stream data using the Storage Write API (gRPC)",
+      "url": "https://docs.cloud.google.com/bigquery/docs/write-api-streaming",
+      "evidence": "If your application can accept the possibility of duplicate records appearing in the destination table, then we recommend using the default stream for streaming scenarios."
+    }
+  },
+  {
+    "id": "dio-f015",
+    "note": "1.3-bigquery-writes",
+    "kind": "concept",
+    "front": "How do you get exactly-once delivery with the BigQuery Storage Write API?",
+    "back": "Create a stream of committed type, and give the next append offset in each `AppendRows` call. BigQuery writes the rows only if the offset matches, so a retry is safe.",
+    "aws": null,
+    "source": {
+      "title": "Stream data using the Storage Write API (gRPC)",
+      "url": "https://docs.cloud.google.com/bigquery/docs/write-api-streaming",
+      "evidence": "If you need exactly-once semantics, then create one or more streams in committed type and use stream offsets to guarantee exactly-once writes."
+    }
+  },
+  {
+    "id": "dio-f016",
+    "note": "1.3-bigquery-writes",
+    "kind": "term",
+    "front": "Storage Write API pending type",
+    "back": "A stream type that keeps rows in a pending state until you commit the stream. The commit is atomic. Use it for batch writes from code, as an alternative to load jobs.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to the Storage Write API (gRPC)",
+      "url": "https://docs.cloud.google.com/bigquery/docs/write-api-grpc",
+      "evidence": "When you commit a stream, all of the pending data becomes available for reading. The commit is an atomic operation. Use this type for batch workloads, as an alternative to BigQuery load jobs."
+    }
+  },
+  {
+    "id": "dio-f017",
+    "note": "1.3-bigquery-writes",
+    "kind": "term",
+    "front": "`tabledata.insertAll`",
+    "back": "The former name of the Storage Write API (REST), the legacy BigQuery streaming insert method. It is still supported, but for new projects Google recommends the Storage Write API (gRPC).",
+    "aws": null,
+    "source": {
+      "title": "Use the Storage Write API (REST)",
+      "url": "https://docs.cloud.google.com/bigquery/docs/write-api-rest",
+      "evidence": "This document describes how to stream data into BigQuery by using the BigQuery Storage Write API (REST), which was previously known as the legacy `tabledata.insertAll` method."
+    }
+  },
+  {
+    "id": "dio-f018",
+    "note": "1.3-bigquery-writes",
+    "kind": "concept",
+    "front": "How long does `insertId` de-duplication work for rows that the Storage Write API (REST) streams?",
+    "back": "For up to one minute, and only as a best effort. Do not rely on it to prevent duplicate rows.",
+    "aws": null,
+    "source": {
+      "title": "Use the Storage Write API (REST)",
+      "url": "https://docs.cloud.google.com/bigquery/docs/write-api-rest",
+      "evidence": "When you supply `insertId` for an inserted row, BigQuery uses this ID to support best effort de-duplication for up to one minute."
+    }
+  },
+  {
+    "id": "dio-f019",
+    "note": "1.3-bigquery-writes",
+    "kind": "term",
+    "front": "BigQuery subscription",
+    "back": "A Pub/Sub subscription type that writes each message to an existing BigQuery table as it arrives. You run no subscriber client. Use it when messages need no processing before storage.",
+    "aws": null,
+    "source": {
+      "title": "BigQuery subscriptions",
+      "url": "https://docs.cloud.google.com/pubsub/docs/bigquery",
+      "evidence": "A BigQuery subscription is a type of export subscription that writes messages to an existing BigQuery table as they are received. You don't need to configure a separate subscriber client."
+    }
+  },
+  {
+    "id": "dio-f020",
+    "note": "1.3-bigquery-writes",
+    "kind": "concept",
+    "front": "Which option writes Pub/Sub messages to BigQuery with exactly-once delivery?",
+    "back": "A Dataflow pipeline. The Dataflow Pub/Sub subscription to BigQuery template enforces exactly-once delivery by default. A BigQuery subscription gives only at-least-once delivery.",
+    "aws": null,
+    "source": {
+      "title": "BigQuery subscriptions",
+      "url": "https://docs.cloud.google.com/pubsub/docs/bigquery",
+      "evidence": "The Pub/Sub subscription to BigQuery template from Dataflow enforces exactly once delivery by default. This is typically achieved through deduplication mechanisms within the Dataflow pipeline. However, the BigQuery subscription only supports at least once delivery."
+    }
+  },
+  {
+    "id": "dio-f021",
+    "note": "1.3-bigquery-writes",
+    "kind": "concept",
+    "front": "What should replace frequent single-row DML `INSERT` statements on a BigQuery table?",
+    "back": "Streaming with the Storage Write API (gRPC). After the first 1,500 `INSERT` statements in 24 hours, BigQuery runs at most 10 at a time on a table.",
+    "aws": null,
+    "source": {
+      "title": "Transform data with DML",
+      "url": "https://docs.cloud.google.com/bigquery/docs/data-manipulation-language",
+      "evidence": "If you must run DML `INSERT` statements more frequently, consider streaming data to your table using the Storage Write API (gRPC)."
+    }
+  },
+  {
+    "id": "dio-f022",
+    "note": "1.3-bigquery-writes",
+    "kind": "concept",
+    "front": "When should you cluster a BigQuery table instead of partitioning it?",
+    "back": "When queries often filter or aggregate on several columns, or on columns with many distinct values. Also when each partition would hold less than about 10 GB.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to partitioned tables",
+      "url": "https://docs.cloud.google.com/bigquery/docs/partitioned-tables",
+      "evidence": "Your queries commonly use filters or aggregation against multiple columns."
+    }
+  },
+  {
+    "id": "dio-f023",
+    "note": "1.3-bigquery-writes",
+    "kind": "term",
+    "front": "BigQuery ML",
+    "back": "A BigQuery feature that creates and runs ML models with GoogleSQL. The data does not move out of the warehouse. Use it to train a model on data that is already in BigQuery.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to ML in BigQuery",
+      "url": "https://docs.cloud.google.com/bigquery/docs/bqml-introduction",
+      "evidence": "BigQuery ML increases the speed of model development and innovation by removing the need to move data from the data warehouse."
+    }
+  },
+  {
+    "id": "dio-f024",
+    "note": "4.1-datastore-connections",
+    "kind": "concept",
+    "front": "Which Cloud SQL IP address type does Google recommend for improved security?",
+    "back": "A private IP address, unless you have a specific need for an instance that is reachable from the internet.",
+    "aws": null,
+    "source": {
+      "title": "Choose how to connect to Cloud SQL",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/connection-options",
+      "evidence": "For improved security, we recommend that you configure your instance with a private IP address type unless you have specific requirements for an internet-accessible Cloud SQL instance"
+    }
+  },
+  {
+    "id": "dio-f025",
+    "note": "4.1-datastore-connections",
+    "kind": "term",
+    "front": "Cloud SQL Language Connector",
+    "back": "A library for Java, Python, Go, or Node.js that encrypts Cloud SQL connections and authorizes them with IAM. You manage no SSL certificates or authorized networks. In Java, Python, and Go, use it instead of the Cloud SQL Auth Proxy.",
+    "aws": null,
+    "source": {
+      "title": "About the Cloud SQL Auth Proxy",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/sql-proxy",
+      "evidence": "If you're using the Java, Python, or Go languages, then connect with the corresponding connector instead of with the Cloud SQL Auth proxy."
+    }
+  },
+  {
+    "id": "dio-f026",
+    "note": "4.1-datastore-connections",
+    "kind": "term",
+    "front": "Cloud SQL Auth Proxy",
+    "back": "A local process or sidecar container that encrypts Cloud SQL connections with TLS 1.3 and authorizes them with IAM. Use it for languages without a Language Connector, for tools such as `psql`, and on GKE.",
+    "aws": null,
+    "source": {
+      "title": "About the Cloud SQL Auth Proxy",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/sql-proxy",
+      "evidence": "The Cloud SQL Auth Proxy automatically encrypts traffic to and from the database using TLS 1.3 with the cipher selection determined by Go's rules."
+    }
+  },
+  {
+    "id": "dio-f027",
+    "note": "4.1-datastore-connections",
+    "kind": "concept",
+    "front": "What must already exist before a Cloud SQL connector can reach a private IP instance?",
+    "back": "A network path, for example VPC access from the client. Connectors add encryption and IAM authorization, but they cannot create a network path.",
+    "aws": null,
+    "source": {
+      "title": "Connect using Cloud SQL Language Connectors",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-connectors",
+      "evidence": "The Cloud SQL Connectors are libraries that provide encryption and Identity and Access Management (IAM)-based authorization when connecting to a Cloud SQL instance. They can't provide a network path to a Cloud SQL instance if one is not already present."
+    }
+  },
+  {
+    "id": "dio-f028",
+    "note": "4.1-datastore-connections",
+    "kind": "term",
+    "front": "`--add-cloudsql-instances`",
+    "back": "A Cloud Run flag that connects a service to a Cloud SQL instance through a built-in Auth Proxy. The service connects to the Unix socket `/cloudsql/INSTANCE_CONNECTION_NAME`. Use it for an instance with a public IP address.",
+    "aws": null,
+    "source": {
+      "title": "Connect from Cloud Run",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-run",
+      "evidence": "Once correctly configured, you can connect your service to your Cloud SQL instance's Unix domain socket accessed on the environment's filesystem at the following path: `/cloudsql/INSTANCE_CONNECTION_NAME`."
+    }
+  },
+  {
+    "id": "dio-f029",
+    "note": "4.1-datastore-connections",
+    "kind": "term",
+    "front": "Cloud SQL Client role",
+    "back": "The IAM role that lets a service account connect to Cloud SQL instances. Grant it to the service account of a Cloud Run service that uses Cloud SQL.",
+    "aws": null,
+    "source": {
+      "title": "Connect from Cloud Run",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-run",
+      "evidence": "Configure the service account for your Cloud Run service. To connect to Cloud SQL, make sure that the service account has the `Cloud SQL Client` IAM role."
+    }
+  },
+  {
+    "id": "dio-f030",
+    "note": "4.1-datastore-connections",
+    "kind": "concept",
+    "front": "Which two settings limit the total Cloud SQL connections from a Cloud Run service?",
+    "back": "The connection pool size in each instance and the Cloud Run maximum instances. The total is the connections for each instance multiplied by the number of instances. Keep it below `max_connections`.",
+    "aws": null,
+    "source": {
+      "title": "Set maximum instances for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/max-instances",
+      "evidence": "You can use this setting as a way to control your costs or to limit the number of connections to a backing service, such as to a database."
+    }
+  },
+  {
+    "id": "dio-f031",
+    "note": "4.1-datastore-connections",
+    "kind": "term",
+    "front": "Managed Connection Pooling",
+    "back": "A server-side connection pool for Cloud SQL for PostgreSQL. It helps most with many short-lived connections or connection surges, for example from Cloud Run. The instance must use Cloud SQL Enterprise Plus edition.",
+    "aws": "Amazon RDS Proxy",
+    "source": {
+      "title": "Managed Connection Pooling overview",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/managed-connection-pooling",
+      "evidence": "While you can use Managed Connection Pooling for any transactional workloads, it provides the most throughput and latency benefit to applications that contain short-lived connections, or applications that result in a connection surge."
+    }
+  },
+  {
+    "id": "dio-f032",
+    "note": "4.1-datastore-connections",
+    "kind": "term",
+    "front": "Automatic IAM database authentication",
+    "back": "A Cloud SQL login mode in which a connector requests and refreshes the OAuth 2.0 access tokens for the app. Use it for connection pools, because each token is valid for only one hour.",
+    "aws": null,
+    "source": {
+      "title": "IAM authentication",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/iam-authentication",
+      "evidence": "Cloud SQL connectors are able to request and refresh these tokens, ensuring that long-lived processes or applications that rely on connection pooling can have stable connections."
+    }
+  },
+  {
+    "id": "dio-f033",
+    "note": "4.1-datastore-connections",
+    "kind": "concept",
+    "front": "Does the Cloud SQL Auth Proxy pool database connections?",
+    "back": "No. The Auth Proxy does not pool or limit connections, so the app must use its own connection pool.",
+    "aws": null,
+    "source": {
+      "title": "About the Cloud SQL Auth Proxy",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/sql-proxy",
+      "evidence": "The Cloud SQL Auth Proxy doesn't provide connection pooling, but can be paired with other connection pooling to increase efficiency."
+    }
+  },
+  {
+    "id": "dio-f034",
+    "note": "4.1-datastore-connections",
+    "kind": "concept",
+    "front": "Where should a Cloud Run service create its Firestore and Cloud Storage client objects?",
+    "back": "Once, in global variables, and then reuse them for later requests. Each new client must authenticate again, which can take several seconds.",
+    "aws": null,
+    "source": {
+      "title": "Client libraries best practices",
+      "url": "https://docs.cloud.google.com/apis/docs/client-libraries-best-practices",
+      "evidence": "When making requests with the same library, you should reuse the same client object for many requests when possible, instead of creating a new one for every request."
+    }
+  },
+  {
+    "id": "dio-f035",
+    "note": "4.1-datastore-connections",
+    "kind": "term",
+    "front": "Firestore server client libraries",
+    "back": "Client libraries for server code, with full access to the Firestore database. Firestore Security Rules do not apply to them, so control their access with IAM.",
+    "aws": null,
+    "source": {
+      "title": "Firestore client libraries",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/reference/libraries",
+      "evidence": "Server client libraries create a privileged Firestore environment with full access to your database. In this environment, requests are not evaluated against your Firestore security rules."
+    }
+  },
+  {
+    "id": "dio-f036",
+    "note": "4.1-datastore-connections",
+    "kind": "concept",
+    "front": "Why should you not add app-level retries around each Cloud Storage client library call?",
+    "back": "The library already retries transient errors. Layered retries multiply the attempts: three app retries of three library retries give nine attempts. Use and configure the built-in retries.",
+    "aws": null,
+    "source": {
+      "title": "Retry strategy",
+      "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+      "evidence": "For example, if your application retries an operation three times, and the underlying client library also retries it three times for each of your application's attempts, you could end up with nine retry attempts."
+    }
+  },
+  {
+    "id": "dio-f037",
+    "note": "4.1-reading-writing-data",
+    "kind": "concept",
+    "front": "Which Cloud Storage upload type is a good choice for most applications?",
+    "back": "A resumable upload. It is more reliable for large files, and it also works for small files at the cost of one extra HTTP request.",
+    "aws": null,
+    "source": {
+      "title": "Object uploads",
+      "url": "https://docs.cloud.google.com/storage/docs/uploads",
+      "evidence": "Resumable uploads are a good choice for most applications, since they also work for small files at the cost of one additional HTTP request per upload."
+    }
+  },
+  {
+    "id": "dio-f038",
+    "note": "4.1-reading-writing-data",
+    "kind": "term",
+    "front": "Generation precondition (`ifGenerationMatch`)",
+    "back": "A Cloud Storage request condition on the object generation. With the value `0`, the request proceeds only if no live object has that name. Use it to stop race conditions and duplicate writes on retry.",
+    "aws": "Amazon S3 conditional writes",
+    "source": {
+      "title": "Request preconditions",
+      "url": "https://docs.cloud.google.com/storage/docs/request-preconditions",
+      "evidence": "When a generation-match precondition with a value of `0` is included in a request, the request only proceeds if no object with the specified name exists in the bucket"
+    }
+  },
+  {
+    "id": "dio-f039",
+    "note": "4.1-reading-writing-data",
+    "kind": "concept",
+    "front": "In Firestore Standard edition, what does a query need to combine equality and range filters on different fields?",
+    "back": "A manual index (formerly composite index) on those fields. Firestore does not create indexes for combinations of fields automatically.",
+    "aws": null,
+    "source": {
+      "title": "Query and filter data",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/query-data/queries",
+      "evidence": "However, you must create a composite index to combine equality operators with the inequality operators, `<`, `<=`, `>`, and `!=`."
+    }
+  },
+  {
+    "id": "dio-f040",
+    "note": "4.1-reading-writing-data",
+    "kind": "concept",
+    "front": "Why should you page through Firestore query results with cursors, not offsets?",
+    "back": "Firestore still reads the documents that an offset skips. These reads add latency, and you pay for them.",
+    "aws": null,
+    "source": {
+      "title": "Firestore best practices",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/best-practices",
+      "evidence": "The skipped documents affect the latency of the query, and your application is billed for the read operations required to retrieve them."
+    }
+  },
+  {
+    "id": "dio-f041",
+    "note": "4.1-reading-writing-data",
+    "kind": "term",
+    "front": "Firestore transaction",
+    "back": "An atomic set of reads followed by writes on one or more documents. Use it when a write depends on a current value. On a concurrent edit, Firestore runs the full transaction again, so the function must not change app state.",
+    "aws": "Amazon DynamoDB transactions",
+    "source": {
+      "title": "Transactions and batched writes",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/manage-data/transactions",
+      "evidence": "A transaction consists of any number of `get()` operations followed by any number of write operations such as `set()`, `update()`, or `delete()`. In the case of a concurrent edit, Firestore runs the entire transaction again."
+    }
+  },
+  {
+    "id": "dio-f042",
+    "note": "4.1-reading-writing-data",
+    "kind": "concept",
+    "front": "When should you use a Firestore batched write instead of a transaction?",
+    "back": "When the operation needs no reads, for example writes to a known set of documents. A batched write is also atomic, and it can write to several documents.",
+    "aws": null,
+    "source": {
+      "title": "Transactions and batched writes",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/manage-data/transactions",
+      "evidence": "If you do not need to read any documents in your operation set, you can execute multiple write operations as a single batch that contains any combination of `set()`, `update()`, or `delete()` operations."
+    }
+  },
+  {
+    "id": "dio-f043",
+    "note": "4.1-reading-writing-data",
+    "kind": "term",
+    "front": "Spanner read-only transaction",
+    "back": "A Spanner transaction for reads that must see one consistent point in time. It takes no locks and can run on any replica. Use it for reads, and use a locking read-write transaction only when you must write.",
+    "aws": null,
+    "source": {
+      "title": "Transactions overview",
+      "url": "https://docs.cloud.google.com/spanner/docs/transactions",
+      "evidence": "Because read-only transactions can execute on any replica, use them for read operations unless a read-write transaction is explicitly required. Only use locking read-write transactions when required."
+    }
+  },
+  {
+    "id": "dio-f044",
+    "note": "4.1-reading-writing-data",
+    "kind": "term",
+    "front": "Partitioned DML",
+    "back": "A Spanner mode that runs one large `UPDATE` or `DELETE` statement over partitions, for example to delete old rows. It has no commit or rollback, and the statement must be idempotent.",
+    "aws": null,
+    "source": {
+      "title": "Partitioned DML",
+      "url": "https://docs.cloud.google.com/spanner/docs/dml-partitioned",
+      "evidence": "Partitioned DML does not support commit or rollback. Spanner executes and applies the DML statement immediately."
+    }
+  },
+  {
+    "id": "dio-f045",
+    "note": "4.1-reading-writing-data",
+    "kind": "concept",
+    "front": "Why should you not mix DML statements and mutations in one Spanner transaction?",
+    "back": "Spanner runs the DML statements before the mutations, and mutations are not visible until the commit. So a DML statement cannot see an earlier mutation in the same transaction.",
+    "aws": null,
+    "source": {
+      "title": "Compare DML and mutations",
+      "url": "https://docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+      "evidence": "If a transaction contains both DML statements and mutations in the commit request, Spanner executes the DML statements before the mutations."
+    }
+  },
+  {
+    "id": "dio-f046",
+    "note": "4.1-reading-writing-data",
+    "kind": "concept",
+    "front": "What happens when a Bigtable read has a filter but no row key or row range?",
+    "back": "Bigtable applies the filter to all rows in a full table scan. Restrict each read to row keys or a row range.",
+    "aws": null,
+    "source": {
+      "title": "Use filters",
+      "url": "https://docs.cloud.google.com/bigtable/docs/using-filters",
+      "evidence": "If you don't specify a row key or range of rows for a filter, the filter is applied to all rows in a full table scan."
+    }
+  },
+  {
+    "id": "dio-f047",
+    "note": "4.1-reading-writing-data",
+    "kind": "term",
+    "front": "`MutateRows`",
+    "back": "The Bigtable batch write request. Each row entry is atomic, but the request as a whole is not. Use it for many rows with similar row keys.",
+    "aws": null,
+    "source": {
+      "title": "Writes",
+      "url": "https://docs.cloud.google.com/bigtable/docs/writes",
+      "evidence": "Each entry in a `MutateRows` request is atomic, but the request as a whole is not."
+    }
+  },
+  {
+    "id": "dio-f048",
+    "note": "4.1-reading-writing-data",
+    "kind": "term",
+    "front": "BigQuery Storage Read API",
+    "back": "An RPC API that reads BigQuery table data in a binary format over parallel streams, with column selection and server-side row filters. Use it for large reads, instead of the paged `tabledata.list` method.",
+    "aws": null,
+    "source": {
+      "title": "Use the BigQuery Storage Read API to read table data",
+      "url": "https://docs.cloud.google.com/bigquery/docs/reference/storage",
+      "evidence": "When you use the Storage Read API, structured data is sent over the wire in a binary serialization format. This allows for additional parallelism among multiple consumers for a set of results."
+    }
+  }
+]

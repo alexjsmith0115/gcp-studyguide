@@ -1,0 +1,2064 @@
+[
+  {
+    "id": "api-001",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "aip",
+      "update-method",
+      "patch"
+    ],
+    "stem": "Your team designs a REST API for a product catalog on Cloud Run. The team follows Google's API design guidance (the AIPs). Mobile clients must change one or two fields of a `Product` without sending the full resource. The team plans to add new fields to `Product` in later releases of `v1`. How should the API expose updates?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`PUT /v1/{product.name=products/*}`, with the full `Product` resource in the request body."
+      },
+      {
+        "id": "B",
+        "text": "`POST /v1/{product.name=products/*}:update`, as a custom method that takes the full resource."
+      },
+      {
+        "id": "C",
+        "text": "`PATCH /v1/{product.name=products/*}`, with an `update_mask` that lists the fields to change."
+      },
+      {
+        "id": "D",
+        "text": "`GET /v1/{product.name=products/*}:setPrice`, with the new value in a query parameter."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Google APIs use the standard Update method, which maps to `PATCH`. The `update_mask` lists the fields to change, so clients send only those fields. Google does not use `PUT`, because of the fields that you **add in later releases of `v1`**. An old client that sends `PUT` with the full resource clears a field that it does not know.",
+    "whyWrong": {
+      "A": "`PUT` replaces the full resource. An old client does not know the new fields, so its request clears them. Google APIs generally do not support `PUT`.",
+      "B": "AIP-136 says to prefer standard methods, and a custom method name should not contain a standard method verb, such as Update. A full resource in the body also does not meet the requirement.",
+      "D": "A method that changes data must use `POST`. `GET` is only for methods that read data."
+    },
+    "sources": [
+      {
+        "title": "AIP-134: Standard methods: Update",
+        "url": "https://google.aip.dev/134",
+        "evidence": "Google APIs generally use the `PATCH` HTTP verb only, and do not support `PUT` requests."
+      },
+      {
+        "title": "AIP-134: Standard methods: Update",
+        "url": "https://google.aip.dev/134",
+        "evidence": "It is often necessary to add a new field to an existing resource, but this becomes a breaking change when using `PUT`."
+      },
+      {
+        "title": "AIP-136: Custom methods",
+        "url": "https://google.aip.dev/136",
+        "evidence": "`POST` must be used if the method has side effects or mutates resources or data."
+      }
+    ]
+  },
+  {
+    "id": "api-002",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "aip",
+      "idempotency",
+      "request-id"
+    ],
+    "stem": "A payments API on Cloud Run has a `CreatePayment` method. On slow mobile networks, the app sometimes gets no response and retries the call. The server then creates a second payment. Two real payments with the same amount can occur within seconds. Following Google's API design guidance, how should you change the API?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a `request_id` field that the client sets to a new UUID and reuses on each retry. The server returns the first response for a duplicate ID."
+      },
+      {
+        "id": "B",
+        "text": "Tell the app to retry with truncated exponential backoff and jitter, so that the retries reach the server more slowly."
+      },
+      {
+        "id": "C",
+        "text": "Return `ALREADY_EXISTS` when the server gets a second payment with the same amount and account within one minute."
+      },
+      {
+        "id": "D",
+        "text": "Change `CreatePayment` to return a long-running operation, and tell the app to poll the operation for the result."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A retry is safe only when the server can detect a duplicate request. AIP-155 adds a client-provided `request_id`. The client keeps the same ID on each retry, and the server processes the request once and returns the earlier response. A rule based on the amount does not work, because **two real payments with the same amount can occur**.",
+    "whyWrong": {
+      "B": "Backoff changes when the retry arrives. It does not stop the server from creating a second payment.",
+      "C": "This rule rejects real payments that have the same amount. The server needs an ID from the client, not a guess based on the content.",
+      "D": "A long-running operation is for work that takes a long time. If the response is lost, the retried call still starts a second payment."
+    },
+    "sources": [
+      {
+        "title": "AIP-155: Request identification",
+        "url": "https://google.aip.dev/155",
+        "evidence": "In the event of a network failure, the client can retry the request, and the server can detect duplication and ensure that the request is only processed once."
+      },
+      {
+        "title": "AIP-155: Request identification",
+        "url": "https://google.aip.dev/155",
+        "evidence": "If a duplicate request is detected, the server should return the response for the previously successful request, because the client most likely did not receive the previous response."
+      }
+    ]
+  },
+  {
+    "id": "api-003",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "aip",
+      "errors",
+      "permission-denied"
+    ],
+    "stem": "Your team builds a REST API for medical records on Cloud Run and follows Google's API design guidance (the AIPs). A security review finds a problem. A caller with no access gets `404 NOT_FOUND` for an ID that does not exist, but `403 PERMISSION_DENIED` for a record that exists. So the caller can learn which record IDs exist. How should the API respond?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Return `NOT_FOUND` (404) to every caller without permission, whether or not the record exists."
+      },
+      {
+        "id": "B",
+        "text": "Check permission first. Return `PERMISSION_DENIED` (403) to a caller without permission, whether or not the record exists."
+      },
+      {
+        "id": "C",
+        "text": "Return `200 OK` with an empty body for a missing record and for a record that the caller cannot read."
+      },
+      {
+        "id": "D",
+        "text": "Return `INVALID_ARGUMENT` (400) for an unknown ID, so that the code differs from the permission error."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "AIP-193 says that the service checks permission before it checks that the resource exists. A caller without permission gets `PERMISSION_DENIED` for every ID, so the response does not show which records exist. A caller with permission gets `NOT_FOUND` for a missing record. The requirement to **follow Google's API design guidance** decides between the 403 option and the 404 option.",
+    "whyWrong": {
+      "A": "This also hides which records exist, but it is not the Google rule. AIP-193 returns `PERMISSION_DENIED` (403) to a caller without permission.",
+      "C": "A success code for a failed read breaks error handling in clients. An error returns a `google.rpc.Status` with a canonical error code.",
+      "D": "A different code for unknown IDs still tells the caller which IDs exist. A missing record is `NOT_FOUND` for a caller with permission."
+    },
+    "sources": [
+      {
+        "title": "AIP-193: Errors",
+        "url": "https://google.aip.dev/193",
+        "evidence": "If the user does not have permission to access the resource or parent, regardless of whether or not it exists, the service must error with `PERMISSION_DENIED` (HTTP 403)."
+      },
+      {
+        "title": "AIP-193: Errors",
+        "url": "https://google.aip.dev/193",
+        "evidence": "Permission must be checked prior to checking if the resource or parent exists."
+      }
+    ]
+  },
+  {
+    "id": "api-004",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "grpc",
+      "transcoding",
+      "api-gateway"
+    ],
+    "stem": "A team runs an order service on Cloud Run as a gRPC server. Internal microservices call it with gRPC. External partners must call the same methods with JSON over HTTP. The team wants one API definition and no second service to maintain. The request and response bodies are small. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Write a REST service that calls the gRPC service, and deploy it on Cloud Run next to the gRPC service."
+      },
+      {
+        "id": "B",
+        "text": "Put a passthrough Network Load Balancer in front of the service, and let partners send JSON to its address."
+      },
+      {
+        "id": "C",
+        "text": "Map each RPC to an HTTP method with `google.api.http`, and let API Gateway transcode JSON to gRPC."
+      },
+      {
+        "id": "D",
+        "text": "Change each RPC to bidirectional streaming, so that one stream can carry both gRPC and JSON messages."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "HTTP/JSON transcoding lets clients call one protocol buffer API with gRPC or with JSON over HTTP. The `google.api.http` annotation maps each RPC to an HTTP method and path. API Gateway uses these mappings to translate JSON requests into gRPC calls for a gRPC service on Cloud Run. This keeps **one API definition** and adds **no second service**. The bodies are small, so the one-megabyte size that can make transcoding fail is not a problem.",
+    "whyWrong": {
+      "A": "A second REST service is a second definition and a second service to deploy and maintain. The stem rules this out.",
+      "B": "A passthrough Network Load Balancer passes TCP connections to the backends. It does not translate JSON to gRPC.",
+      "D": "HTTP/1.1 cannot carry bidirectional streaming, so these RPCs cannot have an HTTP mapping. AIP-127 says to offer a method that does not need bidirectional streaming."
+    },
+    "sources": [
+      {
+        "title": "AIP-127: HTTP and gRPC Transcoding",
+        "url": "https://google.aip.dev/127",
+        "evidence": "APIs must provide HTTP definitions for each RPC that they define, except for bi-directional streaming RPCs, which can not be natively supported using HTTP/1.1."
+      },
+      {
+        "title": "gRPC overview (API Gateway)",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/grpc-overview",
+        "evidence": "API Gateway provides protocol translation for your gRPC services on Cloud Run allowing clients to use HTTP/JSON to communicate with a gRPC service through the API Gateway."
+      }
+    ]
+  },
+  {
+    "id": "api-005",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "grpc",
+      "cloud-run",
+      "http2"
+    ],
+    "stem": "A team deploys a gRPC server to Cloud Run with the command below. The server listens on the port in the `PORT` environment variable. Unary RPCs work, but a new server-streaming RPC fails for every client.\n\n```bash\ngcloud run deploy orders-grpc --image IMAGE_URL --region us-central1\n```\n\nHow should you fix the streaming RPC?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Serve TLS in the container with a certificate, and redeploy the service with `--use-http2`."
+      },
+      {
+        "id": "B",
+        "text": "Change the clients to connect to the service URL on port 8080 instead of port 443."
+      },
+      {
+        "id": "C",
+        "text": "Raise the maximum concurrent requests per instance, because each stream holds a request slot."
+      },
+      {
+        "id": "D",
+        "text": "Make the server accept HTTP/2 cleartext (`h2c`), and redeploy the service with `--use-http2`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google recommends end-to-end HTTP/2 for gRPC on Cloud Run. Some simple gRPC features work without it, but streaming needs HTTP/2. Redeploy with `--use-http2`. The Google frontend ends TLS and sends `h2c` traffic to the container, so the server must accept **HTTP/2 cleartext**.",
+    "whyWrong": {
+      "A": "The container does not end TLS. The Google frontend ends TLS and sends `h2c` to the container, so a server that accepts only TLS fails.",
+      "B": "Clients connect to the service URL on port 443. The `PORT` value is for the server inside the container.",
+      "C": "Each stream counts once against the concurrency setting, but concurrency does not make the RPC fail for every client. The missing end-to-end HTTP/2 does."
+    },
+    "sources": [
+      {
+        "title": "Using gRPC",
+        "url": "https://docs.cloud.google.com/run/docs/triggering/grpc",
+        "evidence": "Google recommends configuring your service to use HTTP/2 if you use gRPC with Cloud Run. Although some simple gRPC features work without using HTTP/2, many gRPC features, such as streaming and metadata, require HTTP/2."
+      },
+      {
+        "title": "Use HTTP/2 for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/http2",
+        "evidence": "Your Cloud Run service must handle requests in HTTP/2 cleartext (`h2c`) format. Google's frontend-serving infrastructure terminates TLS and then forwards the `h2c` traffic to Cloud Run and to your container through an encrypted channel."
+      }
+    ]
+  },
+  {
+    "id": "api-006",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "grpc",
+      "gke",
+      "envoy",
+      "load-balancing"
+    ],
+    "stem": "A gRPC API runs on GKE behind a Service of `type: LoadBalancer`, which creates a passthrough Network Load Balancer. Mobile clients outside the company keep each HTTP/2 connection open for a long time. After a scale-out, a few Pods still handle most RPCs, and the new Pods stay idle. You must spread individual RPCs across the Pods. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy Envoy behind the passthrough Network Load Balancer, and let Envoy route each RPC to the Pods of a headless Service."
+      },
+      {
+        "id": "B",
+        "text": "Add a Horizontal Pod Autoscaler that scales on CPU utilization, so that more Pods share the load of the RPCs."
+      },
+      {
+        "id": "C",
+        "text": "Set `sessionAffinity: ClientIP` on the Service, so that each client keeps the same Pod for all of its calls."
+      },
+      {
+        "id": "D",
+        "text": "Add the `cloud.google.com/app-protocols` annotation with `HTTP2` to the Service, and keep the passthrough load balancer."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A passthrough Network Load Balancer passes TCP connections to the backends. gRPC sends many RPCs on one long-lived HTTP/2 connection, so the new Pods get no RPCs from the existing connections. Envoy is a layer 7 proxy. It ends TLS and load-balances each RPC to the Pods, not each TCP connection. This meets the requirement to **spread individual RPCs**.",
+    "whyWrong": {
+      "B": "More Pods do not help. Each long-lived connection stays on the Pod that it first reached, so the new Pods stay idle.",
+      "C": "Client IP affinity keeps each client on one Pod. This makes the load less even, not more even.",
+      "D": "This annotation sets the protocol that the load balancer of a GKE Ingress uses toward the Pods. A passthrough Network Load Balancer does not read HTTP/2 or RPCs."
+    },
+    "sources": [
+      {
+        "title": "Using Envoy Proxy to load-balance gRPC services on GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/exposing-grpc-services-on-gke-using-envoy-proxy",
+        "evidence": "This means traffic is load-balanced to the pods per RPC request rather than per TCP connection from the client."
+      },
+      {
+        "title": "Using Envoy Proxy to load-balance gRPC services on GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/exposing-grpc-services-on-gke-using-envoy-proxy",
+        "evidence": "This service provides a single public IP address and passes TCP connections directly to the configured backends."
+      },
+      {
+        "title": "Secure traffic for GKE Ingress",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/secure-traffic-management",
+        "evidence": "To enable HTTP/2, you must use the `cloud.google.com/app-protocols` annotation on the Kubernetes Service manifest."
+      }
+    ]
+  },
+  {
+    "id": "api-007",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "apigee",
+      "api-gateway",
+      "api-management"
+    ],
+    "stem": "A retailer wants to offer its inventory and order APIs to hundreds of external partners. Partners must find the APIs in a developer portal, register apps, and get keys. The retailer wants Free and Premium plans with different request limits, and reports on the top developers. Which product should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "API Gateway, with an API key requirement and a per-minute quota in the API config."
+      },
+      {
+        "id": "B",
+        "text": "Cloud Endpoints, with an ESPv2 proxy that you deploy in front of each backend."
+      },
+      {
+        "id": "C",
+        "text": "A global external Application Load Balancer, with Google Cloud Armor rate-limiting rules."
+      },
+      {
+        "id": "D",
+        "text": "Apigee, with an API product for each plan and a developer portal for the partners."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Partners, a **developer portal**, app registration, and **plans** with different limits point to Apigee. Apigee bundles operations in API products, and it gives each registered app a key for its products. It also has developer portals and monetization. Apigee API Analytics shows data such as the top developers. API Gateway fits consumers that need no developer portal.",
+    "whyWrong": {
+      "A": "API Gateway fits serverless backends whose consumers need no developer portal. It has no API products or portal for partner sign-up.",
+      "B": "Cloud Endpoints fits when you run the gateway on your own runtime. You manage the proxies, and it has no API products or plans.",
+      "C": "A load balancer with Cloud Armor can limit traffic, but it has no developer portal, app registration, or keys for partners."
+    },
+    "sources": [
+      {
+        "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+        "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+        "evidence": "In these use cases, Apigee's multiple developer portal offerings, API productization and monetization capabilities streamline this process significantly."
+      },
+      {
+        "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+        "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+        "evidence": "API Gateway is optimal for cloud-native use cases where the target backends are generally limited to services deployed on Google Cloud, and where the developer audiences consuming the APIs don't require a developer portal."
+      },
+      {
+        "title": "Introduction to API products",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/publish/what-api-product",
+        "evidence": "In Apigee, API keys are provisioned, not for APIs themselves, but for API products."
+      }
+    ]
+  },
+  {
+    "id": "api-008",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "apigee",
+      "rate-limiting",
+      "spikearrest",
+      "quota"
+    ],
+    "stem": "A company exposes APIs to partners through Apigee. Each partner's contract allows 100,000 calls per month, and the count must be accurate because it affects billing. The backend also fails when the total traffic from all partners bursts above a few hundred requests per second. Which two configurations should you add to the ProxyEndpoint request PreFlow? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "A SpikeArrest policy at the start of the flow, with a per-second rate that the backend can handle."
+      },
+      {
+        "id": "B",
+        "text": "A SpikeArrest policy for each partner app, with a rate that matches the monthly contract limit."
+      },
+      {
+        "id": "C",
+        "text": "A Quota policy before the VerifyAPIKey policy, so that calls are counted before authentication."
+      },
+      {
+        "id": "D",
+        "text": "A VerifyAPIKey policy, then a Quota policy that reads each app's monthly limit from the API product."
+      },
+      {
+        "id": "E",
+        "text": "A Quota policy with a per-second limit for all partners together, to absorb sudden traffic bursts."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "The two needs map to two policies. SpikeArrest protects the backend from bursts of traffic from all consumers, so it goes at the start of the PreFlow. Quota counts the calls of each app or developer over long periods, such as months. It is the policy for **accurate counts** and contracts. Quota comes after VerifyAPIKey (or OAuthV2 VerifyAccessToken), which identifies the API product and its limits.",
+    "whyWrong": {
+      "B": "SpikeArrest keeps its counts in a best-effort cache, and its rate is per second or per minute. Do not use it for contract limits that need accurate counts.",
+      "C": "The Quota policy needs VerifyAPIKey or VerifyAccessToken first. Without them, it does not know which API product's limits apply.",
+      "E": "Quota is for limits per app or developer over longer periods. Google says not to use it to protect the backend against traffic spikes."
+    },
+    "sources": [
+      {
+        "title": "SpikeArrest policy",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/policies/spike-arrest-policy",
+        "evidence": "Use Quota to enforce business contracts or SLAs with developers and partners, rather than for operational traffic management. Use SpikeArrest to protect against sudden spikes in API traffic."
+      },
+      {
+        "title": "Comparing rate-limiting policies",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/develop/comparing-quota-and-spike-arrest-policies",
+        "evidence": "If you use both SpikeArrest and Quota policies in the same proxy, SpikeArrest should always be attached before the Quota policy in the ProxyEndpoint Request PreFlow."
+      },
+      {
+        "title": "Quota policy",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/policies/quota-policy",
+        "evidence": "For all API proxies in the API product, add a VerifyAPIKey policy or an OAuthv2 policy with a VerifyAccessToken operation in the request flow before the Quota policy."
+      }
+    ]
+  },
+  {
+    "id": "api-009",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "api-gateway",
+      "api-keys",
+      "authentication"
+    ],
+    "stem": "Your company exposes a Cloud Run API through API Gateway. The API config requires an API key in the `key` query parameter on every method. A partner creates an API key in its own Google Cloud project and calls the gateway, but the gateway rejects every request. The usage must count against the partner's project. What should the partner do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable your API's managed service in the partner's project with `gcloud services enable MANAGED_SERVICE_NAME`."
+      },
+      {
+        "id": "B",
+        "text": "Ask your team to grant the partner's API key the Cloud Run Invoker role on the backend service."
+      },
+      {
+        "id": "C",
+        "text": "Ask your team for an API key from your project, and send that key with each request."
+      },
+      {
+        "id": "D",
+        "text": "Send the API key as a bearer token in the `Authorization` header instead of the `key` parameter."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "API Gateway uses the API key to find the client's project. It rejects a key unless the key comes from your project or from a project that enabled your API. Each API on API Gateway has a managed service, and the partner enables it in its own project. The key then identifies the **partner's project** for quota, billing, and monitoring.",
+    "whyWrong": {
+      "B": "An API key does not identify a principal, so you cannot grant it an IAM role. The gateway's own service account calls the backend.",
+      "C": "A key from your project identifies your project, so the usage does not count against the partner's project.",
+      "D": "The API config reads the key from the `key` query parameter. Also, the cause of the error is that the partner's project did not enable the API."
+    },
+    "sources": [
+      {
+        "title": "Use API keys (API Gateway)",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/authenticate-api-keys",
+        "evidence": "API Gateway rejects requests unless the API key was generated in your Google Cloud project or within other Google Cloud projects in which your API has been enabled."
+      },
+      {
+        "title": "Choosing an authentication method (API Gateway)",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/authentication-method",
+        "evidence": "An API key is a simple string that identifies a Google Cloud project for quota, billing, and monitoring purposes."
+      }
+    ]
+  },
+  {
+    "id": "api-010",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "api-gateway",
+      "api-config",
+      "deployment"
+    ],
+    "stem": "A team serves an API through the API Gateway gateway `prod-gw`. A developer adds a new path to the OpenAPI document of the API. The change must reach production clients, and the gateway URL must not change. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud api-gateway api-configs update` on the current API config with the edited document."
+      },
+      {
+        "id": "B",
+        "text": "Create a new API config from the edited document, and update `prod-gw` to use the new API config."
+      },
+      {
+        "id": "C",
+        "text": "Deploy the new API config to `prod-gw` next to the current API config, and route the new path to it."
+      },
+      {
+        "id": "D",
+        "text": "Create a new gateway for the new API config, and keep `prod-gw` for the existing paths."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "An API config cannot change after you create it. Each upload of an edited OpenAPI document creates a new API config. A gateway hosts one API config, and you can update the gateway to use another one. The gateway keeps its URL, so **clients need no change**. For example: `gcloud api-gateway gateways update prod-gw --api=API_ID --api-config=NEW_CONFIG_ID --location=REGION`.",
+    "whyWrong": {
+      "A": "You cannot modify an API config after you create it. The update command changes only the display name and labels.",
+      "C": "A gateway can host only one API config. You cannot deploy two API configs to the same gateway.",
+      "D": "A new gateway has a new URL, so clients must change. The requirement is to keep the gateway URL."
+    },
+    "sources": [
+      {
+        "title": "API Gateway deployment model",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/deployment-model",
+        "evidence": "Each time you upload an API definition, API Gateway creates a new API config. That is, you can create an API config but you cannot later modify it."
+      },
+      {
+        "title": "API Gateway deployment model",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/deployment-model",
+        "evidence": "However, after a gateway is created, you can update the gateway to replace one API config with another."
+      },
+      {
+        "title": "API Gateway deployment model",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/deployment-model",
+        "evidence": "Can only host a single API config. You cannot deploy multiple API configs to the same gateway."
+      }
+    ]
+  },
+  {
+    "id": "api-011",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "versioning",
+      "aip",
+      "backward-compatibility"
+    ],
+    "stem": "Your team owns the stable `v1` of an orders API on Cloud Run. Partner apps that you do not control call it. The team proposes the changes below for the next release. Following Google's API design guidance, which two changes must wait for a new major version? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a required `currency` field to the `CreateOrder` request."
+      },
+      {
+        "id": "B",
+        "text": "Add an optional `gift_message` field to the `Order` resource."
+      },
+      {
+        "id": "C",
+        "text": "Rename the `customer_id` field of the `Order` resource to `client_id`."
+      },
+      {
+        "id": "D",
+        "text": "Add a new `ArchiveOrder` custom method to the API."
+      },
+      {
+        "id": "E",
+        "text": "Add a new value to an enum that only request messages use."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "A stable version gets only backward-compatible changes. Old clients do not send a new **required field**, so their requests fail. A **rename** is a remove and an add, and you must not remove a field in the same major version. Both changes need `v2`. Optional fields, new methods, and new values in request-only enums are compatible.",
+    "whyWrong": {
+      "B": "An optional field is compatible when old clients get the same behavior as before.",
+      "D": "You can add new methods in the same major version. Old clients do not call them.",
+      "E": "You can add values freely to an enum that only request messages use."
+    },
+    "sources": [
+      {
+        "title": "AIP-180: Backwards compatibility",
+        "url": "https://google.aip.dev/180",
+        "evidence": "New required fields must not be added to existing request messages or resources."
+      },
+      {
+        "title": "AIP-180: Backwards compatibility",
+        "url": "https://google.aip.dev/180",
+        "evidence": "Renaming a component is semantically equivalent to \"remove and add\". In cases where these sorts of changes are desirable, a service may add the new component, but must not remove the existing one."
+      },
+      {
+        "title": "AIP-180: Backwards compatibility",
+        "url": "https://google.aip.dev/180",
+        "evidence": "Enum values may be freely added to enums which are only used in request messages."
+      }
+    ]
+  },
+  {
+    "id": "api-012",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "versioning",
+      "aip",
+      "rest"
+    ],
+    "stem": "A team publishes a public REST API on Cloud Run and follows Google's API design guidance. It plans URIs such as `/v1.3/orders` for each minor release. Every change in these releases is backward compatible. What should the team do instead?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the full semantic version in the path, for example `/v1.3.0/orders`."
+      },
+      {
+        "id": "B",
+        "text": "Keep `/v1/orders`, and ship the compatible changes in place in `v1`."
+      },
+      {
+        "id": "C",
+        "text": "Keep `/v1/orders`, and add the minor version as a query parameter."
+      },
+      {
+        "id": "D",
+        "text": "Deploy a new Cloud Run service for each minor version of the API."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Google APIs put only the major version in the URI path, for example `v1`. They do not expose minor or patch versions. Compatible changes go into the major version in place, and clients get new features without a migration. Because **every change is backward compatible**, the version stays `v1`.",
+    "whyWrong": {
+      "A": "Google APIs must not expose minor or patch version numbers, such as `v1.0` or `v1.4.2`.",
+      "C": "A minor version in a query parameter still exposes a minor version, which Google APIs do not do.",
+      "D": "Compatible changes go into the existing major version in place. A service for each minor version adds work and still exposes minor versions."
+    },
+    "sources": [
+      {
+        "title": "AIP-185: API Versioning",
+        "url": "https://google.aip.dev/185",
+        "evidence": "However, unlike in traditional semantic versioning, Google APIs must not expose minor or patch version numbers. For example, Google APIs use `v1`, not `v1.0`, `v1.1`, or `v1.4.2`."
+      },
+      {
+        "title": "AIP-185: API Versioning",
+        "url": "https://google.aip.dev/185",
+        "evidence": "From a user's perspective, major versions are updated in place with minor/patch equivalent changes, and users receive new functionality without migration."
+      }
+    ]
+  },
+  {
+    "id": "api-013",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "apigee",
+      "proxy-revision",
+      "deployment"
+    ],
+    "stem": "Revision 4 of the `orders-v1` API proxy is deployed to the Apigee `prod` environment. A developer must change a policy in the proxy. The change is compatible, so the API stays `v1`. The team wants to test the change before production apps use it, and to roll back fast if needed. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Edit revision 4 in place, and redeploy it to `test` and then to `prod`."
+      },
+      {
+        "id": "B",
+        "text": "Create a second proxy with the same base path in `prod`, and move apps to it."
+      },
+      {
+        "id": "C",
+        "text": "Save the change as revision 5, deploy it to `test`, then deploy it to `prod`."
+      },
+      {
+        "id": "D",
+        "text": "Publish the change as API version `v1.5`, and tell apps the new revision number."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "You cannot change a deployed revision. Save each change as a new revision and deploy that revision. You can test the new revision in `test` while the old one serves `prod`, and then promote it. To **roll back**, deploy the earlier revision again. The revision number is internal, and apps never see it.",
+    "whyWrong": {
+      "A": "Apigee does not let you change a revision and redeploy the same revision. A change needs a new revision.",
+      "B": "A base path must be unique, so you cannot deploy two proxies with the same base path.",
+      "D": "A proxy revision is an internal number that apps do not see. Google APIs also do not expose minor versions such as `v1.5`."
+    },
+    "sources": [
+      {
+        "title": "Deploying an API proxy",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/deploy/ui-deploy-new",
+        "evidence": "You cannot make incremental changes to an API proxy revision and redeploy that same revision to Apigee. To deploy changes to an API proxy, you must save it as a new revision and deploy it."
+      },
+      {
+        "title": "Understanding APIs and API proxies",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies",
+        "evidence": "Revisions are sequentially numbered, enabling you to revert a change by deploying a previous revision of your API proxy."
+      },
+      {
+        "title": "Understanding APIs and API proxies",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies",
+        "evidence": "When you are ready, you can promote the higher revision of your API proxy from test to prod."
+      }
+    ]
+  },
+  {
+    "id": "api-014",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "ingress",
+      "load-balancer",
+      "cloud-armor"
+    ],
+    "stem": "A public REST API runs on Cloud Run with the ingress setting `all`. A global external Application Load Balancer with Google Cloud Armor policies is in front of the service. A test shows that clients can call the `run.app` URL directly and skip Cloud Armor. A Cloud Scheduler job in the same project calls the `run.app` URL each night. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the ingress setting of the service to `internal`."
+      },
+      {
+        "id": "B",
+        "text": "Set the ingress setting of the service to `internal-and-cloud-load-balancing`."
+      },
+      {
+        "id": "C",
+        "text": "Disable the default URL of the service with `--no-default-url`."
+      },
+      {
+        "id": "D",
+        "text": "Remove public access, so that only principals with the Cloud Run Invoker role can call the service."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The `internal-and-cloud-load-balancing` setting accepts requests that come through the external Application Load Balancer, so internet traffic must pass Cloud Armor. Direct internet requests to the `run.app` URL fail. The setting also accepts the sources that `internal` accepts. These include Cloud Scheduler in the same project when it calls the `run.app` URL, so the **nightly job keeps working**.",
+    "whyWrong": {
+      "A": "`internal` does not accept requests from an external Application Load Balancer, so internet clients can no longer reach the API.",
+      "C": "Cloud Scheduler uses the default `run.app` URL to call Cloud Run. If you disable that URL, the nightly job stops working.",
+      "D": "IAM applies on every ingress path. Internet clients that come through the load balancer are also rejected, but the API must stay public."
+    },
+    "sources": [
+      {
+        "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+        "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+        "evidence": "Accept requests from the internet through the external Application Load Balancer. Direct requests to the `run.app` URL from the internet are not allowed."
+      },
+      {
+        "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+        "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+        "evidence": "Google Cloud products, if they're in the same project or VPC Service Controls perimeter as your Cloud Run service or instance, and if they're using the default `run.app` URL and not a custom URL or custom domain: Cloud Scheduler"
+      },
+      {
+        "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+        "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+        "evidence": "Disabling the default `run.app` URL prevents these services or instance from working as expected"
+      }
+    ]
+  },
+  {
+    "id": "api-015",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-run",
+      "custom-domain",
+      "load-balancer"
+    ],
+    "stem": "A production REST API on Cloud Run must serve public clients at `api.example.com`. The company wants to use its own TLS certificate for the domain. Which approach does Google recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Map `api.example.com` to the service with Cloud Run domain mapping."
+      },
+      {
+        "id": "B",
+        "text": "Put API Gateway in front, and give clients its `gateway.dev` URL."
+      },
+      {
+        "id": "C",
+        "text": "Put an internal Application Load Balancer in front, with ingress `internal`."
+      },
+      {
+        "id": "D",
+        "text": "Put a global external Application Load Balancer in front of the service."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Google recommends a global external Application Load Balancer for a custom domain on Cloud Run. It lets you use your own TLS certificate and route URL paths, and you can add Cloud CDN and Cloud Armor. Cloud Run domain mapping is in Preview and is not ready for **production**, and it does not accept your own certificates.",
+    "whyWrong": {
+      "A": "Cloud Run domain mapping is in Preview and is not recommended for production because of latency issues. It also does not accept self-managed certificates.",
+      "B": "The `gateway.dev` URL is not the custom domain. A custom domain for API Gateway also needs a load balancer, and that integration is in Preview.",
+      "C": "An internal Application Load Balancer serves clients in your VPC networks, not public clients on the internet."
+    },
+    "sources": [
+      {
+        "title": "Mapping custom domains",
+        "url": "https://docs.cloud.google.com/run/docs/mapping-custom-domains",
+        "evidence": "Use a global external Application Load Balancer (Recommended)"
+      },
+      {
+        "title": "Mapping custom domains",
+        "url": "https://docs.cloud.google.com/run/docs/mapping-custom-domains",
+        "evidence": "Cloud Run domain mappings are in the preview launch stage. Due to latency issues, they are not production-ready and are not supported at General Availability."
+      },
+      {
+        "title": "Mapping custom domains",
+        "url": "https://docs.cloud.google.com/run/docs/mapping-custom-domains",
+        "evidence": "For example, it lets you use your own TLS certificate or route specific URL paths to the Cloud Run service."
+      }
+    ]
+  },
+  {
+    "id": "api-016",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "iap",
+      "internal-users"
+    ],
+    "stem": "An HR API on Cloud Run is for employees only. Employees sign in with their company Google Workspace accounts. Requests arrive at the `run.app` URL and through an external Application Load Balancer. The team wants the Google-recommended control for both paths, with no authentication code in the service. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable IAP on the Cloud Run service with `--iap`, and grant the IAP service agent the Cloud Run Invoker role."
+      },
+      {
+        "id": "B",
+        "text": "Sign employees in with Identity Platform, make the service public, and verify the ID token in the service code."
+      },
+      {
+        "id": "C",
+        "text": "Enable IAP on the load balancer's backend service, and also enable IAP on the Cloud Run service for `run.app`."
+      },
+      {
+        "id": "D",
+        "text": "Require an API key in API Gateway, and give each employee a key that is restricted to the HR API."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "IAP is for internal users. Google recommends that you enable IAP on the Cloud Run service itself, because it then protects every ingress path. These paths include the `run.app` URL and load balancers. IAP checks the user before the request reaches the service, so the code needs **no authentication logic**. IAP needs the Cloud Run Invoker role to call the service.",
+    "whyWrong": {
+      "B": "Identity Platform is for end users who register their own accounts. It also needs token verification code in the service, which the team does not want.",
+      "C": "You cannot configure IAP on both the load balancer and the Cloud Run service. IAP on the service alone covers both paths.",
+      "D": "An API key identifies a project, not a person, so it cannot limit access to employees."
+    },
+    "sources": [
+      {
+        "title": "Configure IAP for Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/securing/identity-aware-proxy-cloud-run",
+        "evidence": "By enabling IAP on Cloud Run directly, you can secure traffic with a single click from all ingress paths, including default `run.app` URLs and load balancers."
+      },
+      {
+        "title": "Configure IAP for Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/securing/identity-aware-proxy-cloud-run",
+        "evidence": "You cannot configure IAP on both the load balancer and the Cloud Run service."
+      },
+      {
+        "title": "Authenticating users",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/end-users",
+        "evidence": "Internal users: Users who are explicitly granted access to your application by an administrator in your organization. They typically belong to your organization."
+      }
+    ]
+  },
+  {
+    "id": "api-017",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "identity-platform",
+      "end-users"
+    ],
+    "stem": "A consumer mobile app calls an API on Cloud Run. Customers create their own accounts with an email and password or with a Google account. The API must accept only requests from signed-in customers. An organization policy enforces domain restricted sharing, so you cannot grant roles to `allUsers`. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable IAP on the service, and add each new customer to the IAP access policy."
+      },
+      {
+        "id": "B",
+        "text": "Deploy the service with `--no-invoker-iam-check`, so that requests reach the service code."
+      },
+      {
+        "id": "C",
+        "text": "Grant the Cloud Run Invoker role to `allUsers`, and check the app version in the code."
+      },
+      {
+        "id": "D",
+        "text": "Sign customers in with Identity Platform, and verify the ID token in the service code."
+      },
+      {
+        "id": "E",
+        "text": "Grant the Cloud Run Invoker role to each customer's account when the customer signs up."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Customers who register their own accounts are end users, and Google recommends Identity Platform for them. The app sends the user's ID token, and the service code verifies it. The service must be public, so that these requests reach the code. Because **domain restricted sharing** blocks `allUsers`, use the recommended method: disable the Invoker IAM check with `--no-invoker-iam-check`.",
+    "whyWrong": {
+      "A": "IAP is for internal users that an administrator grants access to. Customers who sign up themselves are end users.",
+      "C": "The organization policy blocks roles for `allUsers`. A check of the app version also does not prove that a customer signed in.",
+      "E": "End users do not typically have IAM permissions on the project or the service, and a grant for each customer does not scale."
+    },
+    "sources": [
+      {
+        "title": "Authenticating users",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/end-users",
+        "evidence": "If you want to authenticate users using email/password, phone number, social providers like Google, Facebook or GitHub, or a custom authentication mechanism, you can use Identity Platform."
+      },
+      {
+        "title": "Allowing public (unauthenticated) access",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/public",
+        "evidence": "Use this solution when the project is subject to the domain restricted sharing constraint in an organization policy."
+      },
+      {
+        "title": "Authenticating users",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/end-users",
+        "evidence": "Users do not typically have IAM permission on your Google Cloud project or Cloud Run service."
+      }
+    ]
+  },
+  {
+    "id": "api-018",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "revision-tags",
+      "testing"
+    ],
+    "stem": "Your team deploys version 2 of a REST API as a new revision of the `orders` Cloud Run service. The QA team must test the new revision in production before any client traffic reaches it. Which command should you run first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`gcloud run deploy orders --image IMAGE_URL --tag qa`"
+      },
+      {
+        "id": "B",
+        "text": "`gcloud run deploy orders --image IMAGE_URL`, then roll back if the tests fail"
+      },
+      {
+        "id": "C",
+        "text": "`gcloud run deploy orders --image IMAGE_URL --no-traffic --tag qa`"
+      },
+      {
+        "id": "D",
+        "text": "`gcloud run services update-traffic orders --to-revisions orders-v2=1`"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "`--no-traffic` deploys the revision without client traffic, and `--tag` gives the revision its own URL, for example `https://qa---orders-abcdef.a.run.app`. QA tests that URL. After the tests pass, move traffic with `gcloud run services update-traffic`. So **no client traffic** reaches the revision before the tests.",
+    "whyWrong": {
+      "A": "Without `--no-traffic`, the new revision gets client traffic as soon as it deploys. The tag only adds a URL.",
+      "B": "The new revision serves clients before QA tests it. A rollback happens only after clients see the problems.",
+      "D": "A 1% split still sends real client traffic to a revision that nobody tested. Also, the revision must exist before you can send traffic to it."
+    },
+    "sources": [
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "The tag lets you directly test the new revision at a specific URL, without serving traffic."
+      },
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "Deploy it to production, without serving traffic, and test against a tagged revision in production."
+      }
+    ]
+  },
+  {
+    "id": "api-019",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "api-gateway",
+      "cloud-run",
+      "iam"
+    ],
+    "stem": "A team puts API Gateway in front of a Cloud Run service. The service must stay private and accept calls only from the gateway. The team created the API config with `--backend-auth-service-account=gw-sa@PROJECT_ID.iam.gserviceaccount.com`. Calls through the gateway fail with `403` from Cloud Run. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Allow public access to the service with `--no-invoker-iam-check`."
+      },
+      {
+        "id": "B",
+        "text": "Add `disable_auth: true` to the `x-google-backend` extension."
+      },
+      {
+        "id": "C",
+        "text": "Grant `gw-sa` the Cloud Run Invoker role (`roles/run.invoker`) on the service."
+      },
+      {
+        "id": "D",
+        "text": "Set the ingress setting of the service to `internal`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "API Gateway calls the backend with an ID token for the service account of the API config. A private Cloud Run service accepts the call only if that service account has the Cloud Run Invoker role. Grant the role on the service. The service stays **private**.",
+    "whyWrong": {
+      "A": "This makes the service public, so anyone can skip the gateway. The service must stay private.",
+      "B": "`disable_auth` stops the gateway from adding an ID token. The private service then rejects every call.",
+      "D": "API Gateway is not one of the sources that `internal` accepts, so the gateway can no longer reach the service. IAM also still applies."
+    },
+    "sources": [
+      {
+        "title": "Securing backend services (API Gateway)",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/securing-backend-services",
+        "evidence": "If a gateway's request to your Cloud Run service is rejected, ensure that the gateway's service account is granted the `roles/run.invoker` role, and that the gateway's service account has the `run.routes.invoke` permission."
+      },
+      {
+        "title": "OpenAPI 2.0 extensions in API Gateway",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/oasv2-extensions",
+        "evidence": "This property determines whether API Gateway should prevent obtaining an instance ID token and prevent attaching it to the request."
+      }
+    ]
+  },
+  {
+    "id": "api-020",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "apigee",
+      "api-keys",
+      "api-products"
+    ],
+    "stem": "A team exposes a Cloud Run API through an Apigee API proxy. It creates an API product. Each partner registers a developer app with the product and gets a consumer key. A test shows that a request with no key at all also reaches the backend. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Turn on manual key approval in the API product, so that only approved apps get keys."
+      },
+      {
+        "id": "B",
+        "text": "Attach a VerifyAPIKey policy to the ProxyEndpoint request flow, and read the key from a header."
+      },
+      {
+        "id": "C",
+        "text": "Attach a SpikeArrest policy to the ProxyEndpoint, so that callers without a key are throttled."
+      },
+      {
+        "id": "D",
+        "text": "Add more resource paths to the operations of the API product, so that the product covers every path."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Apigee generates consumer keys, but it does not check them automatically. If the proxy has no credential policy, such as VerifyAPIKey or OAuthV2 VerifyAccessToken, any caller can invoke the API. Add VerifyAPIKey to the request flow. Read the key from a header, because query parameters can appear in browser history and network logs.",
+    "whyWrong": {
+      "A": "Key approval controls which apps get keys. It does not make the proxy check the key on each request.",
+      "C": "SpikeArrest limits the request rate. It does not reject a request that has no key.",
+      "D": "An API product defines what a key can access, but the proxy still needs a policy that checks the key."
+    },
+    "sources": [
+      {
+        "title": "Introduction to API products",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/publish/what-api-product",
+        "evidence": "If you do not include a credential enforcement policy in your API Proxy, any caller can invoke your APIs."
+      },
+      {
+        "title": "VerifyAPIKey policy",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/policies/verify-api-key-policy",
+        "evidence": "It's a good practice to pass the API key in a header rather than in a query parameter."
+      }
+    ]
+  },
+  {
+    "id": "api-021",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "service-usage",
+      "service-disabled",
+      "quota-project"
+    ],
+    "stem": "A job runs as a service account from project `etl-proj` (project number `111111111111`). It publishes messages to a Pub/Sub topic in project `data-proj`. Each publish call fails, and the error has this `ErrorInfo`:\n\n```json\n{ \"reason\": \"SERVICE_DISABLED\",\n  \"domain\": \"googleapis.com\",\n  \"metadata\": { \"consumer\": \"projects/111111111111\",\n                \"service\": \"pubsub.googleapis.com\" } }\n```\n\nWhat should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable `pubsub.googleapis.com` in `data-proj`, the project that owns the topic."
+      },
+      {
+        "id": "B",
+        "text": "Grant the service account the Pub/Sub Publisher role on the topic in `data-proj`."
+      },
+      {
+        "id": "C",
+        "text": "Retry the call with truncated exponential backoff until the service is available."
+      },
+      {
+        "id": "D",
+        "text": "Enable `pubsub.googleapis.com` in `etl-proj`, the project that `consumer` names."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "`SERVICE_DISABLED` means that the service is disabled for the consumer project in the error metadata. Here the consumer is `etl-proj`. The project that is checked for activation is not always the project of the resource. Enable the API in the project that the **`consumer` field** names.",
+    "whyWrong": {
+      "A": "The error names `etl-proj` as the consumer, not `data-proj`. A change in the resource project does not fix this error.",
+      "B": "The error is about a disabled service, not a missing permission. A missing permission returns `PERMISSION_DENIED`.",
+      "C": "A disabled service is not a transient error. Retries fail until someone enables the API."
+    },
+    "sources": [
+      {
+        "title": "Enum ErrorReason",
+        "url": "https://docs.cloud.google.com/java/docs/reference/proto-google-common-protos/latest/com.google.api.ErrorReason",
+        "evidence": "This response indicates the \"pubsub.googleapis.com\" has been disabled in \"projects/123\"."
+      },
+      {
+        "title": "Quota project overview",
+        "url": "https://docs.cloud.google.com/docs/quotas/quota-project",
+        "evidence": "For example, if a service account from project A calls a read method in project B, and neither project has the API enabled, the `API not enabled` error message indicates which project is checked for activation."
+      }
+    ]
+  },
+  {
+    "id": "api-022",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "client-libraries",
+      "grpc"
+    ],
+    "stem": "A team starts a new Python service on Cloud Run that calls Pub/Sub and Firestore. The team wants the Google-recommended way to call these APIs from code, with built-in authentication and gRPC where the API supports it. Which option should the team use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The Google API Client Library for Python (`google-api-python-client`)."
+      },
+      {
+        "id": "B",
+        "text": "The `requests` library, with access tokens from the metadata server."
+      },
+      {
+        "id": "C",
+        "text": "The Cloud Client Libraries for Python, such as `google-cloud-pubsub`."
+      },
+      {
+        "id": "D",
+        "text": "Its own gRPC stubs, generated from the protocol buffer files of the APIs."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Cloud Client Libraries are the recommended way to call Google Cloud APIs from code. They handle authentication and give idiomatic code. Some of them use gRPC, which can increase throughput per CPU. The older Google API Client Libraries support only REST.",
+    "whyWrong": {
+      "A": "These are an earlier type of library. They use only the REST interface of the API, so they give no gRPC.",
+      "B": "Raw REST calls need your own token, retry, and paging code. Google suggests your own client code only when the Cloud Client Libraries do not meet your needs.",
+      "D": "You generate and maintain the client code yourself. Google suggests your own client code only when the Cloud Client Libraries do not meet your needs."
+    },
+    "sources": [
+      {
+        "title": "Client libraries and Cloud APIs explained",
+        "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained",
+        "evidence": "Cloud Client Libraries are the recommended option for accessing Cloud APIs programmatically, where available."
+      },
+      {
+        "title": "Client libraries and Cloud APIs explained",
+        "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained",
+        "evidence": "Provide access to the API's REST interface only; gRPC is not supported."
+      }
+    ]
+  },
+  {
+    "id": "api-023",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "adc",
+      "service-accounts",
+      "client-libraries"
+    ],
+    "stem": "A Python service on Cloud Run creates its Cloud Storage client from a service account key file in the container image:\n\n```python\nfrom google.cloud import storage\n\nclient = storage.Client.from_service_account_json(\"/app/sa-key.json\")\n```\n\nA security review requires that the service use no service account keys. The service only reads objects in one bucket. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Store the key file in Secret Manager, and mount it as a volume in the service."
+      },
+      {
+        "id": "B",
+        "text": "Create the client with `storage.Client()`, so that the library finds credentials with ADC."
+      },
+      {
+        "id": "C",
+        "text": "Set `GOOGLE_APPLICATION_CREDENTIALS` to the path of the key file in the service."
+      },
+      {
+        "id": "D",
+        "text": "Pass an API key in `client_options`, so that the client needs no service account."
+      },
+      {
+        "id": "E",
+        "text": "Attach a user-managed service account that can only read the bucket to the service."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "In production on Google Cloud, Google prefers the credentials of the attached service account. When the code creates the client without credentials, the library uses Application Default Credentials (ADC), which gets tokens from the metadata server. Attach a user-managed service account with the least privileged role, here read access to one bucket. **No key** exists.",
+    "whyWrong": {
+      "A": "The file is still a service account key. Secret Manager protects where you store it, but the review forbids keys.",
+      "C": "This variable only tells ADC where to find a key file. The service still uses a key.",
+      "D": "A standard API key does not identify a principal, so IAM cannot give it read access to the bucket."
+    },
+    "sources": [
+      {
+        "title": "How Application Default Credentials works",
+        "url": "https://docs.cloud.google.com/docs/authentication/application-default-credentials",
+        "evidence": "Using the credentials from the attached service account is the preferred method for finding credentials in a production environment on Google Cloud."
+      },
+      {
+        "title": "Authenticate with client libraries",
+        "url": "https://docs.cloud.google.com/docs/authentication/client-libraries",
+        "evidence": "When you use the client library to create a client, the client library automatically checks for and uses the credentials you have provided to ADC to authenticate to the APIs your code uses."
+      },
+      {
+        "title": "How Application Default Credentials works",
+        "url": "https://docs.cloud.google.com/docs/authentication/application-default-credentials",
+        "evidence": "Grant that service account the least privileged IAM roles possible."
+      }
+    ]
+  },
+  {
+    "id": "api-024",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "service-account-impersonation",
+      "apis-explorer",
+      "testing"
+    ],
+    "stem": "Before a release, a developer must confirm that the service account `app-sa` can list the objects in the bucket `invoices`. The developer uses a user account and must not create service account keys. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Open the APIs Explorer on the `objects.list` reference page, and run the method with the credentials of `app-sa`."
+      },
+      {
+        "id": "B",
+        "text": "Get the Owner role on the project, and run `gcloud storage ls gs://invoices` with the developer's own credentials."
+      },
+      {
+        "id": "C",
+        "text": "Get the Service Account Token Creator role on `app-sa`, and run `gcloud storage ls gs://invoices --impersonate-service-account=APP_SA_EMAIL`."
+      },
+      {
+        "id": "D",
+        "text": "Create a key for `app-sa`, run the test with the key, and delete the key right after the test."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Service account impersonation gives the developer short-lived credentials for `app-sa`, so the command runs with the permissions of `app-sa`. The developer needs the Service Account Token Creator role on the service account, even as a project owner. Impersonation creates **no key**.",
+    "whyWrong": {
+      "A": "The APIs Explorer uses its own credentials. You cannot use other credentials, such as those of `app-sa`, with it.",
+      "B": "This tests the permissions of the developer, not the permissions of `app-sa`.",
+      "D": "The developer must not create keys. A key is a long-lived credential and a high risk if someone gets it."
+    },
+    "sources": [
+      {
+        "title": "APIs Explorer overview",
+        "url": "https://developers.google.com/explorer-help",
+        "evidence": "The APIs Explorer uses its own credentials to make a request. You can't use custom credentials with the APIs Explorer."
+      },
+      {
+        "title": "Use service account impersonation",
+        "url": "https://docs.cloud.google.com/docs/authentication/use-service-account-impersonation",
+        "evidence": "When you use this flag, the gcloud CLI requests short-lived credentials for the specified service account and uses them to authenticate to the API and authorize the access."
+      },
+      {
+        "title": "Use service account impersonation",
+        "url": "https://docs.cloud.google.com/docs/authentication/use-service-account-impersonation",
+        "evidence": "You must grant these roles to your account, even when you are working in a project that you created."
+      }
+    ]
+  },
+  {
+    "id": "api-025",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "quota-project",
+      "rest",
+      "user-credentials"
+    ],
+    "stem": "A developer tests the Cloud Translation API from a laptop with the request below. The API is enabled in project `dev-123`, and the developer has the Service Usage Consumer role there.\n\n```bash\ncurl -X POST \\\n  -H \"Authorization: Bearer $(gcloud auth print-access-token)\" \\\n  -H \"Content-Type: application/json; charset=utf-8\" \\\n  -d @request.json \\\n  \"https://translation.googleapis.com/language/translate/v2\"\n```\n\nThe call fails with an error that says that user credentials are not supported by this API. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add the header `x-goog-user-project: dev-123` to the request."
+      },
+      {
+        "id": "B",
+        "text": "Replace the token with the output of `gcloud auth print-identity-token`."
+      },
+      {
+        "id": "C",
+        "text": "Run `gcloud auth application-default set-quota-project dev-123`, and send the request again."
+      },
+      {
+        "id": "D",
+        "text": "Run `gcloud services enable translate.googleapis.com` in `dev-123` again."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Cloud Translation is a client-based API, so each request needs a quota project. A request with user credentials can fail when no quota project is set. For a REST request, set the quota project with the `x-goog-user-project` header. The Service Usage Consumer role gives the developer `serviceusage.services.use` on `dev-123`, so the developer can use that project.",
+    "whyWrong": {
+      "B": "Google APIs need an OAuth 2.0 access token. An ID token is for services such as Cloud Run, and it does not set a quota project.",
+      "C": "This command sets the quota project in the local ADC file. The `curl` request uses a gcloud CLI token, and gcloud CLI credentials are separate from ADC credentials.",
+      "D": "The API is already enabled in `dev-123`. The error is about the missing quota project, not about activation."
+    },
+    "sources": [
+      {
+        "title": "Authenticate with REST",
+        "url": "https://docs.cloud.google.com/docs/authentication/rest",
+        "evidence": "If your API call returns an error message saying that user credentials are not supported, or that the quota project is not set, you must explicitly set the quota project for the request."
+      },
+      {
+        "title": "Authenticate with REST",
+        "url": "https://docs.cloud.google.com/docs/authentication/rest",
+        "evidence": "To set the quota project, include the `x-goog-user-project` header with your request."
+      },
+      {
+        "title": "Authenticate with REST",
+        "url": "https://docs.cloud.google.com/docs/authentication/rest",
+        "evidence": "Your gcloud credentials are not the same as the credentials you provide to ADC using the gcloud CLI."
+      }
+    ]
+  },
+  {
+    "id": "api-026",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "api-keys",
+      "rest",
+      "security"
+    ],
+    "stem": "A backend calls the Cloud Natural Language API with an API key. It sends requests to `https://language.googleapis.com/v1/documents:analyzeEntities?key=API_KEY`. A security review says that the key must not appear in URLs, where URL scans can find it. How should you change the requests?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the key in an `Authorization: Bearer API_KEY` header."
+      },
+      {
+        "id": "B",
+        "text": "Send the key in the `x-goog-user-project` header."
+      },
+      {
+        "id": "C",
+        "text": "Send the key in the `x-goog-api-key` header."
+      },
+      {
+        "id": "D",
+        "text": "Encode the key with Base64 in the `key` parameter."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "For a REST call, send an API key in the `x-goog-api-key` HTTP header. The `key` query parameter puts the key in the URL, where **URL scans** can steal it.",
+    "whyWrong": {
+      "A": "The `Authorization: Bearer` header carries OAuth 2.0 access tokens, not API keys.",
+      "B": "The `x-goog-user-project` header sets the quota project of the request. It does not carry an API key.",
+      "D": "An encoded key is still in the URL, and anyone who finds it can decode it."
+    },
+    "sources": [
+      {
+        "title": "Authenticate with REST",
+        "url": "https://docs.cloud.google.com/docs/authentication/rest",
+        "evidence": "To include an API key with a REST API call, use the `x-goog-api-key` HTTP header, as shown in the following example:"
+      },
+      {
+        "title": "Authenticate with REST",
+        "url": "https://docs.cloud.google.com/docs/authentication/rest",
+        "evidence": "If you can't use the HTTP header, you can use the `key` query parameter. However, this method includes your API key in the URL, exposing your key to theft through URL scans."
+      }
+    ]
+  },
+  {
+    "id": "api-027",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "partial-response",
+      "fields",
+      "rest"
+    ],
+    "stem": "A backend lists Compute Engine instances with the REST API to show the name and status of each VM. The responses are large, and the backend parses many fields that it does not use. The backend must get only the data that it needs. What should you change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `prettyPrint=false` to the list request."
+      },
+      {
+        "id": "B",
+        "text": "Add the header `Accept-Encoding: gzip` to the list request."
+      },
+      {
+        "id": "C",
+        "text": "Send the list request as a batch request with one call in it."
+      },
+      {
+        "id": "D",
+        "text": "Add `fields=items(name,status),nextPageToken` to the list request."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "By default, the server returns the full resource. The `fields` parameter asks for a partial response with only the listed fields. Here the response keeps `name` and `status` for each item, and `nextPageToken`, so that pagination still works. The backend gets **only the data that it needs**.",
+    "whyWrong": {
+      "A": "`prettyPrint=false` removes white space from the JSON, but the response still has every field.",
+      "B": "Compression makes the response smaller on the network, but the backend still gets and parses every field.",
+      "C": "A batch request puts several calls into one HTTP request. It does not remove fields from a response."
+    },
+    "sources": [
+      {
+        "title": "Improve Performance (Compute Engine API)",
+        "url": "https://docs.cloud.google.com/compute/docs/api/how-tos/performance",
+        "evidence": "To request a partial response, use the `fields` request parameter to specify the fields you want returned. You can use this parameter with any request that returns response data."
+      }
+    ]
+  },
+  {
+    "id": "api-028",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "patch",
+      "partial-update",
+      "compute-engine"
+    ],
+    "stem": "A firewall rule allows the source ranges `198.51.100.0/24` and `192.0.2.0/24`. A script adds the range of a partner with this Compute Engine API request:\n\n```http\nPATCH https://compute.googleapis.com/compute/v1/projects/my-proj/global/firewalls/allow-partners\nContent-Type: application/json\n\n{\"sourceRanges\": [\"203.0.113.0/24\"]}\n```\n\nAfter the call, the rule allows only `203.0.113.0/24`. How should you change the script?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the same body with `PUT`, so that the server merges the new range into the list."
+      },
+      {
+        "id": "B",
+        "text": "Add `fields=sourceRanges` to the request, so that the server changes only that field."
+      },
+      {
+        "id": "C",
+        "text": "Send one `PATCH` request for each range, so that the server adds the ranges one at a time."
+      },
+      {
+        "id": "D",
+        "text": "Read the rule, add the new range to the current list, and send the full list in the `PATCH` body."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A `PATCH` request changes only the fields that you send, but an array is the exception. An array in a `PATCH` request replaces the whole existing array, and you cannot add one item at a time. To keep the existing ranges, read the current `sourceRanges` first, add the new range, and send the full list.",
+    "whyWrong": {
+      "A": "`PUT` replaces the whole resource and clears optional fields that you do not send. It does not merge arrays.",
+      "B": "The `fields` parameter changes only the response data. It does not change the data that the request sends.",
+      "C": "Each request replaces the whole array, so only the range of the last request stays."
+    },
+    "sources": [
+      {
+        "title": "Improve Performance (Compute Engine API)",
+        "url": "https://docs.cloud.google.com/compute/docs/api/how-tos/performance",
+        "evidence": "Patch requests that contain arrays replace the existing array with the one you provide. You cannot modify, add, or delete items in an array in a piecemeal fashion."
+      },
+      {
+        "title": "Improve Performance (Compute Engine API)",
+        "url": "https://docs.cloud.google.com/compute/docs/api/how-tos/performance",
+        "evidence": "For example, if you want to add an item to an array and don't want to lose any of the existing array elements, you must get the existing data first."
+      },
+      {
+        "title": "Improve Performance (Compute Engine API)",
+        "url": "https://docs.cloud.google.com/compute/docs/api/how-tos/performance",
+        "evidence": "Note that the `fields` parameter only affects the response data; it does not affect the data that you need to send, if any."
+      }
+    ]
+  },
+  {
+    "id": "api-029",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "batch-requests",
+      "cloud-storage",
+      "client-libraries"
+    ],
+    "stem": "Each night, a Python job changes the custom metadata of about 5,000 Cloud Storage objects with one request for each object. Then it uploads a new index file that lists the changed objects. The job takes too long because of the HTTP overhead of the many small requests. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the metadata changes inside `client.batch()` blocks of no more than 100 calls each."
+      },
+      {
+        "id": "B",
+        "text": "Put all 5,000 metadata changes in one batch request, so that the job opens one connection."
+      },
+      {
+        "id": "C",
+        "text": "Add the index file upload to the last batch, so that it runs after the metadata changes."
+      },
+      {
+        "id": "D",
+        "text": "Count each batch as one request when you check the job against the per-minute quota."
+      },
+      {
+        "id": "E",
+        "text": "Upload the index file in its own request, after the responses to the batches arrive."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "A batch request groups many calls into one HTTP request, which reduces network overhead and latency. Keep each Cloud Storage batch to 100 calls or fewer. Cloud Storage does not batch uploads, and the server can run the calls of a batch in any order. So upload the index file alone, **after** the batch responses arrive.",
+    "whyWrong": {
+      "B": "A Cloud Storage batch should have no more than 100 calls. Larger batches can fail with HTTP `400` errors, gateway timeouts, and dropped connections.",
+      "C": "Cloud Storage does not support uploads in a batch. Also, the server can run batched calls in any order, so the order is not certain.",
+      "D": "A batch of n calls counts as n requests toward the usage limits. Batching does not save quota."
+    },
+    "sources": [
+      {
+        "title": "Sending batch requests",
+        "url": "https://docs.cloud.google.com/storage/docs/batch",
+        "evidence": "You shouldn't include more than 100 calls in a single batch request to avoid HTTP `400` errors, gateway timeouts, and dropped connections."
+      },
+      {
+        "title": "Sending batch requests",
+        "url": "https://docs.cloud.google.com/storage/docs/batch",
+        "evidence": "Cloud Storage does not support batch operations for uploading or downloading."
+      },
+      {
+        "title": "Sending batch requests",
+        "url": "https://docs.cloud.google.com/storage/docs/batch",
+        "evidence": "The server may perform your requests in any order. Do not rely on requests executing in the order you specify them."
+      }
+    ]
+  },
+  {
+    "id": "api-030",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pagination",
+      "page-token",
+      "aip"
+    ],
+    "stem": "A function reads all the items of a Google REST API list method with the loop below. Users report that items are sometimes missing from long lists.\n\n```python\nitems, token = [], None\nwhile True:\n    resp = list_items(filter=f, page_size=100, page_token=token)\n    items.extend(resp.get(\"items\", []))\n    if len(resp.get(\"items\", [])) < 100:\n        break\n    token = resp[\"nextPageToken\"]\n```\n\nHow should you change the loop?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `page_size` to the maximum of the API, so that one page holds all the items."
+      },
+      {
+        "id": "B",
+        "text": "Stop only when the response has no `nextPageToken`, even when a page is short."
+      },
+      {
+        "id": "C",
+        "text": "Change `filter` on each request, so that it starts after the last item received."
+      },
+      {
+        "id": "D",
+        "text": "Parse the page token to get the next offset, and send that offset instead."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "An API can return fewer items than `page_size`, or none, before the end of the list. The only sign of the end is an empty `next_page_token` (`nextPageToken` in JSON). The loop stops at the first short page, so it **misses the later pages**. Loop until the token is empty.",
+    "whyWrong": {
+      "A": "An API lowers a page size above its maximum to the maximum, and a page can still be short. The loop still stops too early.",
+      "C": "The other request parameters must stay the same between pages. A changed filter can give `INVALID_ARGUMENT`.",
+      "D": "Page tokens are opaque. Clients must not parse them, because their format can change."
+    },
+    "sources": [
+      {
+        "title": "AIP-158: Pagination",
+        "url": "https://google.aip.dev/158",
+        "evidence": "The API may return fewer results than the number requested (including zero results), even if not at the end of the collection."
+      },
+      {
+        "title": "AIP-158: Pagination",
+        "url": "https://google.aip.dev/158",
+        "evidence": "If the end of the collection has been reached, the `next_page_token` field must be empty. This is the only way to communicate \"end-of-collection\" to users."
+      },
+      {
+        "title": "AIP-158: Pagination",
+        "url": "https://google.aip.dev/158",
+        "evidence": "The user is expected to keep all other arguments to the RPC the same; if any arguments are different, the API should send an `INVALID_ARGUMENT` error."
+      }
+    ]
+  },
+  {
+    "id": "api-031",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "caching",
+      "etag",
+      "cloud-storage"
+    ],
+    "stem": "Each Cloud Run instance of an app reads a 5 MB configuration object from Cloud Storage every minute through the XML API. The object changes about once a week, and the app must see a change within one minute. The team wants the app to stop downloading the object when it has not changed. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the object and its ETag in memory. Send the ETag in an `If-None-Match` header, and use the cached copy on `304 Not Modified`."
+      },
+      {
+        "id": "B",
+        "text": "Send the cached ETag in an `If-Match` header, and download the object again only when the response is `412 Precondition Failed`."
+      },
+      {
+        "id": "C",
+        "text": "Download the object once a week, and restart the Cloud Run instances after each change to the object."
+      },
+      {
+        "id": "D",
+        "text": "Fetch the object and its metadata in one batch request each minute, so that each check uses one HTTP call."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A conditional request with `If-None-Match` and the cached ETag returns `304 Not Modified` when the object did not change. The response then has no object data, and the app uses its cached copy. When the object changes, the server sends the new object and a new ETag. The app still checks each minute, so it **sees a change within one minute**.",
+    "whyWrong": {
+      "B": "`If-Match` downloads the object when the ETag matches, which is when the object did not change. This is the opposite of the goal.",
+      "C": "A weekly download can miss a change for days, and restarts add manual work. The app must see a change within one minute.",
+      "D": "Cloud Storage does not support batch requests for downloads, and the app still downloads the full object each minute."
+    },
+    "sources": [
+      {
+        "title": "Download an object (XML API)",
+        "url": "https://docs.cloud.google.com/storage/docs/xml-api/get-object-download",
+        "evidence": "If the object does not match an If-Match header condition, the response is 412 Precondition Failed, and if the object matches the given hash in an If-None-Match header, the response is 304 Not Modified."
+      },
+      {
+        "title": "Download an object (XML API)",
+        "url": "https://docs.cloud.google.com/storage/docs/xml-api/get-object-download",
+        "evidence": "An entity tag (ETag). If the ETag you specify is the same as the ETag for the object, then the object is downloaded."
+      },
+      {
+        "title": "Prevent FHIR resource conflicts using ETags",
+        "url": "https://docs.cloud.google.com/healthcare-api/docs/fhir-etag",
+        "evidence": "If the ETags match, the server responds with `304 Not Modified`, and the client uses its cached copy. This saves bandwidth and reduces the server load."
+      }
+    ]
+  },
+  {
+    "id": "api-032",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "bigquery",
+      "caching",
+      "query-cache"
+    ],
+    "stem": "A dashboard API on Cloud Run runs the query below each time a user opens a page. The tables change once a day, when a batch load runs. The job configuration also writes the results to the destination table `reports.weekly_totals`. The job statistics always show `cacheHit: false`.\n\n```sql\nSELECT region, SUM(amount) AS total\nFROM sales.orders\nWHERE order_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)\nGROUP BY region\n```\n\nWhich two changes let BigQuery return cached results? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the destination table from the job configuration."
+      },
+      {
+        "id": "B",
+        "text": "Set `configuration.query.useQueryCache` to `true` in each job."
+      },
+      {
+        "id": "C",
+        "text": "Compute the start date in the app, and put it in the query as a fixed date."
+      },
+      {
+        "id": "D",
+        "text": "Load the daily data with streaming inserts instead of a batch load."
+      },
+      {
+        "id": "E",
+        "text": "Add a comment with the ID of the user to the query text for audit logs."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "BigQuery does not cache results when the job names a destination table, or when the query uses a non-deterministic function such as `CURRENT_DATE()`. Remove the destination table, and put a fixed date that the app computes into the query. Then the query text stays the same for the whole day, and a repeated query with the same text can use the cached results.",
+    "whyWrong": {
+      "B": "The cache option is on by default. It does not override the cases in which BigQuery does not cache results.",
+      "D": "BigQuery does not cache results for queries on tables that recently received streaming inserts.",
+      "E": "The cache needs exactly the same query text. A comment that changes for each user changes the text, so each query runs again."
+    },
+    "sources": [
+      {
+        "title": "Use cached query results",
+        "url": "https://docs.cloud.google.com/bigquery/docs/cached-results",
+        "evidence": "When a destination table is specified in the job configuration, the Google Cloud console, the bq command-line tool, or the API."
+      },
+      {
+        "title": "Use cached query results",
+        "url": "https://docs.cloud.google.com/bigquery/docs/cached-results",
+        "evidence": "If the query uses non-deterministic functions; for example, date and time functions such as `CURRENT_TIMESTAMP()` and `CURRENT_DATE`, and other functions such as `SESSION_USER()`, it returns different values depending on when a query is executed."
+      },
+      {
+        "title": "Use cached query results",
+        "url": "https://docs.cloud.google.com/bigquery/docs/cached-results",
+        "evidence": "If the query text has changed in any way, including modified whitespace or comments."
+      }
+    ]
+  },
+  {
+    "id": "api-033",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "exponential-backoff",
+      "jitter",
+      "retries"
+    ],
+    "stem": "After a short outage of a Google Cloud API, 2,000 Cloud Run instances of your service retried their failed calls. Each instance waited 1, 2, and then 4 seconds between attempts. The retries arrived in waves at the same moments, and the API failed again. What should you change in the retry logic?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Wait a fixed 1 second between attempts, so that each instance recovers sooner."
+      },
+      {
+        "id": "B",
+        "text": "Retry at once without a wait, and raise the number of attempts to 20."
+      },
+      {
+        "id": "C",
+        "text": "Add a random fraction of a second to each wait, with a new value for each retry."
+      },
+      {
+        "id": "D",
+        "text": "Use exponential backoff with no maximum wait and no deadline, so that no call is lost."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Truncated exponential backoff with jitter adds a random fraction to each wait, with a new random value for each retry. The jitter stops many clients from retrying at the same moment. This prevents the **waves** that the stem describes, which are also called the thundering herd problem.",
+    "whyWrong": {
+      "A": "All instances still retry at the same moments, and a fixed short wait does not reduce the load on the API.",
+      "B": "Retries without a wait can cause cascading failures. More attempts make the load worse.",
+      "D": "Without jitter, the instances stay in step and the waves continue. Retries without a limit can also exhaust resources in the application."
+    },
+    "sources": [
+      {
+        "title": "Retry failed requests (IAM)",
+        "url": "https://docs.cloud.google.com/iam/docs/retry-strategy",
+        "evidence": "This random delay helps prevent a synchronized wave of retries from multiple clients, also known as the thundering herd problem."
+      },
+      {
+        "title": "Retry failed requests (IAM)",
+        "url": "https://docs.cloud.google.com/iam/docs/retry-strategy",
+        "evidence": "Use a different value for each retry. Adding this random value prevents clients from becoming synchronized and sending large numbers of retries at the same time."
+      }
+    ]
+  },
+  {
+    "id": "api-034",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "retries",
+      "client-libraries",
+      "cloud-storage"
+    ],
+    "stem": "A Cloud Run job downloads a report with the Cloud Storage client library for Python. During a Cloud Storage incident, each run took many minutes before it failed. The request rate to Cloud Storage also rose sharply. The team wants a failed download to return in about five minutes.\n\n```python\nimport time\nfrom google.cloud import storage\n\nblob = storage.Client().bucket(\"reports\").blob(\"daily.csv\")\nfor attempt in range(5):\n    try:\n        blob.download_to_filename(\"/tmp/report.csv\")\n        break\n    except Exception:\n        time.sleep(1)\n```\n\nHow should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the loop, and pass `retry=DEFAULT_RETRY.with_timeout(300.0)` to the download call."
+      },
+      {
+        "id": "B",
+        "text": "Keep the loop, and replace the fixed sleep with exponential backoff and jitter."
+      },
+      {
+        "id": "C",
+        "text": "Keep the loop, and raise the number of attempts to 10 so that more runs succeed."
+      },
+      {
+        "id": "D",
+        "text": "Keep the loop, and pass `retry=None` so that each attempt fails at once on any error."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The client library already retries transient errors with exponential backoff, up to a default deadline of 120 seconds. The loop repeats the full library retry sequence up to five times, so the attempts multiply. Google recommends that you use and configure the built-in retries. Remove the loop, and set the library deadline to about **five minutes** with `with_timeout`.",
+    "whyWrong": {
+      "B": "Backoff in the loop still adds application retries on top of the library retries, so the attempts multiply and the run stays long.",
+      "C": "More application attempts multiply the library retries even more. Runs take longer and send more requests.",
+      "D": "This removes the multiplication, but the loop then retries every error, including permanent errors, with no backoff or jitter."
+    },
+    "sources": [
+      {
+        "title": "Retry strategy (Cloud Storage)",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "Adding custom application level retry logic on top of the existing retry mechanisms can lead to an excessive number of retry attempts."
+      },
+      {
+        "title": "Retry strategy (Cloud Storage)",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "We recommend using and configuring the built-in retry mechanisms."
+      },
+      {
+        "title": "Retry strategy (Cloud Storage)",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "To modify the default retry behavior, create a copy of the `google.cloud.storage.retry.DEFAULT_RETRY` object by calling it with a `with_BEHAVIOR` method."
+      }
+    ]
+  },
+  {
+    "id": "api-035",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "retries",
+      "error-handling",
+      "cloud-storage"
+    ],
+    "stem": "A service calls the Cloud Storage JSON API directly with an HTTP client, so you write its retry logic. The calls are `GET` requests, which are safe to repeat. Which two failures should the code retry with exponential backoff? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "`400 Bad Request`, because a query parameter has an invalid value"
+      },
+      {
+        "id": "B",
+        "text": "`403 Forbidden`, because the caller has no permission on the bucket"
+      },
+      {
+        "id": "C",
+        "text": "`503 Service Unavailable`, during a short disruption of the service"
+      },
+      {
+        "id": "D",
+        "text": "`404 Not Found`, because the requested object does not exist"
+      },
+      {
+        "id": "E",
+        "text": "A TCP connection reset before any response arrives"
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Retry transient failures, such as `5xx` responses and connection problems like TCP disconnects. A `GET` request is idempotent, so a retry is safe. An invalid request, a missing permission, or a missing object is a permanent error. A retry does not fix it, and it can cause an endless loop.",
+    "whyWrong": {
+      "A": "An invalid argument fails in the same way each time. Fix the request instead of retrying it.",
+      "B": "The caller needs a permission change first. A retry of an authorization failure does not succeed.",
+      "D": "The object must exist first. A retry does not succeed until the state changes."
+    },
+    "sources": [
+      {
+        "title": "Retry strategy (Cloud Storage)",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "Only retry transient errors like `408`, `429`, and `5xx` HTTP codes, or specific connection issues. For permanent errors, log them and handle the underlying cause appropriately."
+      },
+      {
+        "title": "Retry strategy (Cloud Storage)",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "Some errors for example, authorization failures or invalid requests are persistent and retrying them without addressing the underlying cause won't be successful"
+      },
+      {
+        "title": "AIP-194: Automatic retry configuration",
+        "url": "https://google.aip.dev/194",
+        "evidence": "`UNAVAILABLE`: This code generally results from network hiccups, and is generally transient."
+      }
+    ]
+  },
+  {
+    "id": "api-036",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "iam",
+      "retries",
+      "read-modify-write",
+      "etag"
+    ],
+    "stem": "A deployment tool adds a role binding to the IAM allow policy of a project. It calls `getIamPolicy`, adds the binding to the returned policy, and calls `setIamPolicy` with that policy and its `etag`. During busy deployments, `setIamPolicy` sometimes fails with HTTP `409` and the status `ABORTED`. How should the tool handle this error?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Retry only the `setIamPolicy` call with the same policy, with truncated exponential backoff."
+      },
+      {
+        "id": "B",
+        "text": "Remove the `etag` from the policy before the write, so that the write cannot conflict."
+      },
+      {
+        "id": "C",
+        "text": "Treat the error as permanent, log it, and stop the deployment for a manual fix."
+      },
+      {
+        "id": "D",
+        "text": "Retry the full sequence: read the policy again, add the binding, and write it, with backoff and jitter."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "`409 ABORTED` means that another client changed the policy after the tool read it, so the `etag` no longer matches. Retry the whole read-modify-write sequence with truncated exponential backoff and jitter. A retry of only the write sends the old `etag` again and **keeps failing**.",
+    "whyWrong": {
+      "A": "The policy still has the old `etag`, so the write keeps failing. Google says that a retry of only the write continues to fail.",
+      "B": "Without the `etag`, the write can overwrite the change of the other client. The `etag` exists to prevent this lost update.",
+      "C": "This is a concurrency conflict, not a permanent error. A new read-modify-write sequence can succeed."
+    },
+    "sources": [
+      {
+        "title": "Retry failed requests (IAM)",
+        "url": "https://docs.cloud.google.com/iam/docs/retry-strategy",
+        "evidence": "For this type of error, you should always retry the entire read-modify-write series of requests, using truncated exponential backoff with introduced jitter. If you retry only the write operation, the request will continue to fail."
+      },
+      {
+        "title": "Retry failed requests (IAM)",
+        "url": "https://docs.cloud.google.com/iam/docs/retry-strategy",
+        "evidence": "This type of error indicates a concurrency issue; for example, you might be trying to update an allow policy that another client has already overwritten."
+      }
+    ]
+  },
+  {
+    "id": "api-037",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "compute-engine",
+      "long-running-operations",
+      "rate-quota"
+    ],
+    "stem": "A provisioning script creates 50 VMs with the Compute Engine API. After each `instances.insert` call, it calls `zoneOperations.get` every 200 ms until the operation status is `DONE`. The project now gets `403` errors with the reason `rateLimitExceeded`, and most requests are these `get` calls. What should you change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Treat the `200` response from `instances.insert` as proof that the VM is ready, and stop the checks."
+      },
+      {
+        "id": "B",
+        "text": "Call `zoneOperations.wait` in a retry loop with exponential backoff, instead of polling with `get`."
+      },
+      {
+        "id": "C",
+        "text": "Poll `zoneOperations.get` from ten parallel threads, so that each VM is checked sooner."
+      },
+      {
+        "id": "D",
+        "text": "Retry each failed `get` call at once, without a wait, until the call succeeds."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Short polling uses rate quota on requests that return no useful data. The `wait` method returns when the operation is done or when it nears its deadline. Google recommends `wait` in a retry loop with exponential backoff, which **preserves rate quota** and reduces latency.",
+    "whyWrong": {
+      "A": "A `200` means only that the server accepted the request. The operation can still run, or it can fail later.",
+      "C": "More parallel polling sends more requests and uses the rate quota faster.",
+      "D": "Retries without a wait increase the request rate. They can use up the quota for every tool in the project."
+    },
+    "sources": [
+      {
+        "title": "Best practices for the Compute Engine API",
+        "url": "https://docs.cloud.google.com/compute/docs/api/best-practices",
+        "evidence": "Using the `wait` method in a retry loop with exponential backoff to check the status of your request, instead of using the `get` method with short polling for the `Operation` resource, helps preserve your rate quotas and reduces latency."
+      },
+      {
+        "title": "Best practices for the Compute Engine API",
+        "url": "https://docs.cloud.google.com/compute/docs/api/best-practices",
+        "evidence": "Although receiving a `200` indicates that the server received your API request successfully, this status code doesn't indicate if the requested operation has been completed successfully or not."
+      }
+    ]
+  }
+]

@@ -1,0 +1,1360 @@
+[
+  {
+    "id": "sec-001",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "event-based-hold",
+      "retention-policy",
+      "cloud-storage"
+    ],
+    "stem": "A bank stores loan documents in a Cloud Storage bucket. A regulation requires that each document stays unchanged until 7 years after its loan is paid off. Loans run for different lengths of time, and the payoff date is not known at upload. Nobody may delete a document while its loan is active. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set a 7-year retention policy on the bucket. Put a temporary hold on each document at upload, and release it at payoff."
+      },
+      {
+        "id": "B",
+        "text": "Set a 7-year retention policy on the bucket when you create the bucket. Lock the policy so that nobody can reduce it."
+      },
+      {
+        "id": "C",
+        "text": "Grant users only read access to the bucket. Add a lifecycle rule with the `Delete` action and an `age` condition of 7 years."
+      },
+      {
+        "id": "D",
+        "text": "Set a 7-year retention policy on the bucket, and enable the default event-based hold. Release each document's hold at its loan payoff."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The 7 years must start at an event, the loan payoff, not at the upload. With the default event-based hold, each new object gets a hold, so nobody can delete or replace it during the loan. When you release an event-based hold in a bucket with a retention policy, the object's time in the bucket starts again. The retention policy then keeps the document for 7 more years.",
+    "whyWrong": {
+      "A": "Releasing a temporary hold does not restart the retention period, which counts from the upload. A document from a short loan can be deleted before 7 years after the payoff.",
+      "B": "The retention period counts from the upload. A loan that lasts 5 years leaves only 2 years of retention after the payoff.",
+      "C": "The `age` condition counts from the creation time, not from the payoff. A lifecycle rule also does not stop an administrator from deleting a document."
+    },
+    "sources": [
+      {
+        "title": "Object holds",
+        "url": "https://docs.cloud.google.com/storage/docs/object-holds",
+        "evidence": "Releasing an event-based hold resets the object's time in the bucket for the purposes of the retention period"
+      },
+      {
+        "title": "Object holds",
+        "url": "https://docs.cloud.google.com/storage/docs/object-holds",
+        "evidence": "When the loan is paid off, you can release the hold, at which point the retention policy ensures the loan remains stored and unchangeable until it fulfills the retention period set in your retention policy."
+      },
+      {
+        "title": "Object Lifecycle Management",
+        "url": "https://docs.cloud.google.com/storage/docs/lifecycle",
+        "evidence": "The `age` condition is satisfied when a resource reaches the specified age (in days). Age is measured from the resource's creation time."
+      }
+    ]
+  },
+  {
+    "id": "sec-002",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "soft-delete",
+      "object-versioning",
+      "cloud-storage"
+    ],
+    "stem": "A team stores user uploads in a Cloud Storage bucket. Last month, a script deleted the whole bucket by mistake, and the data was lost because soft delete was disabled. The team must be able to recover deleted or overwritten objects, and a deleted bucket, for up to 30 days. Users must still be able to delete and replace their own files at any time. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable Object Versioning, and add a lifecycle rule that deletes noncurrent versions 30 days after they become noncurrent."
+      },
+      {
+        "id": "B",
+        "text": "Set a soft delete policy with a 30-day retention duration on the bucket."
+      },
+      {
+        "id": "C",
+        "text": "Set a 30-day retention policy on the bucket, and keep the policy unlocked."
+      },
+      {
+        "id": "D",
+        "text": "Place a temporary hold on each new object, and release each hold 30 days later with a scheduled job."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Soft delete keeps deleted and overwritten objects, and deleted buckets, for the retention duration. You can set 7 to 90 days. It does not block deletes or overwrites, so users keep full control of their files. Google recommends soft delete instead of Object Versioning to protect against accidental or malicious deletion.",
+    "whyWrong": {
+      "A": "Object Versioning does not protect against bucket deletion, so the team cannot recover a deleted bucket.",
+      "C": "A retention policy blocks the deletion and replacement of objects that are younger than 30 days, so users cannot manage their own files.",
+      "D": "An object with a hold cannot be deleted or replaced, so users cannot manage their own files for 30 days."
+    },
+    "sources": [
+      {
+        "title": "Object Versioning",
+        "url": "https://docs.cloud.google.com/storage/docs/object-versioning",
+        "evidence": "If you want to prevent permanent data loss from accidental or malicious deletions, use soft delete instead of Object Versioning. soft delete provides bucket-level protection by retaining all recently deleted live or noncurrent objects."
+      },
+      {
+        "title": "Object Versioning",
+        "url": "https://docs.cloud.google.com/storage/docs/object-versioning",
+        "evidence": "Objects can only be recovered from a deleted bucket when soft delete is enabled. Object Versioning does not provide protection against bucket deletions."
+      },
+      {
+        "title": "Soft delete overview",
+        "url": "https://docs.cloud.google.com/storage/docs/soft-delete",
+        "evidence": "The default retention duration is 7 days and you can customize the retention duration to anywhere between 7 to 90 days."
+      }
+    ]
+  },
+  {
+    "id": "sec-003",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "bucket-lock",
+      "lifecycle",
+      "compliance"
+    ],
+    "stem": "A brokerage stores trade confirmations in a new Cloud Storage bucket. SEC rules require that nobody, including project owners, can delete or change a confirmation for 6 years. After 6 years, each confirmation must be deleted without manual work. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set a 6-year retention policy on the bucket, and keep it unlocked so that an administrator can correct mistakes."
+      },
+      {
+        "id": "B",
+        "text": "Set a 6-year retention policy on the bucket, and lock the policy."
+      },
+      {
+        "id": "C",
+        "text": "Enable Object Versioning, so that deleted confirmations stay available as noncurrent versions for 6 years."
+      },
+      {
+        "id": "D",
+        "text": "Add a lifecycle rule with the `Delete` action and an `age` condition that equals 6 years in days."
+      },
+      {
+        "id": "E",
+        "text": "Set the soft delete retention duration of the bucket to 6 years."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "A locked retention policy blocks the deletion and replacement of every object until the object is older than the retention period. Nobody can reduce or remove a locked policy. A lifecycle rule with the `Delete` action also works in a bucket with a locked policy. The rule waits until each object meets the retention period. Together, the two settings keep each record for 6 years and then delete it automatically.",
+    "whyWrong": {
+      "A": "Anyone with the right permissions can reduce or remove an unlocked policy, and then delete records early.",
+      "C": "Object Versioning does not block deletion. A user can delete a noncurrent version by its generation number.",
+      "E": "The soft delete retention duration is at most 90 days. Soft delete also does not block deletion. It only keeps deleted objects for a restore."
+    },
+    "sources": [
+      {
+        "title": "Bucket Lock",
+        "url": "https://docs.cloud.google.com/storage/docs/bucket-lock",
+        "evidence": "Once you lock a policy, you cannot remove it or reduce the retention period it has."
+      },
+      {
+        "title": "Bucket Lock",
+        "url": "https://docs.cloud.google.com/storage/docs/bucket-lock",
+        "evidence": "You can use Object Lifecycle Management to automatically delete objects in a bucket, including in a bucket with a locked policy. A lifecycle rule won't delete an object until after the object fulfills the retention policy."
+      },
+      {
+        "title": "Soft delete overview",
+        "url": "https://docs.cloud.google.com/storage/docs/soft-delete",
+        "evidence": "The default retention duration is 7 days and you can customize the retention duration to anywhere between 7 to 90 days."
+      }
+    ]
+  },
+  {
+    "id": "sec-004",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "public-access-prevention",
+      "organization-policy",
+      "signed-urls"
+    ],
+    "stem": "Your organization enforces the `storage.publicAccessPrevention` constraint on all projects. A partner without a Google account must download one report from a private bucket in the next 24 hours. A developer tries to grant `allUsers` the Storage Object Viewer role on the bucket. The request fails with `412 Precondition Failed`. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask the organization policy administrator to stop enforcing the constraint on the project for one day."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Storage Object Viewer role to `allAuthenticatedUsers` on the bucket instead of `allUsers`."
+      },
+      {
+        "id": "C",
+        "text": "Generate a signed URL for the report that expires in 24 hours, and send it to the partner."
+      },
+      {
+        "id": "D",
+        "text": "Disable uniform bucket-level access, and add an `allUsers` read ACL to the report object."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Public access prevention blocks access through `allUsers` and `allAuthenticatedUsers`. A request to add them fails with `412 Precondition Failed`. Signed URLs give time-limited access to anyone who has the URL, and public access prevention does not affect them. So a signed URL shares one object for 24 hours without a policy exception.",
+    "whyWrong": {
+      "A": "This removes the protection from the whole project and still needs a public grant. A signed URL needs no exception.",
+      "B": "Public access prevention blocks `allAuthenticatedUsers` in the same way as `allUsers`. The partner also has no Google account.",
+      "D": "Public access prevention also blocks ACLs that grant access to `allUsers`."
+    },
+    "sources": [
+      {
+        "title": "Public access prevention",
+        "url": "https://docs.cloud.google.com/storage/docs/public-access-prevention",
+        "evidence": "Signed URLs, which give time limited, narrowly-scoped access to anyone who uses them, are not affected by public access prevention."
+      },
+      {
+        "title": "Public access prevention",
+        "url": "https://docs.cloud.google.com/storage/docs/public-access-prevention",
+        "evidence": "Requests to add `allUsers` and `allAuthenticatedUsers` to an IAM policy or ACL fail with `412 Precondition Failed`."
+      }
+    ]
+  },
+  {
+    "id": "sec-005",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "iap",
+      "cloud-run",
+      "access-control"
+    ],
+    "stem": "An internal expense app runs on Cloud Run with ingress set to `all`. Only employees in the Google group `finance@example.com` may open it in a browser. The company has no VPN. You must protect every path to the app, including the default `run.app` URL, with the least operational overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable IAP on the service, and grant the group the IAP-secured Web App User role. Grant the IAP service agent the Cloud Run Invoker role."
+      },
+      {
+        "id": "B",
+        "text": "Create an external Application Load Balancer with a serverless NEG for the service. Enable IAP on the backend service of the load balancer."
+      },
+      {
+        "id": "C",
+        "text": "Enable IAP on the service. Grant the group the Cloud Run Invoker role on the service, so that its members can open the app."
+      },
+      {
+        "id": "D",
+        "text": "Add Identity Platform sign-in to the app. In the application code, check that each signed-in user is a member of the group."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Google recommends that you enable IAP directly on the Cloud Run service. This protects all ingress paths, including the `run.app` URL, and needs no load balancer. IAP needs permission to invoke the service, so the IAP service agent gets the Cloud Run Invoker role. Users get access through the IAP-secured Web App User role (`roles/iap.httpsResourceAccessor`).",
+    "whyWrong": {
+      "B": "IAP on a load balancer does not protect the `run.app` URL, which stays open with ingress `all`. The load balancer also adds resources to manage.",
+      "C": "IAP checks the IAP-secured Web App User role of the user. The Cloud Run Invoker role belongs to the IAP service agent.",
+      "D": "This needs sign-in and authorization code in the app. IAP controls access by group with no code changes and less overhead."
+    },
+    "sources": [
+      {
+        "title": "Configure IAP for Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/securing/identity-aware-proxy-cloud-run",
+        "evidence": "By enabling IAP on Cloud Run directly, you can secure traffic with a single click from all ingress paths, including default `run.app` URLs and load balancers."
+      },
+      {
+        "title": "Configure IAP for Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/securing/identity-aware-proxy-cloud-run",
+        "evidence": "When you enable IAP for Cloud Run, IAP requires permissions to invoke your Cloud Run service."
+      },
+      {
+        "title": "Identity-Aware Proxy overview",
+        "url": "https://docs.cloud.google.com/iap/docs/concepts-overview",
+        "evidence": "If the user has the IAP-secured Web App User role on the Google Cloud console project where the resource exists, they're authorized to access the application."
+      }
+    ]
+  },
+  {
+    "id": "sec-006",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "iap",
+      "jwt",
+      "signed-headers"
+    ],
+    "stem": "An admin app runs on Cloud Run with IAP enabled on the service. The app authorizes users with this code:\n\n```python\nuser = request.headers.get(\"X-Goog-Authenticated-User-Email\")\nif not is_admin(user):\n    abort(403)\n```\n\nA security review requires that the app identifies users safely, even if IAP is accidentally disabled or bypassed. How should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Reject requests that do not have the `x-goog-iap-jwt-assertion` header. Keep reading the user from the `X-Goog-Authenticated-User-Email` header."
+      },
+      {
+        "id": "B",
+        "text": "Verify the signed `x-goog-iap-jwt-assertion` JWT with the IAP public keys. Check that `aud` is the `run.app` URL of the service, and use its `email` claim."
+      },
+      {
+        "id": "C",
+        "text": "Verify the signed `x-goog-iap-jwt-assertion` JWT with the IAP public keys. Check that `aud` is `/projects/PROJECT_NUMBER/locations/REGION/services/SERVICE_NAME`, and use its `email` claim."
+      },
+      {
+        "id": "D",
+        "text": "Read the user from the `X-Goog-Authenticated-User-Id` header instead. IAP removes all `x-goog-*` headers that clients send to the app."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "If someone bypasses IAP, they can forge the unsigned `x-goog-authenticated-user-*` headers. So the app must verify the signed JWT in the `x-goog-iap-jwt-assertion` header. It checks the signature with the IAP public keys, the issuer, the expiry, and the audience. For a Cloud Run service, the audience is `/projects/PROJECT_NUMBER/locations/REGION/services/SERVICE_NAME`. Then the app uses the `email` claim of the verified JWT as the user identity.",
+    "whyWrong": {
+      "A": "An attacker who bypasses IAP can also send a fake `x-goog-iap-jwt-assertion` header. Only a verified signature proves that IAP sent the request.",
+      "B": "The `run.app` URL is the audience of ID tokens for service-to-service calls. The IAP JWT for Cloud Run has a `/projects/.../services/SERVICE_NAME` audience, so this check rejects valid requests.",
+      "D": "IAP removes client `x-goog-*` headers only from requests that pass through IAP. A request that bypasses IAP can carry a forged user ID header."
+    },
+    "sources": [
+      {
+        "title": "Securing your app with signed headers",
+        "url": "https://docs.cloud.google.com/iap/docs/signed-headers-howto",
+        "evidence": "The JWT is in the HTTP request header `x-goog-iap-jwt-assertion`. If an attacker bypasses IAP, the attacker can forge the IAP unsigned identity headers, `x-goog-authenticated-user-{email,id}`."
+      },
+      {
+        "title": "Securing your app with signed headers",
+        "url": "https://docs.cloud.google.com/iap/docs/signed-headers-howto",
+        "evidence": "Must be a string with the following values: App Engine: `/projects/PROJECT_NUMBER/apps/PROJECT_ID` Compute Engine and GKE: `/projects/PROJECT_NUMBER/global/backendServices/SERVICE_ID` Cloud Run: `/projects/PROJECT_NUMBER/locations/REGION/services/SERVICE_NAME`"
+      },
+      {
+        "title": "Securing your app with signed headers",
+        "url": "https://docs.cloud.google.com/iap/docs/signed-headers-howto",
+        "evidence": "Signed headers provide secondary security in case someone bypasses IAP. When IAP is enabled, IAP strips the `x-goog-*` headers provided by the client when the request goes through the IAP serving infrastructure."
+      }
+    ]
+  },
+  {
+    "id": "sec-007",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "web-security-scanner",
+      "custom-scans",
+      "safe-scanning"
+    ],
+    "stem": "A team runs a public blog app on App Engine. Signed-in users can post comments and delete their own posts. The team wants Web Security Scanner to find XSS in the pages that need a sign-in. The scan must not change production data. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run a custom scan against a copy of the app and its data in a separate test project."
+      },
+      {
+        "id": "B",
+        "text": "Run a managed scan, because managed scans sign in and submit forms with harmless test values."
+      },
+      {
+        "id": "C",
+        "text": "Configure the scan to sign in with a test account that has no access to sensitive data or harmful operations."
+      },
+      {
+        "id": "D",
+        "text": "Configure the scan to sign in with an administrator account, so that the scanner reaches every page."
+      },
+      {
+        "id": "E",
+        "text": "Scan the production app at night, when few users are active, and restore any changed data the next day."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Web Security Scanner fills fields, clicks buttons, and submits forms, so it can post comments or delete posts. Google recommends that you scan a test environment, such as a separate App Engine project. Sign in with a test account that has no access to sensitive data or harmful operations. Pages that need a sign-in also need a custom scan, because managed scans do not authenticate.",
+    "whyWrong": {
+      "B": "Managed scans do not use authentication and send only GET requests, so they cannot test the pages that need a sign-in.",
+      "D": "An administrator account lets the scanner activate harmful operations, such as deleting the posts of other users.",
+      "E": "The scanner still changes production data at night. Google recommends a test environment, not a quiet time."
+    },
+    "sources": [
+      {
+        "title": "Overview of Web Security Scanner",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+        "evidence": "Run scans in a test environment. Set up a test environment by creating a separate App Engine project and loading your application and data there."
+      },
+      {
+        "title": "Overview of Web Security Scanner",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+        "evidence": "Use a test account. Create a user account that doesn't have access to sensitive data or harmful operations, and use it when scanning your app."
+      },
+      {
+        "title": "Overview of Web Security Scanner",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+        "evidence": "These scans don't use authentication and they send GET-only requests so they don't submit any forms on live websites."
+      }
+    ]
+  },
+  {
+    "id": "sec-008",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "artifact-analysis",
+      "vulnerability-response",
+      "base-image"
+    ],
+    "stem": "Artifact Analysis reports a critical vulnerability in an OS package of the image `orders:1.4`, which runs on Cloud Run. The image is built from a Dockerfile that uses a public base image, and a patched version of that base image exists. A developer pulls `orders:1.4`, adds the tag `1.4-patched`, and pushes it. No new scan result appears. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run On-Demand Scanning on `orders:1.4-patched`, so that Artifact Analysis stores a new result for the new tag."
+      },
+      {
+        "id": "B",
+        "text": "Update the base image in the Dockerfile, rebuild and push the image, and deploy the new image to the service."
+      },
+      {
+        "id": "C",
+        "text": "Enable automatic base image updates on the service, so that Google patches the public base image of the running service."
+      },
+      {
+        "id": "D",
+        "text": "Mute the finding in Security Command Center, and fix the base image in the next planned release."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Artifact Analysis scans an image once, by its digest, so a new tag on the same image does not start a scan. The image is also still vulnerable. Fix the source. Update the base image, rebuild the image, and push it. The new image has a new digest, so automatic scanning scans it on push. Then deploy it, so that the service no longer runs the vulnerable image.",
+    "whyWrong": {
+      "A": "The tagged image has the same digest and the same vulnerable package. Another scan of it does not fix anything.",
+      "C": "Automatic base image updates work only with Google Cloud's buildpacks base images, not with a public base image in a Dockerfile.",
+      "D": "Muting only hides the finding. The vulnerable image keeps running in production."
+    },
+    "sources": [
+      {
+        "title": "Container scanning overview",
+        "url": "https://docs.cloud.google.com/artifact-analysis/docs/container-scanning-overview",
+        "evidence": "The images are scanned only once, based on the image's digest. This means that adding or modifying tags won't trigger new scans."
+      },
+      {
+        "title": "Configure automatic base image updates",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/automatic-base-image-updates",
+        "evidence": "Cloud Run only supports automatic base images that use Google Cloud's buildpacks base images."
+      },
+      {
+        "title": "Mute findings in Security Command Center",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/how-to-mute-findings",
+        "evidence": "Muting a finding hides it from the default view of your findings in the Google Cloud console."
+      }
+    ]
+  },
+  {
+    "id": "sec-009",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "security-command-center",
+      "cloud-run",
+      "vulnerability-response"
+    ],
+    "stem": "Security Command Center shows an active `CONTAINER_IMAGE_VULNERABILITY` finding for the Cloud Run service `checkout`. The team rebuilt the image with a patched base image and deployed it with this command:\n\n```bash\ngcloud run deploy checkout --region=us-central1 \\\n  --image=us-central1-docker.pkg.dev/shop/apps/checkout@sha256:NEW_DIGEST \\\n  --tag=fixed --no-traffic\n```\n\nTests against the `fixed` tag URL pass. Two days later, the finding is still active. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a mute rule for the finding, because a revision with the fixed image now exists."
+      },
+      {
+        "id": "B",
+        "text": "Run On-Demand Scanning on the fixed image, so that Security Command Center closes the finding."
+      },
+      {
+        "id": "C",
+        "text": "Push the fixed image again with the `latest` tag, so that Artifact Analysis scans it and updates the finding."
+      },
+      {
+        "id": "D",
+        "text": "Send all traffic to the revision with the fixed image, so that no traffic goes to the vulnerable revision."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "For a Cloud Run service, the finding resolves when no traffic goes to the revision with the vulnerable image. The traffic must go to a revision with a fixed image. The `--no-traffic` flag left all traffic on the vulnerable revision, so the vulnerable image still serves users. Move the traffic, for example with `gcloud run services update-traffic checkout --to-tags fixed=100`.",
+    "whyWrong": {
+      "A": "Muting only hides the finding. The vulnerable revision still serves all traffic.",
+      "B": "On-Demand Scanning only reports the vulnerabilities of an image. The finding is about the deployed vulnerable revision, which still serves all traffic.",
+      "C": "Artifact Analysis scans an image once, by digest, so a new tag does not start a scan. The vulnerable revision also still serves all traffic."
+    },
+    "sources": [
+      {
+        "title": "Enable and use Artifact Registry vulnerability assessment",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/vulnerability-assessment-ar-overview",
+        "evidence": "For Cloud Run services or revisions, allocate traffic to a different revision that is deployed with a fixed image version. Make sure that traffic is not allocated to the revision with the vulnerable image."
+      },
+      {
+        "title": "Mute findings in Security Command Center",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/how-to-mute-findings",
+        "evidence": "Muting a finding hides it from the default view of your findings in the Google Cloud console."
+      }
+    ]
+  },
+  {
+    "id": "sec-010",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "secret-manager",
+      "iam",
+      "least-privilege"
+    ],
+    "stem": "The Cloud Run service `billing` runs as the service account `billing-sa`, which has the Editor role on the project. The project holds secrets for 12 services. A call to `access_secret_version` for the secret `stripe-key` fails with `PERMISSION_DENIED`. You want least privilege. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant `billing-sa` the Secret Manager Secret Accessor role on the project."
+      },
+      {
+        "id": "B",
+        "text": "Grant `billing-sa` the Secret Manager Secret Accessor role on the `stripe-key` secret."
+      },
+      {
+        "id": "C",
+        "text": "Grant `billing-sa` the Secret Manager Secret Version Manager role on the `stripe-key` secret."
+      },
+      {
+        "id": "D",
+        "text": "Grant `billing-sa` the Secret Manager Viewer role on the `stripe-key` secret."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The Editor role does not include the `secretmanager.versions.access` permission, so it cannot read secret payloads. The Secret Accessor role allows access to the payload. A grant on the one secret gives access to only that secret. This is least privilege in a project that holds secrets for many services.",
+    "whyWrong": {
+      "A": "A grant on the project gives `billing-sa` access to the secrets of all 12 services.",
+      "C": "The Secret Version Manager role can add, enable, disable, and destroy versions, but it cannot read their payloads.",
+      "D": "The Secret Manager Viewer role allows access to metadata only. It cannot read secret payloads."
+    },
+    "sources": [
+      {
+        "title": "Access control with IAM",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/access-control",
+        "evidence": "The role `roles/owner` includes the `secretmanager.versions.access` permission, but the `roles/editor` and `roles/viewer` do not."
+      },
+      {
+        "title": "Access control with IAM",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/access-control",
+        "evidence": "For example, you can grant a service account the Secret Manager Secret Accessor role (`roles/secretmanager.secretAccessor`) on a single secret."
+      },
+      {
+        "title": "Secret Manager best practices",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/best-practices",
+        "evidence": "When secrets for many services are in a single project, use secret level IAM bindings, or IAM Conditions to limit access to the necessary subset of secrets."
+      }
+    ]
+  },
+  {
+    "id": "sec-011",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "secret-manager",
+      "cloud-run",
+      "secret-versions"
+    ],
+    "stem": "A Cloud Run service reads a database password from an environment variable. It was deployed with `--update-secrets=DB_PASS=db-pass:latest`. A rotation job adds a new secret version each month. Last month, a bad version broke every new instance that started during a traffic spike. You want each new version to reach production gradually and to roll back with the normal release process. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Mount the secret as a volume that references `latest`, so that running instances read each new version without a restart."
+      },
+      {
+        "id": "B",
+        "text": "Keep `latest` in the environment variable. Set a minimum number of instances, so that fewer instances start after a rotation."
+      },
+      {
+        "id": "C",
+        "text": "At rotation time, resolve `latest` to a version number and store it in the deployment configuration. Deploy a revision that references that number."
+      },
+      {
+        "id": "D",
+        "text": "Make the app poll Secret Manager for the `latest` version every minute. Switch to the new password as soon as it changes."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Google recommends that you resolve the version at rotation time and roll it out with your release process. With a pinned version number, every instance of a revision uses the same version. You can then shift traffic to the new revision gradually, and roll back to the earlier revision if the new password fails. With `latest` in an environment variable, Cloud Run resolves the value at instance startup, so a bad version reaches new instances without control.",
+    "whyWrong": {
+      "A": "Cloud Run fetches a mounted secret from Secret Manager each time the app reads it, so a bad version reaches all instances at once. This approach risks a service-wide outage.",
+      "B": "New instances still resolve `latest` when they start, so a bad version still breaks the service during scale-up. There is no gradual rollout or rollback.",
+      "D": "Continuous polling puts a bad version into use everywhere at once, with no gradual adoption."
+    },
+    "sources": [
+      {
+        "title": "About rotation schedules",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/rotation-recommendations",
+        "evidence": "We recommend resolving the secret version name at rotation time, storing the resource name somewhere durable (for example, commit to Git), and pulling the version name into the deployment configuration during the push to prevent blocked deployments."
+      },
+      {
+        "title": "Configure secrets for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/services/secrets",
+        "evidence": "Environment variables are resolved at instance startup time, so if you use this method, Google recommends that you pin the secret to a particular version instead of using `latest` as the version."
+      },
+      {
+        "title": "About rotation schedules",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/rotation-recommendations",
+        "evidence": "This approach risks immediate, service-wide outage as there's no gradual adoption of the new secret value."
+      }
+    ]
+  },
+  {
+    "id": "sec-012",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "secret-manager",
+      "rotation",
+      "pubsub"
+    ],
+    "stem": "The secret `partner-api-key` has a rotation schedule with a 30-day period and a Pub/Sub topic. Each month, the topic receives a `SECRET_ROTATE` message. However, no new secret version appears, and the app keeps using the old key. The partner offers an admin API that creates new API keys. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Write a subscriber for the message. It creates a key with the partner's admin API and adds it as a new secret version."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Secret Manager service agent the Secret Version Adder role on the secret. Then it can add the rotated version."
+      },
+      {
+        "id": "C",
+        "text": "Set an expiration time on the secret. Secret Manager then replaces the current version with a new value when it expires."
+      },
+      {
+        "id": "D",
+        "text": "Enable automatic rotation on the Cloud KMS key that protects the secret with CMEK. The secret value then changes on schedule."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A rotation schedule only sends a `SECRET_ROTATE` message to the topics at the rotation time. Secret Manager does not create the new value. Your own subscriber, for example a Cloud Run service, must create the credential in the external system and add it as a new secret version. Give the subscriber its own service account with a role such as Secret Version Adder.",
+    "whyWrong": {
+      "B": "Secret Manager cannot create a new partner API key, so a role for its service agent changes nothing. Only your code can make the new value.",
+      "C": "Expiration deletes the secret irreversibly. Google advises against expiration on production secrets.",
+      "D": "Cloud KMS key rotation adds a new key version for encryption. It does not change the secret value."
+    },
+    "sources": [
+      {
+        "title": "Create rotation schedules in Secret Manager",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/secret-rotation",
+        "evidence": "You must configure a Pub/Sub subscriber to receive and act on the `SECRET_ROTATE` messages. You might also need to set up additional workflows in response to these notifications, such as creating a new version of the secret"
+      },
+      {
+        "title": "About rotation schedules",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/rotation-recommendations",
+        "evidence": "Create and configure a Cloud Run service to receive rotation notifications and execute rotation steps:"
+      },
+      {
+        "title": "Secret Manager best practices",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/best-practices",
+        "evidence": "Don't set expiration on production secrets unless you are certain that they should be irreversibly deleted."
+      }
+    ]
+  },
+  {
+    "id": "sec-013",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "secret-manager",
+      "secret-versions",
+      "destroy"
+    ],
+    "stem": "You rotated the API key in the secret `maps-key` and added version 7. Version 6 must be retired. You are not sure that every service has moved to version 7, and you want to be able to undo the change if something breaks. The secret has no delayed destruction setting. What should you do first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Destroy version 6, because Secret Manager keeps destroyed versions recoverable for 30 days by default."
+      },
+      {
+        "id": "B",
+        "text": "Set an expiration time of one week on the secret, so that Secret Manager removes version 6 automatically."
+      },
+      {
+        "id": "C",
+        "text": "Revoke the old key at the API provider, and destroy version 6 if no errors appear after one week."
+      },
+      {
+        "id": "D",
+        "text": "Disable version 6, and watch for errors for about a week before you destroy it."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Disabling a version is reversible. You can enable it again if a service still needs it. By default, Secret Manager destroys a version immediately and permanently. So Google recommends that you disable a version first and wait, for example a week, to find dependencies that still use it. Cloud KMS is different. By default, it keeps a destroyed key version in the scheduled for destruction state for 30 days.",
+    "whyWrong": {
+      "A": "This describes Cloud KMS key versions. Without delayed destruction, Secret Manager destroys a version immediately and permanently.",
+      "B": "Expiration deletes the whole secret irreversibly, including version 7.",
+      "C": "Revoking the old key first breaks every service that still uses version 6. Remove the old credential only after you disable the version and confirm that nothing breaks."
+    },
+    "sources": [
+      {
+        "title": "Delay destruction of secret versions",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/delay-destruction-of-secret-versions",
+        "evidence": "By default, when a user chooses to destroy a secret version in Secret Manager, the secret material is destroyed immediately and permanently."
+      },
+      {
+        "title": "Secret Manager best practices",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/best-practices",
+        "evidence": "Disable secret versions before destroying them or deleting secrets. This helps prevent outages by putting the secret in a state that appears the same as destroy but is reversible."
+      },
+      {
+        "title": "Key version states",
+        "url": "https://docs.cloud.google.com/kms/docs/key-states",
+        "evidence": "By default, keys in Cloud KMS spend 30 days in the Scheduled for destruction (soft deleted) state before the key material is logically deleted from the system."
+      }
+    ]
+  },
+  {
+    "id": "sec-014",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "workload-identity-federation",
+      "service-account-keys",
+      "github-actions"
+    ],
+    "stem": "A team deploys to Cloud Run from GitHub Actions workflows in the GitHub organization `acme-dev`. The team's Google Cloud organization was created in 2025. A developer tries to create a service account key to store as a GitHub secret, and an organization policy blocks the request. You want the Google-recommended approach. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a workload identity pool with a GitHub OIDC provider. Add an attribute condition that accepts only tokens from the `acme-dev` organization."
+      },
+      {
+        "id": "B",
+        "text": "Ask the organization policy administrator to exempt the project from the key creation constraint. Store the key as an encrypted GitHub secret."
+      },
+      {
+        "id": "C",
+        "text": "Create a workload identity pool with a GitHub OIDC provider and no attribute condition. The GitHub issuer URL identifies your organization."
+      },
+      {
+        "id": "D",
+        "text": "Create the key in a project outside the organization, and store it in Secret Manager. The workflow reads the key when it runs."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Organizations created on or after May 3, 2024 enforce the security baseline, which blocks service account key creation. Workload Identity Federation lets the workflow exchange its GitHub OIDC token for short-lived Google Cloud credentials, so no key exists. GitHub uses one issuer URL for all organizations, so the provider needs an attribute condition that accepts only tokens from your organization.",
+    "whyWrong": {
+      "B": "A long-lived key can leak, and the security baseline blocks keys for this reason. Workload Identity Federation removes the need for a key.",
+      "C": "GitHub uses a single issuer URL for all organizations. Without an attribute condition, the provider can accept tokens from workflows in other GitHub organizations.",
+      "D": "The workflow needs a Google Cloud identity to read Secret Manager. That identity can authenticate directly, so a stored key adds risk with no benefit."
+    },
+    "sources": [
+      {
+        "title": "Configure Workload Identity Federation with deployment pipelines",
+        "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines",
+        "evidence": "GitHub, GitLab SaaS, and HCP Terraform use a single issuer URL across all organizations and some of the claims embedded in OIDC tokens might not be unique to your organization."
+      },
+      {
+        "title": "Manage Google Cloud security baseline constraints",
+        "url": "https://docs.cloud.google.com/resource-manager/docs/manage-baseline-constraints",
+        "evidence": "Google Cloud security baseline constraints are enforced for all organizations created on or after May 3, 2024."
+      },
+      {
+        "title": "Configure Workload Identity Federation with deployment pipelines",
+        "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines",
+        "evidence": "After you configure a workload identity pool to trust your GitHub repository, you can let workflows in that repository use their GitHub OIDC token to obtain short-lived Google Cloud credentials."
+      }
+    ]
+  },
+  {
+    "id": "sec-015",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-kms",
+      "iam",
+      "least-privilege"
+    ],
+    "stem": "A Cloud Run service encrypts and decrypts small configuration values with the Cloud KMS key `app-key`. Its service account has the Cloud KMS Admin role on the key ring. Every `Encrypt` call fails with a permission error. You want least privilege. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the service account the Cloud KMS CryptoKey Encrypter/Decrypter role on `app-key`, and remove its Cloud KMS Admin role."
+      },
+      {
+        "id": "B",
+        "text": "Grant the service account the Cloud KMS Admin role on the project, so that the role also covers `app-key`."
+      },
+      {
+        "id": "C",
+        "text": "Grant the service account the Cloud KMS CryptoKey Encrypter/Decrypter role on the project, and keep its Cloud KMS Admin role."
+      },
+      {
+        "id": "D",
+        "text": "Grant the Cloud KMS service agent the Cloud KMS CryptoKey Encrypter/Decrypter role on `app-key`, and keep the current roles."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The Cloud KMS Admin role manages keys, but it does not include the permissions to encrypt or decrypt. The app needs the CryptoKey Encrypter/Decrypter role on the one key that it uses. The app does not need the admin role, so remove it.",
+    "whyWrong": {
+      "B": "The Cloud KMS Admin role cannot encrypt or decrypt at any level of the resource hierarchy.",
+      "C": "A grant on the project gives access to every key in the project, and the app does not need the admin role. This breaks least privilege.",
+      "D": "A service agent uses a key when a Google Cloud service encrypts data for you with CMEK. Here, the app calls Cloud KMS with its own service account."
+    },
+    "sources": [
+      {
+        "title": "Encrypting and decrypting data with a symmetric key",
+        "url": "https://docs.cloud.google.com/kms/docs/encrypt-decrypt",
+        "evidence": "One way to permit a user to encrypt or decrypt is to add the user to the `roles/cloudkms.cryptoKeyEncrypter`, `roles/cloudkms.cryptoKeyDecrypter`, or `roles/cloudkms.cryptoKeyEncrypterDecrypter` IAM roles for that key. The `roles/cloudkms.admin` role does not provide these two permissions."
+      }
+    ]
+  },
+  {
+    "id": "sec-016",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-kms",
+      "envelope-encryption",
+      "client-side-encryption"
+    ],
+    "stem": "An app must encrypt 200-MB video files before it uploads them to Cloud Storage. The security team requires that the key encryption key stays in Cloud KMS and that nobody can export it. The first version of the app sends each file to the Cloud KMS `Encrypt` method, and the calls fail. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Split each file into 64-KiB chunks. Call the Cloud KMS `Encrypt` method once for each chunk, and store the encrypted chunks."
+      },
+      {
+        "id": "B",
+        "text": "Encrypt each file locally with a new data encryption key. Wrap that key with Cloud KMS, and store the wrapped key with the file."
+      },
+      {
+        "id": "C",
+        "text": "Export the key material from Cloud KMS when the app starts. Keep it in memory, and encrypt each file locally with it."
+      },
+      {
+        "id": "D",
+        "text": "Configure the bucket with a customer-managed encryption key (CMEK) in Cloud KMS. Cloud Storage then encrypts each uploaded file with that key."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Cloud KMS is designed to manage key encryption keys (KEKs), so `Encrypt` accepts at most 64 KiB of data. Use envelope encryption. Generate a data encryption key (DEK) locally for each write, and encrypt the data with it. Then ask Cloud KMS to wrap the DEK with the KEK. Store the wrapped DEK next to the data, and never store a plaintext DEK. The KEK never leaves Cloud KMS.",
+    "whyWrong": {
+      "A": "Cloud KMS is designed to manage keys, not to encrypt bulk data. Thousands of calls for each file add latency, and envelope encryption is the documented pattern.",
+      "C": "No Google Cloud principal can view or export the key material of a Cloud KMS key version. Cloud KMS uses the key material for you.",
+      "D": "CMEK is server-side encryption by Cloud Storage. The requirement is to encrypt the files in the app before the upload."
+    },
+    "sources": [
+      {
+        "title": "Envelope encryption",
+        "url": "https://docs.cloud.google.com/kms/docs/envelope-encryption",
+        "evidence": "Cloud Key Management Service was designed to manage KEKs, and thus the maximum data input size for `Encrypt` and `Decrypt` functions is 64 KiB."
+      },
+      {
+        "title": "Envelope encryption",
+        "url": "https://docs.cloud.google.com/kms/docs/envelope-encryption",
+        "evidence": "The process of encrypting data is to generate a DEK locally, encrypt data with the DEK, use a KEK to wrap the DEK, and then store the encrypted data and the wrapped DEK. The KEK never leaves Cloud KMS."
+      },
+      {
+        "title": "Customer-managed encryption keys (CMEK)",
+        "url": "https://docs.cloud.google.com/kms/docs/cmek",
+        "evidence": "Like Google Cloud's default encryption, CMEK is server-side, symmetric, envelope encryption of customer data."
+      }
+    ]
+  },
+  {
+    "id": "sec-017",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-kms",
+      "key-rotation",
+      "re-encryption"
+    ],
+    "stem": "The Cloud KMS key `records-kek` has automatic rotation every 90 days. Your app uses it to wrap the data encryption keys of archived records. A new security rule says that key versions older than one year must be destroyed. All archived records must stay readable. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Destroy the old key versions now, because automatic rotation already re-encrypted the wrapped keys with the new primary version."
+      },
+      {
+        "id": "B",
+        "text": "Destroy the old key versions now. If a decrypt call fails, restore that version during its 30-day scheduled destruction period."
+      },
+      {
+        "id": "C",
+        "text": "Re-encrypt the wrapped data encryption keys with the current primary version. Confirm that nothing uses the old versions, and then destroy them."
+      },
+      {
+        "id": "D",
+        "text": "Turn off automatic rotation, so that all records use one key version and no old versions exist to destroy."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Automatic rotation creates a new key version and makes it the primary version. Rotation does not re-encrypt existing data, and it does not disable or delete old versions. Data that an old version protects needs that version for decryption. So re-encrypt (rewrap) the data encryption keys with the primary version first. When no data depends on an old version, you can destroy it safely.",
+    "whyWrong": {
+      "A": "Rotation does not re-encrypt data. The records that old versions protect become unreadable.",
+      "B": "An archive can stay unread for more than 30 days. After the scheduled destruction period, the key material is gone, and so are the records.",
+      "D": "The single version also becomes older than one year, so the rule requires its destruction. Google also recommends regular automatic rotation of symmetric keys."
+    },
+    "sources": [
+      {
+        "title": "Key rotation",
+        "url": "https://docs.cloud.google.com/kms/docs/key-rotation",
+        "evidence": "Rotating keys creates new active key versions, but doesn't re-encrypt your data and doesn't disable or delete previous key versions."
+      },
+      {
+        "title": "Key rotation",
+        "url": "https://docs.cloud.google.com/kms/docs/key-rotation",
+        "evidence": "Re-encrypting data removes your reliance on old key versions, allowing you to destroy them to avoid incurring additional costs."
+      },
+      {
+        "title": "REST Resource: projects.locations.keyRings.cryptoKeys",
+        "url": "https://docs.cloud.google.com/kms/docs/reference/rest/v1/projects.locations.keyRings.cryptoKeys",
+        "evidence": "At `nextRotationTime`, the Key Management Service will automatically: Create a new version of this `CryptoKey`. Mark the new version as primary."
+      }
+    ]
+  },
+  {
+    "id": "sec-018",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cmek",
+      "cloud-kms",
+      "service-agent"
+    ],
+    "stem": "A new Cloud Storage bucket must use the customer-managed encryption key (CMEK) `bucket-key` in Cloud KMS. A Cloud Run app writes objects to the bucket as the service account `app-sa`. Terraform creates the bucket as the service account `deployer-sa`. You want least privilege. Which principal should get the Cloud KMS CryptoKey Encrypter/Decrypter role on `bucket-key`?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`app-sa`, because it writes the objects that the key protects."
+      },
+      {
+        "id": "B",
+        "text": "`deployer-sa`, because it creates the bucket that uses the key."
+      },
+      {
+        "id": "C",
+        "text": "The Cloud KMS service agent, because it does the key operations in the project."
+      },
+      {
+        "id": "D",
+        "text": "The Cloud Storage service agent, because it encrypts and decrypts the objects."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "CMEK is server-side envelope encryption. The service agent of the integrated service, here Cloud Storage, encrypts and decrypts the data with your key. The principals that create or read the resource do not need a role on the key. So grant the CryptoKey Encrypter/Decrypter role only to the Cloud Storage service agent.",
+    "whyWrong": {
+      "A": "A requester does not need direct access to the CMEK. Cloud Storage encrypts and decrypts the objects for the requester.",
+      "B": "The principal that creates a CMEK-protected resource does not need the Encrypter/Decrypter role on the key.",
+      "C": "With CMEK, the service agent of the service that stores the data uses the key. The Cloud KMS service agent does not encrypt the objects in the bucket."
+    },
+    "sources": [
+      {
+        "title": "Customer-managed encryption keys (CMEK)",
+        "url": "https://docs.cloud.google.com/kms/docs/cmek",
+        "evidence": "The principal that creates or views resources in the CMEK-integrated service does not require the Cloud KMS CryptoKey Encrypter/Decrypter (`roles/cloudkms.cryptoKeyEncrypterDecrypter`) for the CMEK used to protect the resource."
+      },
+      {
+        "title": "Customer-managed encryption keys (CMEK)",
+        "url": "https://docs.cloud.google.com/kms/docs/cmek",
+        "evidence": "Each project resource has a special service account called a service agent that performs encryption and decryption with customer-managed keys."
+      }
+    ]
+  },
+  {
+    "id": "sec-019",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 1,
+    "tags": [
+      "cloud-run",
+      "service-to-service",
+      "id-token"
+    ],
+    "stem": "Two Cloud Run services run in the same project, and each has its own user-managed service account. The `frontend` service calls the `inventory` service over HTTPS. `inventory` requires authentication and must accept requests only from `frontend`. You want the Google-recommended approach with least privilege. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the service account of `frontend` the Cloud Run Invoker role on the project that contains both services."
+      },
+      {
+        "id": "B",
+        "text": "Grant the service account of `frontend` the Cloud Run Invoker role on the `inventory` service."
+      },
+      {
+        "id": "C",
+        "text": "In `frontend`, get an OAuth 2.0 access token with the `cloud-platform` scope. Send it in the `Authorization` header."
+      },
+      {
+        "id": "D",
+        "text": "Allow unauthenticated invocations of `inventory`, and set its ingress to `internal` so that only internal callers reach it."
+      },
+      {
+        "id": "E",
+        "text": "In `frontend`, get a Google-signed ID token with the `inventory` URL as the audience. Send it in the `Authorization` header."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "Cloud Run service-to-service authentication uses IAM and ID tokens. Grant the Cloud Run Invoker role to the caller's service account on the receiving service only. The caller sends a Google-signed OIDC ID token whose audience is the URL of the receiving service.",
+    "whyWrong": {
+      "A": "A project-level grant lets `frontend` invoke every Cloud Run service in the project, which breaks least privilege.",
+      "C": "Cloud Run service-to-service authentication needs a Google-signed ID token with the service URL as the audience, not an access token.",
+      "D": "Without authentication, any internal caller can reach `inventory`, not only `frontend`."
+    },
+    "sources": [
+      {
+        "title": "Authenticating service-to-service",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+        "evidence": "In this situation, Google recommends that you use IAM and a service identity based on a per-service user-managed service account that has been granted the minimum set of permissions required to do its work."
+      },
+      {
+        "title": "Authenticating service-to-service",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+        "evidence": "you configure the receiving service to accept requests from the calling service by making the calling service's service account a principal on the receiving service."
+      },
+      {
+        "title": "Authenticating service-to-service",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+        "evidence": "Fetch a Google-signed ID token by using one of the methods described in the following section. Set the audience claim (`aud`) to the URL of the receiving service or a configured custom audience."
+      }
+    ]
+  },
+  {
+    "id": "sec-020",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "id-token",
+      "traffic-tags"
+    ],
+    "stem": "The `web` service calls the private Cloud Run service `orders`. To test a new version, the team deployed `orders` with the tag `beta`. The service account of `web` has the Cloud Run Invoker role on `orders`. The calling code is:\n\n```python\nurl = \"https://beta---orders-abcdef.a.run.app\"\ntoken = google.oauth2.id_token.fetch_id_token(auth_req, url)\nresp = requests.get(url + \"/v1/orders\",\n                    headers={\"Authorization\": f\"Bearer {token}\"})\n```\n\nCloud Run rejects every call. How should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Get an OAuth 2.0 access token with the `cloud-platform` scope, and send it instead of the ID token."
+      },
+      {
+        "id": "B",
+        "text": "Request the token with the audience `https://orders-abcdef.a.run.app`, and keep sending the request to the tag URL."
+      },
+      {
+        "id": "C",
+        "text": "Send the token in the `X-Serverless-Authorization` header instead of the `Authorization` header."
+      },
+      {
+        "id": "D",
+        "text": "Map the custom domain `orders.example.com` to the service, and use that domain as the audience."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The `aud` claim of the ID token must be the URL of the receiving service, or a configured custom audience. It stays the service URL also when you call a traffic tag URL. The code uses the tag URL as the audience, so Cloud Run rejects the token. Keep the tag URL as the request endpoint, and request the token for the service URL.",
+    "whyWrong": {
+      "A": "Cloud Run service-to-service calls need a Google-signed ID token, not an access token.",
+      "C": "The `X-Serverless-Authorization` header is for apps that already use the `Authorization` header. The token still has the wrong audience.",
+      "D": "Custom domains are not supported as the audience of an ID token. For a custom domain, you configure a custom audience on the service."
+    },
+    "sources": [
+      {
+        "title": "Authenticating service-to-service",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+        "evidence": "If you are not using a custom audience, the `aud` value must remain as the URL of the service, even when making requests to a specific traffic tag."
+      },
+      {
+        "title": "Authenticating service-to-service",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+        "evidence": "Custom domains are currently not supported for the `aud` value."
+      }
+    ]
+  },
+  {
+    "id": "sec-021",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run-ingress",
+      "direct-vpc-egress",
+      "private-google-access"
+    ],
+    "stem": "The Cloud Run service `ledger` has ingress set to `internal` and requires authentication. The Cloud Run service `payments` in the same project calls `ledger` at its `run.app` URL. It sends a valid ID token, and its service account has the Cloud Run Invoker role on `ledger`. Every call is rejected. `payments` has no VPC network configuration. You want the Google-recommended network path with the lowest latency. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure a Serverless VPC Access connector on `payments` that routes all traffic. Enable Private Google Access on the connector's subnet."
+      },
+      {
+        "id": "B",
+        "text": "Change the ingress of `ledger` to `internal-and-cloud-load-balancing`, so that requests from other Cloud Run services are allowed."
+      },
+      {
+        "id": "C",
+        "text": "Configure Direct VPC egress on `payments` with `--vpc-egress=all-traffic`, and enable Private Google Access on its subnet."
+      },
+      {
+        "id": "D",
+        "text": "Configure Direct VPC egress on `payments` with `--vpc-egress=private-ranges-only`, and keep the default DNS for `run.app`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A request from one Cloud Run service to a service with `internal` ingress counts as internal only when it goes through a VPC network. So the caller needs VPC egress, and its requests to the `run.app` URL must use the VPC network. One documented path is to route all traffic to the VPC network and enable Private Google Access on the subnet. Direct VPC egress is the recommended option, with lower latency than a connector.",
+    "whyWrong": {
+      "A": "A connector also works, but it adds VM charges, higher latency, and lower throughput than Direct VPC egress.",
+      "B": "This setting only adds external Application Load Balancers as allowed sources. A call from another Cloud Run service must still go through a VPC network.",
+      "D": "With `private-ranges-only`, only traffic to internal addresses uses the VPC network. With the default DNS, the `run.app` URL is not an internal address, so the request does not use the VPC network."
+    },
+    "sources": [
+      {
+        "title": "Private networking and Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/securing/private-networking",
+        "evidence": "When your destination Cloud Run resource receives traffic from other Cloud Run resources or App Engine, and it uses the \"internal\" or \"internal and load balancing\" ingress setting, the traffic must use the VPC network to be considered internal."
+      },
+      {
+        "title": "Private networking and Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/securing/private-networking",
+        "evidence": "Configure the source resource to route all traffic through the VPC network and enable Private Google Access on the subnet associated with Direct VPC egress or the connector."
+      },
+      {
+        "title": "Compare Direct VPC egress and VPC connectors",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/connecting-vpc",
+        "evidence": "Serverless VPC Access connectors also let you send requests to your VPC network and receive the corresponding responses without using the public internet. Setup requires additional maintenance and cost with lower performance than Direct VPC egress offers."
+      }
+    ]
+  },
+  {
+    "id": "sec-022",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "private-service-connect",
+      "private-connectivity",
+      "vpc"
+    ],
+    "stem": "A platform team runs an internal `pricing` API behind an internal Application Load Balancer in its own project and VPC network. Your app runs on Compute Engine VMs without external IP addresses in your VPC network. The two VPC networks use overlapping IP address ranges, and neither team can change them. Your app must call the API at an internal IP address. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Connect the two VPC networks with VPC Network Peering, and call the internal IP address of the load balancer."
+      },
+      {
+        "id": "B",
+        "text": "Enable Private Google Access on your subnet, so that the VMs can reach the API without external IP addresses."
+      },
+      {
+        "id": "C",
+        "text": "Configure private services access with an allocated range in your VPC network. Connect it to the network of the platform team."
+      },
+      {
+        "id": "D",
+        "text": "Ask the platform team to publish the API with Private Service Connect. Create a Private Service Connect endpoint in your VPC network."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Private Service Connect lets a producer publish a service, and lets consumers reach it at an internal IP address in their own VPC network. Traffic between consumer and producer uses NAT, so the two networks need no IP address coordination. This is why it works with overlapping ranges.",
+    "whyWrong": {
+      "A": "VPC Network Peering routes between the two address spaces directly, so the ranges must not overlap.",
+      "B": "Private Google Access lets VMs without external IP addresses reach Google APIs and services. It does not reach an API in another VPC network.",
+      "C": "Private services access uses VPC Network Peering with a service producer, so the ranges must not overlap. It is for services such as Cloud SQL and Memorystore for Redis."
+    },
+    "sources": [
+      {
+        "title": "Private Service Connect",
+        "url": "https://docs.cloud.google.com/vpc/docs/private-service-connect",
+        "evidence": "No shared dependencies. Traffic between consumer and producers uses NAT so that no IP address coordination or other shared resource dependencies exist between the consumer and producer VPC networks."
+      },
+      {
+        "title": "Private Service Connect",
+        "url": "https://docs.cloud.google.com/vpc/docs/private-service-connect",
+        "evidence": "Private Service Connect endpoints and published services let two independent companies communicate with each other by using internal IP addresses."
+      },
+      {
+        "title": "Private services access",
+        "url": "https://docs.cloud.google.com/vpc/docs/private-services-access",
+        "evidence": "For routing between the two networks to work correctly, the two networks must use distinct IP address ranges."
+      }
+    ]
+  },
+  {
+    "id": "sec-023",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke",
+      "network-policy",
+      "network-policy-enforcement"
+    ],
+    "stem": "A GKE Standard cluster was created without GKE Dataplane V2 and without network policy enforcement. A developer applies a NetworkPolicy that allows ingress to the `payments` Pods only from Pods labeled `app: checkout`. Tests show that every Pod in the cluster can still connect to `payments`. You must enforce the policy on this cluster. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable network policy enforcement on the existing cluster, and plan for the node re-creation that this change causes."
+      },
+      {
+        "id": "B",
+        "text": "Add a NetworkPolicy with an empty `podSelector` that denies all ingress in the namespace of `payments`."
+      },
+      {
+        "id": "C",
+        "text": "Enable GKE Dataplane V2 on the cluster with a cluster update, because it enforces network policies by default."
+      },
+      {
+        "id": "D",
+        "text": "Replace the `podSelector` rule with an `ipBlock` rule that lists the current Pod IP addresses of `checkout`."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Without network policy enforcement, GKE silently ignores NetworkPolicy objects. You cannot enable GKE Dataplane V2 on an existing cluster. So enable network policy enforcement on the cluster. First, enable the add-on with `--update-addons=NetworkPolicy=ENABLED`. Then, enable enforcement with `--enable-network-policy`, which re-creates the node pools. After that, the existing policy takes effect.",
+    "whyWrong": {
+      "B": "GKE also ignores this policy, because the cluster has no network policy enforcement.",
+      "C": "GKE Dataplane V2 can be enabled only when you create a cluster. You cannot upgrade an existing cluster to it.",
+      "D": "GKE also ignores this rule without enforcement. Pod IP addresses also change, so select Pods by label."
+    },
+    "sources": [
+      {
+        "title": "Configure network policies for applications",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/tutorials/network-policy",
+        "evidence": "If you omit the `--enable-network-policy` flag, any NetworkPolicy resources you create are silently ignored."
+      },
+      {
+        "title": "Control communication between Pods and Services using network policies",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/network-policy",
+        "evidence": "Run the following command to enable network policy enforcement on your cluster, which in turn re-creates your cluster's node pools with network policy enforcement enabled:"
+      },
+      {
+        "title": "GKE Dataplane V2",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/dataplane-v2",
+        "evidence": "GKE Dataplane V2 can only be enabled when creating a new cluster. Existing clusters cannot be upgraded to use GKE Dataplane V2."
+      }
+    ]
+  },
+  {
+    "id": "sec-024",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-service-mesh",
+      "mtls",
+      "authorization-policy"
+    ],
+    "stem": "The `payments` service runs in the `pay` namespace of a GKE cluster with managed Cloud Service Mesh. A penetration test shows that a Pod without a sidecar can send plaintext requests to `payments`. The security team requires that `payments` accepts only mTLS traffic. The traffic must come only from workloads that run as the `checkout-sa` Kubernetes service account in the `shop` namespace. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Apply a `PeerAuthentication` policy with mTLS mode `STRICT` in the `pay` namespace."
+      },
+      {
+        "id": "B",
+        "text": "Keep the default `PERMISSIVE` mode, because auto mTLS already encrypts all traffic between Pods in the mesh."
+      },
+      {
+        "id": "C",
+        "text": "Apply an `AuthorizationPolicy` with action `DENY` for all sources on `payments`, and an `ALLOW` policy for `checkout-sa`."
+      },
+      {
+        "id": "D",
+        "text": "Apply an `AuthorizationPolicy` on `payments` with action `ALLOW` and the principal `PROJECT_ID.svc.id.goog/ns/shop/sa/checkout-sa`."
+      },
+      {
+        "id": "E",
+        "text": "Use a Kubernetes NetworkPolicy instead of mesh policies, and allow ingress to `payments` only from Pods labeled `app: checkout`."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Auto mTLS sends mTLS between sidecars, but in the default `PERMISSIVE` mode, services still accept plaintext. A `PeerAuthentication` policy with mode `STRICT` makes the workloads in the namespace accept only mTLS. With STRICT mTLS, an `ALLOW` authorization policy can match the caller's workload identity in `principals`, in the form `PROJECT_ID.svc.id.goog/ns/NAMESPACE/sa/SERVICE_ACCOUNT_NAME`. Requests that match no `ALLOW` policy of the workload are denied.",
+    "whyWrong": {
+      "B": "In `PERMISSIVE` mode, services accept both plaintext and mTLS traffic. This is the problem that the test found.",
+      "C": "Cloud Service Mesh evaluates `DENY` policies before `ALLOW` policies, so a deny-all policy also blocks `checkout-sa`.",
+      "E": "A network policy allows connections by Pod label, namespace, or IP address range. It does not require mTLS, and it does not check workload identity."
+    },
+    "sources": [
+      {
+        "title": "Configure transport security",
+        "url": "https://docs.cloud.google.com/service-mesh/docs/security/configuring-mtls",
+        "evidence": "Note, however, services accept both plaintext and mTLS traffic. As you inject sidecar proxies to your Pods, we recommend that you also configure your services to only accept mTLS traffic."
+      },
+      {
+        "title": "Authorization policy overview",
+        "url": "https://docs.cloud.google.com/service-mesh/docs/security/authorization-policy-overview",
+        "evidence": "If you have `STRICT` mutual TLS (mTLS) enabled, you can restrict access based on the identity of the workload or namespace that the request is from in the `source` section."
+      },
+      {
+        "title": "Authorization policy overview",
+        "url": "https://docs.cloud.google.com/service-mesh/docs/security/authorization-policy-overview",
+        "evidence": "Because `DENY` policies are evaluated before `ALLOW` policies, all requests are denied even if there is an `ALLOW` policy that matches the request."
+      }
+    ]
+  }
+]

@@ -1,0 +1,1378 @@
+[
+  {
+    "id": "dio-001",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "signed-urls",
+      "public-access-prevention",
+      "cloud-storage"
+    ],
+    "stem": "An online course platform keeps lesson videos in a private Cloud Storage bucket. Public access prevention is enforced on the bucket. Customers sign in with the platform's own accounts, not with Google accounts. After a purchase, the customer must be able to download the video for the next 30 minutes. The team wants to keep video traffic off its backend servers. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Turn off public access prevention, grant `allUsers` Storage Object Viewer on the bucket, and send the object URL."
+      },
+      {
+        "id": "B",
+        "text": "Grant the customer the Storage Object Viewer role on the bucket, with an IAM condition that expires after 30 minutes."
+      },
+      {
+        "id": "C",
+        "text": "Generate a V4 signed URL for the video object with a 30-minute expiration, and send the URL to the customer."
+      },
+      {
+        "id": "D",
+        "text": "Have the backend read the object with its service account, and stream the video data to the customer's browser."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The customers have no Google identities, and the app logic decides who gets access. A signed URL gives anyone who has it time-limited access to one object, with no account. Cloud Storage recommends signed URLs for users without accounts. Public access prevention does not affect signed URLs, so the bucket stays private.",
+    "whyWrong": {
+      "A": "This makes every video in the bucket readable by anyone who knows its URL, with no time limit. It also removes the protection that keeps the bucket private.",
+      "B": "IAM gives access to Google identities. The customers have only platform accounts, so IAM cannot identify them.",
+      "D": "This works, but all the video data then goes through the backend. The team wants to keep that traffic off its servers."
+    },
+    "sources": [
+      {
+        "title": "Best practices for Cloud Storage",
+        "url": "https://docs.cloud.google.com/storage/docs/best-practices",
+        "evidence": "If you need to make content available securely to users who don't have user accounts, we recommend you use signed URLs."
+      },
+      {
+        "title": "Public access prevention",
+        "url": "https://docs.cloud.google.com/storage/docs/public-access-prevention",
+        "evidence": "Signed URLs, which give time limited, narrowly-scoped access to anyone who uses them, are not affected by public access prevention."
+      }
+    ]
+  },
+  {
+    "id": "dio-002",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "signed-urls",
+      "signblob",
+      "service-account-token-creator",
+      "cloud-run"
+    ],
+    "stem": "A Python service on Cloud Run creates V4 signed download URLs. It runs as the service account `signer@PROJECT_ID.iam.gserviceaccount.com`, which has only the Storage Object Viewer role on the bucket. Security policy forbids service account keys. To sign without a key, the code passes `service_account_email` and an access token from Application Default Credentials to `generate_signed_url`. No other APIs or roles are set up for signing, and the signing calls fail. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant `signer@PROJECT_ID.iam.gserviceaccount.com` the Service Account Token Creator role, with itself as the principal, so that it can sign blobs."
+      },
+      {
+        "id": "B",
+        "text": "Create a key for the service account, store the key in Secret Manager, and sign the URLs with that key."
+      },
+      {
+        "id": "C",
+        "text": "Grant the service account the Storage Admin role on the bucket, so that it can sign URLs for any object."
+      },
+      {
+        "id": "D",
+        "text": "Enable the IAM Service Account Credentials API in the project, which provides the `signBlob` method."
+      },
+      {
+        "id": "E",
+        "text": "Grant the service account the Service Account User role on itself, so that it can act as itself."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Without a key, the library signs with the IAM `signBlob` method and the Google-managed key of the service account. The caller needs the Service Account Token Creator role, which contains `iam.serviceAccounts.signBlob`. Code that signs as its own attached service account must be the principal of that role. The project also needs the Service Account Credentials API.",
+    "whyWrong": {
+      "B": "Security policy forbids keys. Keyless signing with `signBlob` gives the same URLs, with no key to protect and rotate.",
+      "C": "The missing permission is `iam.serviceAccounts.signBlob`, which is not in Cloud Storage roles. Storage Object Viewer is enough for download URLs, and Storage Admin breaks least privilege.",
+      "E": "Service Account User lets a principal attach the service account to a resource. It does not let the principal sign blobs."
+    },
+    "sources": [
+      {
+        "title": "V4 signing process with Cloud Storage tools",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/signing-urls-with-helpers",
+        "evidence": "Have sufficient permission to sign blobs with the service account. Ask your administrator to grant the Service Account Token Creator role (`roles/iam.serviceAccountTokenCreator`)."
+      },
+      {
+        "title": "Create short-lived credentials for a service account",
+        "url": "https://docs.cloud.google.com/iam/docs/create-short-lived-credentials-direct",
+        "evidence": "Enable the IAM and Service Account Credentials APIs, if any are not already enabled"
+      },
+      {
+        "title": "Roles for service account authentication",
+        "url": "https://docs.cloud.google.com/iam/docs/service-account-permissions",
+        "evidence": "The Service Account User role (`roles/iam.serviceAccountUser`) lets a principal attach a service account to a resource."
+      }
+    ]
+  },
+  {
+    "id": "dio-003",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "signed-policy-document",
+      "html-form-upload",
+      "cloud-storage"
+    ],
+    "stem": "A real-estate website lets visitors upload one photo of a property with a plain HTML form, without JavaScript. Visitors have no Google accounts. Each file must go directly from the browser to a Cloud Storage bucket. The file must be a JPEG image of 5 MB or less. How should the backend authorize the upload?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Sign a V4 `PUT` URL with `content_type=\"image/jpeg\"`, and use the URL as the `action` of the form."
+      },
+      {
+        "id": "B",
+        "text": "Sign a policy document with `Content-Type` and `content-length-range` conditions, and put it in hidden form fields."
+      },
+      {
+        "id": "C",
+        "text": "Grant `allUsers` the Storage Object Creator role, and delete files that break the rules with a Cloud Run function."
+      },
+      {
+        "id": "D",
+        "text": "Post the form to the backend, and have the backend check the file and upload it with the client library."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "HTML forms do not support signed URLs. A form uploads with the XML API `POST` Object request, and a signed policy document authorizes it. The policy can require the content type, and the `content-length-range` condition limits the file size. The client library creates the policy and the hidden form fields.",
+    "whyWrong": {
+      "A": "HTML forms do not support signed URLs. A form sends a multipart `POST` request to the bucket URL, and a signed policy document authorizes that request.",
+      "C": "Google recommends against publicly writable buckets. Anyone can then upload any content, and a check after the upload does not stop it.",
+      "D": "This works, but the file goes through the backend. The requirement is a direct upload from the browser to the bucket."
+    },
+    "sources": [
+      {
+        "title": "Upload an object with HTML forms",
+        "url": "https://docs.cloud.google.com/storage/docs/xml-api/post-object-forms",
+        "evidence": "Signatures are used in HTML forms that have an associated policy document. HTML forms do not support signed URLs."
+      },
+      {
+        "title": "Overview of access control",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control",
+        "evidence": "Policy documents allow greater control over size, content type, and other upload characteristics than signed URLs, and can be used by website owners to allow visitors to upload files to Cloud Storage."
+      }
+    ]
+  },
+  {
+    "id": "dio-004",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "signed-urls",
+      "cors",
+      "browser-upload"
+    ],
+    "stem": "A single-page app at `https://app.example.com` uploads files directly from the browser. The backend signs a V4 `PUT` URL with `content_type=\"application/pdf\"`. The browser then sends the file with `fetch()` and the header `Content-Type: application/pdf`. The same URL works from `curl`. In the browser, the upload fails with a CORS error, and Cloud Storage creates no object. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Sign the URL for the JSON API upload endpoint instead, because JSON API endpoints always allow CORS requests."
+      },
+      {
+        "id": "B",
+        "text": "Sign the URL without a content type, so that the browser sends the upload without a preflight request."
+      },
+      {
+        "id": "C",
+        "text": "Grant `allUsers` the Storage Object Creator role on the bucket, so that Cloud Storage authorizes the preflight request."
+      },
+      {
+        "id": "D",
+        "text": "Set a CORS configuration on the bucket that allows the origin `https://app.example.com`, the `PUT` method, and the `Content-Type` header."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Signed URLs work only with XML API endpoints. XML API endpoints allow a CORS request only when the CORS configuration of the bucket allows it. A `PUT` request always triggers a preflight request, which fails if its method or headers are not in the configuration. `curl` does not use CORS, so the URL works there.",
+    "whyWrong": {
+      "A": "JSON API endpoints do allow CORS requests, but signed URLs work only with XML API endpoints.",
+      "B": "A `PUT` request always triggers a preflight request. Without a CORS configuration, the XML API endpoint still does not allow it.",
+      "C": "CORS is a browser check against the CORS configuration of the bucket, not an IAM permission. A publicly writable bucket is also a security risk."
+    },
+    "sources": [
+      {
+        "title": "Cross-origin resource sharing (CORS)",
+        "url": "https://docs.cloud.google.com/storage/docs/cross-origin",
+        "evidence": "XML API endpoints only allow CORS requests based on the configuration on the bucket and return specific CORS header values in response to that configuration."
+      },
+      {
+        "title": "Signed URLs",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+        "evidence": "Signed URLs can only be used to access resources in Cloud Storage through XML API endpoints."
+      },
+      {
+        "title": "CORS configuration examples",
+        "url": "https://docs.cloud.google.com/storage/docs/cors-configurations",
+        "evidence": "Note that `PUT` requests always trigger a preflight check."
+      }
+    ]
+  },
+  {
+    "id": "dio-005",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "signed-urls",
+      "gcloud-storage-sign-url",
+      "impersonation"
+    ],
+    "stem": "A nightly job on a Compute Engine VM e-mails partners a link to that night's report in a private bucket. Partners download the report at some time in the 8 hours after the e-mail. Organization policy blocks the creation of service account keys. The service account of the VM can impersonate the signing service account, whose email is in the variable `SIGNER`. Which command should the job run?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`gcloud storage sign-url gs://reports/daily.csv --impersonate-service-account=$SIGNER --duration=8h`"
+      },
+      {
+        "id": "B",
+        "text": "`gcloud storage sign-url gs://reports/daily.csv --impersonate-service-account=$SIGNER`"
+      },
+      {
+        "id": "C",
+        "text": "`gcloud storage sign-url gs://reports/daily.csv --impersonate-service-account=$SIGNER --duration=7d`"
+      },
+      {
+        "id": "D",
+        "text": "`gcloud storage sign-url gs://reports/daily.csv --private-key-file=signer-key.json --duration=8h`"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "With `--impersonate-service-account`, gcloud signs with the system-managed key of the signing service account, so the job needs no key file. The `--duration` flag must cover the 8 hours. With impersonation, the maximum duration is 12 hours, because the system-managed key may not stay valid for longer.",
+    "whyWrong": {
+      "B": "The default duration is 1 hour. The link expires before most partners download the report.",
+      "C": "With impersonation, the maximum duration is 12 hours. The 7-day maximum applies only to a private key file or an account that you activated with `gcloud auth activate-service-account`.",
+      "D": "This needs a service account key file, and organization policy blocks the creation of keys."
+    },
+    "sources": [
+      {
+        "title": "gcloud storage sign-url",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/storage/sign-url",
+        "evidence": "The max duration allowed is 12 hours. This limitation exists because the system-managed key used to sign the URL may not remain valid after 12 hours."
+      },
+      {
+        "title": "gcloud storage sign-url",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/storage/sign-url",
+        "evidence": "Specifies the duration that the signed url should be valid for, default duration is 1 hour."
+      }
+    ]
+  },
+  {
+    "id": "dio-006",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigquery",
+      "storage-write-api",
+      "exactly-once"
+    ],
+    "stem": "A new payment service on Cloud Run writes each settled payment as a row in a BigQuery table. It handles about 200 payments each second. Fraud dashboards must see each row within seconds. A duplicate row would double-count revenue, and the service retries every write that fails. Which write method should the service use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The Storage Write API (gRPC) default stream, with exponential backoff for the appends that fail."
+      },
+      {
+        "id": "B",
+        "text": "The Storage Write API (REST) through `insert_rows_json`, with a unique `insertId` for each row."
+      },
+      {
+        "id": "C",
+        "text": "A Storage Write API (gRPC) stream of committed type, with an offset in each `AppendRows` request."
+      },
+      {
+        "id": "D",
+        "text": "A Storage Write API (gRPC) stream of pending type for each payment, committed with `BatchCommitWriteStreams`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding needs are rows that are visible within seconds and no duplicates after retries. In committed type, rows are available for query as soon as BigQuery acknowledges the write. With an offset, BigQuery writes the rows only if the offset matches the next append offset, so a retry cannot write the rows twice.",
+    "whyWrong": {
+      "A": "The default stream gives at-least-once delivery. A retry after an error can write the same row twice.",
+      "B": "`insertId` de-duplication is best effort for about one minute, and you must not rely on it. For new projects, Google recommends the Storage Write API (gRPC).",
+      "D": "Pending type is for batch workloads. Rows in a pending stream become visible only when you commit the stream. One stream for each payment means about 200 new streams each second. Google advises against a high rate of `CreateWriteStream` calls."
+    },
+    "sources": [
+      {
+        "title": "Stream data using the Storage Write API (gRPC)",
+        "url": "https://docs.cloud.google.com/bigquery/docs/write-api-streaming",
+        "evidence": "If you need exactly-once semantics, then create one or more streams in committed type and use stream offsets to guarantee exactly-once writes."
+      },
+      {
+        "title": "Use the Storage Write API (REST)",
+        "url": "https://docs.cloud.google.com/bigquery/docs/write-api-rest",
+        "evidence": "De-duplication offered by BigQuery is best effort, and it shouldn't be relied upon as a mechanism to ensure the absence of duplicates in your data."
+      },
+      {
+        "title": "Introduction to the Storage Write API (gRPC)",
+        "url": "https://docs.cloud.google.com/bigquery/docs/write-api-grpc",
+        "evidence": "Use this type for batch workloads, as an alternative to BigQuery load jobs."
+      }
+    ]
+  },
+  {
+    "id": "dio-007",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "bigquery",
+      "pubsub-bigquery-subscription",
+      "operational-overhead"
+    ],
+    "stem": "A Pub/Sub topic receives JSON click events, and each message already matches the schema of a BigQuery table. The analytics team needs no transformation, windowing, or aggregation. The team removes the rare duplicate rows in its queries. You must load the events into the table with the least operational overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the Dataflow Pub/Sub to BigQuery template as a streaming job that reads from a subscription."
+      },
+      {
+        "id": "B",
+        "text": "Create a BigQuery subscription on the topic that writes each message to the table."
+      },
+      {
+        "id": "C",
+        "text": "Deploy a Cloud Run service that receives a push subscription and writes rows with the Storage Write API."
+      },
+      {
+        "id": "D",
+        "text": "Trigger a Cloud Run function from the topic that runs one DML `INSERT` statement for each message."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A BigQuery subscription writes each message to an existing table as it arrives, with no subscriber code and no Dataflow job. It gives at-least-once delivery, which is acceptable because the team removes duplicates in its queries. Dataflow is for messages that need complex processing before the write.",
+    "whyWrong": {
+      "A": "The template enforces exactly-once delivery, but the team needs neither that nor a transformation. The Dataflow job is overhead that a BigQuery subscription removes.",
+      "C": "This works, but you must write, deploy, and run the subscriber code. A BigQuery subscription needs no code.",
+      "D": "This needs code, and BigQuery limits how many DML `INSERT` statements run at the same time on a table. For frequent inserts, Google recommends the Storage Write API (gRPC)."
+    },
+    "sources": [
+      {
+        "title": "BigQuery subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/bigquery",
+        "evidence": "The overhead of running a Dataflow job is not necessary when messages don't require additional processing before storing them in a BigQuery table; you can use a BigQuery subscription instead."
+      },
+      {
+        "title": "Transform data with DML",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-manipulation-language",
+        "evidence": "If you must run DML `INSERT` statements more frequently, consider streaming data to your table using the Storage Write API (gRPC)."
+      }
+    ]
+  },
+  {
+    "id": "dio-008",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigquery",
+      "dml",
+      "storage-write-api"
+    ],
+    "stem": "An order service streams about 50 new orders each second into BigQuery with this call:\n\n```python\nerrors = client.insert_rows_json(table_id, rows)\n```\n\nA reconciliation job runs `UPDATE` statements that change the `status` of orders a few minutes after they arrive. The statements fail on rows that were streamed in the last 30 minutes, and they work on older rows. Ingestion must stay near real time, and updates must happen within minutes. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pass a unique value for each row in `row_ids`, so that the `UPDATE` statements can find the new rows."
+      },
+      {
+        "id": "B",
+        "text": "Replace each `UPDATE` statement with a `MERGE` statement that matches the rows on the order ID."
+      },
+      {
+        "id": "C",
+        "text": "Insert each order with its own DML `INSERT` statement, so that all writes and updates use DML."
+      },
+      {
+        "id": "D",
+        "text": "Stream the rows with the Storage Write API (gRPC) default stream instead of `insert_rows_json`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "`insert_rows_json` uses the Storage Write API (REST), formerly `tabledata.insertAll`. DML cannot change rows that this API wrote in the last 30 minutes. Rows that the Storage Write API (gRPC) wrote recently can be changed with `UPDATE`, `DELETE`, or `MERGE`. The default stream also makes the rows available for query at once.",
+    "whyWrong": {
+      "A": "`row_ids` sets the `insertId` for best-effort de-duplication. It does not change when DML can modify the rows.",
+      "B": "The limit applies to `MERGE` too. DML cannot change rows that the REST API wrote in the last 30 minutes.",
+      "C": "BigQuery limits how many DML `INSERT` statements run at the same time on a table, and the extra statements wait in a queue. For frequent inserts, Google recommends the Storage Write API (gRPC)."
+    },
+    "sources": [
+      {
+        "title": "Transform data with DML",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-manipulation-language",
+        "evidence": "Alternatively, rows that were recently written using the Storage Write API (gRPC) can be modified using `UPDATE`, `DELETE`, or `MERGE` statements."
+      },
+      {
+        "title": "Transform data with DML",
+        "url": "https://docs.cloud.google.com/bigquery/docs/data-manipulation-language",
+        "evidence": "Rows that were recently written using the BigQuery Storage Write API (REST) can't be modified with data manipulation language (DML), such as `UPDATE`, `DELETE`, `MERGE`, or `TRUNCATE` statements."
+      }
+    ]
+  },
+  {
+    "id": "dio-009",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-sql",
+      "connection-pool",
+      "cloud-run-max-instances"
+    ],
+    "stem": "A Python API on Cloud Run connects to Cloud SQL for PostgreSQL through the Cloud SQL Python Connector. Each instance creates a SQLAlchemy pool with `pool_size=5` and `max_overflow=2`. The service uses the default maximum instances setting. The database allows 200 connections, and a reporting tool needs 20 of them. During traffic spikes, new connections fail because the database has reached its limit. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the maximum instances of the service to 20, so that the service opens at most about 140 connections."
+      },
+      {
+        "id": "B",
+        "text": "Raise `pool_size` to 20, so that each instance keeps more open connections ready to reuse."
+      },
+      {
+        "id": "C",
+        "text": "Run the Cloud SQL Auth Proxy as a sidecar container, and let the proxy pool the connections."
+      },
+      {
+        "id": "D",
+        "text": "Remove the pool, and open a new connection at the start of each request and close it at the end."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Each instance opens up to `pool_size` plus `max_overflow`, or 7, connections. By default, Cloud Run allows 100 instances for each revision, so the service can try to open 700 connections. Cloud Run documents maximum instances as a way to limit connections to a database. With 20 instances, the service needs about 140 connections, which leaves room for the reporting tool.",
+    "whyWrong": {
+      "B": "A larger pool lets each instance open more connections, so the total passes the limit sooner.",
+      "C": "The Cloud SQL Auth Proxy does not pool connections and does not limit them. The app must limit or pool its connections.",
+      "D": "Without a pool, each concurrent request opens its own connection, so the total can grow even more. Each request also waits while a new connection opens."
+    },
+    "sources": [
+      {
+        "title": "Set maximum instances for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/max-instances",
+        "evidence": "You can use this setting as a way to control your costs or to limit the number of connections to a backing service, such as to a database."
+      },
+      {
+        "title": "Set maximum instances for services",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/max-instances",
+        "evidence": "By default, Cloud Run sets 100 instances for each revision."
+      },
+      {
+        "title": "About the Cloud SQL Auth Proxy",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/sql-proxy",
+        "evidence": "The Cloud SQL Auth Proxy doesn't provide connection pooling, but can be paired with other connection pooling to increase efficiency."
+      }
+    ]
+  },
+  {
+    "id": "dio-010",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-sql",
+      "private-ip",
+      "direct-vpc-egress"
+    ],
+    "stem": "A Cloud Run service uses the Cloud SQL Python Connector with `ip_type=IPTypes.PRIVATE`. The Cloud SQL instance has only a private IP address. The service account has the Cloud SQL Client role, and the Cloud SQL Admin API is enabled. The service has no VPC egress settings, and every connection attempt times out. You want the Google-recommended fix with the least operational overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the Cloud SQL Auth Proxy as a sidecar container, which opens its own path to the private IP address."
+      },
+      {
+        "id": "B",
+        "text": "Configure Direct VPC egress, so that the service sends traffic to the VPC network of the private IP address."
+      },
+      {
+        "id": "C",
+        "text": "Create a Serverless VPC Access connector in that VPC network, and send the egress of the service through it."
+      },
+      {
+        "id": "D",
+        "text": "Add the outbound IP address range of Cloud Run to the authorized networks of the Cloud SQL instance."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The Cloud SQL connectors authorize and encrypt connections, but they cannot create a network path. A service that connects to a private IP address must send its egress into the VPC network. The Cloud Run docs recommend Direct VPC egress, which needs no Serverless VPC Access connector to manage.",
+    "whyWrong": {
+      "A": "The Auth Proxy is also a Cloud SQL connector. It cannot provide a network path to the instance if no path exists.",
+      "C": "A connector also gives a network path, but it adds connector instances to maintain and pay for. Google recommends Direct VPC egress.",
+      "D": "Authorized networks control connections to a public IP address. This instance has only a private IP address."
+    },
+    "sources": [
+      {
+        "title": "Connect using Cloud SQL Language Connectors",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-connectors",
+        "evidence": "They can't provide a network path to a Cloud SQL instance if one is not already present."
+      },
+      {
+        "title": "Connect from Cloud Run",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-run",
+        "evidence": "If you route all egress traffic through Direct VPC egress or a Serverless VPC Access connector, use a private IP address."
+      },
+      {
+        "title": "Compare Direct VPC egress and VPC connectors",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/connecting-vpc",
+        "evidence": "Setup: Cloud Run services and jobs can send traffic to a VPC network without the overhead of managing a Serverless VPC Access connector."
+      }
+    ]
+  },
+  {
+    "id": "dio-011",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-sql",
+      "iam-database-authentication",
+      "connection-pool"
+    ],
+    "stem": "A Python service on Cloud Run must use IAM database authentication and a connection pool for Cloud SQL for PostgreSQL. At startup, the code gets an OAuth 2.0 access token from Application Default Credentials. It uses the token as the password for a SQLAlchemy pool. About one hour after each deployment, new connections fail with authentication errors, but open connections keep working. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `pool_recycle=3000`, so that the pool replaces each connection before the token expires."
+      },
+      {
+        "id": "B",
+        "text": "Store a database password in Secret Manager, and log in with built-in database authentication."
+      },
+      {
+        "id": "C",
+        "text": "Use the Cloud SQL Python Connector with `enable_iam_auth=True` and no password, so that it refreshes the tokens."
+      },
+      {
+        "id": "D",
+        "text": "Get a new access token in each request handler, and open a new connection with it for each request."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "IAM database authentication uses OAuth 2.0 access tokens that are valid for only one hour. With manual authentication, the pool keeps sending the expired token from startup. With automatic IAM database authentication, a Cloud SQL connector requests and refreshes the tokens, so a pool keeps stable connections. Google strongly recommends automatic mode.",
+    "whyWrong": {
+      "A": "New connections still use the token from startup. After one hour, the replacement connections fail too.",
+      "B": "This works, but the service must use IAM database authentication. Built-in authentication also adds a password to manage.",
+      "D": "This removes the connection pool, which the service must keep. Each request also waits while it authenticates and opens a connection."
+    },
+    "sources": [
+      {
+        "title": "IAM authentication",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/iam-authentication",
+        "evidence": "IAM database authentication uses OAuth 2.0 access tokens, which are short-lived and valid for only one hour. Cloud SQL connectors are able to request and refresh these tokens"
+      },
+      {
+        "title": "IAM authentication",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/iam-authentication",
+        "evidence": "Automatic IAM database authentication is strongly recommended over manual authentication."
+      }
+    ]
+  },
+  {
+    "id": "dio-012",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-sql-auth-proxy",
+      "gke",
+      "workload-identity-federation"
+    ],
+    "stem": "A Ruby on Rails app runs on a GKE Standard cluster that has Workload Identity Federation for GKE enabled. The app must connect to a Cloud SQL for PostgreSQL instance that has a public IP address. The security team forbids service account keys and authorized networks. Each app in the cluster must use its own identity. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run one Cloud SQL Auth Proxy Deployment behind a ClusterIP Service, and point every app in the cluster to it."
+      },
+      {
+        "id": "B",
+        "text": "Run the Cloud SQL Auth Proxy as a sidecar container in the app Pod. The app connects to it on `localhost`."
+      },
+      {
+        "id": "C",
+        "text": "Store a JSON key for the IAM service account in a Kubernetes Secret, and mount it in the proxy container."
+      },
+      {
+        "id": "D",
+        "text": "Add the external IP addresses of the cluster nodes to the authorized networks of the Cloud SQL instance."
+      },
+      {
+        "id": "E",
+        "text": "Link the Kubernetes service account of the app to an IAM service account that has the Cloud SQL Client role."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "Cloud SQL Language Connectors exist for Java, Python, Go, and Node.js, so a Ruby app uses the Cloud SQL Auth Proxy. On GKE, the proxy runs as a sidecar in the same Pod, and the app connects to it on `localhost`. Workload Identity Federation for GKE is the preferred way to give the proxy an identity without a key file. That IAM service account needs the Cloud SQL Client role.",
+    "whyWrong": {
+      "A": "The link from an app to the proxy is not encrypted, so Google recommends the proxy on the same machine as the workload. A shared proxy also gives every app the same identity.",
+      "C": "The security team forbids keys. Workload Identity Federation for GKE gives the proxy credentials without a key file.",
+      "D": "The security team forbids authorized networks. The proxy authorizes connections with IAM, so it needs no authorized networks."
+    },
+    "sources": [
+      {
+        "title": "Connect from Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-kubernetes-engine",
+        "evidence": "The Cloud SQL Auth Proxy container is in the same pod as your application, which enables the application to connect to the Cloud SQL Auth Proxy using `localhost`, increasing security and performance."
+      },
+      {
+        "title": "Connect from Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-kubernetes-engine",
+        "evidence": "If you are using Google Kubernetes Engine, the preferred method is to use GKE's Workload Identity feature."
+      },
+      {
+        "title": "About the Cloud SQL Auth Proxy",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/sql-proxy",
+        "evidence": "The connection between the client applications and the Cloud SQL Auth Proxy client on the client machine is not encrypted. We recommend that you run the proxy on the same machine that contains your workload."
+      }
+    ]
+  },
+  {
+    "id": "dio-013",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "client-libraries",
+      "firestore",
+      "cloud-run"
+    ],
+    "stem": "A Cloud Run service runs this code:\n\n```python\nfrom flask import Flask\nfrom google.cloud import firestore\n\napp = Flask(__name__)\n\n@app.route(\"/orders/<order_id>\")\ndef get_order(order_id):\n    db = firestore.Client()\n    doc = db.collection(\"orders\").document(order_id).get()\n    return doc.to_dict() or {}\n```\n\nUnder load, latency is high, and some requests fail with authentication errors. How should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Call `db.close()` at the end of each request, so that the client releases its credentials."
+      },
+      {
+        "id": "B",
+        "text": "Wrap the `get()` call in a retry loop with exponential backoff and jitter."
+      },
+      {
+        "id": "C",
+        "text": "Set the maximum concurrency of the service to 1, so that each instance creates fewer clients."
+      },
+      {
+        "id": "D",
+        "text": "Create the `firestore.Client()` once in global scope, and reuse it in every request."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Each new client authenticates and gets an access token, which can take several seconds. Each client also has its own credential cache, so many new clients in a short time can be rate limited and fail authentication. Cloud Run reuses instances, so one client in a global variable serves many requests with the same token.",
+    "whyWrong": {
+      "A": "Each request still creates a new client that must authenticate again. Closing the client does not remove that cost.",
+      "B": "Retries add more requests but do not fix the cause. Every request still creates a new client that must authenticate.",
+      "C": "Lower concurrency makes Cloud Run start more instances. Each request still creates a new client."
+    },
+    "sources": [
+      {
+        "title": "Client libraries best practices",
+        "url": "https://docs.cloud.google.com/apis/docs/client-libraries-best-practices",
+        "evidence": "Since each instance of the client has its own credential cache, creating too many in a small period of time may incur rate limiting causing library requests to fail authentication."
+      },
+      {
+        "title": "General development tips",
+        "url": "https://docs.cloud.google.com/run/docs/tips/general",
+        "evidence": "However, Cloud Run does reuse individual instances to serve ongoing traffic, so you can declare a variable in global scope to allow its value to be reused in subsequent invocations."
+      }
+    ]
+  },
+  {
+    "id": "dio-014",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "retry-strategy",
+      "client-libraries"
+    ],
+    "stem": "A batch job uploads thousands of files to Cloud Storage with the Python client library, and each upload sets `if_generation_match=0`. A developer wrapped each upload in an application loop that retries any exception three times. During a short service disruption, the job sent many more requests than expected, and Cloud Storage throttled it. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the application loop, and adjust the built-in retries of the library with a copy of `DEFAULT_RETRY` if needed."
+      },
+      {
+        "id": "B",
+        "text": "Keep the loop, and add a fixed pause of one second between the retries of the application."
+      },
+      {
+        "id": "C",
+        "text": "Keep the loop, but use it to retry only `403 Forbidden` errors, with exponential backoff."
+      },
+      {
+        "id": "D",
+        "text": "Keep both retry layers, and raise the retry deadline of the library, so that uploads outlast the disruption."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The Cloud Storage client library already retries transient errors with exponential backoff. The precondition makes each upload safe to retry. An application loop on top of the library retries multiplies the attempts, for example three times three gives nine. Google recommends that you use and configure the built-in retries.",
+    "whyWrong": {
+      "B": "The two retry layers still multiply the attempts. A fixed pause, without backoff and jitter, can also make an outage worse.",
+      "C": "A `403` error is permanent, for example an authorization failure. A retry cannot succeed.",
+      "D": "A longer deadline gives each layer more time to retry, so the job sends even more requests. The two layers still multiply the attempts."
+    },
+    "sources": [
+      {
+        "title": "Retry strategy",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "Adding custom application level retry logic on top of the existing retry mechanisms can lead to an excessive number of retry attempts."
+      },
+      {
+        "title": "Retry strategy",
+        "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+        "evidence": "How to avoid this: We recommend using and configuring the built-in retry mechanisms."
+      }
+    ]
+  },
+  {
+    "id": "dio-015",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "firestore",
+      "iam",
+      "security-rules"
+    ],
+    "stem": "A mobile app writes to Firestore through the Firebase SDK, and Firestore Security Rules limit each user to their own documents. The team adds a Cloud Run service that uses the Firestore server client library for Python. The service updates the orders of all users. How should you control the data access of the Cloud Run service?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a Security Rules condition that allows writes only when a request comes from the email of the service."
+      },
+      {
+        "id": "B",
+        "text": "Create a Firebase Authentication user for the service, and sign in as that user before each request."
+      },
+      {
+        "id": "C",
+        "text": "Grant the service account of the service an IAM role for Firestore, such as Cloud Datastore User."
+      },
+      {
+        "id": "D",
+        "text": "Pass the Firebase ID token of each end user to the server client library, so that the rules apply."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Server client libraries create a privileged environment with full access to the database. Firestore does not evaluate their requests against Security Rules. IAM controls their access, so you grant the service account a Firestore role. Cloud Datastore User (`roles/datastore.user`) gives read and write access to the data.",
+    "whyWrong": {
+      "A": "Firestore does not evaluate Security Rules for requests from server client libraries, so the condition has no effect.",
+      "B": "The server client library authenticates as the service account through IAM. A Firebase Authentication user does not change how Firestore checks its requests.",
+      "D": "Requests from server client libraries are not evaluated against Security Rules, so an ID token does not make the rules apply."
+    },
+    "sources": [
+      {
+        "title": "Firestore client libraries",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/reference/libraries",
+        "evidence": "Server client libraries create a privileged Firestore environment with full access to your database. In this environment, requests are not evaluated against your Firestore security rules."
+      },
+      {
+        "title": "Security for server client libraries",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/security/iam",
+        "evidence": "Read/write access to data in a Firestore database. Intended for application developers and service accounts."
+      }
+    ]
+  },
+  {
+    "id": "dio-016",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "preconditions",
+      "idempotency"
+    ],
+    "stem": "Workers take jobs from a queue that can deliver a job more than once. Each worker writes its result to `gs://results/JOB_ID.json` with the Python client library. The first result written for a job must never be replaced by a later write. How should the workers write the result?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Call `blob.exists()` first, and upload the result only when the call returns `False`."
+      },
+      {
+        "id": "B",
+        "text": "Upload with `if_generation_match=0`, and treat a `412 Precondition Failed` error as a result that already exists."
+      },
+      {
+        "id": "C",
+        "text": "Enable Object Versioning on the bucket, so that a later write keeps the first result as a noncurrent version."
+      },
+      {
+        "id": "D",
+        "text": "Upload with an XML API multipart upload that sends the header `x-goog-if-generation-match: 0`."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A generation-match precondition with the value `0` lets the upload proceed only if no live object has that name. Cloud Storage checks the condition when it writes, so two workers cannot both succeed. The second write fails with `412 Precondition Failed`, which the worker treats as a duplicate job.",
+    "whyWrong": {
+      "A": "Another worker can create the object between the check and the upload. Only a precondition makes the check part of the write.",
+      "C": "Versioning keeps the old data, but the later write still replaces the live object. Readers then get the later result.",
+      "D": "XML API multipart uploads do not support preconditions. The request fails with a `400 NotImplemented` error."
+    },
+    "sources": [
+      {
+        "title": "Request preconditions",
+        "url": "https://docs.cloud.google.com/storage/docs/request-preconditions",
+        "evidence": "the request only proceeds if no object with the specified name exists in the bucket or if there are only noncurrent versions of the object in the bucket"
+      },
+      {
+        "title": "Request preconditions",
+        "url": "https://docs.cloud.google.com/storage/docs/request-preconditions",
+        "evidence": "Preconditions cannot be used in XML API multipart uploads. Attempting to do so results in a `400 NotImplemented` error."
+      }
+    ]
+  },
+  {
+    "id": "dio-017",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "resumable-upload",
+      "signed-urls"
+    ],
+    "stem": "A mobile app uploads videos of up to 2 GB to Cloud Storage over cellular networks that often drop. Users sign in to your backend on Cloud Run and have no Google accounts. After a dropped connection, an upload must continue from where it stopped. The video data must not go through the backend. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Have the backend sign a V4 `PUT` URL. The app sends each video in one request, and sends it again after a drop."
+      },
+      {
+        "id": "B",
+        "text": "Have the backend sign a separate V4 `PUT` URL for each 8 MiB chunk, and join the chunks later."
+      },
+      {
+        "id": "C",
+        "text": "Have the app upload each video to the backend. The backend then sends it to Cloud Storage as a resumable upload."
+      },
+      {
+        "id": "D",
+        "text": "Have the backend start a resumable upload session and return the session URI. The app uploads and resumes with that URI."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A resumable upload is more reliable for large files, because the client can resume after an interruption. In most cases, the server starts the session and sends the session URI to the client. The session URI acts as an authentication token, so the app needs no Google account, and the data goes directly to Cloud Storage.",
+    "whyWrong": {
+      "A": "A single-request upload must start again from the beginning after a failure. For 2 GB over an unstable network, that wastes time and data.",
+      "B": "Separate `PUT` URLs create separate objects that need extra steps to join. A resumable session uploads all the data through one session URI.",
+      "C": "The video data then goes through the backend, which the requirements do not allow."
+    },
+    "sources": [
+      {
+        "title": "Signed URLs",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+        "evidence": "in most cases the server can initiate the resumable upload instead. The server then sends the session URI to the client to perform the upload."
+      },
+      {
+        "title": "Object uploads",
+        "url": "https://docs.cloud.google.com/storage/docs/uploads",
+        "evidence": "Resumable upload. An upload method that provides a more reliable transfer, which is especially important with large files."
+      },
+      {
+        "title": "Signed URLs",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls",
+        "evidence": "Generally, creating signed URLs for resumable uploads is unnecessary, because after the request to initiate the upload, subsequent `PUT` requests to upload the object data use a session URI, which acts as an authentication token."
+      }
+    ]
+  },
+  {
+    "id": "dio-018",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "firestore",
+      "indexes",
+      "queries"
+    ],
+    "stem": "A service runs this query against a Firestore database in Standard edition:\n\n```python\nquery = (\n    db.collection(\"orders\")\n    .where(filter=FieldFilter(\"status\", \"==\", \"shipped\"))\n    .where(filter=FieldFilter(\"total\", \">\", 100))\n)\nresults = list(query.stream())\n```\n\nThe query fails with an error message that contains a link. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Follow the link to create a manual index (formerly composite index) on `status` and `total`, then run the query again."
+      },
+      {
+        "id": "B",
+        "text": "Remove the `status` filter from the query, and filter the results by status in the application code."
+      },
+      {
+        "id": "C",
+        "text": "Create an automatic index (formerly single-field index) on the `total` field, then run the query again."
+      },
+      {
+        "id": "D",
+        "text": "Retry the query with exponential backoff, because Firestore creates the missing index after the first failure."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "In Standard edition, every query uses an index. A query with an equality filter on one field and a range filter on another field needs a manual index. When an index is missing, Firestore returns an error message with a link that creates the index.",
+    "whyWrong": {
+      "B": "The query then reads, and bills, many documents that the app drops. The index fixes the query instead.",
+      "C": "By default, Firestore already creates an automatic index for each field. This query combines filters on two fields, so it needs a manual index.",
+      "D": "Firestore does not create a manual index by itself. You create it, for example from the link in the error message."
+    },
+    "sources": [
+      {
+        "title": "Standard edition index overview",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/standard-index-overview",
+        "evidence": "Any time you attempt a query that isn't supported by an existing index, Firestore Standard edition returns an error message with a link that you can follow to create the missing index."
+      },
+      {
+        "title": "Standard edition index overview",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/standard-index-overview",
+        "evidence": "If you need to run a compound query that uses a range comparison (`<`, `<=`, `>`, or `>=`) or if you need to sort by a different field, you must create a manual index for that query."
+      }
+    ]
+  },
+  {
+    "id": "dio-019",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "firestore",
+      "transactions",
+      "query-cursors"
+    ],
+    "stem": "A ticketing service uses this Firestore code:\n\n```python\n@firestore.transactional\ndef reserve_seat(transaction, seat_ref, email):\n    seat = seat_ref.get(transaction=transaction)\n    if seat.get(\"taken\"):\n        raise ValueError(\"Seat already taken\")\n    transaction.update(seat_ref, {\"taken\": True, \"email\": email})\n    send_confirmation_email(email)\n\ndef list_events(page):\n    return (db.collection(\"events\").order_by(\"date\")\n            .offset(page * 50).limit(50).stream())\n```\n\nDuring busy sales, users get duplicate confirmation e-mails. Deep pages of the event list are also slow and costly. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace the transaction with a batched write, so that the function runs only once."
+      },
+      {
+        "id": "B",
+        "text": "Wrap each call to `reserve_seat` in an application retry loop with exponential backoff."
+      },
+      {
+        "id": "C",
+        "text": "Send the e-mail after `reserve_seat` returns successfully, not inside the transaction function."
+      },
+      {
+        "id": "D",
+        "text": "Raise the page size from 50 to 500, so that users reach deep events with fewer requests."
+      },
+      {
+        "id": "E",
+        "text": "Page with a query cursor, such as `start_after()` with the last document of the previous page."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "A transaction function can run more than once when a concurrent edit changes a document that it reads. So the function must not have side effects, such as an e-mail. Send the e-mail after the transaction commits. An offset does not skip reads: Firestore still reads the skipped documents, and you pay for them. A query cursor starts the next page after the last document.",
+    "whyWrong": {
+      "A": "A batched write cannot read documents. The code must read the seat to see whether it is taken, so a batched write cannot prevent double booking.",
+      "B": "The client library already retries failed transactions. More retries can run the function, and send the e-mail, more times.",
+      "D": "Larger pages do not remove the offset. Firestore still reads every skipped document, and you pay for those reads."
+    },
+    "sources": [
+      {
+        "title": "Transactions and batched writes",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/manage-data/transactions",
+        "evidence": "Do not modify application state inside of your transaction functions. Doing so will introduce concurrency issues, because transaction functions can run multiple times and are not guaranteed to run on the UI thread."
+      },
+      {
+        "title": "Firestore best practices",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/best-practices",
+        "evidence": "Do not use offsets. Instead, use cursors. Using an offset only avoids returning the skipped documents to your application, but these documents are still retrieved internally."
+      },
+      {
+        "title": "Transactions and batched writes",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/manage-data/transactions",
+        "evidence": "If you do not need to read any documents in your operation set, you can execute multiple write operations as a single batch"
+      }
+    ]
+  },
+  {
+    "id": "dio-020",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "spanner",
+      "read-only-transactions",
+      "locking"
+    ],
+    "stem": "A reporting endpoint reads the balance and the recent transactions of a customer from two Spanner tables with two queries. Both results must show the data at the same point in time. The endpoint never writes data. It must not take locks that slow down the read-write transactions of the payment service. Which approach should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run both queries in one read-write transaction with `database.run_in_transaction()`, which gives serializable isolation."
+      },
+      {
+        "id": "B",
+        "text": "Run both queries in one read-only transaction, for example with `database.snapshot(multi_use=True)`."
+      },
+      {
+        "id": "C",
+        "text": "Run each query as its own single read with `database.snapshot()`, one call after the other."
+      },
+      {
+        "id": "D",
+        "text": "Copy both tables to BigQuery every hour, and run the two queries on the copies."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A read-only transaction gives consistent data across several reads. It takes no locks and needs no commit, and it can run on any replica. Google recommends read-only transactions for reads, and locking read-write transactions only when the code must write.",
+    "whyWrong": {
+      "A": "A read-write transaction can take locks, which adds contention with the payment service. Use it only when you must write.",
+      "C": "Each single read runs at its own timestamp. The two results can show different points in time.",
+      "D": "The copies can be up to one hour old, and the copy job is one more pipeline to run. A read-only transaction reads consistent data from the database itself."
+    },
+    "sources": [
+      {
+        "title": "Transactions overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/transactions",
+        "evidence": "Read-only: These transactions guarantee data consistency across multiple read operations, but don't permit data modifications."
+      },
+      {
+        "title": "Transactions overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/transactions",
+        "evidence": "Because read-only transactions can execute on any replica, use them for read operations unless a read-write transaction is explicitly required. Only use locking read-write transactions when required."
+      }
+    ]
+  },
+  {
+    "id": "dio-021",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "spanner",
+      "dml",
+      "mutations"
+    ],
+    "stem": "A Spanner app runs this function:\n\n```python\ndef add_album(transaction):\n    transaction.insert(\n        \"Albums\",\n        columns=(\"SingerId\", \"AlbumId\", \"AlbumTitle\"),\n        values=[(1, 10, \"New Album\")],\n    )\n    transaction.execute_update(\n        \"UPDATE Singers SET AlbumCount = \"\n        \"(SELECT COUNT(*) FROM Albums WHERE SingerId = 1) \"\n        \"WHERE SingerId = 1\"\n    )\n\ndatabase.run_in_transaction(add_album)\n```\n\nAfter each commit, `AlbumCount` is one lower than the real number of albums. The insert and the count update must stay in one atomic transaction. How should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move the `execute_update()` call so that it runs before the `transaction.insert()` call."
+      },
+      {
+        "id": "B",
+        "text": "Read the count with `database.snapshot()` in the function, and write it with `transaction.update()`."
+      },
+      {
+        "id": "C",
+        "text": "Replace `transaction.insert()` with a DML `INSERT` statement that runs through `execute_update()`."
+      },
+      {
+        "id": "D",
+        "text": "Run the `UPDATE` statement with `database.execute_partitioned_dml()` after the transaction commits."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "`transaction.insert()` adds a mutation, which Spanner applies only at commit. When a transaction has both DML and mutations, Spanner runs the DML first, so the `UPDATE` cannot see the new album. DML changes are visible to later statements in the same transaction. With a DML `INSERT`, the `UPDATE` counts the new row, and the code no longer mixes DML and mutations.",
+    "whyWrong": {
+      "A": "The order in the code does not matter. Spanner applies the mutation at commit, after all DML statements.",
+      "B": "A read-only snapshot cannot see the mutation, which is not committed yet. The count is still one lower.",
+      "D": "Partitioned DML runs outside this transaction, so the insert and the count update are no longer atomic."
+    },
+    "sources": [
+      {
+        "title": "Compare DML and mutations",
+        "url": "https://docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+        "evidence": "If a transaction contains both DML statements and mutations in the commit request, Spanner executes the DML statements before the mutations."
+      },
+      {
+        "title": "Compare DML and mutations",
+        "url": "https://docs.cloud.google.com/spanner/docs/dml-versus-mutations",
+        "evidence": "Changes you make using DML statements are visible to subsequent statements in the same transaction."
+      }
+    ]
+  },
+  {
+    "id": "dio-022",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "spanner",
+      "partitioned-dml",
+      "bulk-delete"
+    ],
+    "stem": "A nightly job must delete events older than 400 days from a Spanner table that holds billions of rows. One `DELETE` statement in a read-write transaction fails, because the transaction exceeds the limits of Spanner. The deletion does not need to be atomic, and the statement is safe to run more than once. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Read the keys of the old rows, and delete the rows with mutations in one read-write transaction."
+      },
+      {
+        "id": "B",
+        "text": "Run the same `DELETE` statement in a read-write transaction that has a longer timeout."
+      },
+      {
+        "id": "C",
+        "text": "Change the isolation level to repeatable read, and run the same `DELETE` in a read-write transaction."
+      },
+      {
+        "id": "D",
+        "text": "Run the `DELETE` statement as partitioned DML, with `database.execute_partitioned_dml()` instead of a read-write transaction."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Partitioned DML is for large, database-wide `UPDATE` and `DELETE` statements. Spanner splits the key space and runs the statement in separate, smaller transactions, so the limits of one transaction do not apply. Partitioned DML has no rollback, and it can run more than once on a partition. This job accepts both, because the deletion need not be atomic and the statement is idempotent.",
+    "whyWrong": {
+      "A": "All the mutations still go into one commit, so the transaction is still too large.",
+      "B": "A longer timeout does not change the size limits of one transaction.",
+      "C": "The isolation level controls how transactions read and lock data. It does not change the size limits of one transaction."
+    },
+    "sources": [
+      {
+        "title": "Partitioned DML",
+        "url": "https://docs.cloud.google.com/spanner/docs/dml-partitioned",
+        "evidence": "Partitioned DML, which enables large-scale, database-wide operations with minimal impact on concurrent transaction processing by partitioning the key space and running the statement over partitions in separate, smaller-scoped transactions."
+      },
+      {
+        "title": "Partitioned DML",
+        "url": "https://docs.cloud.google.com/spanner/docs/dml-partitioned",
+        "evidence": "Spanner handles the transaction limits and per-transaction concurrency limits."
+      },
+      {
+        "title": "Partitioned DML",
+        "url": "https://docs.cloud.google.com/spanner/docs/dml-partitioned",
+        "evidence": "Partitioned DML does not support commit or rollback. Spanner executes and applies the DML statement immediately."
+      }
+    ]
+  },
+  {
+    "id": "dio-023",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "bigtable",
+      "row-ranges",
+      "aggregate-cells"
+    ],
+    "stem": "Row keys in a Bigtable table have the form `phone#DEVICE_ID#YYYYMMDD`. The app profile of the app uses multi-cluster routing. The app runs this code:\n\n```python\n# Readings of device 4c410523 for September 2026\nrows = table.read_rows(\n    filter_=row_filters.RowKeyRegexFilter(b\".*4c410523#202609.*\"))\n\n# Page-view counter for the home page\nrow = table.append_row(b\"page#home\")\nrow.increment_cell_value(\"stats\", b\"views\", 1)\nrow.commit()\n```\n\nWhich two changes follow Google's recommendations? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the regex filter, read all rows, and keep only the rows of the device and month in the app, because filters add CPU work in Bigtable."
+      },
+      {
+        "id": "B",
+        "text": "Read a row range from `phone#4c410523#20260901` to `phone#4c410523#20261001` instead of the regex filter."
+      },
+      {
+        "id": "C",
+        "text": "Send the increments for many pages in one `MutateRows` batch, so that all the counts change atomically."
+      },
+      {
+        "id": "D",
+        "text": "Count page views with a `MutateRow` request that sends an `AddToCell` mutation to an aggregate cell."
+      },
+      {
+        "id": "E",
+        "text": "Replace the increment with a `CheckAndMutateRow` request that writes the new count only if the old count matches."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "A filter without a row key or row range runs on every row in a full table scan. A row key regex limits the scan only when it starts with a fixed prefix, and this regex starts with `.*`. A row range reads only the rows of that device for September. For counters, Google recommends `AddToCell` on aggregate cells instead of the `ReadModifyWriteRow` request that `append_row` sends. Do not use `ReadModifyWriteRow` with multi-cluster routing.",
+    "whyWrong": {
+      "A": "The read still scans the full table, and it also sends every row to the app. A row range limits the read to the rows that the app needs.",
+      "C": "Each entry in a `MutateRows` request is atomic, but the request as a whole is not.",
+      "E": "Conditional writes are also not for app profiles with multi-cluster routing. For counters, use `AddToCell`."
+    },
+    "sources": [
+      {
+        "title": "Use filters",
+        "url": "https://docs.cloud.google.com/bigtable/docs/using-filters",
+        "evidence": "If you don't specify a row key or range of rows for a filter, the filter is applied to all rows in a full table scan."
+      },
+      {
+        "title": "Writes",
+        "url": "https://docs.cloud.google.com/bigtable/docs/writes",
+        "evidence": "For example, if you want to count something that will number in the millions, such as page views, you should `MutateRow` with an `AddToCell` mutation to update your counts at write time."
+      },
+      {
+        "title": "Writes",
+        "url": "https://docs.cloud.google.com/bigtable/docs/writes",
+        "evidence": "Each entry in a `MutateRows` request is atomic, but the request as a whole is not."
+      }
+    ]
+  },
+  {
+    "id": "dio-024",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "bigquery",
+      "storage-read-api",
+      "column-projection"
+    ],
+    "stem": "Each night, a Python job reads about 300 million rows from a BigQuery table into a pandas DataFrame. The job needs only 3 of the 200 columns of the table. It pages through the rows with `client.list_rows()`, and the read takes several hours. What should you do to make the read faster?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Read the table with the BigQuery Storage Read API, select only the 3 columns, and read several streams in parallel."
+      },
+      {
+        "id": "B",
+        "text": "Lower the `page_size` of `list_rows()`, so that each request returns a smaller page of rows faster."
+      },
+      {
+        "id": "C",
+        "text": "Create a logical view that has the 3 columns, and read the view with the Storage Read API."
+      },
+      {
+        "id": "D",
+        "text": "Run `SELECT *` on the table with `query_and_wait()`, and iterate over the rows that it returns."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The Storage Read API sends data in a binary format over RPC, so several consumers can read streams in parallel. Column projection returns only the columns that you select. Paged methods, such as `tabledata.list`, suit small result sets.",
+    "whyWrong": {
+      "B": "Smaller pages mean more requests for the same rows. Paged reads suit small result sets.",
+      "C": "The Storage Read API cannot read logical views directly. You can query the view, and then read the result table.",
+      "D": "This reads all 200 columns, and the client still pages through the results."
+    },
+    "sources": [
+      {
+        "title": "Use the BigQuery Storage Read API to read table data",
+        "url": "https://docs.cloud.google.com/bigquery/docs/reference/storage",
+        "evidence": "When you use the Storage Read API, structured data is sent over the wire in a binary serialization format. This allows for additional parallelism among multiple consumers for a set of results."
+      },
+      {
+        "title": "Use the BigQuery Storage Read API to read table data",
+        "url": "https://docs.cloud.google.com/bigquery/docs/reference/storage",
+        "evidence": "Column Projection: At session creation, users can select an optional subset of columns to read. This allows efficient reads when tables contain many columns."
+      },
+      {
+        "title": "Use the BigQuery Storage Read API to read table data",
+        "url": "https://docs.cloud.google.com/bigquery/docs/reference/storage",
+        "evidence": "Because the Storage Read API operates on storage, you cannot use the Storage Read API to directly read from logical or materialized views."
+      }
+    ]
+  },
+  {
+    "id": "dio-025",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-storage",
+      "preconditions",
+      "concurrency"
+    ],
+    "stem": "Two Cloud Run services update the same small JSON settings object in Cloud Storage with the Python client library. Each service downloads the object, changes one field, and uploads the full object again. Sometimes a change from one service disappears. You must prevent lost updates without adding a database. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Upload with `if_generation_match=0`, so that an upload never replaces a newer version of the object."
+      },
+      {
+        "id": "B",
+        "text": "Upload with `if_metageneration_match` set to the metageneration that the download returned, and retry after a `412` error."
+      },
+      {
+        "id": "C",
+        "text": "Upload with `if_generation_match` set to the downloaded generation. After a `412` error, download again and reapply the change."
+      },
+      {
+        "id": "D",
+        "text": "Write each change to a new object with a timestamp in its name, and have readers use the newest object."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The two services have a race condition in their read-modify-write cycles. Use the generation from the download in a generation-match precondition on the upload. If another service wrote the object first, the generation changed, and the upload fails with `412 Precondition Failed`. The service then reads the new data and applies its change again.",
+    "whyWrong": {
+      "A": "The value `0` lets a write proceed only when no live object has that name. The object exists, so every update fails.",
+      "B": "Another generation of the object can have the same metageneration number, so the upload can still overwrite the other change. Always add a generation precondition to a metageneration precondition.",
+      "D": "Each service still starts from an old copy. When both services change the settings at the same time, the newest object lacks the other change."
+    },
+    "sources": [
+      {
+        "title": "Request preconditions",
+        "url": "https://docs.cloud.google.com/storage/docs/request-preconditions",
+        "evidence": "you should use the generation number that's returned in the initial request for object metadata, and then use this value in a generation-match precondition in the second request."
+      },
+      {
+        "title": "Request preconditions",
+        "url": "https://docs.cloud.google.com/storage/docs/request-preconditions",
+        "evidence": "If you use a metageneration precondition in an object request, you should always use a generation precondition as well."
+      }
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "displayName": "lab70-payment-failures",
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "lab70-backend logged a payment failure",
+      "conditionThreshold": {
+        "filter": "metric.type=\"logging.googleapis.com/user/lab70-payment-failures\" AND resource.type=\"cloud_run_revision\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "600s",
+            "perSeriesAligner": "ALIGN_SUM",
+            "crossSeriesReducer": "REDUCE_SUM"
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "0s",
+        "trigger": {
+          "count": 1
+        }
+      }
+    }
+  ],
+  "documentation": {
+    "content": "lab70-backend logged a payment failure in the last 10 minutes. Open the error group in Error Reporting, or run the Logs Explorer query `jsonPayload.event=\"payment_failed\"`.",
+    "mimeType": "text/markdown"
+  }
+}

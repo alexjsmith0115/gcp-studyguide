@@ -1,0 +1,130 @@
+{
+  "exam": "Google Cloud Professional Cloud Developer",
+  "guideVersion": "",
+  "guideUrl": "https://services.google.com/fh/files/misc/professional_cloud_developer_exam_guide_english.pdf",
+  "certPage": "https://cloud.google.com/learn/certification/cloud-developer",
+  "sampleQuestions": "https://docs.google.com/forms/d/e/1FAIpQLSfFeB8zBNi2q-ar0V7iIguhk2e6P-UkrJ8OJfg6n0k6HcYLDQ/viewform",
+  "retrieved": "2026-09-30",
+  "local": "pcd/sources/pcd-exam-guide.pdf",
+  "app": {
+    "name": "PCD Workbook",
+    "slug": "pcd-workbook",
+    "subtitle": "Professional Cloud Developer · official exam guide",
+    "labPrefix": "pcd-lab",
+    "sectionShort": {"1": "Designing applications", "2": "Building and testing", "3": "Deploying applications", "4": "Integrating services"}
+  },
+  "intro": "A Professional Cloud Developer builds and configures scalable, secure applications by using Google-recommended tools and best practices. They are proficient in the full development lifecycle, from architecting cloud-native applications to integrating advanced machine learning capabilities. They are also responsible for utilizing generative AI APIs to create intelligent user experiences. Additionally, they leverage AI-powered development tools—such as AI coding assistants, context engineering, and automated debugging agents—to accelerate delivery and improve code quality.",
+  "format": {
+    "durationMinutes": 120,
+    "questions": "50-60 multiple choice and multiple select",
+    "fee": "$200 (plus tax where applicable)",
+    "languages": ["English", "Japanese"],
+    "delivery": "Online-proctored from a remote location, or onsite-proctored at a testing center",
+    "prerequisites": "None",
+    "recommendedExperience": "3+ years of industry experience including 1+ years designing and managing solutions using Google Cloud",
+    "renewal": "Renew with the standard exam. The renewal window opens 60 days before the inactive date, and renewal adds 2 years. This certification has no shorter renewal exam and no continuing-education option.",
+    "renewalSource": "https://support.google.com/cloud-certification/answer/9907853"
+  },
+  "caseStudies": [],
+  "sections": [
+    {
+      "id": "1", "weight": 32,
+      "title": "Designing highly scalable, secure, and reliable cloud-native applications",
+      "objectives": [
+        {"id": "1.1", "title": "Designing high-performing applications and APIs", "considerations": [
+          "Choosing the appropriate platform based on the use case and requirements (e.g., Compute Engine, Google Kubernetes Engine, Cloud Run)",
+          "Building, refactoring, and deploying application containers to Cloud Run and GKE",
+          "Understanding how Google Cloud services are geographically distributed (e.g., latency, regional services, zonal services)",
+          "Understanding the use cases for load balancers",
+          "Enabling session affinity for performant content delivery",
+          "Implementing caching solutions (e.g., Memorystore)",
+          "Creating and deploying APIs (e.g., HTTP REST, gRPC [Remote Procedure Call])",
+          "Using application rate limiting, authentication, and observability (e.g., Apigee, Cloud API Gateway)",
+          "Integrating applications using asynchronous or event-driven approaches (e.g., Eventarc, Pub/Sub)",
+          "Defining resource requirements for workloads",
+          "Optimizing for cost and resource usage",
+          "Understanding data replication to support zonal and regional failover models",
+          "Using traffic splitting strategies (e.g., gradual rollouts, rollbacks, A/B testing) on a new service on Cloud Run or GKE",
+          "Orchestrating application services with Workflows, Eventarc, Cloud Tasks, and Cloud Scheduler"
+        ]},
+        {"id": "1.2", "title": "Designing secure applications", "considerations": [
+          "Implementing data retention and organization policies (e.g., Cloud Storage Object Lifecycle Management, Cloud Storage use and lock retention policies)",
+          "Using security mechanisms that identify vulnerabilities and protect services and resources (e.g., Identity-Aware Proxy [IAP], Web Security Scanner)",
+          "Responding to and resolving vulnerabilities, including those identified by Artifact Analysis and Security Command Center",
+          "Storing, accessing, and rotating application secrets, credentials, and encryption keys (e.g., Secret Manager, Cloud Key Management Service, Workload Identity Federation)",
+          "Authenticating to Google Cloud services (e.g., Application Default Credentials, JSON Web Token [JWT], OAuth 2.0, Cloud SQL Auth Proxy, AlloyDB Auth Proxy, Identity Platform, WIF)",
+          "Securing cloud resources using Identity and Access Management (IAM) roles for service accounts",
+          "Incorporating secure service-to-service communications (e.g., Cloud Service Mesh, Kubernetes Network Policies, Direct VPC egress, private service connectivity)",
+          "Running services with least privileged access",
+          "Securing application artifacts using Binary Authorization"
+        ]},
+        {"id": "1.3", "title": "Storing and accessing data", "considerations": [
+          "Selecting the appropriate storage system based on the volume of data and performance requirements",
+          "Designing appropriate schemas for structured databases (e.g., AlloyDB, Spanner) and unstructured databases (e.g., Bigtable, Firestore)",
+          "Understanding the implications of eventual and strongly consistent replication of AlloyDB, Bigtable, Cloud SQL, Spanner, and Cloud Storage",
+          "Creating signed URLs to grant access to Cloud Storage objects",
+          "Writing data to BigQuery for analytics and AI/ML workloads"
+        ]}
+      ]
+    },
+    {
+      "id": "2", "weight": 23,
+      "title": "Building and testing applications",
+      "objectives": [
+        {"id": "2.1", "title": "Setting up your development environment", "considerations": [
+          "Emulating Google Cloud services using the Google Cloud CLI for local application development and local unit testing",
+          "Using the Google Cloud console, Cloud SDK, Cloud Code, Gemini Cloud Assist, Cloud Shell, and Cloud Workstations",
+          "Configuring IDEs with the appropriate integrations (e.g., Cloud SDK, AI tooling [coding assistants, MCP servers])"
+        ]},
+        {"id": "2.2", "title": "Building", "considerations": [
+          "Using Cloud Build and Artifact Registry to build and store containers from source code",
+          "Configuring provenance in Cloud Build (e.g., Binary Authorization)"
+        ]},
+        {"id": "2.3", "title": "Testing", "considerations": [
+          "Writing unit tests with the help of AI coding assistants",
+          "Executing automated integration tests in Cloud Build"
+        ]}
+      ]
+    },
+    {
+      "id": "3", "weight": 24,
+      "title": "Configuring cloud-native applications for deployment",
+      "objectives": [
+        {"id": "3.1", "title": "Deploying applications to Cloud Run", "considerations": [
+          "Deploying applications from source code",
+          "Invoking Cloud Run services using triggers (e.g., Eventarc, Pub/Sub)",
+          "Configuring event receivers (e.g., Eventarc, Pub/Sub)",
+          "Versioning, exposing and securing APIs in applications (e.g., Apigee)"
+        ]},
+        {"id": "3.2", "title": "Deploying containers to GKE", "considerations": [
+          "Deploying containerized applications",
+          "Implementing Kubernetes health checks to increase application availability",
+          "Incorporating Horizontal Pod Autoscaler attributes (scaling, metrics)"
+        ]}
+      ]
+    },
+    {
+      "id": "4", "weight": 21,
+      "title": "Integrating applications with Google Cloud services",
+      "objectives": [
+        {"id": "4.1", "title": "Integrating applications with data and storage services", "considerations": [
+          "Managing connections to various Google Cloud datastores (e.g., Cloud SQL, Firestore, Cloud Storage)",
+          "Reading and writing data to and from various Google Cloud data sources",
+          "Writing applications that publish and consume data using messaging services"
+        ]},
+        {"id": "4.2", "title": "Consuming Google Cloud APIs", "considerations": [
+          "Enabling Google Cloud services",
+          "Making API calls by using supported options (e.g., Cloud Client Libraries, REST API, gRPC, API Explorer) taking into consideration: batching requests; restricting return data; paginating results; caching results; handling errors (e.g., exponential backoff)",
+          "Using service accounts to make Cloud API calls"
+        ]},
+        {"id": "4.3", "title": "Troubleshooting and observability", "considerations": [
+          "Instrumenting code to facilitate troubleshooting using metrics, logs, and traces in Google Cloud Observability",
+          "Identifying and resolving issues using Google Cloud Observability",
+          "Managing application issues using Error Reporting",
+          "Using trace IDs to correlate trace spans across services",
+          "Using AI-assisted observability"
+        ]}
+      ]
+    }
+  ]
+}
