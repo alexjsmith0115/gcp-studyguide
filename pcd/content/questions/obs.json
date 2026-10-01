@@ -1,0 +1,1445 @@
+[
+  {
+    "id": "obs-001",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-run",
+      "structured-logging",
+      "cloud-logging"
+    ],
+    "stem": "A team runs a Python API on Cloud Run. The code writes plain text log lines. The team wants to filter its logs by severity in the Logs Explorer and to query a `customer_tier` field. The team does not want to add an agent or extra API calls. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Install the Ops Agent in the container image, and configure it to read the log file of the application."
+      },
+      {
+        "id": "B",
+        "text": "Write each log line to `stdout` as one line of JSON, with `severity`, `message`, and `customer_tier` fields."
+      },
+      {
+        "id": "C",
+        "text": "Write each log line to `stderr` as plain text, with a prefix such as `WARNING:` or `ERROR:` before the message."
+      },
+      {
+        "id": "D",
+        "text": "Use the Cloud Logging client library with `CloudLoggingHandler` to send each entry to the Cloud Logging API."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Cloud Run collects `stdout` and `stderr` automatically, without an agent. Cloud Logging puts a single line of serialized JSON into `jsonPayload`, so you can query its fields. The special `severity` field sets the severity of the entry. This meets the requirement for **no agent and no extra API calls**.",
+    "whyWrong": {
+      "A": "Cloud Run does not use logging agents, because it has built-in log collection.",
+      "C": "Plain text goes to `textPayload`, so there is no `customer_tier` field to query. The prefix is only text. A structured log line sets the severity with its `severity` key.",
+      "D": "`CloudLoggingHandler` sends each entry to the Cloud Logging API over the network. These are the extra API calls that the team does not want."
+    },
+    "sources": [
+      {
+        "title": "Logging and viewing logs in Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/logging",
+        "evidence": "When you write logs, you can send a simple text string or send a single line of serialized JSON, also called \"structured\" data. This is picked up and parsed by Cloud Logging and is placed into `jsonPayload`."
+      },
+      {
+        "title": "Logging and viewing logs in Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/logging",
+        "evidence": "Cloud Run does not use logging agents because it has built-in support for log collection."
+      },
+      {
+        "title": "Choose an instrumentation approach",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/instrumentation/choose-approach",
+        "evidence": "Cloud Run collects logs written to `stdout` and `stderr` automatically."
+      }
+    ]
+  },
+  {
+    "id": "obs-002",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke",
+      "log-severity",
+      "structured-logging"
+    ],
+    "stem": "A Java service on GKE writes warning messages as plain text to standard error. In the Logs Explorer, all of these entries have the `ERROR` severity. A log-based alerting policy for `ERROR` entries now pages the on-call developer for each warning. You want the warnings to keep a warning level and to stop paging the developer. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Write the warnings to standard output, so that GKE gives them the `WARNING` severity."
+      },
+      {
+        "id": "B",
+        "text": "Change the alerting policy so that it ignores all the entries from standard error."
+      },
+      {
+        "id": "C",
+        "text": "Write each warning as a JSON line, with a `severity` field set to `WARNING`."
+      },
+      {
+        "id": "D",
+        "text": "Add a `logging.googleapis.com/labels` object with a `level` key set to `WARNING`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "By default, GKE gives lines on standard output the `INFO` severity and lines on standard error the `ERROR` severity. A structured JSON line can include a `severity` field, which sets the severity of the entry. Only this change gives the entries a **warning level** and keeps them out of the `ERROR` alert.",
+    "whyWrong": {
+      "A": "GKE gives lines on standard output the `INFO` severity, not `WARNING`. The entries lose their warning level.",
+      "B": "Real errors also go to standard error. The policy then misses them, and the warnings still have the wrong severity.",
+      "D": "Labels classify an entry. They do not change its severity, so the entries keep the `ERROR` severity of standard error."
+    },
+    "sources": [
+      {
+        "title": "About GKE logs",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-logs",
+        "evidence": "By default, logs written to the standard output are on the `INFO` level and logs written to the standard error are on the `ERROR` level. Structured logs can include a `severity` field, which defines the log's severity."
+      }
+    ]
+  },
+  {
+    "id": "obs-003",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "opentelemetry",
+      "collector-sidecar",
+      "metrics"
+    ],
+    "stem": "A Python service on Cloud Run sends OpenTelemetry metrics with the OTLP exporter to an OpenTelemetry Collector sidecar in the same service. The service uses request-based billing. It runs as a user-created service account that has only the Cloud Datastore User role. No application metrics appear in Cloud Monitoring. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Install the Ops Agent in the application container, and send the OTLP data to it."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Cloud Trace Agent role to the service account of the service."
+      },
+      {
+        "id": "C",
+        "text": "Grant the Monitoring Metric Writer role to the service account of the service."
+      },
+      {
+        "id": "D",
+        "text": "Replace the sidecar with calls to the Cloud Monitoring API from the request handlers."
+      },
+      {
+        "id": "E",
+        "text": "Change the billing setting of the service to instance-based billing."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "The Cloud Run service identity needs the Monitoring Metric Writer role, so that the collector can write the metrics. Google also says to use instance-based billing for a service with OpenTelemetry instrumentation. With it, Cloud Run allocates the CPU for the whole instance lifecycle, which the background processing of OpenTelemetry needs.",
+    "whyWrong": {
+      "A": "The Ops Agent is the collector for Compute Engine VMs. On Cloud Run, Google recommends an OpenTelemetry Collector sidecar.",
+      "B": "The Cloud Trace Agent role is for writing traces. It does not let the collector write metrics.",
+      "D": "Google recommends OpenTelemetry instead of direct calls to the Monitoring API. The calls also still fail without a role that can write metrics."
+    },
+    "sources": [
+      {
+        "title": "Write OTLP metrics by using an OpenTelemetry Collector sidecar",
+        "url": "https://docs.cloud.google.com/run/docs/tutorials/custom-metrics-opentelemetry-sidecar",
+        "evidence": "Also note that the Cloud Run service identity needs the Monitoring Metric Writer (`roles/monitoring.metricWriter`) role."
+      },
+      {
+        "title": "Choose an instrumentation approach",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/instrumentation/choose-approach",
+        "evidence": "For your Cloud Run service, use instance-based billing. With instance-based billing, the CPU is allocated for the entire instance lifecycle, which is necessary because OpenTelemetry instrumentation does background processing."
+      },
+      {
+        "title": "User-defined metrics overview",
+        "url": "https://docs.cloud.google.com/monitoring/custom-metrics",
+        "evidence": "You can create user-defined metrics, except log-based metrics, by using the Cloud Monitoring API directly. However, we recommend that you use OpenTelemetry."
+      }
+    ]
+  },
+  {
+    "id": "obs-004",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "custom-metrics",
+      "cardinality",
+      "metric-labels"
+    ],
+    "stem": "A developer adds an OpenTelemetry counter named `checkout_requests` to a service. The counter has three labels: `customer_id`, `region`, and `status_code`. The service has about two million customers. After the release, the number of time series grows quickly, and charts of the metric load slowly. You must keep the error rate for each region. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Combine the three labels into one label whose value joins the three values."
+      },
+      {
+        "id": "B",
+        "text": "Write the metric to the `global` monitored resource instead of `generic_task`."
+      },
+      {
+        "id": "C",
+        "text": "Replace the counter with a log-based metric that extracts `customer_id` as a label."
+      },
+      {
+        "id": "D",
+        "text": "Remove the `customer_id` label, and keep the labels that have a small set of values."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Each combination of label values creates one time series. Cardinality depends mostly on the number of values that each label can have, not on the number of labels. Google says not to use user IDs as metric labels. The `region` and `status_code` labels still give the **error rate for each region**.",
+    "whyWrong": {
+      "A": "One combined label has as many values as the three labels together. The number of time series does not change.",
+      "B": "The monitored resource does not reduce the label values. Google also says that `generic_task` is usually a better choice than `global`.",
+      "C": "A log-based metric with a `customer_id` label still creates one time series for each customer. The problem stays."
+    },
+    "sources": [
+      {
+        "title": "Components of the metric model",
+        "url": "https://docs.cloud.google.com/monitoring/api/v3/metric-model",
+        "evidence": "Do not use high-resolution values like timestamps, any kind of unique identifier, user IDs, IP addresses, unparameterized URLs, and so forth, for metric labels."
+      },
+      {
+        "title": "Components of the metric model",
+        "url": "https://docs.cloud.google.com/monitoring/api/v3/metric-model",
+        "evidence": "Cardinality depends primarily on the number of values your labels can have, not on the number of labels."
+      }
+    ]
+  },
+  {
+    "id": "obs-005",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "managed-prometheus",
+      "gke",
+      "metrics"
+    ],
+    "stem": "A team moves several microservices to GKE. The services already expose metrics with Prometheus client libraries. The team has Grafana dashboards and alerts that use PromQL. The team does not want to deploy, scale, or shard Prometheus servers. What should you recommend?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run a self-managed Prometheus server in the cluster, with a persistent disk for storage."
+      },
+      {
+        "id": "B",
+        "text": "Rewrite the metrics with the Cloud Monitoring API client library, and rebuild the dashboards."
+      },
+      {
+        "id": "C",
+        "text": "Create log-based metrics from the application logs, and recreate the alerts in Cloud Monitoring."
+      },
+      {
+        "id": "D",
+        "text": "Use Managed Service for Prometheus with managed collection, and keep the PromQL queries."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Managed Service for Prometheus collects metrics from Prometheus exporters, and you keep your Grafana dashboards and PromQL alerts. Google recommends managed collection for all Kubernetes environments. It removes the work to **deploy, scale, shard**, configure, and maintain Prometheus servers.",
+    "whyWrong": {
+      "A": "A self-managed Prometheus server is the deployment and scaling work that the team wants to avoid.",
+      "B": "A rewrite discards working instrumentation and the PromQL dashboards. For metrics, Google recommends OpenTelemetry or Prometheus client libraries, not product-specific APIs.",
+      "C": "The metrics already exist in Prometheus format. Log-based metrics need new log lines, and they count only the entries that arrive after you create them."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud Managed Service for Prometheus",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/managed-prometheus",
+        "evidence": "We recommend that you use managed collection; using it eliminates the complexity of deploying, scaling, sharding, configuring, and maintaining Prometheus servers."
+      },
+      {
+        "title": "Google Cloud Managed Service for Prometheus",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/managed-prometheus",
+        "evidence": "Managed Service for Prometheus collects metrics from Prometheus exporters and lets you query the data globally using PromQL, meaning that you can keep using any existing Grafana dashboards, PromQL-based alerts, and workflows."
+      }
+    ]
+  },
+  {
+    "id": "obs-006",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "telemetry-api",
+      "otlp",
+      "quota-project"
+    ],
+    "stem": "A short-lived batch process exports OTLP traces directly to the Telemetry API (`telemetry.googleapis.com`), because a separate collector is not practical for it. The process uses Application Default Credentials. Its service account has only the Cloud Telemetry Writer role on the project. The export requests fail. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Cloud Trace Agent role to the service account on the project."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Monitoring Metric Writer role to the service account on the project."
+      },
+      {
+        "id": "C",
+        "text": "Set a quota project, and grant the service account the Service Usage Consumer role on it."
+      },
+      {
+        "id": "D",
+        "text": "Replace the OTLP exporter with the Google Cloud trace exporter for the Cloud Trace API."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "An application that writes to the Telemetry API needs a quota project. Its identity needs the Service Usage Consumer role on that quota project, and the Cloud Telemetry Writer role on the project. The service account has **only the writer role**, so the quota project setup is missing.",
+    "whyWrong": {
+      "A": "The service account already has a role that writes telemetry. Another writer role does not give the missing Service Usage Consumer role.",
+      "B": "The Monitoring Metric Writer role is for metrics. It does not give the missing Service Usage Consumer role.",
+      "D": "Google recommends the Telemetry API instead of the Cloud Trace API. A Google Cloud trace exporter converts the data, and the conversion can lose data."
+    },
+    "sources": [
+      {
+        "title": "Telemetry (OTLP) API overview",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/reference/telemetry/overview",
+        "evidence": "Service Usage Consumer role (`roles/serviceusage.serviceUsageConsumer`) on the quota project."
+      },
+      {
+        "title": "Telemetry (OTLP) API overview",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/reference/telemetry/overview",
+        "evidence": "Configure a quota project. To learn more, see Set the quota project."
+      },
+      {
+        "title": "Migrate from the Trace exporter to the OTLP endpoint",
+        "url": "https://docs.cloud.google.com/stackdriver/docs/instrumentation/migrate-to-otlp-endpoints",
+        "evidence": "For trace data, we recommend that you migrate your application to use the Telemetry (OTLP) API to export data, because this export doesn't require a data transformation."
+      }
+    ]
+  },
+  {
+    "id": "obs-007",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-profiler",
+      "cpu",
+      "performance"
+    ],
+    "stem": "After a release, a Python service on Compute Engine uses much more CPU under normal load. Cloud Trace shows no slow calls to other services. The VMs run as a user-created service account. You want to find the functions that use the most CPU time, with production data and low overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add the Cloud Profiler agent to the service, and grant the Cloud Profiler Agent role to the service account."
+      },
+      {
+        "id": "B",
+        "text": "Add an OpenTelemetry span around each function, and grant the Cloud Trace Agent role to the service account."
+      },
+      {
+        "id": "C",
+        "text": "Profile the service on a staging VM during a load test, and compare the result with the previous release."
+      },
+      {
+        "id": "D",
+        "text": "Create a log-based distribution metric for request latency, and chart it for each function in Metrics Explorer."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Cloud Profiler continuously collects CPU and memory-allocation data from **production** code, and it links the data to the source code. Its amortized overhead is commonly less than 0.5%. A user-created service account needs the Cloud Profiler Agent role.",
+    "whyWrong": {
+      "B": "Spans measure the latency of operations, not the CPU time of each function. Cloud Trace already shows that no call is slow.",
+      "C": "A staging test does not use production data, which the requirement asks for.",
+      "D": "A latency metric shows that requests are slow. It does not show which functions use CPU time."
+    },
+    "sources": [
+      {
+        "title": "Cloud Profiler overview",
+        "url": "https://docs.cloud.google.com/profiler/docs/about-profiler",
+        "evidence": "Cloud Profiler is a statistical, low-overhead profiler that continuously gathers CPU usage and memory-allocation information from your production applications."
+      },
+      {
+        "title": "Cloud Profiler overview",
+        "url": "https://docs.cloud.google.com/profiler/docs/about-profiler",
+        "evidence": "Amortized over the execution time and across multiple replicas of a service, the overhead is commonly less than 0.5 percent, making it an affordable option for always-on profiling in production systems."
+      },
+      {
+        "title": "Profiling Python applications",
+        "url": "https://docs.cloud.google.com/profiler/docs/profiling-python",
+        "evidence": "If you do any of the following, then you need to grant the service account the IAM role of Cloud Profiler Agent (`roles/cloudprofiler.agent`):"
+      }
+    ]
+  },
+  {
+    "id": "obs-008",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "observability-analytics",
+      "log-based-metrics",
+      "sql"
+    ],
+    "stem": "A product manager asks how many `payment declined` errors a Cloud Run service logged in each hour of the past 14 days. The logs are in the `_Default` log bucket. Your team upgraded this bucket to use Observability Analytics (formerly Log Analytics) last year. No metric for this error exists. You need the answer today. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a log-based counter metric for the error, and chart the past 14 days in Metrics Explorer."
+      },
+      {
+        "id": "B",
+        "text": "Create a log-based alerting policy that notifies the team each time the error message appears."
+      },
+      {
+        "id": "C",
+        "text": "Add an OpenTelemetry counter for the error to the code, and chart it on a custom dashboard."
+      },
+      {
+        "id": "D",
+        "text": "Run a SQL query in Observability Analytics that counts the matching entries for each hour."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The Logs Explorer does not aggregate, but Observability Analytics runs SQL queries that group and count log entries, for example by the hour. The bucket is already upgraded, so the query reads the existing entries **today**. A new metric has no data for the past 14 days.",
+    "whyWrong": {
+      "A": "A user-defined log-based metric counts only the entries that arrive after you create it. Older entries do not fill it.",
+      "B": "A log-based alerting policy notifies you when a message appears. It does not count past entries.",
+      "C": "A new counter measures only future errors. It also needs a code change and a release."
+    },
+    "sources": [
+      {
+        "title": "Log-based metrics overview",
+        "url": "https://docs.cloud.google.com/logging/docs/logs-based-metrics",
+        "evidence": "The data for a user-defined log-based metric comes only from log entries received after the metric is created. A metric isn't retroactively populated with data from log entries that are already in Logging."
+      },
+      {
+        "title": "Analyze logs using Logs Explorer and Observability Analytics",
+        "url": "https://docs.cloud.google.com/logging/docs/log-analytics",
+        "evidence": "The Logs Explorer doesn't support aggregate operations, like counting the number of log entries that contain a specific pattern. To perform aggregate operations, enable analytics on the log bucket and then use Observability Analytics."
+      }
+    ]
+  },
+  {
+    "id": "obs-009",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "logging-query-language",
+      "logs-explorer"
+    ],
+    "stem": "You want to see two sets of entries in the Logs Explorer: the `ERROR` entries of the `checkout` service, and all the entries of the `payments` service. You run this query, but it returns no entries from `payments`:\n\n```text\nresource.labels.service_name=\"checkout\" AND severity>=\"ERROR\" OR resource.labels.service_name=\"payments\"\n```\n\nHow should you change the query?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Write the Boolean operators in lowercase, as `and` and `or`."
+      },
+      {
+        "id": "B",
+        "text": "Put parentheses around the `checkout` comparison and the `severity` comparison."
+      },
+      {
+        "id": "C",
+        "text": "Move the `payments` comparison to the start of the query, before the others."
+      },
+      {
+        "id": "D",
+        "text": "Use the `:` operator instead of `=` in the two service name comparisons."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "In the Logging query language, `NOT` has the highest precedence, then `OR`, then `AND`. The query therefore means `checkout AND (ERROR OR payments)`, which matches only `checkout` entries. With parentheses, it means `(checkout AND ERROR) OR payments`. Google says to use parentheses when you **combine `AND` and `OR`**.",
+    "whyWrong": {
+      "A": "Lowercase `and` and `or` are parsed as search terms, not as operators.",
+      "C": "`OR` still has a higher precedence than `AND`. The query then means `(payments OR checkout) AND ERROR`, which drops the other `payments` entries.",
+      "D": "The `:` operator matches substrings, but it does not change the precedence. Substring matches on indexed fields also do not use the log indexes."
+    },
+    "sources": [
+      {
+        "title": "Logging query language",
+        "url": "https://docs.cloud.google.com/logging/docs/view/logging-query-language",
+        "evidence": "The Boolean operators `AND` and `OR` are short-circuit operators. The `NOT` operator has the highest precedence, followed by `OR` and `AND` in that order."
+      },
+      {
+        "title": "Logging query language",
+        "url": "https://docs.cloud.google.com/logging/docs/view/logging-query-language",
+        "evidence": "To combine `AND` and `OR` rules in the same expression, you must nest the rules using parentheses. If you don't use parentheses, your query might not work as intended."
+      },
+      {
+        "title": "Logging query language",
+        "url": "https://docs.cloud.google.com/logging/docs/view/logging-query-language",
+        "evidence": "Boolean operators always need to be capitalized. Lowercase `and`, `or`, and `not` are parsed as search terms."
+      }
+    ]
+  },
+  {
+    "id": "obs-010",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run",
+      "http-500",
+      "cold-start",
+      "retries"
+    ],
+    "stem": "A Cloud Run service has a long cold start. During short traffic spikes, some clients get this error:\n\n```text\nHTTP 500\nThe request was aborted because there was no available instance\n```\n\nThe container instance count stays well below the maximum instances setting. The clients must not drop these requests. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Implement exponential backoff and retries in the clients for the failed requests."
+      },
+      {
+        "id": "B",
+        "text": "Raise the maximum instances setting of the service, and request more quota."
+      },
+      {
+        "id": "C",
+        "text": "Configure minimum instances to reduce cold starts, and accept the higher cost."
+      },
+      {
+        "id": "D",
+        "text": "Raise the memory limit of the service, so that each instance can hold more requests."
+      },
+      {
+        "id": "E",
+        "text": "Change the ingress setting of the service to Internal and Cloud Load Balancing."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "HTTP 500 with `no available instance` means that Cloud Run could not scale fast enough, for example because of a sudden spike and a long cold start. Google says to use exponential backoff and retries in the client for requests that the clients **must not drop**. Minimum instances reduce cold starts, at a higher cost.",
+    "whyWrong": {
+      "B": "More maximum instances fixes HTTP 429, when the service reaches its maximum. Here the instance count stays **well below the maximum**.",
+      "D": "More memory does not make new instances start faster. A memory problem shows a different error, about an instance that used too much memory.",
+      "E": "The ingress setting controls which network paths can reach the service. It does not help the service scale."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot Cloud Run issues",
+        "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+        "evidence": "For HTTP trigger-based services or functions, have the client implement exponential backoff and retries for requests that must not be dropped."
+      },
+      {
+        "title": "Troubleshoot Cloud Run issues",
+        "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+        "evidence": "For issues pertaining to cold starts, configure minimum instances to reduce the amount of cold starts with a higher billing implication."
+      }
+    ]
+  },
+  {
+    "id": "obs-011",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "http-404",
+      "ingress",
+      "request-logs"
+    ],
+    "stem": "A partner calls the `run.app` URL of a Cloud Run service from the internet and gets HTTP 404. The URL path is correct. You run this query in the Logs Explorer for the time of the calls, and it returns no entries:\n\n```text\nresource.type=\"cloud_run_revision\"\nlog_name=\"projects/PROJECT_ID/logs/run.googleapis.com%2Frequests\"\nhttpRequest.status=404\n```\n\nWhat should you check first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The ingress setting of the service, and whether the default `run.app` URL is disabled."
+      },
+      {
+        "id": "B",
+        "text": "The application code, to find the route handler that returns 404 for this path."
+      },
+      {
+        "id": "C",
+        "text": "The Cloud Run Invoker role binding, to confirm that the partner can call the service."
+      },
+      {
+        "id": "D",
+        "text": "The maximum instances setting, to confirm that the service can start new instances."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "When the ingress setting blocks a request, or the default `run.app` URL is disabled, the request does not reach the container. The client gets HTTP 404, and the request logs have no entry for it. Because **the request logs show nothing**, check these two settings first.",
+    "whyWrong": {
+      "B": "When the application returns 404, the request reaches the container and the request log records it. The query found no such entry.",
+      "C": "A missing invoker permission gives HTTP 403, not 404.",
+      "D": "When no instance is available, Cloud Run returns HTTP 429 or 500, not 404."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot Cloud Run issues",
+        "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+        "evidence": "A request doesn't satisfy the specified network restriction, especially when Cloud Run service's ingress settings are set to Internal or Internal and Cloud Load Balancing."
+      },
+      {
+        "title": "Troubleshoot Cloud Run issues",
+        "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+        "evidence": "The Cloud Run service's default `run.app` URL is disabled, and a client attempts to reach the service at that `run.app` URL."
+      },
+      {
+        "title": "Troubleshoot Cloud Run issues",
+        "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+        "evidence": "In both of these scenarios, you can't find the `404` error in Cloud Logging, even when you apply the following filter:"
+      }
+    ]
+  },
+  {
+    "id": "obs-012",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gke",
+      "imagepullbackoff",
+      "artifact-registry",
+      "iam"
+    ],
+    "stem": "A new Deployment on GKE stays in `ImagePullBackOff`. The Pod events show this error:\n\n```text\nFailed to authorize: failed to fetch oauth token: unexpected status: 403 Forbidden\n```\n\nThe image is in a private Artifact Registry repository. Yesterday, a developer granted the Artifact Registry Reader role to the Kubernetes service account of the Pod, which uses Workload Identity Federation for GKE. The Deployment has no `imagePullSecret`, and your policy does not allow service account keys. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Artifact Registry Reader role to the service account of the node pool."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Artifact Registry Writer role to the Kubernetes service account of the Pod."
+      },
+      {
+        "id": "C",
+        "text": "Create an `imagePullSecret` from a service account key, and add it to the Deployment."
+      },
+      {
+        "id": "D",
+        "text": "Change the image reference from a tag to a digest, and apply the Deployment again."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The kubelet pulls images from Artifact Registry with the service account of the node VM, not with Workload Identity Federation for GKE. Without an `imagePullSecret`, the **node pool service account** needs read access to the repository. The grant to the Kubernetes service account has no effect on the pull.",
+    "whyWrong": {
+      "B": "The kubelet does not use the identity of the Pod to pull images, so a stronger role for it does not help. Writer also gives more access than a pull needs.",
+      "C": "The policy does not allow service account keys. The node pool service account can pull the image without a key.",
+      "D": "A digest makes the image reference immutable. A 403 error is an access problem, not a wrong image reference."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot image pulls",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/troubleshooting/image-pulls",
+        "evidence": "Image pulls from Artifact Registry by the kubelet don't use Workload Identity Federation for GKE. Instead, these image pulls use the service account associated with the VM."
+      },
+      {
+        "title": "Troubleshoot image pulls",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/troubleshooting/image-pulls",
+        "evidence": "If you use an imagePullSecret, the service account linked with the Secret needs read permission to the repository. Otherwise, the node pool's service account needs permission."
+      }
+    ]
+  },
+  {
+    "id": "obs-013",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "error-reporting",
+      "structured-logging",
+      "reportederrorevent"
+    ],
+    "stem": "A Cloud Run service writes this JSON line to `stdout` when an order fails validation. The entries appear in the Logs Explorer with the `ERROR` severity, but Error Reporting shows no error group for them.\n\n```json\n{\"severity\": \"ERROR\", \"message\": \"Order validation failed: missing shipping address\"}\n```\n\nYou want Error Reporting to group these errors. You want to keep writing them to `stdout`, without a new library. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Raise the severity of the entries from `ERROR` to `CRITICAL`."
+      },
+      {
+        "id": "B",
+        "text": "Add an `@type` field set to the `ReportedErrorEvent` type to each entry."
+      },
+      {
+        "id": "C",
+        "text": "Move the message text from the `message` field to a `stack_trace` field."
+      },
+      {
+        "id": "D",
+        "text": "Add a `logging.googleapis.com/labels` object with an `error` key to each entry."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Error Reporting captures a log entry that contains a stack trace or a formatted `ReportedErrorEvent`. These entries have only a text message. When you set `@type` to `type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent`, Error Reporting evaluates the entry as though all required fields are present, and it captures the error.",
+    "whyWrong": {
+      "A": "`ERROR` is already a high enough severity. The entry still has no stack trace and no `@type` field.",
+      "C": "The `stack_trace` field must contain a stack trace. A plain message in that field does not make an error event.",
+      "D": "Labels classify an entry. They do not make Error Reporting capture it."
+    },
+    "sources": [
+      {
+        "title": "Format a log entry to report error events",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/formatting-error-messages",
+        "evidence": "When you set the `@type` field to the specified value, Error Reporting always evaluates the log entry as though all required fields are present. As a result, Error Reporting captures the error event."
+      },
+      {
+        "title": "Format a log entry to report error events",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/formatting-error-messages",
+        "evidence": "When you write log entries by using Cloud Logging, the `LogEntry` object must contain a stack trace or a formatted `ReportedErrorEvent` object."
+      }
+    ]
+  },
+  {
+    "id": "obs-014",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "error-reporting",
+      "cmek",
+      "client-library"
+    ],
+    "stem": "A company policy requires customer-managed encryption keys (CMEK) on all log buckets, and the policy cannot change. A Python service on GKE catches exceptions and logs them with full stack traces at the `ERROR` severity. The entries appear in the Logs Explorer, but Error Reporting shows no errors. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add an `@type` field set to the `ReportedErrorEvent` type to each exception entry."
+      },
+      {
+        "id": "B",
+        "text": "Route the exception entries with a sink to a new log bucket that does not use CMEK."
+      },
+      {
+        "id": "C",
+        "text": "Call `report_exception()` from the Error Reporting client library in the exception handlers."
+      },
+      {
+        "id": "D",
+        "text": "Raise the severity of the exception entries to `CRITICAL`, so that Error Reporting reads them."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Error Reporting cannot analyze log entries in log buckets that use CMEK. The Error Reporting client library sends error events directly, so it captures errors even when the log buckets use CMEK. The workload identity needs the Error Reporting Writer role. This keeps the **CMEK policy** in place.",
+    "whyWrong": {
+      "A": "`@type` changes how Error Reporting reads an entry. Error Reporting still cannot analyze entries in a CMEK log bucket.",
+      "B": "A log bucket without CMEK breaks the company policy.",
+      "D": "`ERROR` is already a high enough severity. The cause is the CMEK log bucket, not the severity."
+    },
+    "sources": [
+      {
+        "title": "Instrument Python apps for Error Reporting",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/setup/python",
+        "evidence": "Instrumenting your application with the library lets you report custom error events and capture errors even when your log buckets use customer-managed encryption keys (CMEK)."
+      },
+      {
+        "title": "Error Reporting overview",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/grouping-errors",
+        "evidence": "Customer-managed encryption keys (CMEK) are disabled on all log buckets that store the log entry. Error Reporting can't store log entries in log buckets that have CMEK enabled."
+      }
+    ]
+  },
+  {
+    "id": "obs-015",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "error-reporting",
+      "resolution-status",
+      "notifications"
+    ],
+    "stem": "Your team fixes the bug behind a frequent error group in Error Reporting. The team wants the error group to record that the bug is fixed. If the error occurs again after the release, the team wants a notification. Which resolution status should you set on the error group?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Acknowledged"
+      },
+      {
+        "id": "B",
+        "text": "Muted"
+      },
+      {
+        "id": "C",
+        "text": "Resolved"
+      },
+      {
+        "id": "D",
+        "text": "Open"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Resolved means that the error group is fixed and is not expected to occur again. If the error **occurs again**, Error Reporting changes the status back to Open. An error event in a Resolved group is a regression, and Error Reporting can send a notification for it.",
+    "whyWrong": {
+      "A": "Acknowledged is a state for triage. It does not record that the bug is fixed.",
+      "B": "Muted hides the error group. Error Reporting does not record new events in a muted group, and it sends no notification.",
+      "D": "Open is the default status of a new error group. Error Reporting notifies for new error groups and for errors in Resolved groups, not for more events in an Open group."
+    },
+    "sources": [
+      {
+        "title": "Manage error groups",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/managing-errors",
+        "evidence": "Resolved: A state for indicating that an error group is fixed and no longer expected to occur. If an error group marked as Resolved later reoccurs, then Error Reporting changes the resolution status to Open."
+      },
+      {
+        "title": "Configure and manage notifications",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/notifications",
+        "evidence": "When an error event occurs in an error group marked as Resolved, indicating a regression."
+      }
+    ]
+  },
+  {
+    "id": "obs-016",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "error-reporting",
+      "log-format",
+      "severity"
+    ],
+    "stem": "A Python service on Cloud Run writes JSON log lines to `stdout`. No log bucket in the project uses CMEK. Which two log entries does Error Reporting capture as error events? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "An entry with `severity` set to `WARNING`, and a Python traceback in the `message` field."
+      },
+      {
+        "id": "B",
+        "text": "An entry with `severity` set to `CRITICAL`, and a Python traceback in the `stack_trace` field."
+      },
+      {
+        "id": "C",
+        "text": "An entry with `severity` set to `ERROR`, and only the text `Payment failed` in the `message` field."
+      },
+      {
+        "id": "D",
+        "text": "An entry with `severity` set to `ERROR`, and a Python traceback in the `message` field."
+      },
+      {
+        "id": "E",
+        "text": "An entry with `severity` set to `NOTICE`, and a Python traceback in the `exception` field."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "On Cloud Run, Error Reporting creates an error event from a log entry that contains a stack trace. The severity of the entry must be not set or at least `ERROR`. In a `jsonPayload`, the stack trace can be in the `message`, `stack_trace`, or `exception` field. Only the `CRITICAL` and `ERROR` entries with a traceback meet both rules.",
+    "whyWrong": {
+      "A": "`WARNING` is lower than `ERROR`, so Error Reporting does not create an error event from the traceback.",
+      "C": "The entry has no stack trace and no `@type` field set to the `ReportedErrorEvent` type.",
+      "E": "`NOTICE` is lower than `ERROR`. The `exception` field is a valid place for the traceback, but the severity is too low."
+    },
+    "sources": [
+      {
+        "title": "Instrument Python apps for Error Reporting",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/setup/python",
+        "evidence": "Error Reporting automatically creates an error event when a log entry contains a stack trace and the severity level of the log entry isn't set or is set to at least `ERROR`."
+      },
+      {
+        "title": "Format a log entry to report error events",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/formatting-error-messages",
+        "evidence": "A `jsonPayload` that includes a `message`, `stack_trace`, or `exception` field."
+      }
+    ]
+  },
+  {
+    "id": "obs-017",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-trace",
+      "context-propagation",
+      "traceparent"
+    ],
+    "stem": "A `frontend` Cloud Run service calls a `backend` Cloud Run service over HTTP. Neither service has tracing code. In Trace Explorer, each user request appears as two separate traces: one for `frontend` and one for `backend`. You want one trace for each user request. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Turn on trace linking for the two services in the Cloud Trace settings of the project."
+      },
+      {
+        "id": "B",
+        "text": "Raise the trace sample rate of both services, so that Cloud Run samples every request."
+      },
+      {
+        "id": "C",
+        "text": "Add OpenTelemetry instrumentation that propagates the trace context in the calls to `backend`."
+      },
+      {
+        "id": "D",
+        "text": "Send the calls from `frontend` to `backend` through an internal Application Load Balancer."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Cloud Trace does not propagate trace context. The services and applications that send data to Cloud Trace must do it. Google says to add instrumentation that propagates the trace context, so that Cloud Trace shows the request flow across several services as **one request**.",
+    "whyWrong": {
+      "A": "Cloud Trace has no setting that links services, because it does not propagate context. The services must pass the context on.",
+      "B": "You cannot configure the Cloud Run sample rate. Sampling also does not link the traces of two services.",
+      "D": "Internal Application Load Balancers do not support Cloud Trace, and a load balancer does not create the link."
+    },
+    "sources": [
+      {
+        "title": "Trace context",
+        "url": "https://docs.cloud.google.com/trace/docs/trace-context",
+        "evidence": "Cloud Trace isn't responsible for context propagation. Context propagation is the responsibility of the components that submit data to Cloud Trace."
+      },
+      {
+        "title": "Using distributed tracing",
+        "url": "https://docs.cloud.google.com/run/docs/trace",
+        "evidence": "Propagate trace context so Cloud Trace shows the request flow across multiple services as a single request."
+      },
+      {
+        "title": "Using distributed tracing",
+        "url": "https://docs.cloud.google.com/run/docs/trace",
+        "evidence": "Cloud Run does not support configuration of the Cloud Run sample rate."
+      }
+    ]
+  },
+  {
+    "id": "obs-018",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "trace-log-correlation",
+      "span-id",
+      "x-cloud-trace-context"
+    ],
+    "stem": "An upstream service calls your Flask service on GKE. For each call, the upstream service creates a span and sends its trace ID and span ID in the `X-Cloud-Trace-Context` header. Your code writes log entries that should link to that span:\n\n```python\nheader = request.headers[\"X-Cloud-Trace-Context\"]\n# Example: 4bf92f3577b34da6a3ce929d0e0e4736/74;o=1\ntrace_id, rest = header.split(\"/\")\nspan_id = rest.split(\";\")[0]\nprint(json.dumps({\n    \"severity\": \"INFO\",\n    \"message\": \"Order saved\",\n    \"logging.googleapis.com/trace\": trace_id,\n    \"logging.googleapis.com/spanId\": span_id,\n}))\n```\n\nA Logs Explorer query on the trace ID finds the entries. In Trace Explorer, the **Logs & Events** tab of the span never lists them. How should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Write `trace` as `projects/PROJECT_ID/traces/TRACE_ID`, the only format that Cloud Trace accepts."
+      },
+      {
+        "id": "B",
+        "text": "Add `logging.googleapis.com/trace_sampled` set to `true`, so that Cloud Trace attaches the entries."
+      },
+      {
+        "id": "C",
+        "text": "Move the trace and span fields into a `logging.googleapis.com/labels` object, so that they are indexed."
+      },
+      {
+        "id": "D",
+        "text": "Convert `span_id` from a decimal number to a string of 16 hexadecimal characters."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The `X-Cloud-Trace-Context` header carries the span ID as a **decimal** number. The `spanId` field of a log entry needs the 16-character hexadecimal form: span ID `74` is `000000000000004a`. The **Logs & Events** tab lists entries whose trace ID and span ID match the span, so the decimal value never matches.",
+    "whyWrong": {
+      "A": "The preferred `trace` format is the trace ID alone, and the legacy format is also accepted. The trace ID already matches, because the Logs Explorer query finds the entries.",
+      "B": "`traceSampled` records the sampling decision at the time that the code wrote the entry. The tab matches entries on the trace ID and the span ID.",
+      "C": "Labels classify an entry. Values in labels do not set the `trace` and `spanId` fields that link an entry to a span."
+    },
+    "sources": [
+      {
+        "title": "Trace context",
+        "url": "https://docs.cloud.google.com/trace/docs/trace-context",
+        "evidence": "`SPAN_ID` is a 64-bit decimal representation of the unsigned span ID."
+      },
+      {
+        "title": "Link log entries with traces",
+        "url": "https://docs.cloud.google.com/trace/docs/trace-log-integration",
+        "evidence": "To associate a log entry with a span when using the Logging API, set the `spanId` field in the `LogEntry` object to the 16-character hexadecimal encoding of the span's ID."
+      },
+      {
+        "title": "Find and explore traces",
+        "url": "https://docs.cloud.google.com/trace/docs/finding-traces",
+        "evidence": "Logs & Events: This tab lists events and log entries whose `trace_id` and `span_id` fields match the selected span."
+      }
+    ]
+  },
+  {
+    "id": "obs-019",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "load-balancing",
+      "trace-context",
+      "opentelemetry"
+    ],
+    "stem": "A GKE service links its log entries to traces with the trace ID from the `X-Cloud-Trace-Context` header. The service has no tracing library. The links worked behind a global external Application Load Balancer. After a move to a regional external Application Load Balancer, most requests arrive without the header, and most log entries have no trace ID. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Read the `traceparent` header instead, because the regional load balancer adds it to each request."
+      },
+      {
+        "id": "B",
+        "text": "Instrument the service with OpenTelemetry, and write the trace ID of the active span to each entry."
+      },
+      {
+        "id": "C",
+        "text": "Turn on Cloud Trace for the regional load balancer, so that it exports a root span for each request."
+      },
+      {
+        "id": "D",
+        "text": "Put an internal Application Load Balancer behind the regional one, so that it adds the trace header."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The global external and classic Application Load Balancers add `X-Cloud-Trace-Context` when it is missing. The regional external Application Load Balancer does not add it, and no Application Load Balancer exports spans. With OpenTelemetry, the service has an active span for each request, so its logs get a trace ID **without help from the load balancer**.",
+    "whyWrong": {
+      "A": "Application Load Balancers do not support Cloud Trace. The regional external one does not add a trace header for the service to read.",
+      "C": "Application Load Balancers export no traces or spans, so this setting does not exist.",
+      "D": "Internal Application Load Balancers do not support Cloud Trace. An extra load balancer also adds latency and cost."
+    },
+    "sources": [
+      {
+        "title": "External Application Load Balancer overview",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https",
+        "evidence": "Trace is not supported with Application Load Balancers. The global and classic Application Load Balancers add the `X-Cloud-Trace-Context` header if it is not present. The regional external Application Load Balancer does not add this header."
+      },
+      {
+        "title": "Link log entries with traces",
+        "url": "https://docs.cloud.google.com/trace/docs/trace-log-integration",
+        "evidence": "For example, if you are using OpenTelemetry and are logging from an active OpenTelemetry span, then the trace fields in the log entry are populated from the OpenTelemetry Context."
+      }
+    ]
+  },
+  {
+    "id": "obs-020",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "trace-sampling",
+      "parentbased",
+      "opentelemetry"
+    ],
+    "stem": "A Cloud Run service calls an `inventory` service on GKE. The Cloud Run service passes the trace context, with the sampled flag, in the `traceparent` header. The `inventory` service uses OpenTelemetry with this sampler:\n\n```python\nsampler = TraceIdRatioBased(0.1)\n```\n\nMany traces show the Cloud Run spans without the `inventory` spans. You want `inventory` spans in every trace that Cloud Run samples, and no `inventory` spans for requests that Cloud Run does not sample. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the sampler to `ParentBased(root=TraceIdRatioBased(0.1))`, so that it follows the sampled flag."
+      },
+      {
+        "id": "B",
+        "text": "Change the sampler to `TraceIdRatioBased(1.0)`, so that `inventory` samples every request."
+      },
+      {
+        "id": "C",
+        "text": "Configure tail-based sampling in Cloud Trace, so that it keeps only the complete traces."
+      },
+      {
+        "id": "D",
+        "text": "Raise the sample rate of the Cloud Run service to 10%, so that it matches the `inventory` ratio."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Each component makes its own sampling decision. With the `ParentBased` sampler, OpenTelemetry respects the sampled flag of the parent, so `inventory` samples **exactly the requests that Cloud Run sampled**. The root span then decides for the whole trace, and each sampled trace is complete.",
+    "whyWrong": {
+      "B": "A ratio of 1.0 also exports `inventory` spans for requests that Cloud Run did not sample. The requirement rules this out.",
+      "C": "Cloud Trace does not support tail-based sampling. Tail sampling needs an OpenTelemetry Collector with the Tail Sampling Processor.",
+      "D": "Cloud Run does not support configuration of its sample rate."
+    },
+    "sources": [
+      {
+        "title": "Instrument for Cloud Trace",
+        "url": "https://docs.cloud.google.com/trace/docs/setup",
+        "evidence": "Your applications: You configure how the instrumentation logic respects the `sampled` flag. For example, when using OpenTelemetry, you can use the `ParentBased` sampler to ensure that the parent's sampling flag is respected."
+      },
+      {
+        "title": "Trace sampling",
+        "url": "https://docs.cloud.google.com/trace/docs/trace-sampling",
+        "evidence": "Cloud Trace doesn't support tail-based sampling; sampling decisions must be made in the components that send data to Cloud Trace."
+      },
+      {
+        "title": "Using distributed tracing",
+        "url": "https://docs.cloud.google.com/run/docs/trace",
+        "evidence": "Cloud Run does not support configuration of the Cloud Run sample rate."
+      }
+    ]
+  },
+  {
+    "id": "obs-021",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "opentelemetry",
+      "trace-context"
+    ],
+    "stem": "A publisher creates its Pub/Sub client with `PublisherOptions(enable_open_telemetry_tracing=True)` and exports spans to Cloud Trace. The subscriber runs in another service, which also exports OpenTelemetry spans. The subscriber code creates its client as follows:\n\n```python\nsubscriber = pubsub_v1.SubscriberClient()\nfuture = subscriber.subscribe(subscription_path, callback=callback)\n```\n\nIn Cloud Trace, the publish spans appear, but the spans of the subscriber never join the traces of the messages. You want the fewest code changes. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Cloud Trace Agent role to the service account of the publisher."
+      },
+      {
+        "id": "B",
+        "text": "Create the subscriber client with `SubscriberOptions(enable_open_telemetry_tracing=True)`."
+      },
+      {
+        "id": "C",
+        "text": "Add the trace ID to the data of each message, and read it in the subscriber callback."
+      },
+      {
+        "id": "D",
+        "text": "Change the sampler of the subscriber to `TraceIdRatioBased(1)`, so that it samples every message."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The Pub/Sub client library creates a trace for each message, from publish to acknowledgment. The context travels in a message attribute with the `googclient_` prefix, and this propagation works only when tracing is on. The subscriber client must therefore also enable tracing. One option on the client is the **fewest code changes**.",
+    "whyWrong": {
+      "A": "The publish spans already appear, so the publisher can write traces. The subscriber client is the part without tracing.",
+      "C": "Manual propagation needs new code in both services. The client library already propagates the context when tracing is on.",
+      "D": "The subscriber client creates no message spans until you enable tracing on it. A sampler change alone does not add them."
+    },
+    "sources": [
+      {
+        "title": "Pub/Sub OpenTelemetry tracing",
+        "url": "https://docs.cloud.google.com/pubsub/docs/open-telemetry-tracing",
+        "evidence": "The context propagation mechanism is only enabled when tracing is turned on and is prepended with the `googclient_` prefix."
+      },
+      {
+        "title": "Pub/Sub OpenTelemetry tracing",
+        "url": "https://docs.cloud.google.com/pubsub/docs/open-telemetry-tracing",
+        "evidence": "For every message published, the client library creates a new trace. This trace represents the entire lifecycle of the message, from the moment you publish a message to when the message is acknowledged."
+      }
+    ]
+  },
+  {
+    "id": "obs-022",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "log-correlation",
+      "request-logs"
+    ],
+    "stem": "A Python service on Cloud Run prints JSON log lines with `severity` and `message` fields to `stdout`. In the Logs Explorer, these container logs are not nested under the request log of the request that wrote them. You want each container log nested under its request log. Which two approaches meet this goal? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add the `logging.googleapis.com/trace` field to each line, with the trace ID from the trace header of the request."
+      },
+      {
+        "id": "B",
+        "text": "Write the lines to a file under `/var/log` instead of `stdout`, so that Cloud Run tags them with the request."
+      },
+      {
+        "id": "C",
+        "text": "Add a `logging.googleapis.com/labels` object with a `request_id` key to each line."
+      },
+      {
+        "id": "D",
+        "text": "Write the lines to `stderr` instead of `stdout`, so that Cloud Run links them to the request."
+      },
+      {
+        "id": "E",
+        "text": "Use the Cloud Logging client library with `setup_logging()` in a supported web framework."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "The Logs Explorer nests container logs under a request log when both have the same `trace`. Cloud Run does not correlate them automatically, unless you use a Cloud Logging client library or write the `logging.googleapis.com/trace` field yourself. The Python library reads the `traceparent` or `X-Cloud-Trace-Context` header in a supported web framework.",
+    "whyWrong": {
+      "B": "Cloud Run collects files under `/var/log`, but the file location does not add a trace to the entries.",
+      "C": "Labels classify an entry. Nesting uses the `trace` field, not a label.",
+      "D": "Cloud Run collects both `stdout` and `stderr`. The output stream does not add a trace to the entries."
+    },
+    "sources": [
+      {
+        "title": "Logging and viewing logs in Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/logging",
+        "evidence": "Container logs are not automatically correlated to request logs unless you use a Cloud Logging client library."
+      },
+      {
+        "title": "Logging and viewing logs in Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/logging",
+        "evidence": "you can use a structured JSON log line that contains a `logging.googleapis.com/trace` field with the trace identifier extracted from the `X-Cloud-Trace-Context` header"
+      },
+      {
+        "title": "Automatic Trace/Span ID Extraction",
+        "url": "https://docs.cloud.google.com/python/docs/reference/logging/latest/auto-trace-span-extraction",
+        "evidence": "Another possible method of automatic trace / span_id is via extraction from HTTP headers. This is prioritized after OpenTelemetry and requires a supported Python web framework."
+      }
+    ]
+  },
+  {
+    "id": "obs-023",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "trace-explorer",
+      "trace-scope"
+    ],
+    "stem": "Your company runs its services in several projects. A developer copies a trace ID from a log entry of the `billing` service. The `traceSampled` field of the entry is `true`. In Trace Explorer, the developer clicks **Search for trace** and enters the ID. The page uses the default scope of the developer's own project. The search returns no result, although the trace ID is valid. What should the developer do first?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ask the `billing` team to force sampling for the request, and search for the trace again."
+      },
+      {
+        "id": "B",
+        "text": "Raise the sample rate of the `billing` service, and wait for the next request to be traced."
+      },
+      {
+        "id": "C",
+        "text": "Grant the developer the Logs Viewer role in the project of the `billing` service."
+      },
+      {
+        "id": "D",
+        "text": "Update the **Scope** setting, so that Trace Explorer searches the project that stores the trace."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The **Scope** setting decides which views Trace Explorer searches. On a new project, the default trace scope lists only the trace data of that project. If a **valid trace ID** returns no result, the trace can be in a project that the scope does not search. Google says to find the project that stores the trace, and then update the **Scope** setting.",
+    "whyWrong": {
+      "A": "The `traceSampled` field shows that the request was sampled, so the trace exists already. Forced sampling affects only new requests.",
+      "B": "A higher sample rate affects only future requests. The `traceSampled` field shows that the trace exists already.",
+      "C": "The Logs Viewer role gives access to log entries, not to trace data. The search fails because of the scope."
+    },
+    "sources": [
+      {
+        "title": "Find and explore traces",
+        "url": "https://docs.cloud.google.com/trace/docs/finding-traces",
+        "evidence": "If you enter a valid trace ID but the result is empty, then the trace might be stored in a project that isn't being searched."
+      },
+      {
+        "title": "Find and explore traces",
+        "url": "https://docs.cloud.google.com/trace/docs/finding-traces",
+        "evidence": "To resolve this failure, identify the project that stores the trace and then update the Scope setting."
+      },
+      {
+        "title": "Link log entries with traces",
+        "url": "https://docs.cloud.google.com/trace/docs/trace-log-integration",
+        "evidence": "To indicate that you are using trace sampling and that the trace was sampled for storage when the log entry was written, set the `traceSampled` field in the `LogEntry` object."
+      }
+    ]
+  },
+  {
+    "id": "obs-024",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "gemini-cloud-assist",
+      "investigations",
+      "root-cause"
+    ],
+    "stem": "An alert fires for a Cloud Run service: the error rate rose sharply 20 minutes ago. The on-call developer does not know whether the cause is a code change, a configuration change, or a failing dependency. The developer wants an AI tool to find probable root causes in the logs, metrics, and configuration of the affected resources. Which feature should the developer use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A Gemini Cloud Assist investigation, started from the alert."
+      },
+      {
+        "id": "B",
+        "text": "Error Reporting, to group the new exceptions by their stack traces."
+      },
+      {
+        "id": "C",
+        "text": "Cloud Profiler, to compare the CPU profiles of the old and new revisions."
+      },
+      {
+        "id": "D",
+        "text": "Observability Analytics, to count the errors for each revision with SQL."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A Gemini Cloud Assist investigation (Preview) reviews logs, configurations, and metrics, and it identifies probable root causes as hypotheses with next steps. You can start one from an alert that has a resource label. The other tools each show one kind of data, and none of them finds **probable root causes** for you.",
+    "whyWrong": {
+      "B": "Error Reporting groups and counts exceptions. It does not analyze metrics or configuration to find root causes.",
+      "C": "Cloud Profiler shows which functions use CPU and memory. It does not analyze logs or configuration changes.",
+      "D": "Observability Analytics (formerly Log Analytics) runs the SQL that you write. It does not suggest root causes."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+        "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+        "evidence": "Observations help you to quickly understand what is happening in your environment and are based on Gemini Cloud Assist's review of data sources such as logs, configurations, and metrics."
+      },
+      {
+        "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+        "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+        "evidence": "Investigations synthesizes the observations and uses domain-specific knowledge to identify probable root causes."
+      },
+      {
+        "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+        "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+        "evidence": "The Investigate button appears for alerts that have a resource label."
+      }
+    ]
+  },
+  {
+    "id": "obs-025",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini-cloud-assist",
+      "investigations"
+    ],
+    "stem": "You create a Gemini Cloud Assist investigation for a failing GKE workload. For the issue, you enter \"the app is broken\". You select the last 7 days as the time range and add no resources. The hypotheses are vague and do not mention the workload. How should you improve the next run?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Paste the exact error message, set an accurate start time, and add the affected resources."
+      },
+      {
+        "id": "B",
+        "text": "Widen the time range to the last 30 days, so that the investigation can compare more data."
+      },
+      {
+        "id": "C",
+        "text": "Run the same input several more times, and keep the hypothesis that appears most often."
+      },
+      {
+        "id": "D",
+        "text": "Describe the issue in more general terms, so that the investigation considers more causes."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "An investigation (Preview) works best with **precise input**. You can paste the exact error message. An accurate start time lets the investigation correlate events, and it gives more weight to events close to the start time. The affected resources focus the investigation on the workload.",
+    "whyWrong": {
+      "B": "A wider range makes the start time less accurate. Google says that an accurate time range gives better results.",
+      "C": "Two runs can give slightly different results, but more runs with the same vague input do not add the missing detail.",
+      "D": "More general terms make the input less precise. The exact error message gives the investigation more to work with."
+    },
+    "sources": [
+      {
+        "title": "Create a Gemini Cloud Assist investigation",
+        "url": "https://docs.cloud.google.com/cloud-assist/create-investigation",
+        "evidence": "An accurate start time enables time-based correlations to be made across seemingly unrelated events and adds more weight to events that occurred close to the start time."
+      },
+      {
+        "title": "Create a Gemini Cloud Assist investigation",
+        "url": "https://docs.cloud.google.com/cloud-assist/create-investigation",
+        "evidence": "You can copy and paste the exact error message you received, you can use natural language to explain the issue that you're experiencing, or you can include both."
+      },
+      {
+        "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+        "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+        "evidence": "Timestamps are a key piece of information in effective investigations. For the best results, verify that the time range reported in the investigation is reasonably accurate."
+      }
+    ]
+  },
+  {
+    "id": "obs-026",
+    "objective": "4.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "gemini-cloud-assist",
+      "investigations",
+      "data-residency"
+    ],
+    "stem": "Your team runs its services in three projects. By regulation, the logs of one project must stay in the EU. The team plans how to use Gemini Cloud Assist investigations (Preview) during incidents. Which two practices should the team follow? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run investigations on all three projects, also on the project whose logs must stay in the EU."
+      },
+      {
+        "id": "B",
+        "text": "Expect an investigation that a developer runs to see only the data that this developer can see."
+      },
+      {
+        "id": "C",
+        "text": "Let investigations apply their suggested fixes automatically, without a review step."
+      },
+      {
+        "id": "D",
+        "text": "Validate the hypotheses and the suggested steps of an investigation before you act on them."
+      },
+      {
+        "id": "E",
+        "text": "Create one investigation that covers all three projects, without an App Hub application."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "An investigation uses the credentials of the person who runs it, so its access is limited to that person's access. Google recommends that you validate all output from Gemini for Google Cloud products before you use it. Hypotheses and generated plans are such output.",
+    "whyWrong": {
+      "A": "Google can store investigation data in any Google Cloud data center. Google says not to run investigations on data with **residency requirements**.",
+      "C": "For some hypotheses, **Generate plan** creates steps with `gcloud` commands or manifests. You review the plan, and then you click **Run**.",
+      "E": "One investigation covers a single project or a single App Hub application."
+    },
+    "sources": [
+      {
+        "title": "Create a Gemini Cloud Assist investigation",
+        "url": "https://docs.cloud.google.com/cloud-assist/create-investigation",
+        "evidence": "When you perform an investigation, Gemini Cloud Assist uses your credentials to access APIs and information. This means that the investigation's access is limited to the access that you have."
+      },
+      {
+        "title": "Gemini Cloud Assist overview",
+        "url": "https://docs.cloud.google.com/cloud-assist/overview",
+        "evidence": "We recommend that you validate all output from Gemini for Google Cloud products before you use it."
+      },
+      {
+        "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+        "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+        "evidence": "You shouldn't perform investigations on data subject to residency or jurisdictional regulatory compliances."
+      }
+    ]
+  }
+]

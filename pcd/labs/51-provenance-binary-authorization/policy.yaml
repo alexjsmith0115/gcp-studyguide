@@ -1,0 +1,13 @@
+# Lab 51: the Binary Authorization policy of the project (one policy for each project).
+# Step 7 replaces __PROJECT_ID__ with your project ID and imports the result.
+name: projects/__PROJECT_ID__/policy
+# The default value. It trusts the Google-maintained system images that GKE needs.
+globalPolicyEvaluationMode: ENABLE
+# Cloud Run uses only the default rule.
+defaultAdmissionRule:
+  # Allow an image only if every attestor below has a valid attestation for its digest.
+  evaluationMode: REQUIRE_ATTESTATION
+  # Block the deployment and write an audit log entry. DRYRUN_AUDIT_LOG_ONLY only logs.
+  enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG
+  requireAttestationsBy:
+  - projects/__PROJECT_ID__/attestors/built-by-cloud-build

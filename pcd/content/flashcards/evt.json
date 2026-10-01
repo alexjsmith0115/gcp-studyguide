@@ -1,0 +1,626 @@
+[
+  {
+    "id": "evt-f001",
+    "note": "1.1-async-events",
+    "kind": "term",
+    "front": "Pub/Sub",
+    "back": "An asynchronous messaging service that decouples the services that produce messages from the services that process them. It leases each message to a subscriber and does not use partitions, so partitions do not limit the number of consumers.",
+    "aws": "Amazon Kinesis Data Streams, Amazon MQ",
+    "source": {
+      "title": "What is Pub/Sub?",
+      "url": "https://docs.cloud.google.com/pubsub/docs/overview",
+      "evidence": "Pub/Sub is an asynchronous and scalable messaging service that decouples services producing messages from services processing those messages."
+    }
+  },
+  {
+    "id": "evt-f002",
+    "note": "1.1-async-events",
+    "kind": "concept",
+    "front": "How does Pub/Sub deliver messages to two subscribers that share one subscription?",
+    "back": "It shares the messages between them, so each subscriber gets a different subset (load balancing). For fan-out, give each consumer its own subscription, because each subscription gets a copy of every message.",
+    "aws": null,
+    "source": {
+      "title": "Overview of the Pub/Sub service",
+      "url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics",
+      "evidence": "Each of the subscriber applications gets a subset of the published messages, and no two subscriber applications get the same subset of messages."
+    }
+  },
+  {
+    "id": "evt-f003",
+    "note": "1.1-async-events",
+    "kind": "concept",
+    "front": "Which messages does a new Pub/Sub subscription receive?",
+    "back": "Only the messages that are published after you create it. To replay older messages, enable topic retention before you publish, and then seek the subscription to a past time.",
+    "aws": null,
+    "source": {
+      "title": "Subscription overview",
+      "url": "https://docs.cloud.google.com/pubsub/docs/subscription-overview",
+      "evidence": "Only messages published to the topic after the subscription is created are available to subscriber clients."
+    }
+  },
+  {
+    "id": "evt-f004",
+    "note": "1.1-async-events",
+    "kind": "concept",
+    "front": "What delivery guarantee does a Pub/Sub subscription give by default?",
+    "back": "At-least-once delivery, with no ordering guarantee. Pub/Sub can redeliver a message even after a successful acknowledgment, so the subscriber must be idempotent.",
+    "aws": null,
+    "source": {
+      "title": "Subscription overview",
+      "url": "https://docs.cloud.google.com/pubsub/docs/subscription-overview",
+      "evidence": "By default, Pub/Sub offers at-least-once delivery with no ordering guarantees on all subscription types."
+    }
+  },
+  {
+    "id": "evt-f005",
+    "note": "1.1-async-events",
+    "kind": "concept",
+    "front": "Which Pub/Sub subscription type supports exactly-once delivery?",
+    "back": "Only pull subscriptions, including subscribers that use StreamingPull. Push and export subscriptions do not support exactly-once delivery.",
+    "aws": null,
+    "source": {
+      "title": "Exactly-once delivery",
+      "url": "https://docs.cloud.google.com/pubsub/docs/exactly-once-delivery",
+      "evidence": "Only the pull subscription type supports exactly-once delivery, including subscribers that use the StreamingPull API. Push and export subscriptions don't support exactly-once delivery."
+    }
+  },
+  {
+    "id": "evt-f006",
+    "note": "1.1-async-events",
+    "kind": "term",
+    "front": "Ordering key",
+    "back": "A string on a Pub/Sub message that groups related messages, for example a customer ID. When the subscription has message ordering enabled, messages with the same key arrive in publish order. Messages with different keys have no order between them.",
+    "aws": null,
+    "source": {
+      "title": "Order messages",
+      "url": "https://docs.cloud.google.com/pubsub/docs/ordering",
+      "evidence": "An ordering key is a string that identifies related messages that should be ordered. Examples of ordering keys include customer IDs or the primary key of a row in a database."
+    }
+  },
+  {
+    "id": "evt-f007",
+    "note": "1.1-async-events",
+    "kind": "concept",
+    "front": "How long does a Pub/Sub subscription keep an unacknowledged message by default?",
+    "back": "7 days. You can set the retention from 10 minutes to 31 days. By default, the subscription discards a message as soon as a subscriber acknowledges it.",
+    "aws": null,
+    "source": {
+      "title": "Configure message retention for a subscription",
+      "url": "https://docs.cloud.google.com/pubsub/docs/subscription-message-retention",
+      "evidence": "By default, Pub/Sub discards a message from a subscription as soon as the message is acknowledged, and retains unacknowledged messages for 7 days."
+    }
+  },
+  {
+    "id": "evt-f008",
+    "note": "1.1-async-events",
+    "kind": "term",
+    "front": "Dead-letter topic",
+    "back": "A separate topic that receives the messages that subscribers cannot acknowledge. Pub/Sub forwards a message after a maximum number of delivery attempts: 5 by default, 5 to 100. Attach a subscription to it to read the forwarded messages.",
+    "aws": null,
+    "source": {
+      "title": "Dead-letter topics",
+      "url": "https://docs.cloud.google.com/pubsub/docs/dead-letter-topics",
+      "evidence": "When a subscriber application can't acknowledge a message, Pub/Sub retries delivery until the acknowledgment deadline is met or the message expires. After an approximately configured number of delivery attempts, Pub/Sub can forward the undeliverable message to a dead-letter topic."
+    }
+  },
+  {
+    "id": "evt-f009",
+    "note": "1.1-async-events",
+    "kind": "concept",
+    "front": "On which resource do you configure a Pub/Sub dead-letter topic?",
+    "back": "On the subscription, not on the topic. The dead-letter topic must be a different topic from the topic that the subscription is attached to.",
+    "aws": null,
+    "source": {
+      "title": "Dead-letter topics",
+      "url": "https://docs.cloud.google.com/pubsub/docs/dead-letter-topics",
+      "evidence": "You configure a dead-letter topic on a subscription, not on the topic it pulls from. This is because it's a subscription property."
+    }
+  },
+  {
+    "id": "evt-f010",
+    "note": "1.1-async-events",
+    "kind": "term",
+    "front": "Eventarc Standard",
+    "back": "The Eventarc edition that routes events from a provider to one destination with triggers. A trigger filters on the event type and specific attributes. Google recommends it when an application only delivers events from a provider to a destination.",
+    "aws": "AWS EventBridge",
+    "source": {
+      "title": "Eventarc overview",
+      "url": "https://docs.cloud.google.com/eventarc/docs/overview",
+      "evidence": "Eventarc Standard is recommended for applications where the focus is on simply delivering events from event provider to event destination."
+    }
+  },
+  {
+    "id": "evt-f011",
+    "note": "1.1-async-events",
+    "kind": "term",
+    "front": "Eventarc Advanced",
+    "back": "The Eventarc edition with a central bus. Enrollments match events with CEL expressions, and pipelines deliver them to destinations, with optional transformation. Use it for many-to-many routing across teams and projects.",
+    "aws": "AWS EventBridge",
+    "source": {
+      "title": "Eventarc overview",
+      "url": "https://docs.cloud.google.com/eventarc/docs/overview",
+      "evidence": "You can use the bus to route events from multiple sources in real time and publish them to multiple destinations, and optionally transform events prior to delivery to a target."
+    }
+  },
+  {
+    "id": "evt-f012",
+    "note": "1.1-async-events",
+    "kind": "term",
+    "front": "CloudEvents",
+    "back": "A CNCF specification that describes event data in a common way. Eventarc sends each event as an HTTP POST request to the root path (`/`) of the receiver. The event attributes are `ce-` headers, and the event data is the body.",
+    "aws": null,
+    "source": {
+      "title": "CloudEvents format - HTTP protocol binding",
+      "url": "https://docs.cloud.google.com/eventarc/docs/cloudevents",
+      "evidence": "Target services receive events from event routers as HTTP POST requests formatted to the CloudEvents version 1.0 HTTP protocol binding specification."
+    }
+  },
+  {
+    "id": "evt-f013",
+    "note": "1.1-orchestration",
+    "kind": "concept",
+    "front": "Which Google Cloud products fit service orchestration, and which fit service choreography?",
+    "back": "Workflows fits orchestration, where a central service defines and controls the flow. Pub/Sub and Eventarc fit choreography, where each service reacts to events and no service controls the flow.",
+    "aws": null,
+    "source": {
+      "title": "Better service orchestration with Workflows",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/better-service-orchestration-workflows",
+      "evidence": "Google Cloud provides services supporting both Orchestration and Choreography approaches. Pub/Sub and Eventarc are both suited for choreography of event-driven services, whereas Workflows is suited for centrally orchestrated services."
+    }
+  },
+  {
+    "id": "evt-f014",
+    "note": "1.1-orchestration",
+    "kind": "concept",
+    "front": "Which product should you use to make one HTTP call at a set time next week?",
+    "back": "Cloud Tasks, with a schedule time on the task. Cloud Tasks can schedule a task up to 30 days in advance. Cloud Scheduler is for repeating jobs.",
+    "aws": null,
+    "source": {
+      "title": "Manage cron jobs",
+      "url": "https://docs.cloud.google.com/scheduler/docs/creating",
+      "evidence": "Cloud Scheduler is intended for repeating jobs. If you need to run a job only once, consider using Cloud Tasks, which can schedule a task up to 30 days in advance."
+    }
+  },
+  {
+    "id": "evt-f015",
+    "note": "1.1-orchestration",
+    "kind": "term",
+    "front": "Managed Service for Apache Airflow",
+    "back": "A managed Apache Airflow service (formerly Cloud Composer) for data-driven batch workflows, such as ETL or ELT pipelines, that you write as Python DAGs. Its latency between tasks is a few seconds, so use Workflows for low-latency service orchestration.",
+    "aws": "Managed Workflows for Apache Airflow",
+    "source": {
+      "title": "Choose Workflows or Managed Airflow for service orchestration",
+      "url": "https://docs.cloud.google.com/workflows/docs/choose-orchestration",
+      "evidence": "Managed Airflow is designed to orchestrate data driven workflows (particularly ETL/ELT). It's built on the Apache Airflow project, but Managed Airflow is fully managed."
+    }
+  },
+  {
+    "id": "evt-f016",
+    "note": "1.1-orchestration",
+    "kind": "term",
+    "front": "Workflows",
+    "back": "A serverless orchestration platform. A workflow calls services and APIs in an order that you define in YAML or JSON, with conditions, parallel steps, and retries. Workflows has no charges while idle, and a workflow can wait for up to a year.",
+    "aws": "AWS Step Functions",
+    "source": {
+      "title": "Workflows overview",
+      "url": "https://docs.cloud.google.com/workflows/docs/overview",
+      "evidence": "Workflows is a fully managed orchestration platform that executes services in an order that you define: a workflow."
+    }
+  },
+  {
+    "id": "evt-f017",
+    "note": "1.1-orchestration",
+    "kind": "concept",
+    "front": "Which token type should a workflow send to call a private Cloud Run service?",
+    "back": "An ID token (OIDC), set with `auth: {type: OIDC}` in the step. Workflows adds no token by default. Use an OAuth 2.0 access token only for Google APIs on `*.googleapis.com`.",
+    "aws": null,
+    "source": {
+      "title": "Make authenticated requests from a workflow",
+      "url": "https://docs.cloud.google.com/workflows/docs/authenticate-from-workflow",
+      "evidence": "When connecting with Cloud Run functions or Cloud Run, use an ID token (OIDC). For APIs hosted on `googleapis.com`, use an access token (OAuth 2.0)."
+    }
+  },
+  {
+    "id": "evt-f018",
+    "note": "1.1-orchestration",
+    "kind": "concept",
+    "front": "Which IAM role does a workflow's service account need to call a Cloud Run function?",
+    "back": "Cloud Run Invoker (`roles/run.invoker`), not Cloud Functions Invoker (`roles/cloudfunctions.invoker`). Cloud Run manages the invocation permissions of a Cloud Run function (formerly Cloud Functions).",
+    "aws": null,
+    "source": {
+      "title": "Invoke Cloud Run functions or Cloud Run",
+      "url": "https://docs.cloud.google.com/workflows/docs/calling-run-functions",
+      "evidence": "If your workflow is invoking a Cloud Run functions service, you don't need to grant the caller's service account the Cloud Functions Invoker (`roles/cloudfunctions.invoker`) role. Instead, you must grant the Cloud Run Invoker (`roles/run.invoker`) role."
+    }
+  },
+  {
+    "id": "evt-f019",
+    "note": "1.1-orchestration",
+    "kind": "term",
+    "front": "Workflows callback",
+    "back": "An HTTP endpoint that a workflow creates with `events.create_callback_endpoint` and then waits on with `events.await_callback`. It pauses the execution, without polling, until a person or a system responds, for example with an approval. The default wait is 12 hours.",
+    "aws": null,
+    "source": {
+      "title": "Wait using callbacks",
+      "url": "https://docs.cloud.google.com/workflows/docs/creating-callback-endpoints",
+      "evidence": "With callbacks, you can signal to your workflow that a specified event has occurred, and wait on that event without polling."
+    }
+  },
+  {
+    "id": "evt-f020",
+    "note": "1.1-orchestration",
+    "kind": "concept",
+    "front": "What happens when an Eventarc event starts a workflow execution that later fails?",
+    "back": "Eventarc does not retry it. The event counts as delivered as soon as the execution starts. Handle errors inside the workflow with `try` and `retry`.",
+    "aws": null,
+    "source": {
+      "title": "Trigger a workflow with events or Pub/Sub messages",
+      "url": "https://docs.cloud.google.com/workflows/docs/trigger-workflow-eventarc",
+      "evidence": "Executions triggered by events are not retried if the workflow execution starts, but later fails."
+    }
+  },
+  {
+    "id": "evt-f021",
+    "note": "1.1-orchestration",
+    "kind": "term",
+    "front": "Cloud Tasks",
+    "back": "A queue service for explicit invocation. The producer names the HTTP endpoint for each task, and the queue controls the dispatch rate and the retries. Use it to defer calls to one specific handler or to control their rate.",
+    "aws": "Amazon SQS, Amazon SNS",
+    "source": {
+      "title": "Choosing Pub/Sub or Cloud Tasks",
+      "url": "https://docs.cloud.google.com/pubsub/docs/choosing-pubsub-or-cloud-tasks",
+      "evidence": "By contrast, Cloud Tasks is aimed at explicit invocation where the publisher retains full control of execution. In particular, a publisher specifies an endpoint where each message is to be delivered."
+    }
+  },
+  {
+    "id": "evt-f022",
+    "note": "1.1-orchestration",
+    "kind": "concept",
+    "front": "How do you stop Cloud Tasks from adding the same task to a queue twice?",
+    "back": "Give each task your own name. Cloud Tasks rejects a task whose name already exists in the queue. It also remembers the name for up to 24 hours after the task is deleted.",
+    "aws": null,
+    "source": {
+      "title": "Understand Cloud Tasks",
+      "url": "https://docs.cloud.google.com/tasks/docs/dual-overview",
+      "evidence": "Task deduplication is achieved by assigning a unique name to a task. If you attempt to create a task with a name that already exists in the queue, the creation request will fail."
+    }
+  },
+  {
+    "id": "evt-f023",
+    "note": "1.1-orchestration",
+    "kind": "term",
+    "front": "Cloud Scheduler",
+    "back": "A service that runs cron jobs. Each job sends a request on a unix-cron schedule to one target: an HTTP or HTTPS endpoint, a Pub/Sub topic, or an App Engine app. Use it for repeating work, such as a daily report.",
+    "aws": "Amazon EventBridge",
+    "source": {
+      "title": "About Cloud Scheduler",
+      "url": "https://docs.cloud.google.com/scheduler/docs/overview",
+      "evidence": "With Cloud Scheduler you set up scheduled units of work to be executed at defined times or regular intervals. These work units are commonly known as cron jobs."
+    }
+  },
+  {
+    "id": "evt-f024",
+    "note": "1.1-orchestration",
+    "kind": "concept",
+    "front": "How many times does a Cloud Scheduler job retry a failed attempt by default?",
+    "back": "Zero. `--max-retry-attempts` and `--max-retry-duration` both default to 0, so a failed attempt waits for the next scheduled run. Set `--max-retry-attempts` (up to 5) to enable retries.",
+    "aws": null,
+    "source": {
+      "title": "Retry jobs",
+      "url": "https://docs.cloud.google.com/scheduler/docs/configuring/retry-jobs",
+      "evidence": "Both settings default to 0 and the job doesn't retry at all."
+    }
+  },
+  {
+    "id": "evt-f025",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "term",
+    "front": "Eventarc direct event",
+    "back": "An event that Eventarc gets directly from a Google source, for example `google.cloud.storage.object.v1.finalized`. When a source offers both, use it instead of a Cloud Audit Logs event. It has lower latency, a typed format, and no audit log cost.",
+    "aws": null,
+    "source": {
+      "title": "Event routes",
+      "url": "https://docs.cloud.google.com/eventarc/standard/docs/run/event-routing-options",
+      "evidence": "For the event that you want to route, if both direct and audit log options are supported, we recommend that you create a trigger to route the direct event."
+    }
+  },
+  {
+    "id": "evt-f026",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "term",
+    "front": "Eventarc trigger",
+    "back": "An Eventarc Standard resource that routes the events that match its filters to one destination, for example a Cloud Run service. An event must match all filters exactly, with no wildcards or regular expressions. The `type` filter is required.",
+    "aws": "AWS EventBridge",
+    "source": {
+      "title": "Create triggers with Eventarc",
+      "url": "https://docs.cloud.google.com/run/docs/triggering/trigger-with-events",
+      "evidence": "Only events that match all the filters are sent to the destination. Wildcards and regular expressions are not supported"
+    }
+  },
+  {
+    "id": "evt-f027",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "Which identity does an Eventarc trigger use when you do not give it a service account?",
+    "back": "The Compute Engine default service account, which can have the highly privileged basic Editor role. Give each trigger a user-managed service account with only the roles that it needs.",
+    "aws": null,
+    "source": {
+      "title": "Create triggers with Eventarc",
+      "url": "https://docs.cloud.google.com/run/docs/triggering/trigger-with-events",
+      "evidence": "If you don't specify a service account during the trigger's creation, the trigger uses the Compute Engine default service account for its identity."
+    }
+  },
+  {
+    "id": "evt-f028",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "Why does an active Eventarc trigger fail to authenticate to its Cloud Run service?",
+    "back": "The trigger service account lacks the Cloud Run Invoker role (`roles/run.invoker`) on the service. Eventarc creates and activates the trigger without this role, but every request fails authentication.",
+    "aws": null,
+    "source": {
+      "title": "Roles and permissions for Cloud Run targets",
+      "url": "https://docs.cloud.google.com/eventarc/docs/roles-permissions",
+      "evidence": "Note that if you create a trigger for an authenticated Cloud Run service without granting the Cloud Run Invoker role, the trigger is created successfully and is active. However, the trigger won't work as expected"
+    }
+  },
+  {
+    "id": "evt-f029",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "Which way of creating an Eventarc trigger gives one delivery attempt with no retries by default?",
+    "back": "The Cloud Run page of the Google Cloud console. Triggers that you create with gcloud, Terraform, or the Eventarc page of the console retry by default.",
+    "aws": null,
+    "source": {
+      "title": "Retry events",
+      "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+      "evidence": "Optionally, for Cloud Run destinations (including Cloud Run functions), you can configure a single delivery attempt with no retries. When you create an Eventarc trigger in the Google Cloud console from the Cloud Run page, this is the default configuration."
+    }
+  },
+  {
+    "id": "evt-f030",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "What is the default acknowledgment deadline of the Pub/Sub subscription behind an Eventarc trigger?",
+    "back": "10 seconds. This is too short for many handlers and can cause duplicate executions. Google recommends the maximum value, 600 seconds.",
+    "aws": null,
+    "source": {
+      "title": "Create triggers with Eventarc",
+      "url": "https://docs.cloud.google.com/run/docs/triggering/trigger-with-events",
+      "evidence": "By default, the acknowledgement (`ack`) deadline of this Pub/Sub subscription is 10 seconds. This setting is insufficient for many functions, and can have the effect of causing unwanted duplicate executions."
+    }
+  },
+  {
+    "id": "evt-f031",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "What code must a private Cloud Run service run to verify the OIDC token of a Pub/Sub push request?",
+    "back": "None. Cloud Run checks that the token is valid and that the push service account has the Cloud Run Invoker role. Keep the service private, with no unauthenticated access.",
+    "aws": null,
+    "source": {
+      "title": "Use Pub/Sub with Cloud Run tutorial",
+      "url": "https://docs.cloud.google.com/run/docs/tutorials/pubsub",
+      "evidence": "For Cloud Run only, there is a built-in authentication check that the token is valid and an authorization check that the service account has permission to invoke the Cloud Run service."
+    }
+  },
+  {
+    "id": "evt-f032",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "Which HTTP status codes acknowledge a Pub/Sub push message?",
+    "back": "102, 200, 201, 202, and 204. Any other code, including 400, is a negative acknowledgment, and Pub/Sub resends the message.",
+    "aws": null,
+    "source": {
+      "title": "Push subscriptions",
+      "url": "https://docs.cloud.google.com/pubsub/docs/push",
+      "evidence": "To send a negative acknowledgment for the message, return any other status code. If you send a negative acknowledgment or the acknowledgment deadline expires, Pub/Sub resends the message."
+    }
+  },
+  {
+    "id": "evt-f033",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "term",
+    "front": "Pub/Sub notifications for Cloud Storage",
+    "back": "A notification configuration on a bucket. It publishes a message to a Pub/Sub topic when an object changes, for example `OBJECT_FINALIZE`. Any subscription type can read the topic. One change can give several messages with different IDs.",
+    "aws": null,
+    "source": {
+      "title": "Pub/Sub notifications for Cloud Storage",
+      "url": "https://docs.cloud.google.com/storage/docs/pubsub-notifications",
+      "evidence": "Pub/Sub also offers at-least-once delivery to the recipient, which means that you could receive multiple messages, with multiple IDs, that represent the same Cloud Storage event."
+    }
+  },
+  {
+    "id": "evt-f034",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "term",
+    "front": "Event-driven function",
+    "back": "A Cloud Run function (formerly Cloud Functions) that runs when an event arrives. Every event-driven function uses one Eventarc trigger. You configure its retries on that trigger, not on the function.",
+    "aws": "AWS Lambda",
+    "source": {
+      "title": "Configure event-driven function retries",
+      "url": "https://docs.cloud.google.com/run/docs/tips/function-retries",
+      "evidence": "The retries property is not implemented on the function itself but on the Eventarc trigger that invokes the function, which provides more flexibility."
+    }
+  },
+  {
+    "id": "evt-f035",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "Why does a 30-minute Cloud Run request timeout not help a slow Pub/Sub push receiver?",
+    "back": "Pub/Sub resends the message when the acknowledgment deadline of the subscription expires, at most 600 seconds. A push receiver cannot extend that deadline. A pull subscriber can extend it, so pull fits long processing better.",
+    "aws": null,
+    "source": {
+      "title": "Push subscriptions",
+      "url": "https://docs.cloud.google.com/pubsub/docs/push",
+      "evidence": "You can't modify the acknowledgment deadline of individual messages that you receive from push subscriptions."
+    }
+  },
+  {
+    "id": "evt-f036",
+    "note": "3.1-triggers-and-receivers",
+    "kind": "concept",
+    "front": "Which Cloud Run ingress setting blocks internet traffic but still accepts Eventarc and Pub/Sub push requests?",
+    "back": "Internal. Eventarc, Pub/Sub, Cloud Scheduler, Cloud Tasks, and Workflows still reach the service when they are in the same project or VPC Service Controls perimeter. They must use the `run.app` URL, not a custom domain.",
+    "aws": null,
+    "source": {
+      "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+      "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+      "evidence": "The following Google Cloud products, if they're in the same project or VPC Service Controls perimeter as your Cloud Run service or instance, and if they're using the default `run.app` URL and not a custom URL or custom domain"
+    }
+  },
+  {
+    "id": "evt-f037",
+    "note": "4.1-messaging",
+    "kind": "concept",
+    "front": "What is the maximum data size of one Pub/Sub message?",
+    "back": "10 MB for the `data` field. A message can also have up to 100 attributes.",
+    "aws": null,
+    "source": {
+      "title": "Pub/Sub quotas and limits",
+      "url": "https://docs.cloud.google.com/pubsub/quotas",
+      "evidence": "Message size (the `data` field): 10MB Attributes per message: 100 Attribute key size: 256 bytes Attribute value size: 1024 bytes"
+    }
+  },
+  {
+    "id": "evt-f038",
+    "note": "4.1-messaging",
+    "kind": "concept",
+    "front": "What does the Pub/Sub publisher client trade when it batches messages?",
+    "back": "It gets higher throughput and lower cost, but adds latency, because it waits to fill each batch. The client libraries batch by default. In Python, the client sends a batch at 100 messages, 1 MB, or 10 ms, whichever comes first.",
+    "aws": null,
+    "source": {
+      "title": "Best practices to publish to a Pub/Sub topic",
+      "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+      "evidence": "Batching reduces the cost to publish data. However, batching also creates latency for individual messages because the publisher waits for the batch to be filled up before publishing the batch."
+    }
+  },
+  {
+    "id": "evt-f039",
+    "note": "4.1-messaging",
+    "kind": "term",
+    "front": "Publisher flow control",
+    "back": "A Pub/Sub publisher client setting that limits the outstanding messages and bytes. Without it, a burst of publish requests waits in memory until the requests fail with `DEADLINE_EXCEEDED`. Use it for temporary spikes. For a lasting overload, add publisher instances.",
+    "aws": null,
+    "source": {
+      "title": "Flow control",
+      "url": "https://docs.cloud.google.com/pubsub/docs/flow-control-messages",
+      "evidence": "To mitigate flow rate issues, configure your publisher client with flow control to limit the rate of publish requests. You can configure the maximum number of bytes allocated for outstanding requests, and the maximum number of outstanding messages permitted."
+    }
+  },
+  {
+    "id": "evt-f040",
+    "note": "4.1-messaging",
+    "kind": "concept",
+    "front": "Why does a check on the message ID not catch every duplicate Pub/Sub message?",
+    "back": "A publish can succeed while its response is lost. The client library then publishes again, so two identical messages arrive with different message IDs. This also happens with exactly-once delivery.",
+    "aws": null,
+    "source": {
+      "title": "Retry requests",
+      "url": "https://docs.cloud.google.com/pubsub/docs/retry-requests",
+      "evidence": "when a publish operation succeeds but the publish response is not received in time by the publisher client. In this case too, the publish operation is retried. As a result, you can have two identical messages with different message IDs."
+    }
+  },
+  {
+    "id": "evt-f041",
+    "note": "4.1-messaging",
+    "kind": "concept",
+    "front": "What must a Pub/Sub publisher do after a publish with an ordering key fails with a non-retryable error?",
+    "back": "Call the resume method for that ordering key, `resume_publish` in Python. Until then, the client library does not publish later messages with the same key.",
+    "aws": null,
+    "source": {
+      "title": "Retry requests",
+      "url": "https://docs.cloud.google.com/pubsub/docs/retry-requests",
+      "evidence": "To continue publishing messages with the same ordering key, call a method to resume publishing and then start publishing again."
+    }
+  },
+  {
+    "id": "evt-f042",
+    "note": "4.1-messaging",
+    "kind": "term",
+    "front": "StreamingPull",
+    "back": "The Pub/Sub pull API that keeps a persistent two-way connection open and sends messages as they become available. Google recommends the high-level client library, which uses StreamingPull, with asynchronous processing for most subscribers.",
+    "aws": null,
+    "source": {
+      "title": "Pull subscriptions",
+      "url": "https://docs.cloud.google.com/pubsub/docs/pull",
+      "evidence": "For most use cases, we recommend the Google-provided high-level client library with the StreamingPull API and asynchronous message processing."
+    }
+  },
+  {
+    "id": "evt-f043",
+    "note": "4.1-messaging",
+    "kind": "term",
+    "front": "Lease management",
+    "back": "A feature of the high-level Pub/Sub client libraries. It automatically extends the acknowledgment deadline of each unacknowledged message, by default for up to an hour. Use it for a slow pull subscriber instead of a high subscription deadline.",
+    "aws": null,
+    "source": {
+      "title": "Extend ack time with lease management",
+      "url": "https://docs.cloud.google.com/pubsub/docs/lease-management",
+      "evidence": "The Pub/Sub high-level client libraries provide lease management as a feature that automatically extends the deadline of a message that has not yet been acknowledged. By default, the client libraries can extend the deadline to an hour"
+    }
+  },
+  {
+    "id": "evt-f044",
+    "note": "4.1-messaging",
+    "kind": "concept",
+    "front": "Should a Pub/Sub subscriber acknowledge a message before or after it processes the message?",
+    "back": "After. Pub/Sub does not redeliver an acknowledged message, so a failure after an early acknowledgment loses the work. Only a seek, with retained acknowledged messages or topic retention, can bring it back.",
+    "aws": null,
+    "source": {
+      "title": "Best practices to subscribe to a Pub/Sub topic",
+      "url": "https://docs.cloud.google.com/pubsub/docs/subscribe-best-practices",
+      "evidence": "If you don't process a message before sending an acknowledgment and the processing fails, the service does not redeliver the message. The exception is when you have configured retaining acknowledged messages or topic retention and you perform a seek operation."
+    }
+  },
+  {
+    "id": "evt-f045",
+    "note": "4.1-messaging",
+    "kind": "term",
+    "front": "Pub/Sub subscription filter",
+    "back": "An expression on message attributes that selects the messages that a subscription delivers. Pub/Sub automatically acknowledges the messages that do not match. A filter cannot use the message data, and you cannot change it after you create the subscription.",
+    "aws": null,
+    "source": {
+      "title": "Filter messages from a subscription",
+      "url": "https://docs.cloud.google.com/pubsub/docs/subscription-message-filter",
+      "evidence": "The Pub/Sub service automatically acknowledges the messages that don't match the filter. You can filter messages by their attributes, but not by the data in the message."
+    }
+  },
+  {
+    "id": "evt-f046",
+    "note": "4.1-messaging",
+    "kind": "concept",
+    "front": "Which roles does the Pub/Sub service agent need to forward messages to a dead-letter topic?",
+    "back": "Pub/Sub Publisher (`roles/pubsub.publisher`) on the dead-letter topic and Pub/Sub Subscriber (`roles/pubsub.subscriber`) on the source subscription. Without both roles, Pub/Sub does not count delivery attempts or forward messages.",
+    "aws": null,
+    "source": {
+      "title": "Dead-letter topics",
+      "url": "https://docs.cloud.google.com/pubsub/docs/dead-letter-topics",
+      "evidence": "To use dead-letter topics, you must also grant specific publisher and subscriber roles to your Pub/Sub service account. However, you must do this after you create the dead-letter topic."
+    }
+  },
+  {
+    "id": "evt-f047",
+    "note": "4.1-messaging",
+    "kind": "term",
+    "front": "Pub/Sub snapshot",
+    "back": "A point-in-time record of the acknowledgment state of a subscription. Create one before you deploy new subscriber code. If the code acknowledges messages by mistake, seek the subscription back to the snapshot. A snapshot lasts at most 7 days.",
+    "aws": null,
+    "source": {
+      "title": "Replay and purge messages with seek",
+      "url": "https://docs.cloud.google.com/pubsub/docs/replay-overview",
+      "evidence": "A concern with deploying new subscriber code is that the new executable may erroneously acknowledge messages, leading to message loss. Incorporating snapshots into your deployment process gives you a way to recover from bugs in new subscriber code."
+    }
+  },
+  {
+    "id": "evt-f048",
+    "note": "4.1-messaging",
+    "kind": "term",
+    "front": "Pub/Sub schema",
+    "back": "A contract for the format of the message data on a topic, in Apache Avro or Protocol Buffer format. Pub/Sub does not publish a message that does not conform. You choose `JSON` or `BINARY` encoding when you attach the schema.",
+    "aws": null,
+    "source": {
+      "title": "Schema overview",
+      "url": "https://docs.cloud.google.com/pubsub/docs/schemas",
+      "evidence": "You can create a schema and associate it with a topic to enforce the schema for published messages. If a specific message does not conform to the schema, the message is not published."
+    }
+  }
+]

@@ -1,4 +1,15 @@
-# PCA study guide
+# Google Cloud study guides
+
+This repository has two study guides. They share the study app, the checks, and the authoring rules.
+
+| Guide | Exam | Files | Study app |
+|---|---|---|---|
+| PCA | Professional Cloud Architect | This page, `content/`, `labs/` | [PCA Workbook](https://claude.ai/artifact/TPcb1cyHLyPXTyEkZbcYqz) |
+| PCD | Professional Cloud Developer | [pcd/README.md](pcd/README.md), `pcd/content/`, `pcd/labs/` | [PCD Workbook](https://claude.ai/artifact/2CHa4KR5pQHwwsxbC5CjfS) |
+
+The rest of this page describes the PCA guide and the parts that both guides share. The PCD guide has its own [README](pcd/README.md).
+
+## PCA guide
 
 A study system for the Google Cloud **Professional Cloud Architect** exam (exam guide v6.1). It has these parts:
 
@@ -65,8 +76,9 @@ Every lab runs in one dedicated project whose ID starts with `pca-lab-`. [Lab 00
 | `content/SPEC.md`, `content/PLAN.md` | Authoring rules and the content plan. |
 | `labs/` | Labs, `labs/env.sh`, and the teardown scripts. |
 | `app/` | The study app: `src/` (UI, storage, scoring logic), `build.mjs`, and tests. |
-| `tools/` | The docs fetcher and the content validators. |
+| `tools/` | The docs fetcher and the content validators. Each validator takes `--guide pca` (the default) or `--guide pcd`. |
 | `sources/` | The official exam guide and case study PDFs. |
+| `pcd/` | The PCD guide, with the same layout: `pcd/content/`, `pcd/labs/`, `pcd/sources/`, and `pcd/README.md`. |
 
 ## Checks and build
 
@@ -80,6 +92,18 @@ npm run check:links          # every cited link returns HTTP 200
 npm run build                # writes dist/index.html (the app) and dist/pca-workbook.html (a standalone copy)
 npm run share                # strict build, plus dist/pca-workbook.zip (standalone copy and lab files)
 node app/build.mjs --strict  # also fails on broken internal links
+```
+
+The PCD guide has the same commands with `pcd` in the name:
+
+```bash
+npm run check:pcd:questions
+npm run check:pcd:flashcards
+npm run check:pcd:labs
+npm run check:pcd:links
+npm run build:pcd                        # writes dist/pcd/index.html and dist/pcd/pcd-workbook.html
+npm run share:pcd                        # strict build, plus dist/pcd/pcd-workbook.zip
+node app/build.mjs --guide pcd --strict
 ```
 
 `tools/fetch_doc.py URL` prints a docs page as plain text (`--outline`, `--grep REGEX`, `--links`). It caches pages in `.cache/docs/`. `check:questions` uses the same cache to confirm that each evidence quote appears on its source page.

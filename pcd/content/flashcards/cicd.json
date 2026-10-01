@@ -1,0 +1,470 @@
+[
+  {
+    "id": "cicd-f001",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "term",
+    "front": "Cloud Build",
+    "back": "The Google Cloud service that runs your builds. It runs each step of a build config file (`cloudbuild.yaml`) as a Docker container. One file can hold the test, build, push, and deploy steps.",
+    "aws": "AWS CodeBuild",
+    "source": {
+      "title": "Build configuration file schema",
+      "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+      "evidence": "For each build step, Cloud Build executes a docker container as an instance of `docker run`."
+    }
+  },
+  {
+    "id": "cicd-f002",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "concept",
+    "front": "How do you push an image during a build and also show it in the build results?",
+    "back": "Use a `docker push` step, and also list the image in the `images` field. The push step makes the image available to later steps, such as a deploy step. Only the `images` field shows the image in the build results.",
+    "aws": null,
+    "source": {
+      "title": "Build container images",
+      "url": "https://docs.cloud.google.com/build/docs/building/build-containers",
+      "evidence": "If you want to store the image as part of your build flow and want to display the image in the build results, use both the Docker `push` command and the `images` field in your build config file."
+    }
+  },
+  {
+    "id": "cicd-f003",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "concept",
+    "front": "Which service account runs a triggered build when `cloudbuild.yaml` also sets `serviceAccount`?",
+    "back": "The service account on the trigger. For builds that a trigger starts, Cloud Build ignores the `serviceAccount` field of the build config file.",
+    "aws": null,
+    "source": {
+      "title": "Create and manage build triggers",
+      "url": "https://docs.cloud.google.com/build/docs/automating-builds/create-manage-triggers",
+      "evidence": "If you specified a service account in your build config, it will be ignored during build execution when using triggers."
+    }
+  },
+  {
+    "id": "cicd-f004",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "concept",
+    "front": "Which service account runs Cloud Build builds by default in a new project?",
+    "back": "The Compute Engine default service account. Projects that ran their first build before a change in May and June 2024 use the legacy Cloud Build service account. Google recommends a user-specified service account with only the roles that the build needs.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Build default service account change",
+      "url": "https://docs.cloud.google.com/build/docs/cloud-build-service-account-updates",
+      "evidence": "After this change, Cloud Build now uses the Compute Engine default service account as the default service account."
+    }
+  },
+  {
+    "id": "cicd-f005",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "term",
+    "front": "Private pool",
+    "back": "A dedicated pool of Cloud Build workers that Cloud Build manages and scales to zero. Use it when a build must reach private resources through VPC peering, or needs VPC Service Controls. The default pool supports neither.",
+    "aws": null,
+    "source": {
+      "title": "Private pools overview",
+      "url": "https://docs.cloud.google.com/build/docs/private-pools/private-pools-overview",
+      "evidence": "Private pools are private, dedicated pools of workers that offer greater customization over the build environment, including the ability to access resources in a private network."
+    }
+  },
+  {
+    "id": "cicd-f006",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "term",
+    "front": "Artifact Registry",
+    "back": "The recommended Google Cloud service to store and manage container images. It also stores language packages and OS packages. Each repository has one format and one location, and you can grant IAM roles on each repository.",
+    "aws": "Amazon ECR, AWS CodeArtifact",
+    "source": {
+      "title": "Transition from Container Registry",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/transition/transition-from-gcr",
+      "evidence": "Artifact Registry is the recommended service for container image storage and management on Google Cloud."
+    }
+  },
+  {
+    "id": "cicd-f007",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "concept",
+    "front": "Can a new pipeline push images to Container Registry?",
+    "back": "No. Container Registry shut down on March 18, 2025, and you cannot write images to it. Push to an Artifact Registry repository instead. `gcr.io` URLs that Artifact Registry hosts, such as the Cloud Build builder images, still work.",
+    "aws": null,
+    "source": {
+      "title": "Transition from Container Registry",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/transition/transition-from-gcr",
+      "evidence": "Container Registry is deprecated. Effective March 18, 2025, Container Registry is shut down and writing images to Container Registry is unavailable."
+    }
+  },
+  {
+    "id": "cicd-f008",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "term",
+    "front": "Remote repository",
+    "back": "An Artifact Registry repository mode. It is a read-only proxy that caches artifacts from an upstream source, such as Docker Hub, Maven Central, or PyPI. Use it for faster access to public dependencies, and to keep them available during an upstream outage.",
+    "aws": null,
+    "source": {
+      "title": "Remote repositories overview",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/remote-overview",
+      "evidence": "Storing cached copies of your public dependencies in Artifact Registry reduces latency when other Google Cloud services retrieve images. Cached artifacts are also still available if the external public repository is offline due to an outage or other issue."
+    }
+  },
+  {
+    "id": "cicd-f009",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "term",
+    "front": "Virtual repository",
+    "back": "An Artifact Registry repository mode. It is one read-only endpoint for several upstream repositories of the same format. Give your private standard repository a higher priority than a remote repository of public packages, to reduce the risk of dependency confusion attacks.",
+    "aws": null,
+    "source": {
+      "title": "Repository overview",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories",
+      "evidence": "You can also mitigate dependency confusion attacks by configuring your upstream policy to prioritize repositories with your private artifacts over remote repositories that cache public artifacts."
+    }
+  },
+  {
+    "id": "cicd-f010",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "term",
+    "front": "Cleanup policy",
+    "back": "Artifact Registry rules that automatically delete artifact versions that you no longer need, for example by tag prefix or age. Keep policies keep the versions that you want. If a delete policy and a keep policy both match a version, Artifact Registry applies the keep policy.",
+    "aws": null,
+    "source": {
+      "title": "Repository overview",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories",
+      "evidence": "If an artifact version matches criteria in both a delete policy and a keep policy, Artifact Registry applies the keep policy."
+    }
+  },
+  {
+    "id": "cicd-f011",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "concept",
+    "front": "Which identity needs Artifact Registry Reader when Cloud Run deploys an image from another project's repository?",
+    "back": "The Cloud Run Service Agent of the Cloud Run project, `service-PROJECT_NUMBER@serverless-robot-prod.iam.gserviceaccount.com`. Grant the role in the project that has the repository.",
+    "aws": null,
+    "source": {
+      "title": "Access control with IAM",
+      "url": "https://docs.cloud.google.com/artifact-registry/docs/access-control",
+      "evidence": "In the project with Artifact Registry, grant the workload identity pool or service account for each service the required role. If connecting to Cloud Run, grant the Cloud Run Service Agent the required role."
+    }
+  },
+  {
+    "id": "cicd-f012",
+    "note": "2.2-cloud-build-artifact-registry",
+    "kind": "concept",
+    "front": "Which image reference must a deployment use to run exactly the image that was scanned or signed?",
+    "back": "The digest, `IMAGE@sha256:DIGEST`. A digest identifies one image version and cannot change. A tag can move to another image after a later push.",
+    "aws": null,
+    "source": {
+      "title": "About container image digests",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-container-images",
+      "evidence": "To ensure that you deploy the image that was scanned, you cannot rely on the tag because the image referred by the tag might have changed."
+    }
+  },
+  {
+    "id": "cicd-f013",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "term",
+    "front": "Build provenance",
+    "back": "Verifiable metadata about a build, such as the digests of the built images, the source locations, the build arguments, and the build duration. Cloud Build generates it only for artifacts in Artifact Registry. Cloud Build provenance meets SLSA (Supply-chain Levels for Software Artifacts) level 3.",
+    "aws": null,
+    "source": {
+      "title": "Generate and validate build provenance",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+      "evidence": "Build provenance is a collection of verifiable data about a build. Provenance metadata includes details such as the digests of the built images, the input source locations, the build arguments, and the build duration."
+    }
+  },
+  {
+    "id": "cicd-f014",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "concept",
+    "front": "How must a build push an image so that Cloud Build generates provenance for it?",
+    "back": "With the `images` field, to an Artifact Registry repository. Cloud Build cannot generate provenance for an image that an explicit `docker push` step pushes.",
+    "aws": null,
+    "source": {
+      "title": "Generate and validate build provenance",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+      "evidence": "Cloud Build can't generate provenance if you push your image to Artifact Registry using an explicit `docker push` step."
+    }
+  },
+  {
+    "id": "cicd-f015",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "concept",
+    "front": "Which build option makes Cloud Build generate provenance and fail the build if provenance is missing?",
+    "back": "`requestedVerifyOption: VERIFIED` in the `options` section of the build config file. With it, Cloud Build marks a build successful only if it generates provenance.",
+    "aws": null,
+    "source": {
+      "title": "Generate and validate build provenance",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+      "evidence": "This setting enables provenance generation and configures Cloud Build to verify that provenance metadata is present. Builds will only be marked successful if provenance is generated."
+    }
+  },
+  {
+    "id": "cicd-f016",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "term",
+    "front": "Binary Authorization",
+    "back": "A deploy-time control for GKE, Cloud Run, Cloud Service Mesh (formerly Anthos Service Mesh and Traffic Director), and Google Distributed Cloud. It blocks an image that does not meet your policy, for example an image without a required signed attestation.",
+    "aws": null,
+    "source": {
+      "title": "Binary Authorization overview",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/overview",
+      "evidence": "Using this service, you can prevent images from being deployed unless it satisfies a policy you define."
+    }
+  },
+  {
+    "id": "cicd-f017",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "term",
+    "front": "Attestor",
+    "back": "A Binary Authorization resource that holds a public key. At deploy time, Binary Authorization uses it to verify the attestation, which is a signature over the image digest. A policy rule lists the attestors that an image needs.",
+    "aws": null,
+    "source": {
+      "title": "Binary Authorization concepts",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/key-concepts",
+      "evidence": "Attestors contain the public key that corresponds to the private key used by a signer to sign the image digest and create the attestation."
+    }
+  },
+  {
+    "id": "cicd-f018",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "concept",
+    "front": "Does the default rule still apply to a deployment that a cluster-specific rule matches?",
+    "back": "No. Binary Authorization does not consider the default rule for that deployment. The cluster-specific rule must list every attestor that the cluster needs, also the attestors that the default rule lists.",
+    "aws": null,
+    "source": {
+      "title": "Policy YAML reference",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/policy-yaml-reference",
+      "evidence": "If Binary Authorization applies a cluster-specific rule to a deployment, the default rule is not considered."
+    }
+  },
+  {
+    "id": "cicd-f019",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "concept",
+    "front": "Which attestor must a policy require so that only images that Cloud Build built can deploy?",
+    "back": "`built-by-cloud-build`, as `projects/PROJECT_ID/attestors/built-by-cloud-build`, where `PROJECT_ID` is the project that runs Cloud Build. Cloud Build creates this attestor at the first build in the project. Cloud Build signs the attestations at build time.",
+    "aws": null,
+    "source": {
+      "title": "Securing image deployments to Cloud Run and Google Kubernetes Engine",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/secure-deployments-to-run-gke",
+      "evidence": "Cloud Build generates and signs attestations at build time. With Binary Authorization, you can use the `built-by-cloud-build` attestor to verify the attestations and only deploy images built by Cloud Build."
+    }
+  },
+  {
+    "id": "cicd-f020",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "concept",
+    "front": "Why must a pipeline under a `built-by-cloud-build` policy use separate build and deploy config files?",
+    "back": "Cloud Build creates the attestation only after the whole build pipeline completes successfully. A deploy step in the same build runs before that, so the policy has no attestation to check.",
+    "aws": null,
+    "source": {
+      "title": "Securing image deployments to Cloud Run and Google Kubernetes Engine",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/secure-deployments-to-run-gke",
+      "evidence": "You must use separate build config files for your build pipeline and deployment pipeline. This is because Cloud Build produces attestations only after the build pipeline completes successfully."
+    }
+  },
+  {
+    "id": "cicd-f021",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "concept",
+    "front": "How do you stop Cloud Run developers from turning off Binary Authorization on their services?",
+    "back": "Set the organization policy `run.allowedBinaryAuthorizationPolicies` to `default` on the organization, a folder, or a project. Without this policy, Cloud Run developers can turn Binary Authorization off.",
+    "aws": null,
+    "source": {
+      "title": "Enable Binary Authorization for Cloud Run",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/run/enabling-binauthz-cloud-run",
+      "evidence": "We recommend that you require Binary Authorization for Cloud Run by configuring an organization policy to do so. Binary Authorization can be disabled by Cloud Run developers if the policy is not configured."
+    }
+  },
+  {
+    "id": "cicd-f022",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "term",
+    "front": "Dry-run mode (Binary Authorization)",
+    "back": "An enforcement mode, `DRYRUN_AUDIT_LOG_ONLY`. It allows every image to deploy and writes policy violations to Cloud Audit Logs. Use it to test a policy before you change to `ENFORCED_BLOCK_AND_AUDIT_LOG`.",
+    "aws": null,
+    "source": {
+      "title": "Enable dry-run mode",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/enabling-dry-run",
+      "evidence": "When you enable dry-run mode, Binary Authorization allows all container images to be deployed, even if those images violate the Binary Authorization policy. Policy compliance status messages are logged to Cloud Audit Logs."
+    }
+  },
+  {
+    "id": "cicd-f023",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "term",
+    "front": "Breakglass",
+    "back": "A way to deploy an image that the Binary Authorization policy blocks, for emergencies only. Binary Authorization always writes a breakglass event to Cloud Audit Logs, so you can alert on it.",
+    "aws": null,
+    "source": {
+      "title": "Use breakglass (GKE, Distributed Cloud)",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/using-breakglass",
+      "evidence": "Breakglass provides an emergency escape hatch that lets you override Binary Authorization policy enforcement to allow images to be deployed, even those that would be disallowed by the policy."
+    }
+  },
+  {
+    "id": "cicd-f024",
+    "note": "2.2-provenance-binary-authorization",
+    "kind": "term",
+    "front": "Continuous validation (CV)",
+    "back": "A Binary Authorization feature (Preview) that checks the images of running GKE Pods against check-based platform policies at least every 24 hours. It logs violations to Cloud Logging but does not stop the Pods. Enforcement checks an image only at deploy time.",
+    "aws": null,
+    "source": {
+      "title": "Continuous validation overview",
+      "url": "https://docs.cloud.google.com/binary-authorization/docs/overview-cv",
+      "evidence": "Although Binary Authorization enforcement provides one-time image validations when you deploy container images, CV continuously monitors that images associated with running Pods continue to conform to your policies."
+    }
+  },
+  {
+    "id": "cicd-f025",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "term",
+    "front": "`waitFor`",
+    "back": "A build step field that lists the `id` values of the steps that must complete successfully before this step starts. A step without `waitFor` waits for all earlier steps. `waitFor: ['-']` starts the step when the build starts.",
+    "aws": null,
+    "source": {
+      "title": "Configuring the order of build steps",
+      "url": "https://docs.cloud.google.com/build/docs/configuring-builds/configure-build-step-order",
+      "evidence": "A step is dependent on every `id` in its `waitFor` and will not launch until each dependency has completed successfully."
+    }
+  },
+  {
+    "id": "cicd-f026",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "concept",
+    "front": "When a Cloud Build step fails, what happens to the steps that are running or not started?",
+    "back": "Unless the step allows failure, the build status becomes `FAILURE`. Running steps become `CANCELLED`, and steps that did not start stay `QUEUED`. A deploy step that waits for the failed test step does not run.",
+    "aws": null,
+    "source": {
+      "title": "View build results",
+      "url": "https://docs.cloud.google.com/build/docs/view-build-results",
+      "evidence": "Failed step is marked `FAILED`. Steps that succeed before the termination of the build are marked `SUCCESS`. Steps in the middle of execution are marked `CANCELLED`. Steps that don't start to execute are marked `QUEUED`."
+    }
+  },
+  {
+    "id": "cicd-f027",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "term",
+    "front": "`allowFailure`",
+    "back": "A build step field. When it is `true`, a failure of that step does not fail the build, and later steps still run. Do not set it on a test step that must stop the deploy steps.",
+    "aws": null,
+    "source": {
+      "title": "Build configuration file schema",
+      "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+      "evidence": "In a build step, if you set the value of the `allowFailure` field to `true`, and the build step fails, then the build succeeds as long as all other build steps in that build succeed."
+    }
+  },
+  {
+    "id": "cicd-f028",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "term",
+    "front": "`cloudbuild` network",
+    "back": "The local Docker network that Cloud Build attaches each step container to. It hosts Application Default Credentials (ADC). A step that starts nested Docker containers adds `--network=cloudbuild`, so that those containers can use the credentials.",
+    "aws": null,
+    "source": {
+      "title": "Build configuration file schema",
+      "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+      "evidence": "When Cloud Build runs each build step, it attaches the step's container to a local Docker network named `cloudbuild`. The `cloudbuild` network hosts Application Default Credentials (ADC) that Google Cloud services can use to automatically find your credentials."
+    }
+  },
+  {
+    "id": "cicd-f029",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "term",
+    "front": "`artifacts` field",
+    "back": "A build config field that stores build results, such as JUnit XML test reports, in Cloud Storage or Artifact Registry. Cloud Build uploads them only after all build steps succeed, so a failed test run uploads no report.",
+    "aws": null,
+    "source": {
+      "title": "Build configuration file schema",
+      "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+      "evidence": "The `artifacts` field specifies one or more artifacts to be stored in Cloud Storage or Artifact Registry upon successful completion of all build steps."
+    }
+  },
+  {
+    "id": "cicd-f030",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "concept",
+    "front": "Which role does the build service account need to read a Secret Manager secret in a build?",
+    "back": "Secret Manager Secret Accessor (`roles/secretmanager.secretAccessor`) on the secret. The build config maps the secret version to a variable in `availableSecrets`, and each step that uses it lists the variable in `secretEnv`.",
+    "aws": null,
+    "source": {
+      "title": "Use secrets from Secret Manager",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/use-secrets",
+      "evidence": "Grant the Secret Manager Secret Accessor (`roles/secretmanager.secretAccessor`) IAM role for the secret to the service account you are using for the build"
+    }
+  },
+  {
+    "id": "cicd-f031",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "concept",
+    "front": "How does a build step use a secret from `secretEnv` in its `args`?",
+    "back": "Set `entrypoint: 'bash'`, pass `-c` as the first argument, and write the variable with `$$`, for example `$$PASSWORD`. With one `$`, Cloud Build reads `$PASSWORD` as a substitution, which is not valid.",
+    "aws": null,
+    "source": {
+      "title": "Use secrets from Secret Manager",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/use-secrets",
+      "evidence": "When specifying the secret in the `args` field, specify it using the environment variable prefixed with `$$`."
+    }
+  },
+  {
+    "id": "cicd-f032",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "concept",
+    "front": "Which `gcloud run deploy` flags create a revision that gets no traffic but has its own test URL?",
+    "back": "`--no-traffic --tag TAG_NAME`. The tag gives the revision its own URL, which starts with the tag name. A later build step tests that URL, and then you move traffic to the tag.",
+    "aws": null,
+    "source": {
+      "title": "Rollbacks, gradual rollouts, and traffic migration",
+      "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+      "evidence": "The tag lets you directly test the new revision at a specific URL, without serving traffic. The URL starts with the tag name you provided"
+    }
+  },
+  {
+    "id": "cicd-f033",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "concept",
+    "front": "Which service account must a build run as to get ID tokens for a private Cloud Run service?",
+    "back": "A user-specified service account with the Service Account OpenID Connect Identity Token Creator role. Cloud Build does not generate ID tokens with the default service account. The service account also needs the Cloud Run Invoker role on the service.",
+    "aws": null,
+    "source": {
+      "title": "Authorize service-to-service access",
+      "url": "https://docs.cloud.google.com/build/docs/securing-builds/authorize-service-to-service-access",
+      "evidence": "The following instructions are only supported for user-specified service accounts. Cloud Build does not support ID token generation with the default service account."
+    }
+  },
+  {
+    "id": "cicd-f034",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "term",
+    "front": "Comment control",
+    "back": "A setting on a GitHub pull request trigger. When it is required, a build starts only after a repository owner or collaborator comments `/gcbrun` on the pull request. Use it because any user with read access can open a pull request that runs a build.",
+    "aws": null,
+    "source": {
+      "title": "Building repositories from GitHub",
+      "url": "https://docs.cloud.google.com/build/docs/automating-builds/github/build-repos-from-github",
+      "evidence": "When a pull request is created or updated by any contributor, builds are executed only after an owner or collaborator comments `/gcbrun` on the pull request."
+    }
+  },
+  {
+    "id": "cicd-f035",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "concept",
+    "front": "What does `--pull-request-pattern=main` match in a GitHub pull request trigger?",
+    "back": "Every base branch whose name contains `main`, for example `main-old`. The pattern is an RE2 search on the branch that the pull request merges into. Use `^main$` to match only `main`.",
+    "aws": null,
+    "source": {
+      "title": "gcloud builds triggers create github",
+      "url": "https://docs.cloud.google.com/sdk/gcloud/reference/builds/triggers/create/github",
+      "evidence": "This pattern is used as a regex search for the base branch (the branch you are trying to merge into) for pull request updates. For example, --pull-request-pattern=foo will match \"foo\", \"foobar\", and \"barfoo\"."
+    }
+  },
+  {
+    "id": "cicd-f036",
+    "note": "2.3-integration-tests-cloud-build",
+    "kind": "term",
+    "front": "`verify` stanza (Cloud Deploy)",
+    "back": "A section of a Cloud Deploy delivery pipeline stage that runs your test containers after each deployment to the target. Exit code `0` means success. If a verify container fails, the rollout fails.",
+    "aws": null,
+    "source": {
+      "title": "Verify your deployment",
+      "url": "https://docs.cloud.google.com/deploy/docs/verify-deployment",
+      "evidence": "Verification is done using your own testing image or images, and you configure Cloud Deploy to run those tests after deployment finishes."
+    }
+  }
+]

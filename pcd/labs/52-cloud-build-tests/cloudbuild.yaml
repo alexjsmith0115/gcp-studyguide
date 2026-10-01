@@ -1,0 +1,69 @@
+# Lab 52: unit tests, image build, integration tests against real containers, then the push.
+# Start the build from the repository root (README.md, step 4):
+#   gcloud builds submit pcd/labs/52-cloud-build-tests \
+#     --config=pcd/labs/52-cloud-build-tests/cloudbuild.yaml --region="$REGION" ...
+# The optional trigger in step 8 reads this file from the root of a GitHub repository.
+
+steps:
+# waitFor: ['-'] starts a step when the build starts. install, build, and start-redis run in parallel.
+# --user puts the packages in the home folder, so that later steps can use them too.
+- id: install
+  name: python:3.12-slim
+  entrypoint: python
+  args: ['-m', 'pip', 'install', '--user', '-r', 'requirements.txt', '-r', 'requirements-test.txt']
+  waitFor: ['-']
+
+# Unit tests need no Redis: they replace the Redis client with a fake.
+# A step timeout stops a hung step. It must not be more than the build timeout.
+- id: unit-tests
+  name: python:3.12-slim
+  entrypoint: python
+  args: ['-m', 'pytest', 'test_unit.py', '--junitxml=reports/unit.xml']
+  waitFor: ['install']
+  timeout: 300s
+
+# Build the image in the Docker daemon of the build worker. Nothing is pushed yet.
+- id: build
+  name: gcr.io/cloud-builders/docker
+  args: ['build', '-t', '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/lab52-repo/lab52-app:${BUILD_ID}', '.']
+  waitFor: ['-']
+
+# The dependency, in the background (-d). Redis 7.2 is the default version of Memorystore for Redis.
+# Every step container joins the cloudbuild Docker network. --network=cloudbuild adds this one too.
+- id: start-redis
+  name: gcr.io/cloud-builders/docker
+  args: ['run', '-d', '--network=cloudbuild', '--name=lab52-redis', 'redis:7.2']
+  waitFor: ['-']
+
+# The app, from the image that the build step made. REDISHOST is the name of the Redis container.
+- id: start-app
+  name: gcr.io/cloud-builders/docker
+  args: ['run', '-d', '--network=cloudbuild', '--name=lab52-app', '--env=REDISHOST=lab52-redis',
+         '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/lab52-repo/lab52-app:${BUILD_ID}']
+  waitFor: ['build', 'start-redis']
+
+# Real HTTP requests to the app container. The step waits for both branches of the build.
+- id: integration-tests
+  name: python:3.12-slim
+  entrypoint: python
+  args: ['-m', 'pytest', 'test_integration.py', '--junitxml=reports/integration.xml']
+  env: ['APP_URL=http://lab52-app:8080']
+  waitFor: ['unit-tests', 'start-app']
+  timeout: 120s
+
+# Cloud Build pushes the image only after all steps succeed. A failed test means no push.
+images:
+- '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/lab52-repo/lab52-app:${BUILD_ID}'
+
+# The JUnit XML reports. Cloud Build uploads them only after all steps succeed.
+artifacts:
+  objects:
+    location: 'gs://lab52-${PROJECT_ID}/reports/${BUILD_ID}/'
+    paths: ['reports/*.xml']
+
+# The limit for the whole build. The default is 60 minutes.
+timeout: 900s
+
+options:
+  # With a user-specified service account, logs must go to Cloud Logging or to a bucket that you own.
+  logging: CLOUD_LOGGING_ONLY

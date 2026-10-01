@@ -1,0 +1,28 @@
+# Lab 60: a load generator for the HPA test. Delete it to stop the load.
+# Step 11 replaces LAB60_IMAGE with the image in Artifact Registry.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab60-load
+  namespace: lab60
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lab60-load
+  template:
+    metadata:
+      labels:
+        app: lab60-load
+    spec:
+      containers:
+      - name: load
+        image: LAB60_IMAGE
+        command: ["python", "load.py", "http://lab60-app/"]   # 4 threads, no pause
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi

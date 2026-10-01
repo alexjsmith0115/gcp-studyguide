@@ -1,0 +1,2159 @@
+[
+  {
+    "id": "cicd-001",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "buildpacks",
+      "gcloud-builds-submit",
+      "artifact-registry"
+    ],
+    "stem": "A team has a Python web app with a `requirements.txt` file and a `Procfile`. The repository has no `Dockerfile` and no build config file. The team wants Cloud Build to build a container image and store it in Artifact Registry. The team does not want to write a `Dockerfile`. Which command should you run in the source directory?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`gcloud builds submit --tag us-central1-docker.pkg.dev/my-proj/apps/web`"
+      },
+      {
+        "id": "B",
+        "text": "`gcloud builds submit --pack image=us-central1-docker.pkg.dev/my-proj/apps/web`"
+      },
+      {
+        "id": "C",
+        "text": "`gcloud builds submit --config cloudbuild.yaml .`, with a new config file that has one `docker build` step"
+      },
+      {
+        "id": "D",
+        "text": "`docker build -t us-central1-docker.pkg.dev/my-proj/apps/web .` in Cloud Shell, and then `docker push`"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Google Cloud's buildpacks build an image **without a `Dockerfile` or a build config file**. The `--pack` flag selects them, and the default builder `gcr.io/buildpacks/builder` detects the language. Python needs a `Procfile` to set the start command, and the repository has one.",
+    "whyWrong": {
+      "A": "`--tag` builds the image from a `Dockerfile` in the source directory. The repository has no `Dockerfile`.",
+      "C": "A `docker build` step needs a `Dockerfile`. The team must also write and maintain a build config file.",
+      "D": "`docker build` needs a `Dockerfile`, and this approach does not use Cloud Build."
+    },
+    "sources": [
+      {
+        "title": "Build container images",
+        "url": "https://docs.cloud.google.com/build/docs/building/build-containers",
+        "evidence": "Cloud Build lets you build an image without a Dockerfile or a build config file. You can do this using Google Cloud's buildpacks."
+      },
+      {
+        "title": "Google Cloud's buildpacks",
+        "url": "https://docs.cloud.google.com/docs/buildpacks/overview",
+        "evidence": "A `Procfile` can be used to override the default start process for any buildpacks type, but is mandatory for some, including Python."
+      }
+    ]
+  },
+  {
+    "id": "cicd-002",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "build-triggers",
+      "build-service-account"
+    ],
+    "stem": "A team creates a GitHub push trigger and selects the Compute Engine default service account on the trigger. The `cloudbuild.yaml` file sets `serviceAccount` to a dedicated service account, `build-deployer`, which has only the roles that the trigger and the build need. The build history shows that triggered builds run as the Compute Engine default service account. You want triggered builds to run as `build-deployer`. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant yourself the Service Account User role on `build-deployer`, and run the trigger again."
+      },
+      {
+        "id": "B",
+        "text": "Add `options.logging: CLOUD_LOGGING_ONLY` so that Cloud Build accepts the `serviceAccount` field."
+      },
+      {
+        "id": "C",
+        "text": "Run the trigger with `gcloud builds triggers run`, which reads `serviceAccount` from the build config."
+      },
+      {
+        "id": "D",
+        "text": "Select `build-deployer` as the service account of the trigger, and keep the build config as it is."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A triggered build runs as **the service account on the trigger**. Cloud Build ignores the `serviceAccount` field of the build config when a trigger runs the build. Set `build-deployer` on the trigger instead.",
+    "whyWrong": {
+      "A": "You need the `iam.serviceAccounts.actAs` permission to select `build-deployer` on the trigger. The role alone does not change the service account that the trigger uses.",
+      "B": "A user-specified service account needs its logs in Cloud Logging or in a bucket that you own. That setting does not make a trigger use the `serviceAccount` field.",
+      "C": "A build that a trigger runs uses the service account on the trigger. This is also true when you run the trigger manually."
+    },
+    "sources": [
+      {
+        "title": "Create and manage build triggers",
+        "url": "https://docs.cloud.google.com/build/docs/automating-builds/create-manage-triggers",
+        "evidence": "Only the service account specified on your trigger will be used for builds executed by triggers. If you specified a service account in your build config, it will be ignored during build execution when using triggers."
+      }
+    ]
+  },
+  {
+    "id": "cicd-003",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "images-field",
+      "docker-push",
+      "build-results"
+    ],
+    "stem": "A `cloudbuild.yaml` file builds an image, pushes it with a `docker push` step, and then deploys it to Cloud Run in a later step. The deployment works. The release team uses `gcloud builds list` and the build details page to find the image of each build. No image appears in the build results. The deploy step must stay in the same build. What should you change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the `docker push` step, and also list the image in the `images` field."
+      },
+      {
+        "id": "B",
+        "text": "Remove the `docker push` step, and list the image in the `images` field."
+      },
+      {
+        "id": "C",
+        "text": "Keep the `docker push` step, and list the image in the `artifacts.objects` field."
+      },
+      {
+        "id": "D",
+        "text": "Move the `docker push` step to the end of the build, after the deploy step."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "An image that the `images` field lists shows in the build results. Cloud Build pushes these images after the build completes, so **the deploy step in the same build** still needs the `docker push` step. The docs say to use both when you push the image during the build and want it in the build results.",
+    "whyWrong": {
+      "B": "The `images` field pushes the image after the build completes. The deploy step runs before that, so it cannot find the image.",
+      "C": "`artifacts.objects` uploads files to Cloud Storage. It does not record a container image in the build results.",
+      "D": "The deploy step then runs before the push, so it cannot find the image. A `docker push` step also never shows the image in the build results."
+    },
+    "sources": [
+      {
+        "title": "Build container images",
+        "url": "https://docs.cloud.google.com/build/docs/building/build-containers",
+        "evidence": "If you want to store the image as part of your build flow and want to display the image in the build results, use both the Docker `push` command and the `images` field in your build config file."
+      },
+      {
+        "title": "Generate and validate build provenance",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+        "evidence": "In your build config file, add the `images` field to configure Cloud Build to store your built images in Artifact Registry after your build completes."
+      }
+    ]
+  },
+  {
+    "id": "cicd-004",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "private-pools",
+      "vpc"
+    ],
+    "stem": "A build downloads Python packages from a private package server. The server has only an internal IP address in a VPC network. The security team does not allow a public IP address on the server. Builds run in the default pool and fail when they connect to the server. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run the build in the default pool in the same region as the VPC network."
+      },
+      {
+        "id": "B",
+        "text": "Grant the build service account the Compute Network User role on the VPC network."
+      },
+      {
+        "id": "C",
+        "text": "Create a private pool that is peered with the VPC network, and run the build in it."
+      },
+      {
+        "id": "D",
+        "text": "Add a firewall rule that allows traffic from `0.0.0.0/0` to the server on the package port."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The default pool cannot peer with a VPC network. A private pool can peer with your VPC network, so builds in the pool **reach the internal IP address** of the server. The server stays private.",
+    "whyWrong": {
+      "A": "The region of the default pool does not give it a path into your VPC network.",
+      "B": "An IAM role does not create a network path. The default pool cannot peer with your VPC network.",
+      "D": "The server has no public IP address, so the rule gives no path to it. A rule that is open to all addresses also breaks the security requirement."
+    },
+    "sources": [
+      {
+        "title": "Private pools overview",
+        "url": "https://docs.cloud.google.com/build/docs/private-pools/private-pools-overview",
+        "evidence": "Private pools are private, dedicated pools of workers that offer greater customization over the build environment, including the ability to access resources in a private network."
+      },
+      {
+        "title": "Private pools overview",
+        "url": "https://docs.cloud.google.com/build/docs/private-pools/private-pools-overview",
+        "evidence": "For your builds to access resources in your private network, you can create a private VPC peering connection between your VPC network and the service producer network."
+      }
+    ]
+  },
+  {
+    "id": "cicd-005",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "artifact-registry-iam",
+      "cross-project",
+      "cloud-run"
+    ],
+    "stem": "Images are in an Artifact Registry repository in the project `shared-images`. A team deploys a Cloud Run service in the project `app-prod` with an image from that repository. The deployment fails because Cloud Run cannot pull the image. You want to follow the principle of least privilege. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "In `app-prod`, grant the Artifact Registry Reader role to the Cloud Run service agent of `shared-images`."
+      },
+      {
+        "id": "B",
+        "text": "In `shared-images`, grant the Artifact Registry Reader role on the repository to the Cloud Run service agent of `app-prod`."
+      },
+      {
+        "id": "C",
+        "text": "In `shared-images`, grant the Artifact Registry Writer role on the project to the Compute Engine default service account of `app-prod`."
+      },
+      {
+        "id": "D",
+        "text": "In `shared-images`, grant the Artifact Registry Reader role on the repository to `allUsers`."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "For a pull from another project, grant the role **in the project that has the repository**. The docs grant it to the **Cloud Run service agent** of the project where the service runs. The Reader role on one repository gives **least privilege**.",
+    "whyWrong": {
+      "A": "The role must be in the project that has the repository. The identity must be the service agent of the Cloud Run project.",
+      "C": "For an image in another project, the docs grant the role to the Cloud Run service agent, not to the Compute Engine default service account. The Writer role on the whole project is also more access than a pull needs.",
+      "D": "`allUsers` makes the images public. This breaks least privilege."
+    },
+    "sources": [
+      {
+        "title": "Access control with IAM",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/access-control",
+        "evidence": "In the project with Artifact Registry, grant the workload identity pool or service account for each service the required role. If connecting to Cloud Run, grant the Cloud Run Service Agent the required role."
+      },
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "For stronger security, grant access to the Artifact Registry repository that contains your container images."
+      }
+    ]
+  },
+  {
+    "id": "cicd-006",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "container-registry",
+      "artifact-registry"
+    ],
+    "stem": "A team copies an old `cloudbuild.yaml` file from a blog post into a new project. The file tags and pushes images as `gcr.io/$PROJECT_ID/app`. The team wants to store new images in the Google-recommended registry. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable the Container Registry API, and push the first image to `gcr.io` so that the registry is created."
+      },
+      {
+        "id": "B",
+        "text": "Store the images as `artifacts.objects` in a Cloud Storage bucket in the same region as the builds."
+      },
+      {
+        "id": "C",
+        "text": "Push the images to Docker Hub, and pull them through an Artifact Registry remote repository."
+      },
+      {
+        "id": "D",
+        "text": "Create a Docker repository in Artifact Registry, and push the images to `LOCATION-docker.pkg.dev/PROJECT_ID/REPO/app`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Container Registry shut down on March 18, 2025, and you cannot write images to it. Artifact Registry is the **Google-recommended registry** for container images. Create the Docker repository first, and then push to its `pkg.dev` path.",
+    "whyWrong": {
+      "A": "This is the old Container Registry pattern. Container Registry is shut down, so a new pipeline cannot write images to it.",
+      "B": "`artifacts.objects` stores files in Cloud Storage. A bucket is not a container registry, and Artifact Registry is the recommended service for images.",
+      "C": "A remote repository caches artifacts from an upstream source. Your own build output belongs in a standard repository."
+    },
+    "sources": [
+      {
+        "title": "Transition from Container Registry",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/transition/transition-from-gcr",
+        "evidence": "Container Registry is deprecated. Effective March 18, 2025, Container Registry is shut down and writing images to Container Registry is unavailable."
+      },
+      {
+        "title": "Transition from Container Registry",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/transition/transition-from-gcr",
+        "evidence": "Artifact Registry is the recommended service for container image storage and management on Google Cloud."
+      }
+    ]
+  },
+  {
+    "id": "cicd-007",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "artifact-registry-location",
+      "latency",
+      "egress"
+    ],
+    "stem": "A team runs Cloud Build and a Cloud Run service in `europe-west1`. The service must stay in that region. The images are in an Artifact Registry repository in the `us` multi-region. You want to reduce the time to pull images and the network egress cost. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a standard Docker repository in `europe-west1`, and push new images to it."
+      },
+      {
+        "id": "B",
+        "text": "Create a standard Docker repository in the `europe` multi-region, and push new images to it."
+      },
+      {
+        "id": "C",
+        "text": "Keep the `us` repository, and build the images in a private pool in `europe-west1`."
+      },
+      {
+        "id": "D",
+        "text": "Keep the `us` repository, and add a `.gcloudignore` file so that the images are smaller."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Google recommends a repository in **the same region** as the GKE, Cloud Run, and Cloud Build resources that use it. This reduces latency and egress cost, and egress to services in the same region has no charge. A single-region repository can also be faster than a multi-region repository.",
+    "whyWrong": {
+      "B": "Operations in a multi-region repository can be slower than in a single-region repository. Google recommends a repository in the region where Cloud Run and Cloud Build run.",
+      "C": "The build location does not change where the images are stored. Cloud Run still pulls each image from the `us` multi-region.",
+      "D": "`.gcloudignore` excludes files from the source upload of a build. It does not change where Cloud Run pulls the images from."
+    },
+    "sources": [
+      {
+        "title": "Repository overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories",
+        "evidence": "You can reduce latency and network egress costs by creating repositories in the same region where you run GKE, Cloud Run, Cloud Build, and other Google Cloud services that interact with the repository."
+      },
+      {
+        "title": "Artifact Registry locations",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/repo-locations",
+        "evidence": "Multi-region repositories may continue to work if one of their regions are down. However, operations in multi-region repositories may be slower than single-region repositories."
+      }
+    ]
+  },
+  {
+    "id": "cicd-008",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "remote-repository",
+      "dependencies",
+      "artifact-analysis"
+    ],
+    "stem": "Builds for a Python service install packages from PyPI. Last month, a PyPI outage stopped all builds for two hours. The security team also wants vulnerability scans of the public packages that the builds use. You want the least operational overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a virtual repository with PyPI as its only upstream, and configure `pip` to use it."
+      },
+      {
+        "id": "B",
+        "text": "Create a connector repository (Preview) with PyPI as its upstream, and configure `pip` to use it."
+      },
+      {
+        "id": "C",
+        "text": "Create a remote repository with PyPI as its upstream, and configure `pip` to use it."
+      },
+      {
+        "id": "D",
+        "text": "Run a nightly build that downloads the packages and uploads them to a standard repository."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A remote repository caches each package version that a build requests. The cached copies **stay available during an upstream outage**. Artifact Analysis (formerly Container Analysis) can **scan the cached packages** for vulnerabilities. Artifact Registry manages the cache, so the operational overhead is low.",
+    "whyWrong": {
+      "A": "The upstreams of a virtual repository are Artifact Registry repositories, not PyPI. A virtual repository also stores no data, so it does not cache packages.",
+      "B": "A connector repository sends every request to the upstream source and does not cache artifacts. A PyPI outage still stops the builds.",
+      "D": "A scheduled copy job is custom work that you must maintain. A remote repository caches the packages without it."
+    },
+    "sources": [
+      {
+        "title": "Remote repositories overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/remote-overview",
+        "evidence": "Cached artifacts are also still available if the external public repository is offline due to an outage or other issue."
+      },
+      {
+        "title": "Repository overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories",
+        "evidence": "Remote repositories reduce latency and improve availability for builds and deployments on Google Cloud. You can also use Artifact Analysis to scan cached packages for vulnerabilities and other metadata."
+      }
+    ]
+  },
+  {
+    "id": "cicd-009",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "virtual-repository",
+      "dependency-confusion",
+      "python"
+    ],
+    "stem": "Your company publishes internal Python packages to a standard repository, `py-internal`. A remote repository, `py-pypi`, caches PyPI. Developers configure `pip` with both repositories. A security review warns about dependency confusion. An attacker can publish a package on PyPI with an internal package name and a higher version. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a virtual repository with `py-internal` at priority 1 and `py-pypi` at priority 10. Configure `pip` to use only the virtual repository."
+      },
+      {
+        "id": "B",
+        "text": "Create a virtual repository with `py-internal` at priority 100 and `py-pypi` at priority 10. Configure `pip` to use only the virtual repository."
+      },
+      {
+        "id": "C",
+        "text": "Create a virtual repository with `py-internal` at priority 100 and `py-pypi` at priority 10. Configure `pip` to use the virtual repository and PyPI."
+      },
+      {
+        "id": "D",
+        "text": "Keep both repositories in the `pip` configuration, and list `py-internal` first so that `pip` searches it first."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A virtual repository chooses among its upstream repositories by priority, and **a higher value wins**. Give `py-internal` the higher value. Then configure `pip` to read **only from the virtual repository**, so that the client does not choose between sources.",
+    "whyWrong": {
+      "A": "A higher priority value wins. With these values, `py-pypi` wins when a package version is in both repositories.",
+      "C": "`pip` chooses the latest version from all the sources that it searches. With PyPI in the configuration, the attacker's version can still win.",
+      "D": "`pip` gives no way to control the search order of a mix of private and public repositories. The configuration stays open to dependency confusion."
+    },
+    "sources": [
+      {
+        "title": "Virtual repositories overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/virtual-overview",
+        "evidence": "The priority is an integer that acts as a weight, not a ranking. This means that repositories with a higher priority value are prioritized over repositories with lower priority values."
+      },
+      {
+        "title": "Virtual repositories overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/virtual-overview",
+        "evidence": "Configure package managers and other tools to read from the virtual repository only, so that the client logic is not involved repository selection."
+      }
+    ]
+  },
+  {
+    "id": "cicd-010",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cleanup-policies",
+      "artifact-registry"
+    ],
+    "stem": "A Docker repository gets a new image version for every commit, and its storage cost grows. You must delete untagged versions that are older than 30 days. You must always keep the 10 most recent versions of each image, also when they are untagged. You want to test the policies before Artifact Registry deletes anything. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Define one delete policy for untagged versions older than 30 days, with `keepCount: 10` in its `condition`."
+      },
+      {
+        "id": "B",
+        "text": "Define a delete policy for untagged versions older than 30 days, and a keep policy for the 10 most recent versions."
+      },
+      {
+        "id": "C",
+        "text": "Apply the policies to a virtual repository that has the Docker repository as its upstream."
+      },
+      {
+        "id": "D",
+        "text": "Apply the policy file with `gcloud artifacts repositories set-cleanup-policies` and the `--dry-run` flag."
+      },
+      {
+        "id": "E",
+        "text": "Turn on immutable tags for the repository, so that cleanup cannot delete the recent versions."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "A keep policy protects versions that a delete policy matches: **when both policies match, Artifact Registry keeps the version**. A keep policy with `mostRecentVersions` keeps the 10 newest versions. The `--dry-run` flag lets you **test the policies** before they delete anything.",
+    "whyWrong": {
+      "A": "`keepCount` belongs to the `mostRecentVersions` section of a keep policy. A delete policy has no setting that keeps the newest versions.",
+      "C": "You can apply cleanup policies only to standard repositories, not to virtual repositories.",
+      "E": "Immutable tags stop cleanup from deleting tagged versions only. The newest versions can be untagged, and immutable tags do not count versions."
+    },
+    "sources": [
+      {
+        "title": "Configure cleanup policies",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy",
+        "evidence": "If an artifact matches the criteria in both the delete policy and the keep policy, the artifact is kept."
+      },
+      {
+        "title": "Configure cleanup policies",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy",
+        "evidence": "A keep policy for retaining a specific number of versions has a `mostRecentVersions` section instead of a `condition` section."
+      },
+      {
+        "title": "Configure cleanup policies",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/cleanup-policy",
+        "evidence": "To test your cleanup policies, you can set your cleanup policy to dry run in the console, or run the `gcloud artifacts set-cleanup-policies` command with the `--dry-run` flag."
+      }
+    ]
+  },
+  {
+    "id": "cicd-011",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "workload-identity-federation",
+      "docker-authentication",
+      "artifact-registry"
+    ],
+    "stem": "A team builds images with a CI system that runs on servers outside Google Cloud. The CI jobs push the images to an Artifact Registry repository. The jobs authenticate with a service account key that is stored as a CI secret. The security team wants to remove long-lived credentials. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Rotate the service account key every week, and store it in Secret Manager instead of the CI system."
+      },
+      {
+        "id": "B",
+        "text": "Use the standalone Docker credential helper on the CI servers with the service account key file."
+      },
+      {
+        "id": "C",
+        "text": "Create an access token on a workstation each morning with impersonation, and store it as a CI secret."
+      },
+      {
+        "id": "D",
+        "text": "Set up Workload Identity Federation for the CI system, and grant it the Artifact Registry Writer role on the repository."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Workload Identity Federation gives an external workload IAM roles **without a service account key**. Grant the federated identity the Writer role on the repository so that the CI jobs can push images. No long-lived credential remains.",
+    "whyWrong": {
+      "A": "A rotated key is still a long-lived credential. The security team wants to remove keys.",
+      "B": "The credential helper still uses the key file, so the long-lived credential stays.",
+      "C": "An access token is valid for 60 minutes, so the CI jobs fail after the first hour. The manual step each morning is also fragile."
+    },
+    "sources": [
+      {
+        "title": "Access control with IAM",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/access-control",
+        "evidence": "Workload Identity Federation lets you use Identity and Access Management to grant external identities IAM roles, including the ability to impersonate service accounts. This approach eliminates the maintenance and security burden associated with service account keys."
+      },
+      {
+        "title": "Authenticate Docker to Artifact Registry",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/docker/authentication",
+        "evidence": "Because the credential is long-lived, it is the least secure option of all the available authentication methods."
+      }
+    ]
+  },
+  {
+    "id": "cicd-012",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "image-digests",
+      "gke",
+      "image-tags"
+    ],
+    "stem": "A pipeline builds an image, tags it `v2`, and pushes it to an Artifact Registry repository that uses the default, mutable tags. The security team reviews the scan results of each image and approves it. A GKE Deployment refers to `.../app:v2`. Last week, someone pushed a hotfix with the same `v2` tag, and new Pods ran the hotfix image, which the security team had not approved. You must make sure that the Deployment runs only approved images. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Tag each build with its commit SHA, and refer to that tag in the Deployment."
+      },
+      {
+        "id": "B",
+        "text": "Add a cleanup policy that deletes older versions, so that each tag matches only one image."
+      },
+      {
+        "id": "C",
+        "text": "Refer to the approved image by its digest, `app@sha256:...`, in the Deployment."
+      },
+      {
+        "id": "D",
+        "text": "Rely on automatic vulnerability scanning, which scans each push of `v2` before Pods start."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A digest identifies one image version and cannot change. A mutable tag can point to a new image after each push. Scan results are valid only for the image that was scanned, so **deploy by digest** to run exactly the approved image.",
+    "whyWrong": {
+      "A": "A commit SHA tag is still a mutable tag in this repository. Someone can push another image with the same tag.",
+      "B": "A cleanup policy deletes old versions. It does not stop a push from moving a tag to a new image.",
+      "D": "Scanning reports vulnerabilities, but it does not stop Pods from pulling an image that nobody approved. The tag can still move."
+    },
+    "sources": [
+      {
+        "title": "About container image digests",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-container-images",
+        "evidence": "To ensure that you deploy the image that was scanned, you cannot rely on the tag because the image referred by the tag might have changed."
+      },
+      {
+        "title": "Repository and image names",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/docker/names",
+        "evidence": "An image digest is an automatically generated hash of the image index or image manifest. Each image digest is a unique identifier for an image version and cannot be changed."
+      }
+    ]
+  },
+  {
+    "id": "cicd-013",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "build-speed",
+      "gcloudignore"
+    ],
+    "stem": "A developer runs `gcloud builds submit --config cloudbuild.yaml .` in a Node.js project. Each build waits several minutes for the source upload before the first step starts. The directory contains `.git`, `node_modules`, and compiled assets. The build installs the dependencies and compiles the assets itself, and it does not use `.git`. What should you do to reduce the upload time?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a `.gcloudignore` file that excludes `.git`, `node_modules`, and the compiled assets."
+      },
+      {
+        "id": "B",
+        "text": "Set `options.machineType` to a high-CPU machine type so that the build runs faster."
+      },
+      {
+        "id": "C",
+        "text": "Pull the previous image, and add `--cache-from` to the `docker build` step in the config."
+      },
+      {
+        "id": "D",
+        "text": "Set `options.diskSizeGb` to a larger value so that the build has more disk space."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A `.gcloudignore` file excludes the files that the build does not need from the upload. The build creates `node_modules` and the assets again and does not use `.git`, so **the upload gets smaller and faster**. The build also gets more consistent.",
+    "whyWrong": {
+      "B": "A larger machine makes the steps faster. The upload happens before any step starts, so its time does not change.",
+      "C": "`--cache-from` reuses Docker layers during the build. It does not change the size of the source upload.",
+      "D": "A larger disk gives the build more space. It does not reduce the data that `gcloud` uploads."
+    },
+    "sources": [
+      {
+        "title": "Best practices for speeding up builds",
+        "url": "https://docs.cloud.google.com/build/docs/optimize-builds/speeding-up-builds",
+        "evidence": "You can exclude files not needed by your build with a `.gcloudignore` file to optimize the upload time."
+      }
+    ]
+  },
+  {
+    "id": "cicd-014",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "build-speed",
+      "docker-cache"
+    ],
+    "stem": "A `cloudbuild.yaml` file builds a large Docker image. Most commits change only the application code, which the `Dockerfile` copies in its last layers. Each build still runs every layer again, and this includes a long dependency installation. You want the easiest change that reduces the build time. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `options.machineType` to a larger machine type, and keep the `docker build` step as it is."
+      },
+      {
+        "id": "B",
+        "text": "Pull the previous image at the start of the build, and pass it to `docker build` with `--cache-from`."
+      },
+      {
+        "id": "C",
+        "text": "Add `waitFor: ['-']` to the `docker build` step so that it starts when the build starts."
+      },
+      {
+        "id": "D",
+        "text": "Replace the build config with `gcloud builds submit --tag`, which builds from the `Dockerfile`."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The docs call a cached image **the easiest way** to make a Docker build faster. With `--cache-from`, Docker reuses the unchanged early layers, such as the dependency installation. It rebuilds only the layers from the first changed layer to the end.",
+    "whyWrong": {
+      "A": "A larger machine runs each layer faster, but Docker still runs every layer again. A larger machine can also start more slowly.",
+      "C": "`waitFor: ['-']` changes when the step starts. It does not let Docker reuse the layers of the earlier image.",
+      "D": "A `Dockerfile` build without a cache source runs every layer again, as the current build does."
+    },
+    "sources": [
+      {
+        "title": "Best practices for speeding up builds",
+        "url": "https://docs.cloud.google.com/build/docs/optimize-builds/speeding-up-builds",
+        "evidence": "The easiest way to increase the speed of your Docker image build is by specifying a cached image that can be used for subsequent builds."
+      },
+      {
+        "title": "Best practices for speeding up builds",
+        "url": "https://docs.cloud.google.com/build/docs/optimize-builds/speeding-up-builds",
+        "evidence": "Using `--cache-from` rebuilds all the layers from the changed layer until the end of the build"
+      }
+    ]
+  },
+  {
+    "id": "cicd-015",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "build-triggers",
+      "monorepo"
+    ],
+    "stem": "A monorepo has the folders `services/api/` and `services/web/`. A push trigger for the API starts a build on every push to `main`, also when a commit changes only files in `services/web/`. You want the API trigger to start a build only when files under `services/api/` change. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the ignored files filter of the API trigger to `services/api/**`."
+      },
+      {
+        "id": "B",
+        "text": "Ask developers to add `[skip ci]` to the messages of commits that change only `services/web/`."
+      },
+      {
+        "id": "C",
+        "text": "Set `dir: services/api` on each step in the build config of the API."
+      },
+      {
+        "id": "D",
+        "text": "Set the included files filter of the API trigger to `services/api/**`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "With an included files filter, a trigger starts a build only when a change affects at least one matching file. The `**` pattern matches all files in the folder and its subfolders. This **limits the API builds to changes in `services/api/`**.",
+    "whyWrong": {
+      "A": "An ignored files filter does the opposite. Changes that affect only `services/api/` then do not start a build.",
+      "B": "`[skip ci]` stops all builds for that commit, also the build of the web trigger. It also depends on each developer remembering it.",
+      "C": "The `dir` field sets the working directory of a step. It does not decide whether the trigger starts a build."
+    },
+    "sources": [
+      {
+        "title": "Create and manage build triggers",
+        "url": "https://docs.cloud.google.com/build/docs/automating-builds/create-manage-triggers",
+        "evidence": "Included files (optional): Changes affecting at least one of these files will invoke a build."
+      }
+    ]
+  },
+  {
+    "id": "cicd-016",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "build-approval",
+      "build-triggers"
+    ],
+    "stem": "A trigger deploys to production when someone pushes a release tag. Compliance requires that a release manager approves each production build before it runs. Developers who push tags must not be able to approve builds. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a first build step that waits until a release manager publishes a message to a Pub/Sub topic."
+      },
+      {
+        "id": "B",
+        "text": "Set comment control on the trigger so that a release manager must comment `/gcbrun` before each build."
+      },
+      {
+        "id": "C",
+        "text": "Configure the trigger with `--require-approval`, and grant the Cloud Build Approver role only to release managers."
+      },
+      {
+        "id": "D",
+        "text": "Grant the release managers the Cloud Build Editor role, and remove that role from all the developers."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A trigger that requires approval holds each build as pending. The build starts only after a user with the **Cloud Build Approver role** approves it. Give that role only to release managers, so that developers cannot approve builds.",
+    "whyWrong": {
+      "A": "The build already runs while the step waits, and you must write and maintain the wait logic. Approval is the built-in gate.",
+      "B": "Comment control applies to pull request triggers. This trigger starts on a tag push.",
+      "D": "The Cloud Build Editor role does not hold builds for approval. The tag push still starts the build immediately."
+    },
+    "sources": [
+      {
+        "title": "Gate builds on approval",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/gate-builds-on-approval",
+        "evidence": "Cloud Build enables you to configure triggers that do not immediately execute a build but instead mark a build as pending until approved."
+      },
+      {
+        "title": "Gate builds on approval",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/gate-builds-on-approval",
+        "evidence": "In order to grant a user permission to approve builds within your project, the user must have the Cloud Build Approver role."
+      }
+    ]
+  },
+  {
+    "id": "cicd-017",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub-triggers",
+      "artifact-registry",
+      "base-images"
+    ],
+    "stem": "A platform team pushes a new version of a base image to Artifact Registry each week and tags it `stable`. Ten applications build their images from this base image. Each application must rebuild automatically when a new `stable` tag is pushed. The team does not want polling jobs. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a Pub/Sub trigger for each application on the Artifact Registry notification topic, with a filter for the `stable` tag."
+      },
+      {
+        "id": "B",
+        "text": "Create a webhook trigger for each application, and configure Artifact Registry to call the webhook URL after each push."
+      },
+      {
+        "id": "C",
+        "text": "Create a manual trigger for each application, and run it from Cloud Scheduler every hour to get new base images."
+      },
+      {
+        "id": "D",
+        "text": "Create a push trigger for each application repository, with the included files filter set to the `Dockerfile` path."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Artifact Registry publishes a Pub/Sub message when an image is pushed or tagged. A Pub/Sub trigger starts a build for these messages, and **a filter on substitution values** limits the builds to the `stable` tag. No polling is necessary.",
+    "whyWrong": {
+      "B": "Artifact Registry sends its events to Pub/Sub. A webhook trigger is for external systems that send requests to the trigger URL.",
+      "C": "A schedule is a form of polling. It rebuilds every hour also when the base image did not change, and it rebuilds late after a change.",
+      "D": "A push trigger starts on changes in the application repository. A new base image in Artifact Registry does not change that repository."
+    },
+    "sources": [
+      {
+        "title": "Cloud Build triggers",
+        "url": "https://docs.cloud.google.com/build/docs/triggers",
+        "evidence": "You can create Pub/Sub triggers to execute builds in response to any message published over Pub/Sub. For example, you can use Pub/Sub triggers for building in response to image pushes to Artifact Registry."
+      },
+      {
+        "title": "Automate builds in response to Pub/Sub events",
+        "url": "https://docs.cloud.google.com/build/docs/automate-builds-pubsub-events",
+        "evidence": "You can create a Pub/Sub trigger that responds to Artifact Registry events such as when images are pushed, tagged, or deleted."
+      }
+    ]
+  },
+  {
+    "id": "cicd-018",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "build-service-account",
+      "least-privilege",
+      "build-triggers"
+    ],
+    "stem": "In a project, Cloud Build runs builds as the Compute Engine default service account. That account has the Editor role, and other workloads in the project also use it. A developer must create a push trigger that builds an image and deploys it to Cloud Run. You want least privilege. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `serviceAccount` in `cloudbuild.yaml` to a new service account, and keep the default service account on the trigger."
+      },
+      {
+        "id": "B",
+        "text": "Create a key for a new service account, and give the build the key through Secret Manager."
+      },
+      {
+        "id": "C",
+        "text": "Create a service account with only the roles that the trigger and the build need, and select it on the trigger."
+      },
+      {
+        "id": "D",
+        "text": "Grant the developer the Service Account User role on the new service account."
+      },
+      {
+        "id": "E",
+        "text": "Replace the Editor role of the Compute Engine default service account with the Cloud Build Service Account role."
+      }
+    ],
+    "answer": [
+      "C",
+      "D"
+    ],
+    "explanation": "Google recommends **your own service account with only the roles that the trigger and the build need**, set on the trigger. A trigger's service account needs `cloudbuild.builds.create` to create the build. The person who creates the trigger needs the `iam.serviceAccounts.actAs` permission on that service account. The Service Account User role gives this permission.",
+    "whyWrong": {
+      "A": "A triggered build ignores the `serviceAccount` field of the build config. The build still runs as the default service account with the Editor role.",
+      "B": "The build already runs as a service account. A key adds a long-lived credential that you must protect.",
+      "E": "Other workloads also use the Compute Engine default service account, so the change affects them too. A dedicated service account gives each trigger only its own roles."
+    },
+    "sources": [
+      {
+        "title": "Default Cloud Build service account",
+        "url": "https://docs.cloud.google.com/build/docs/cloud-build-service-account",
+        "evidence": "As part of this principle, we recommend creating your own service account to execute builds on your behalf."
+      },
+      {
+        "title": "Default Cloud Build service account",
+        "url": "https://docs.cloud.google.com/build/docs/cloud-build-service-account",
+        "evidence": "User-specified service account or the Compute Engine default service account: Any user with the Cloud Build Editor role who has the `iam.serviceAccounts.actAs` permission can create and directly run a trigger."
+      },
+      {
+        "title": "Troubleshooting build errors and more",
+        "url": "https://docs.cloud.google.com/build/docs/troubleshooting",
+        "evidence": "This error indicates that the service account is missing the `cloudbuild.builds.create` IAM permission, which is required for the service account to run a build trigger."
+      }
+    ]
+  },
+  {
+    "id": "cicd-019",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "immutable-tags",
+      "artifact-registry"
+    ],
+    "stem": "Release images use version tags such as `v1.4.2`. The security team is concerned that a user with write access can push a different image with an existing release tag. The tag then points to the new image. You want each tag to always point to the same image. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a keep policy to the repository that keeps all tagged versions."
+      },
+      {
+        "id": "B",
+        "text": "Turn on immutable tags for the Docker repository that stores the release images."
+      },
+      {
+        "id": "C",
+        "text": "Deploy by digest in all environments, and keep the default tag settings."
+      },
+      {
+        "id": "D",
+        "text": "Move the release images to a remote repository that caches them."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "In a repository with immutable tags, **a tag always points to the same image digest**. Artifact Registry then does not let a push reuse a tag for another image version.",
+    "whyWrong": {
+      "A": "A keep policy stops cleanup from deleting versions. It does not stop a push from moving a tag.",
+      "C": "Digests protect the deployments, but the tag can still move to a new image. The requirement is about the tag.",
+      "D": "A remote repository is a read-only cache of an upstream source. Your build does not push its own images to it."
+    },
+    "sources": [
+      {
+        "title": "Create standard repositories",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/repositories/create-repos",
+        "evidence": "`--immutable-tags` is an optional flag that configures your repository to use tags that always point to the same image digest."
+      },
+      {
+        "title": "Repository and image names",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/docker/names",
+        "evidence": "Although mutable image tags provide a convenient way to label versions, they can also be manipulated by a bad actor to associate a tag with a malicious version of an image."
+      }
+    ]
+  },
+  {
+    "id": "cicd-020",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "repository-connections",
+      "build-triggers",
+      "gitlab"
+    ],
+    "stem": "Your company started to use Google Cloud in 2025. Its code is on GitLab.com. You want Cloud Build to run on pushes and merge requests, and to post the build status back to GitLab. You want the Google-recommended approach. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a webhook trigger, and configure GitLab to send push and merge request events to its URL."
+      },
+      {
+        "id": "B",
+        "text": "Mirror the GitLab repository to Cloud Source Repositories, and create triggers on the mirror."
+      },
+      {
+        "id": "C",
+        "text": "Connect the repository with a Cloud Build repositories (2nd gen) connection, and create repository event triggers."
+      },
+      {
+        "id": "D",
+        "text": "Create a Pub/Sub trigger, and publish the GitLab events to its topic with a Cloud Run function."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "For repository events, Google recommends **repository triggers**. A Cloud Build repositories (2nd gen) connection supports GitLab. Its triggers filter events and **post the build status back** to the source provider. Developer Connect is the other supported way to connect the repository.",
+    "whyWrong": {
+      "A": "A webhook trigger works with GitLab, but Google recommends repository triggers for repository events. Repository triggers also post the build status back.",
+      "B": "Cloud Source Repositories is not available to new customers since June 17, 2024. A company that started in 2025 cannot use it.",
+      "D": "This adds a function and custom code to move the events. A repository trigger gets the events directly."
+    },
+    "sources": [
+      {
+        "title": "Automate builds in response to webhook events",
+        "url": "https://docs.cloud.google.com/build/docs/automate-builds-webhook-events",
+        "evidence": "If you're creating a trigger that automates builds on repository events, we recommend using Cloud Build repository triggers."
+      },
+      {
+        "title": "Automate builds in response to webhook events",
+        "url": "https://docs.cloud.google.com/build/docs/automate-builds-webhook-events",
+        "evidence": "Repository triggers let you filter incoming events and post build status back to the source provider, and can also be configured to work with a private network."
+      },
+      {
+        "title": "Cloud Build triggers",
+        "url": "https://docs.cloud.google.com/build/docs/triggers",
+        "evidence": "Effective June 17, 2024, Cloud Source Repositories isn't available to new customers."
+      }
+    ]
+  },
+  {
+    "id": "cicd-021",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "build-provenance",
+      "slsa",
+      "images-field"
+    ],
+    "stem": "A trigger runs this build config in the default pool. `_IMAGE` is an Artifact Registry path.\n\n```yaml\nsteps:\n- name: 'gcr.io/cloud-builders/docker'\n  args: ['build', '-t', '${_IMAGE}', '.']\n- name: 'gcr.io/cloud-builders/docker'\n  args: ['push', '${_IMAGE}']\noptions:\n  logging: CLOUD_LOGGING_ONLY\n```\n\nThe security team requires build provenance for every image. A build must fail if Cloud Build does not generate the provenance. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace the `docker push` step with an `images` field that lists `${_IMAGE}`."
+      },
+      {
+        "id": "B",
+        "text": "Run the build in a private pool instead of the default pool."
+      },
+      {
+        "id": "C",
+        "text": "Add a step that runs `gcloud artifacts docker images describe` with `--show-provenance`."
+      },
+      {
+        "id": "D",
+        "text": "Add a cosign step that signs the image as the build service account."
+      },
+      {
+        "id": "E",
+        "text": "Add `requestedVerifyOption: VERIFIED` to the `options` of the build config."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "Cloud Build generates provenance only for an image that **the `images` field** pushes, not for an explicit `docker push` step. `requestedVerifyOption: VERIFIED` turns on provenance generation, and the build **succeeds only if the provenance is generated**.",
+    "whyWrong": {
+      "B": "A private pool does not add provenance. Builds in a private pool also need `requestedVerifyOption: VERIFIED` and the `images` field.",
+      "C": "This command shows provenance that already exists. It does not make Cloud Build generate provenance.",
+      "D": "A cosign signature records which service account started the build. It is not the build provenance that Cloud Build generates."
+    },
+    "sources": [
+      {
+        "title": "Generate and validate build provenance",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+        "evidence": "Cloud Build can't generate provenance if you push your image to Artifact Registry using an explicit `docker push` step."
+      },
+      {
+        "title": "Generate and validate build provenance",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/generate-validate-build-provenance",
+        "evidence": "This setting enables provenance generation and configures Cloud Build to verify that provenance metadata is present. Builds will only be marked successful if provenance is generated."
+      }
+    ]
+  },
+  {
+    "id": "cicd-022",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "binary-authorization",
+      "built-by-cloud-build",
+      "attestations"
+    ],
+    "stem": "Cloud Run in the project `prod` enforces a Binary Authorization policy that requires the `built-by-cloud-build` attestor. Cloud Build also runs in `prod`, in the default pool. One `cloudbuild.yaml` file builds the image, lists it in the `images` field, and runs `gcloud run deploy` with that image in a later step. The deploy step fails in every build. A manual deployment of the same image after the build completes succeeds. You want each new image to deploy automatically. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `requestedVerifyOption: VERIFIED` to the build config options, and keep the deploy step in the same build."
+      },
+      {
+        "id": "B",
+        "text": "Add `waitFor` to the deploy step so that it starts only after the `docker build` step completes."
+      },
+      {
+        "id": "C",
+        "text": "Push the image with an explicit `docker push` step before the deploy step in the same build."
+      },
+      {
+        "id": "D",
+        "text": "Move the deploy step to a separate build config that runs after the image build completes."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The `images` field pushes the image only after the build completes, and Cloud Build creates the attestation **only after the build pipeline completes successfully**. A deploy step in the same build runs before both. The docs require **separate build config files** for the build and the deployment, so that the deployment starts when the image and its attestation exist.",
+    "whyWrong": {
+      "A": "This option makes the build fail when provenance is missing, and it turns on attestations in private pools. The push and the attestation still happen only after the build completes.",
+      "B": "Steps already run in order by default. The image and its attestation still do not exist while the build runs.",
+      "C": "The image is then in the registry when the deploy step runs. But Cloud Build creates the attestation only after the build completes, so Binary Authorization still blocks the deployment."
+    },
+    "sources": [
+      {
+        "title": "Securing image deployments to Cloud Run and Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/secure-deployments-to-run-gke",
+        "evidence": "You must use separate build config files for your build pipeline and deployment pipeline. This is because Cloud Build produces attestations only after the build pipeline completes successfully."
+      },
+      {
+        "title": "Build container images",
+        "url": "https://docs.cloud.google.com/build/docs/building/build-containers",
+        "evidence": "Use the `images` field to store a Docker image in Artifact Registry after your build completes."
+      }
+    ]
+  },
+  {
+    "id": "cicd-023",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "private-pools",
+      "binary-authorization",
+      "attestations"
+    ],
+    "stem": "A team moved its builds from the default pool to a private pool to reach a private package server. Since the move, Binary Authorization on GKE blocks every new image, because the images have no `built-by-cloud-build` attestation. The build config pushes the images with the `images` field. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `requestedVerifyOption: VERIFIED` to the `options` of the build config."
+      },
+      {
+        "id": "B",
+        "text": "Move the builds back to the default pool, and give the package server a public IP address."
+      },
+      {
+        "id": "C",
+        "text": "Run one build in the default pool, so that Cloud Build creates the `built-by-cloud-build` attestor."
+      },
+      {
+        "id": "D",
+        "text": "Set the policy rule to `DRYRUN_AUDIT_LOG_ONLY` until the private pool creates attestations."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "By default, Cloud Build does not generate Binary Authorization attestations for builds **in a private pool**. `requestedVerifyOption: VERIFIED` turns on attestations and provenance for these builds.",
+    "whyWrong": {
+      "B": "This removes the reason for the private pool, and a public IP address exposes the package server.",
+      "C": "The attestor already exists from the earlier builds. The problem is that builds in the private pool create no attestations.",
+      "D": "Dry run allows every image, so it removes the protection. The private pool still does not create attestations."
+    },
+    "sources": [
+      {
+        "title": "Securing image deployments to Cloud Run and Google Kubernetes Engine",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/secure-deployments-to-run-gke",
+        "evidence": "By default, Cloud Build does not generate Binary Authorization attestations for builds in private pools. To generate attestations, add the `requestedVerifyOption: VERIFIED` option to your build configuration file"
+      }
+    ]
+  },
+  {
+    "id": "cicd-024",
+    "objective": "2.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "slsa",
+      "build-provenance"
+    ],
+    "stem": "A customer contract requires SLSA level 3 build provenance for every container image that you ship. Today, a Jenkins server that a developer maintains builds the images with shell scripts and pushes them to Artifact Registry. You want to meet the requirement with the least operational overhead. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a Jenkins step that writes the build details to a JSON file and uploads the file next to the image."
+      },
+      {
+        "id": "B",
+        "text": "Sign each image with a developer's key after the Jenkins build, and create a Binary Authorization attestation."
+      },
+      {
+        "id": "C",
+        "text": "Build the images with Cloud Build, push them with the `images` field, and set `requestedVerifyOption: VERIFIED`."
+      },
+      {
+        "id": "D",
+        "text": "Build the images on developer workstations, and record the commit SHA and the build time in an image label."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Cloud Build generates build provenance that meets **SLSA level 3** for container images. The `images` field and `VERIFIED` make Cloud Build generate the provenance and fail the build without it. Cloud Build is a managed service, so the **operational overhead is low**.",
+    "whyWrong": {
+      "A": "From SLSA level 2, the build service must generate the provenance and sign it so that consumers can verify it. An unsigned file from a script does not meet this.",
+      "B": "An attestation says that an image passed a step. It is not build provenance with the entry point and the parameters of the build.",
+      "D": "From SLSA level 2, builds must run on a build service, not in developer environments."
+    },
+    "sources": [
+      {
+        "title": "Safeguard builds",
+        "url": "https://docs.cloud.google.com/software-supply-chain-security/docs/safeguard-builds",
+        "evidence": "Cloud Build can generate build provenance for container images that provide SLSA level 3 build assurance."
+      },
+      {
+        "title": "Safeguard builds",
+        "url": "https://docs.cloud.google.com/software-supply-chain-security/docs/safeguard-builds",
+        "evidence": "In the requirements for the SLSA framework, automated builds are a requirement for SLSA level 1, and using a build service instead of developer environments for builds is a requirement for SLSA level 2."
+      }
+    ]
+  },
+  {
+    "id": "cicd-025",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "binary-authorization",
+      "policy-rules",
+      "gke"
+    ],
+    "stem": "The security team wants every image to be built by Cloud Build. Images in `prod-cluster` must also have QA approval. Enforcement is on for all clusters. The Binary Authorization policy is:\n\n```yaml\ndefaultAdmissionRule:\n  evaluationMode: REQUIRE_ATTESTATION\n  enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG\n  requireAttestationsBy:\n  - projects/build-proj/attestors/built-by-cloud-build\nclusterAdmissionRules:\n  us-east1-b.prod-cluster:\n    evaluationMode: REQUIRE_ATTESTATION\n    enforcementMode: ENFORCED_BLOCK_AND_AUDIT_LOG\n    requireAttestationsBy:\n    - projects/build-proj/attestors/qa-approved\n```\n\nAn audit finds an image in `prod-cluster` that a developer built on a laptop. The image has a QA attestation. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `globalPolicyEvaluationMode: ENABLE`, so that the default rule also applies to `prod-cluster`."
+      },
+      {
+        "id": "B",
+        "text": "Add the `built-by-cloud-build` attestor to `requireAttestationsBy` in the `prod-cluster` rule."
+      },
+      {
+        "id": "C",
+        "text": "Move the `qa-approved` attestor to the default rule, and delete the `prod-cluster` rule."
+      },
+      {
+        "id": "D",
+        "text": "Run `gcloud container clusters update` on `prod-cluster` with `--binauthz-evaluation-mode=PROJECT_SINGLETON_POLICY_ENFORCE`."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "When a cluster-specific rule applies to a deployment, Binary Authorization **does not consider the default rule**. The `prod-cluster` rule lists only `qa-approved`, so that cluster has no build check. A cluster rule must list **every attestor that it needs**.",
+    "whyWrong": {
+      "A": "`globalPolicyEvaluationMode` exempts Google-maintained system images. It does not add the default rule to a cluster rule.",
+      "C": "Then every cluster needs QA approval, but only `prod-cluster` must have it. The other clusters would block images without QA approval.",
+      "D": "Enforcement is already on for the cluster. The cluster rule itself is incomplete."
+    },
+    "sources": [
+      {
+        "title": "Policy YAML reference",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/policy-yaml-reference",
+        "evidence": "If Binary Authorization applies a cluster-specific rule to a deployment, the default rule is not considered."
+      },
+      {
+        "title": "Policy YAML reference",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/policy-yaml-reference",
+        "evidence": "The system policy is provided by Google and exempts a list of Google-maintained system images from further policy evaluation."
+      }
+    ]
+  },
+  {
+    "id": "cicd-026",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "binary-authorization",
+      "dry-run"
+    ],
+    "stem": "Last month, a team set the default rule of its Binary Authorization policy to `DRYRUN_AUDIT_LOG_ONLY`. The rule requires the `built-by-cloud-build` attestor. The audit logs now show only the expected violations. Today, an image that was built on a laptop was deployed to a production GKE cluster without problems. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `evaluationMode` of the default rule to `ALWAYS_DENY`."
+      },
+      {
+        "id": "B",
+        "text": "Add the path of the laptop image to `admissionWhitelistPatterns`."
+      },
+      {
+        "id": "C",
+        "text": "Turn on continuous validation, so that it stops Pods that violate the policy."
+      },
+      {
+        "id": "D",
+        "text": "Set `enforcementMode` of the default rule to `ENFORCED_BLOCK_AND_AUDIT_LOG`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Dry-run mode **allows every image** and only writes violations to the audit log. The test shows that the policy works as intended. Change the rule to `ENFORCED_BLOCK_AND_AUDIT_LOG` so that Binary Authorization **blocks** images without the attestation.",
+    "whyWrong": {
+      "A": "`ALWAYS_DENY` blocks every image, also the images that Cloud Build built.",
+      "B": "Exempt images are always allowed. This exempts an image that the policy must block.",
+      "C": "Continuous validation logs violations of running Pods. It does not stop Pods."
+    },
+    "sources": [
+      {
+        "title": "Policy YAML reference",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/policy-yaml-reference",
+        "evidence": "`DRYRUN_AUDIT_LOG_ONLY`: Allows deployment of non-conformant images and writes details about the violation to the audit log."
+      },
+      {
+        "title": "Policy YAML reference",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/policy-yaml-reference",
+        "evidence": "Most production rules use the `ENFORCED_BLOCK_AND_AUDIT_LOG` enforcement mode. `DRYRUN_AUDIT_LOG_ONLY` is primarily used for testing a policy in your environment before it goes into effect."
+      }
+    ]
+  },
+  {
+    "id": "cicd-027",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "binary-authorization",
+      "cloud-run",
+      "organization-policy"
+    ],
+    "stem": "Your organization has many running Cloud Run services. Security now requires Binary Authorization with the `built-by-cloud-build` attestor on every Cloud Run service, and developers must not be able to turn it off. Some running services can use images that fail the policy. These services must keep serving until teams rebuild them. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the organization policy `run.allowedBinaryAuthorizationPolicies` to `default` on the organization."
+      },
+      {
+        "id": "B",
+        "text": "Start with the policy rule in dry-run mode, and review the Cloud Run entries in Cloud Audit Logs before you enforce it."
+      },
+      {
+        "id": "C",
+        "text": "Add a specific rule for each Cloud Run service that requires the `built-by-cloud-build` attestor."
+      },
+      {
+        "id": "D",
+        "text": "Turn on Binary Authorization on each service with `--binary-authorization=default`, and check the services each week."
+      },
+      {
+        "id": "E",
+        "text": "Add the `run.googleapis.com/binary-authorization-breakglass` annotation to the running services until teams rebuild them."
+      }
+    ],
+    "answer": [
+      "A",
+      "B"
+    ],
+    "explanation": "Cloud Run developers can turn off Binary Authorization unless **an organization policy requires it**. The `run.allowedBinaryAuthorizationPolicies` constraint with the value `default` requires it. This policy can affect running services, so Google recommends **dry-run mode first** and a review of Cloud Audit Logs.",
+    "whyWrong": {
+      "C": "Cloud Run supports only the default rule. Specific rules are for GKE and other Kubernetes platforms.",
+      "D": "Developers can still turn off Binary Authorization between the checks. An organization policy prevents this.",
+      "E": "This annotation makes all later deployments of the service bypass enforcement. Use breakglass only in an emergency."
+    },
+    "sources": [
+      {
+        "title": "Enable Binary Authorization for Cloud Run",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/run/enabling-binauthz-cloud-run",
+        "evidence": "We recommend that you require Binary Authorization for Cloud Run by configuring an organization policy to do so. Binary Authorization can be disabled by Cloud Run developers if the policy is not configured."
+      },
+      {
+        "title": "Require Binary Authorization for Cloud Run",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/run/requiring-binauthz-cloud-run",
+        "evidence": "Setting this policy can affect running services. If you have running services, we recommend you enable dry-run mode in the policy and review Cloud Audit Logs entries for Cloud Run before updating the policy to be more restrictive."
+      }
+    ]
+  },
+  {
+    "id": "cicd-028",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "binary-authorization",
+      "continuous-validation",
+      "gke"
+    ],
+    "stem": "A GKE cluster enforces a Binary Authorization project-singleton policy. The security team also wants to know when running Pods use images that no longer conform, for example after the policy becomes stricter. You created a matching platform policy for continuous validation (CV) with check-based platform policies (Preview). How should you set `--binauthz-evaluation-mode` on the cluster?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set it to `POLICY_BINDINGS`."
+      },
+      {
+        "id": "B",
+        "text": "Set it to `PROJECT_SINGLETON_POLICY_ENFORCE`."
+      },
+      {
+        "id": "C",
+        "text": "Set it to `POLICY_BINDINGS_AND_PROJECT_SINGLETON_POLICY_ENFORCE`."
+      },
+      {
+        "id": "D",
+        "text": "Keep the current mode, and set the policy rule to `DRYRUN_AUDIT_LOG_ONLY`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Enforcement checks an image once, at deploy time, so a stricter policy does not affect Pods that already run. CV monitors running Pods. This value turns on **both CV monitoring and enforcement**, so the cluster **keeps its enforcement**. In gcloud, the CV values are in `gcloud beta container clusters update`.",
+    "whyWrong": {
+      "A": "`POLICY_BINDINGS` turns on only CV monitoring, and it turns off the existing enforcement.",
+      "B": "`PROJECT_SINGLETON_POLICY_ENFORCE` turns on only enforcement, and it turns off CV monitoring.",
+      "D": "Dry run allows every deployment and logs only at deploy time. It does not check the Pods that already run."
+    },
+    "sources": [
+      {
+        "title": "Enable enforcement on an existing cluster",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/enable-cluster",
+        "evidence": "`POLICY_BINDINGS`: enables only CV monitoring and disables an existing enforcement policy if there is one"
+      },
+      {
+        "title": "Continuous validation overview",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/overview-cv",
+        "evidence": "When you update existing clusters to enable CV, they might already be using Binary Authorization for enforcement. In this case, use the following flag to ensure continued enforcement: `--binauthz-evaluation-mode=POLICY_BINDINGS_AND_PROJECT_SINGLETON_POLICY_ENFORCE`"
+      },
+      {
+        "title": "gcloud beta container clusters update",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/beta/container/clusters/update",
+        "evidence": "`BINAUTHZ_EVALUATION_MODE` must be one of: `disabled`, `policy-bindings`, `policy-bindings-and-project-singleton-policy-enforce`, `project-singleton-policy-enforce`."
+      }
+    ]
+  },
+  {
+    "id": "cicd-029",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "binary-authorization",
+      "breakglass",
+      "cloud-run"
+    ],
+    "stem": "A production Cloud Run service enforces Binary Authorization. During an outage, you must deploy a hotfix image that has no attestation yet. Only this one deployment may bypass the policy, and all later deployments must stay enforced. The security team requires an audit record of the bypass. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy the hotfix image with `gcloud run services update` and the `--breakglass` flag with a justification."
+      },
+      {
+        "id": "B",
+        "text": "Add the `run.googleapis.com/binary-authorization-breakglass` annotation to the service YAML, and replace the service."
+      },
+      {
+        "id": "C",
+        "text": "Turn off Binary Authorization on the service, deploy the hotfix image, and then turn it on again."
+      },
+      {
+        "id": "D",
+        "text": "Change the default rule to `ALWAYS_ALLOW`, deploy the hotfix image, and then change the rule back."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Breakglass deploys an image that violates the policy, and Cloud Run **writes a breakglass event to Cloud Audit Logs**. The flag applies to that operation: the next update or deployment clears the justification, so **later deployments stay enforced**.",
+    "whyWrong": {
+      "B": "With this annotation in the service YAML, all later deployments bypass enforcement.",
+      "C": "While Binary Authorization is off, every deployment of the service bypasses the policy, not only the hotfix. Breakglass bypasses the policy for one deployment.",
+      "D": "The default rule applies to all Cloud Run services in the project. All their deployments bypass the policy while the rule allows all images."
+    },
+    "sources": [
+      {
+        "title": "Use breakglass (Cloud Run)",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/run/using-breakglass-cloud-run",
+        "evidence": "When you use breakglass to deploy an image, a breakglass event is automatically logged to Cloud Audit Logs, regardless of whether the deployment satisfies or violates the policy."
+      },
+      {
+        "title": "Use breakglass (Cloud Run)",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/run/using-breakglass-cloud-run",
+        "evidence": "it can cause all subsequent deployments to bypass Binary Authorization enforcement and use breakglass with the provided justification."
+      },
+      {
+        "title": "gcloud run services update",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/run/services/update",
+        "evidence": "Next update or deploy command will automatically clear existing breakglass justification."
+      }
+    ]
+  },
+  {
+    "id": "cicd-030",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "build-step-order",
+      "waitfor"
+    ],
+    "stem": "A build config runs these steps:\n\n```yaml\nsteps:\n- id: install\n  name: 'python'\n  entrypoint: 'python'\n  args: ['-m', 'pip', 'install', '-r', 'requirements.txt', '--user']\n- id: unit-tests\n  name: 'python'\n  entrypoint: 'python'\n  args: ['-m', 'pytest', 'tests/unit']\n- id: integration-tests\n  name: 'python'\n  entrypoint: 'python'\n  args: ['-m', 'pytest', 'tests/integration']\n  waitFor: ['-']\n```\n\nThe unit tests pass, but the integration tests often fail because modules are missing. You want the integration tests to run only after the install step and the unit tests succeed. What should you change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `waitFor: ['-']` to the `install` step as well."
+      },
+      {
+        "id": "B",
+        "text": "Remove `waitFor: ['-']` from the `integration-tests` step."
+      },
+      {
+        "id": "C",
+        "text": "Add `allowFailure: true` to the `integration-tests` step."
+      },
+      {
+        "id": "D",
+        "text": "Move the `integration-tests` step above `unit-tests`, and keep its `waitFor` value."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "`waitFor: ['-']` starts a step **when the build starts**, so the integration tests run before the install step finishes. A step without `waitFor` waits until **all earlier steps complete successfully**. Remove the field, and the tests run after `install` and `unit-tests`.",
+    "whyWrong": {
+      "A": "The first step already starts with the build. This does not make the integration tests wait.",
+      "C": "The build then succeeds also when the integration tests fail. It does not fix the order.",
+      "D": "With `waitFor: ['-']`, the step starts with the build at any position in the file. The tests would also run before the unit tests."
+    },
+    "sources": [
+      {
+        "title": "Configuring the order of build steps",
+        "url": "https://docs.cloud.google.com/build/docs/configuring-builds/configure-build-step-order",
+        "evidence": "Steps without the optional `waitFor` field (or with an empty `waitFor`) will wait for all prior steps to complete successfully before executing."
+      },
+      {
+        "title": "Configuring the order of build steps",
+        "url": "https://docs.cloud.google.com/build/docs/configuring-builds/configure-build-step-order",
+        "evidence": "By declaring that a step depends only on `-`, the step runs immediately when the build starts."
+      }
+    ]
+  },
+  {
+    "id": "cicd-031",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "allowfailure",
+      "test-gates"
+    ],
+    "stem": "A pipeline runs unit tests, then integration tests, and then deploys to Cloud Run. Yesterday, a broken change reached production although the integration tests failed. The build status was `SUCCESS`. The integration test step has `allowFailure: true`. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `waitFor` with the `id` of the integration test step to the deploy step."
+      },
+      {
+        "id": "B",
+        "text": "Increase the `timeout` of the integration test step and of the build."
+      },
+      {
+        "id": "C",
+        "text": "Remove `allowFailure: true` from the integration test step."
+      },
+      {
+        "id": "D",
+        "text": "Configure the trigger with `--require-approval` for every build."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "With `allowFailure: true`, a failure of the step **does not fail the build**, so the deploy step still runs. Without it, a failed test step fails the build, and the steps that did not start, such as the deploy step, **do not run**.",
+    "whyWrong": {
+      "A": "The deploy step already runs after the test step. The allowed failure still lets the build continue.",
+      "B": "The tests failed. They did not time out, so a longer timeout does not stop the deployment.",
+      "D": "Approval adds a manual gate to every build. It does not make a failed test stop the deployment."
+    },
+    "sources": [
+      {
+        "title": "Build configuration file schema",
+        "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+        "evidence": "In a build step, if you set the value of the `allowFailure` field to `true`, and the build step fails, then the build succeeds as long as all other build steps in that build succeed."
+      },
+      {
+        "title": "View build results",
+        "url": "https://docs.cloud.google.com/build/docs/view-build-results",
+        "evidence": "Failed step is marked `FAILED`. Steps that succeed before the termination of the build are marked `SUCCESS`. Steps in the middle of execution are marked `CANCELLED`. Steps that don't start to execute are marked `QUEUED`."
+      }
+    ]
+  },
+  {
+    "id": "cicd-032",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "test-reports",
+      "artifacts",
+      "cloud-storage"
+    ],
+    "stem": "A build runs tests and uploads a JUnit XML report:\n\n```yaml\nsteps:\n- name: 'python'\n  entrypoint: 'python'\n  args: ['-m', 'pip', 'install', '-r', 'requirements.txt', '--user']\n- name: 'python'\n  entrypoint: 'python'\n  args: ['-m', 'pytest', '--junitxml=${BUILD_ID}_report.xml']\nartifacts:\n  objects:\n    location: 'gs://${_BUCKET}/reports/'\n    paths: ['${BUILD_ID}_report.xml']\n```\n\nWhen the tests pass, the report is in the bucket. When a test fails, the bucket has no report for that build. What is the cause?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The build service account lacks the Storage Object Creator role on the bucket."
+      },
+      {
+        "id": "B",
+        "text": "Cloud Build uploads `artifacts` only for builds that a trigger starts."
+      },
+      {
+        "id": "C",
+        "text": "The bucket has no Object Versioning, so a later build replaces the report."
+      },
+      {
+        "id": "D",
+        "text": "Cloud Build uploads `artifacts` only after all build steps succeed."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Cloud Build stores `artifacts` **upon successful completion of all build steps**. A failed test step fails the build, so the upload does not happen. For a failed build, read the log of the failed step on the build details page.",
+    "whyWrong": {
+      "A": "The reports of passing builds reach the bucket, so the service account can write objects there.",
+      "B": "The upload does not depend on how the build started. It depends on whether all steps succeed.",
+      "C": "Each report name contains the build ID, so no build replaces the report of another build."
+    },
+    "sources": [
+      {
+        "title": "Build configuration file schema",
+        "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+        "evidence": "The `artifacts` field specifies one or more artifacts to be stored in Cloud Storage or Artifact Registry upon successful completion of all build steps."
+      }
+    ]
+  },
+  {
+    "id": "cicd-033",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "substitutions",
+      "test-reports"
+    ],
+    "stem": "A build config writes its test report to `${SHORT_SHA}_test_log.xml` and uploads it with the `artifacts` field. Developers often run the config with `gcloud builds submit` to test changes. Each of these manual builds writes the same object, `_test_log.xml`, and replaces the earlier report. Triggered builds do not have this problem. You want a unique report name for every build, with no extra command flags. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Name the report with `$BUILD_ID` instead of `$SHORT_SHA`."
+      },
+      {
+        "id": "B",
+        "text": "Name the report with `$COMMIT_SHA` instead of `$SHORT_SHA`."
+      },
+      {
+        "id": "C",
+        "text": "Turn on Object Versioning for the bucket that stores the reports."
+      },
+      {
+        "id": "D",
+        "text": "Set `options.substitutionOption: ALLOW_LOOSE` in the build config."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Only triggered builds set `$SHORT_SHA`. A build from `gcloud builds submit` gets an empty string, so every manual report has the same name. `$BUILD_ID` is a **default substitution for all builds**, and each build has its own ID.",
+    "whyWrong": {
+      "B": "`$COMMIT_SHA` also comes only from triggers, so it is empty for manual builds too.",
+      "C": "Object Versioning keeps the older versions, but every report still has the same object name.",
+      "D": "`ALLOW_LOOSE` only stops errors for missing substitutions. `$SHORT_SHA` stays empty."
+    },
+    "sources": [
+      {
+        "title": "Build and test Go applications",
+        "url": "https://docs.cloud.google.com/build/docs/building/build-go",
+        "evidence": "`SHORT_SHA` values are automatically populated for builds invoked by triggers, but aren't provided when submitting a build using the gcloud CLI."
+      },
+      {
+        "title": "Substituting variable values",
+        "url": "https://docs.cloud.google.com/build/docs/configuring-builds/substitute-variable-values",
+        "evidence": "If a default substitution is not available (such as with sourceless builds, or with builds that use storage source), then occurrences of the missing variable are replaced with an empty string."
+      }
+    ]
+  },
+  {
+    "id": "cicd-034",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-run-tags",
+      "no-traffic",
+      "smoke-tests"
+    ],
+    "stem": "A Cloud Build pipeline deploys a new image to the production Cloud Run service `orders`. The service sends all traffic to its latest revision. A later step must run smoke tests against the new revision before users reach it. If the tests pass, the pipeline sends all traffic to the new revision. Which sequence should the pipeline use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Deploy with `--no-traffic`, run the tests against the service URL, and then run `update-traffic --to-latest`."
+      },
+      {
+        "id": "B",
+        "text": "Deploy with `--tag candidate`, run the tests against the `candidate---` URL, and then remove the tag."
+      },
+      {
+        "id": "C",
+        "text": "Deploy the image to a separate service, `orders-test`, test its URL, and then deploy the image to `orders`."
+      },
+      {
+        "id": "D",
+        "text": "Deploy with `--no-traffic --tag candidate`, test the `candidate---` URL, and then run `update-traffic --to-tags candidate=100`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "`--no-traffic` keeps users on the current revision, and `--tag` gives the new revision **its own URL for tests**. After the tests pass, `--to-tags candidate=100` sends all traffic to the tested revision. If a test fails, the build fails before the traffic step.",
+    "whyWrong": {
+      "A": "The service URL still goes to the revision that serves traffic. The tests check the old revision, not the new one.",
+      "B": "Without `--no-traffic`, the new revision gets all traffic when it deploys, before the tests run.",
+      "C": "The tests check a different service, not the revision that the users of `orders` get. The Cloud Run docs test a tagged revision of the service itself."
+    },
+    "sources": [
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "The tag lets you directly test the new revision at a specific URL, without serving traffic."
+      },
+      {
+        "title": "Rollbacks, gradual rollouts, and traffic migration",
+        "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+        "evidence": "Deploy it to production, without serving traffic, and test against a tagged revision in production."
+      }
+    ]
+  },
+  {
+    "id": "cicd-035",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "id-tokens",
+      "cloud-run-tags",
+      "audience"
+    ],
+    "stem": "A build deploys a revision of the private Cloud Run service `orders` with `--no-traffic --tag candidate`. A test step then calls `https://candidate---orders-abc123-uc.a.run.app`. The build runs as a user-specified service account that can create ID tokens and has the Cloud Run Invoker role on the service. The step creates its token with `--audiences=https://candidate---orders-abc123-uc.a.run.app`. The service has no custom audiences, and the requests fail with an authentication error. What should you change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the service account the Cloud Run Invoker role on the project instead of on the service."
+      },
+      {
+        "id": "B",
+        "text": "Create the token with the service URL, `https://orders-abc123-uc.a.run.app`, as the audience."
+      },
+      {
+        "id": "C",
+        "text": "Send the token in the `X-Serverless-Authorization` header instead of the `Authorization` header."
+      },
+      {
+        "id": "D",
+        "text": "Run the test step as the default Cloud Build service account, and keep the same audience."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Without a custom audience, the `aud` value of the ID token **must be the URL of the service**, also for requests to a traffic tag. The service account and its role are already correct, so the audience is the problem.",
+    "whyWrong": {
+      "A": "The Invoker role on the service already allows the call. The problem is the audience of the token.",
+      "C": "Cloud Run accepts the token in either header. The audience is still wrong.",
+      "D": "Cloud Build does not generate ID tokens with the default service account. The audience is also still wrong."
+    },
+    "sources": [
+      {
+        "title": "Authenticating service-to-service",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+        "evidence": "If you are not using a custom audience, the `aud` value must remain as the URL of the service, even when making requests to a specific traffic tag."
+      }
+    ]
+  },
+  {
+    "id": "cicd-036",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "id-tokens",
+      "build-service-account",
+      "cloud-run"
+    ],
+    "stem": "A test step in Cloud Build must call a private Cloud Run service with an ID token. The project still uses the legacy Cloud Build service account, and `gcloud auth print-identity-token` fails in the step. You want to follow Google-recommended practices. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant another service account the Service Account Token Creator role on the legacy Cloud Build service account."
+      },
+      {
+        "id": "B",
+        "text": "Allow unauthenticated invocations of the Cloud Run service while the build runs."
+      },
+      {
+        "id": "C",
+        "text": "Run the build as a user-specified service account that has the Service Account OpenID Connect Identity Token Creator role."
+      },
+      {
+        "id": "D",
+        "text": "Store a service account key in Secret Manager, and create the token from the key in the step."
+      },
+      {
+        "id": "E",
+        "text": "Grant the user-specified service account the Cloud Run Invoker role on the Cloud Run service."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Cloud Build generates ID tokens **only for user-specified service accounts**. That service account needs the Service Account OpenID Connect Identity Token Creator role to create tokens. It also needs the **Cloud Run Invoker role** on the service, so that Cloud Run accepts its requests.",
+    "whyWrong": {
+      "A": "You cannot add an IAM policy binding on the legacy service account, so no other principal can get this role on it. The legacy service account also cannot generate ID tokens.",
+      "B": "This makes the service public during the build and removes the protection of the private service.",
+      "D": "A key is a long-lived credential. A user-specified service account creates ID tokens without a key."
+    },
+    "sources": [
+      {
+        "title": "Default Cloud Build service account",
+        "url": "https://docs.cloud.google.com/build/docs/cloud-build-service-account",
+        "evidence": "If you need to authenticate between services using an ID token, you must run your builds with a user-specified service account. You can't use the legacy Cloud Build service account to generate ID tokens."
+      },
+      {
+        "title": "Authorize service-to-service access",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/authorize-service-to-service-access",
+        "evidence": "Grant the Service Account OpenID Connect Identity Token Creator (`roles/iam.serviceAccountOpenIdTokenCreator`) role to your user-specified service account in the project where you created the service account."
+      },
+      {
+        "title": "Authenticating service-to-service",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+        "evidence": "Then you grant that service account the Cloud Run Invoker (`roles/run.invoker`) role."
+      }
+    ]
+  },
+  {
+    "id": "cicd-037",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "cloud-sql-auth-proxy",
+      "integration-tests",
+      "databases"
+    ],
+    "stem": "Integration tests in Cloud Build must run against a Cloud SQL for PostgreSQL test instance that has a public IP address. The team uses the Cloud SQL Auth Proxy and does not want to add authorized networks. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Start the Cloud SQL Auth Proxy in its own step, and run the tests in a later step that waits for it."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Cloud SQL Client role to the service account that runs the build."
+      },
+      {
+        "id": "C",
+        "text": "Add the IP address ranges of the Cloud Build default pool to the authorized networks of the instance."
+      },
+      {
+        "id": "D",
+        "text": "In the test step, start the Cloud SQL Auth Proxy in the background, and then run the tests in the same step."
+      },
+      {
+        "id": "E",
+        "text": "Store the database password as a substitution value on the trigger, and pass it to the tests."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "The build service account needs the **Cloud SQL Client role** to connect through the Cloud SQL Auth Proxy. The docs start the proxy **in the background in the same step** as the command that uses the database. Each step runs in its own container, so a later step cannot use a proxy from an earlier step.",
+    "whyWrong": {
+      "A": "A step that waits for the proxy step starts only after that step ends. When a step ends, its container stops, and the proxy stops with it.",
+      "C": "The team does not want authorized networks. For public IP, the docs connect from Cloud Build through the Cloud SQL Auth Proxy and the Cloud SQL Client role.",
+      "E": "The password then goes into the trigger configuration as plain text. Store it in Secret Manager, and read it with `availableSecrets`."
+    },
+    "sources": [
+      {
+        "title": "Connect from Cloud Build",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-build",
+        "evidence": "Your Cloud Build service account needs the `Cloud SQL Client` IAM role."
+      },
+      {
+        "title": "Connect from Cloud Build",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-build",
+        "evidence": "Using the second container, starts the Cloud SQL Auth Proxy and runs any migration commands."
+      }
+    ]
+  },
+  {
+    "id": "cicd-038",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "secret-manager",
+      "secretenv",
+      "substitutions"
+    ],
+    "stem": "Integration tests need an API key for a partner sandbox. The key is in Secret Manager. A developer writes this build config:\n\n```yaml\nsteps:\n- name: 'python'\n  entrypoint: 'bash'\n  args: ['-c', 'python run_integration.py --api-key=$PARTNER_KEY']\n  secretEnv: ['PARTNER_KEY']\navailableSecrets:\n  secretManager:\n  - versionName: projects/$PROJECT_ID/secrets/partner-key/versions/latest\n    env: 'PARTNER_KEY'\n```\n\nWhen the developer runs it with `gcloud builds submit`, Cloud Build rejects it with a substitution error. The build service account has no role on the secret. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Write the variable as `$$PARTNER_KEY` in the `args` of the step."
+      },
+      {
+        "id": "B",
+        "text": "Move `PARTNER_KEY` from `secretEnv` to the `env` field of the step."
+      },
+      {
+        "id": "C",
+        "text": "Grant the build service account the Secret Manager Secret Accessor role on the secret."
+      },
+      {
+        "id": "D",
+        "text": "Pass the key with `--substitutions=_PARTNER_KEY=...`, and write `$_PARTNER_KEY` in `args`."
+      },
+      {
+        "id": "E",
+        "text": "Replace `secretManager` with an `inline` entry that uses a value encrypted with Cloud KMS."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Cloud Build reads `$PARTNER_KEY` as a substitution, and it is not a valid one. Write **`$$PARTNER_KEY`** so that bash gets the environment variable from `secretEnv`. The build service account also needs the **Secret Manager Secret Accessor role** on the secret to read it at build time.",
+    "whyWrong": {
+      "B": "`env` sets plain values. A step gets the secrets from `availableSecrets` through `secretEnv`, and the `$` problem in `args` stays.",
+      "D": "The key then leaves Secret Manager and goes into the build request as plain text.",
+      "E": "A Cloud KMS value in `availableSecrets` exposes sensitive data in the build config file. Google strongly recommends Secret Manager instead."
+    },
+    "sources": [
+      {
+        "title": "Use secrets from Secret Manager",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/use-secrets",
+        "evidence": "When specifying the secret in the `args` field, specify it using the environment variable prefixed with `$$`."
+      },
+      {
+        "title": "Use secrets from Secret Manager",
+        "url": "https://docs.cloud.google.com/build/docs/securing-builds/use-secrets",
+        "evidence": "Grant the Secret Manager Secret Accessor (`roles/secretmanager.secretAccessor`) IAM role for the secret to the service account you are using for the build"
+      },
+      {
+        "title": "Substituting variable values",
+        "url": "https://docs.cloud.google.com/build/docs/configuring-builds/substitute-variable-values",
+        "evidence": "`$FOO` is invalid since it is not a built-in substitution."
+      }
+    ]
+  },
+  {
+    "id": "cicd-039",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "pull-request-triggers",
+      "branch-patterns"
+    ],
+    "stem": "A team creates a pull request trigger with `--pull-request-pattern=main`. The trigger runs builds for pull requests into `main`, and also for pull requests into `main-legacy`. You want builds only for pull requests that merge into `main`. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the trigger to use `--branch-pattern=^main$`."
+      },
+      {
+        "id": "B",
+        "text": "Change the pull request pattern to `main*`."
+      },
+      {
+        "id": "C",
+        "text": "Change the pull request pattern to `^main$`."
+      },
+      {
+        "id": "D",
+        "text": "Set `--comment-control=COMMENTS_ENABLED` on the trigger."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "`--pull-request-pattern` is a regular expression **search** on the base branch, so `main` also matches `main-legacy`. Anchor the pattern with `^` and `$` so that it **matches only `main`**.",
+    "whyWrong": {
+      "A": "`--branch-pattern` is for push events. The trigger then no longer builds pull requests.",
+      "B": "This is still a search. It matches every base branch name that contains `mai`, also `main-legacy`.",
+      "D": "Comment control sets who must comment `/gcbrun`. It does not change which base branches match."
+    },
+    "sources": [
+      {
+        "title": "gcloud builds triggers create github",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/builds/triggers/create/github",
+        "evidence": "This pattern is used as a regex search for the base branch (the branch you are trying to merge into) for pull request updates. For example, --pull-request-pattern=foo will match \"foo\", \"foobar\", and \"barfoo\"."
+      }
+    ]
+  },
+  {
+    "id": "cicd-040",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "pull-request-triggers",
+      "comment-control",
+      "untrusted-code"
+    ],
+    "stem": "An open-source project on a public GitHub repository uses a pull request trigger. The trigger runs integration tests as a service account that can read test secrets. Builds must start automatically on pull requests from maintainers. Pull requests from outside contributors must not build until a maintainer reviews them. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set comment control on the trigger to `COMMENTS_ENABLED_FOR_EXTERNAL_CONTRIBUTORS_ONLY`."
+      },
+      {
+        "id": "B",
+        "text": "Set comment control on the trigger to `COMMENTS_ENABLED`."
+      },
+      {
+        "id": "C",
+        "text": "Set comment control to `COMMENTS_DISABLED`, and turn on `--require-approval` for the trigger."
+      },
+      {
+        "id": "D",
+        "text": "Remove the secret access from the service account, and keep comment control off."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "With this value, pull requests from **owners and collaborators build automatically**. A pull request from an **external contributor** builds only after an owner or collaborator comments `/gcbrun`. This meets both requirements.",
+    "whyWrong": {
+      "B": "`COMMENTS_ENABLED` needs a `/gcbrun` comment on every pull request, also from maintainers. Their builds do not start automatically.",
+      "C": "Approval holds every build until an approver acts, also the builds for maintainers.",
+      "D": "The integration tests need the secrets. Pull requests from outside contributors also still build without a review."
+    },
+    "sources": [
+      {
+        "title": "Building repositories from GitHub",
+        "url": "https://docs.cloud.google.com/build/docs/automating-builds/github/build-repos-from-github",
+        "evidence": "If an external contributor initiates the action, builds are executed only after an owner or collaborator comments `/gcbrun` on the pull request."
+      },
+      {
+        "title": "Building repositories from GitHub",
+        "url": "https://docs.cloud.google.com/build/docs/automating-builds/github/build-repos-from-github",
+        "evidence": "Required except for owners and collaborators: When a pull request is created or updated by a repository owner or collaborator, builds are automatically executed by the trigger."
+      },
+      {
+        "title": "gcloud builds triggers create github",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/builds/triggers/create/github",
+        "evidence": "Enforce that repository owners or collaborators must comment on external contributors' Pull Requests before builds are triggered."
+      }
+    ]
+  },
+  {
+    "id": "cicd-041",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloudbuild-network",
+      "adc",
+      "integration-tests"
+    ],
+    "stem": "An integration test step runs the tests in a nested container:\n\n```yaml\n- id: integration-tests\n  name: 'gcr.io/cloud-builders/docker'\n  args: ['run', '--rm', '${_TEST_IMAGE}', 'pytest', 'tests/integration']\n```\n\nThe tests use the Cloud Storage client library to read fixtures from a test bucket. They fail because the client library cannot find credentials. The build service account has the Storage Object Viewer role on the bucket. The security team does not allow service account keys. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the build service account the Storage Admin role on the bucket."
+      },
+      {
+        "id": "B",
+        "text": "Add `--network=cloudbuild` to the arguments of the `docker run` command in the step."
+      },
+      {
+        "id": "C",
+        "text": "Run the build in a private pool, so that the nested container can reach the credentials."
+      },
+      {
+        "id": "D",
+        "text": "Change the builder of the step to `gcr.io/google.com/cloudsdktool/cloud-sdk`, and keep the same `docker run` command."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Cloud Build attaches each step's container to a Docker network named `cloudbuild`, which **hosts Application Default Credentials**. A nested container gets these credentials only when you add `--network=cloudbuild`. Then the client library finds the credentials of the build service account, and no key is necessary.",
+    "whyWrong": {
+      "A": "The service account already has read access. The nested container cannot find any credentials, so a larger role does not help.",
+      "C": "A private pool changes the networks that the build can reach. A nested container still needs `--network=cloudbuild` to get the credentials.",
+      "D": "The builder image of the step does not change the network of the nested container. The container still has no path to the credentials."
+    },
+    "sources": [
+      {
+        "title": "Build configuration file schema",
+        "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+        "evidence": "When Cloud Build runs each build step, it attaches the step's container to a local Docker network named `cloudbuild`. The `cloudbuild` network hosts Application Default Credentials (ADC) that Google Cloud services can use to automatically find your credentials."
+      },
+      {
+        "title": "Build configuration file schema",
+        "url": "https://docs.cloud.google.com/build/docs/build-config-file-schema",
+        "evidence": "If you're running nested Docker containers and want to expose ADC to an underlying container or using `gcloud` in a `docker` step, use the `--network` flag in your docker `build` step"
+      }
+    ]
+  }
+]

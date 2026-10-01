@@ -1,0 +1,21 @@
+# Lab 51: build an image that gets SLSA build provenance and the built-by-cloud-build attestation.
+# This config only builds and pushes. Deploy in a separate step or pipeline: Cloud Build creates
+# the attestation only after the whole build completes successfully.
+substitutions:
+  _TAG: v1
+
+steps:
+- id: build
+  name: gcr.io/cloud-builders/docker
+  args: ['build', '-t', '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/lab51-repo/lab51-app:${_TAG}', '.']
+
+# Push with the images field, not with a docker push step. Cloud Build generates provenance
+# and the attestation only for the images that it pushes through this field.
+images:
+- '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/lab51-repo/lab51-app:${_TAG}'
+
+options:
+  # Cloud Build marks the build SUCCESS only if it generates the attestations and provenance.
+  # A build in a private pool needs this option to get the attestation at all.
+  requestedVerifyOption: VERIFIED
+  logging: CLOUD_LOGGING_ONLY

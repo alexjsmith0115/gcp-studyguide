@@ -1,0 +1,76 @@
+# lab22-order: an order workflow that calls the private lab22-steps Cloud Run service in sequence.
+# Input:  {"order_id": "o-1", "amount": 30}
+# Output: {"order_id": ..., "status": "confirmed", ...} or {"order_id": ..., "status": "declined"}
+main:
+  params: [args]
+  steps:
+    - init:
+        assign:
+          # STEPS_URL is a workflow environment variable (gcloud workflows deploy --set-env-vars).
+          - base_url: ${sys.get_env("STEPS_URL")}
+          - order_id: ${args.order_id}
+          - amount: ${args.amount}
+    - reserve:
+        try:
+          call: http.post
+          args:
+            url: ${base_url + "/reserve"}
+            # Workflows adds an ID token (OIDC) for its service account. The audience is the service root URL.
+            auth:
+              type: OIDC
+              audience: ${base_url}
+            body:
+              order_id: ${order_id}
+          result: reservation
+        # Retry 429, 502, 503, 504, and connection errors: 1 s, 2 s, 4 s, ... up to 10 s between attempts.
+        # Each retry counts as a step execution for pricing.
+        retry:
+          predicate: ${http.default_retry_predicate}
+          max_retries: 5
+          backoff:
+            initial_delay: 1
+            max_delay: 10
+            multiplier: 2
+    - charge:
+        try:
+          call: http.post
+          args:
+            url: ${base_url + "/charge"}
+            auth:
+              type: OIDC
+              audience: ${base_url}
+            body:
+              order_id: ${order_id}
+              amount: ${amount}
+          result: payment
+        # Workflows raises an HttpError for any status of 400 or more. Catch the business error here.
+        except:
+          as: e
+          steps:
+            - known_errors:
+                switch:
+                  - condition: ${"HttpError" in e.tags and e.code == 402}
+                    steps:
+                      # Compensation: undo the reservation, then end the execution with a result.
+                      - release:
+                          call: http.post
+                          args:
+                            url: ${base_url + "/release"}
+                            auth:
+                              type: OIDC
+                              audience: ${base_url}
+                            body:
+                              order_id: ${order_id}
+                      - declined:
+                          return:
+                            order_id: ${order_id}
+                            status: declined
+            # Any other error fails the execution.
+            - unhandled_exception:
+                raise: ${e}
+    - confirmed:
+        return:
+          order_id: ${order_id}
+          status: confirmed
+          reservation: ${reservation.body.reservation}
+          charged: ${payment.body.charged}

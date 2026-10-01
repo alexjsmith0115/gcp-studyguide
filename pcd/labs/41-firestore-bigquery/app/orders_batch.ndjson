@@ -1,0 +1,6 @@
+{"order_id": "batch-0901-a", "customer_id": "ada", "status": "paid", "total": 25.0, "source": "batch", "created_at": "2026-09-01 09:15:00"}
+{"order_id": "batch-0901-b", "customer_id": "grace", "status": "shipped", "total": 40.0, "source": "batch", "created_at": "2026-09-01 17:40:00"}
+{"order_id": "batch-0902-a", "customer_id": "linus", "status": "paid", "total": 15.0, "source": "batch", "created_at": "2026-09-02 08:05:00"}
+{"order_id": "batch-0902-b", "customer_id": "ada", "status": "paid", "total": 45.0, "source": "batch", "created_at": "2026-09-02 12:30:00"}
+{"order_id": "batch-0903-a", "customer_id": "grace", "status": "paid", "total": 12.5, "source": "batch", "created_at": "2026-09-03 10:00:00"}
+{"order_id": "batch-0903-b", "customer_id": "linus", "status": "shipped", "total": 20.0, "source": "batch", "created_at": "2026-09-03 19:20:00"}

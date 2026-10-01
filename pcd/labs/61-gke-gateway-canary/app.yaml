@@ -1,0 +1,76 @@
+# Lab 61: two versions of one app. Each version has its own Deployment and Service,
+# so that the HTTPRoute can give each Service a share of the traffic.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab61
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab61-v1
+  namespace: lab61
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: lab61, version: v1}
+  template:
+    metadata:
+      labels: {app: lab61, version: v1}
+    spec:
+      containers:
+      - name: hello
+        image: us-docker.pkg.dev/google-samples/containers/gke/hello-app:1.0   # answers "Version: 1.0.0"
+        ports:
+        - containerPort: 8080
+        resources:                     # Autopilot bills the requests
+          requests: {cpu: 50m, memory: 64Mi}
+          limits: {cpu: 50m, memory: 64Mi}
+        readinessProbe:                # the kubelet uses this probe. The load balancer does not:
+          httpGet: {path: /, port: 8080}   # the Gateway sends its own health check to /.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab61-v1
+  namespace: lab61
+spec:
+  selector: {app: lab61, version: v1}   # the v1 Pods only
+  ports:
+  - port: 8080
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab61-v2
+  namespace: lab61
+spec:
+  replicas: 1                          # fewer Pods than v1: the weights split requests, not Pods
+  selector:
+    matchLabels: {app: lab61, version: v2}
+  template:
+    metadata:
+      labels: {app: lab61, version: v2}
+    spec:
+      containers:
+      - name: hello
+        image: us-docker.pkg.dev/google-samples/containers/gke/hello-app:2.0   # answers "Version: 2.0.0"
+        ports:
+        - containerPort: 8080
+        resources:
+          requests: {cpu: 50m, memory: 64Mi}
+          limits: {cpu: 50m, memory: 64Mi}
+        readinessProbe:
+          httpGet: {path: /, port: 8080}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab61-v2
+  namespace: lab61
+spec:
+  selector: {app: lab61, version: v2}   # the v2 Pods only
+  ports:
+  - port: 8080
+    targetPort: 8080

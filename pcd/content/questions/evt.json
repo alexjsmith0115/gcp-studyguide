@@ -1,0 +1,2390 @@
+[
+  {
+    "id": "evt-001",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "pubsub",
+      "fan-out",
+      "subscriptions"
+    ],
+    "stem": "An online store has a checkout service that publishes an `order-placed` message for each order. The billing, inventory, and analytics services must each process every order. Other teams plan to add more consumers next year, and the checkout code must not change when they do. How should you design the integration?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create one Pub/Sub topic with one pull subscription, and connect the three services to that subscription."
+      },
+      {
+        "id": "B",
+        "text": "Create a Cloud Tasks queue, and make the checkout service add one task for each consumer endpoint."
+      },
+      {
+        "id": "C",
+        "text": "Create one Pub/Sub topic, and give each consumer service its own subscription to the topic."
+      },
+      {
+        "id": "D",
+        "text": "Create one Pub/Sub topic for each consumer, and make the checkout service publish to every topic."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Each subscription gets a copy of every message, so one subscription for each consumer gives fan-out. The publisher does not know the subscribers, so a team adds a consumer with a new subscription. This meets the requirement that the **checkout code must not change** when teams add consumers.",
+    "whyWrong": {
+      "A": "Subscribers on one subscription share its messages. Each service gets only a subset of the orders.",
+      "B": "Cloud Tasks uses explicit invocation. The checkout service must know every endpoint, so each new consumer needs a code change.",
+      "D": "The checkout service must know every topic. Each new consumer needs a change to the checkout code."
+    },
+    "sources": [
+      {
+        "title": "Overview of the Pub/Sub service",
+        "url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics",
+        "evidence": "This single topic is attached to multiple subscriptions. Each subscription is connected to a single subscriber application. Each of the subscriber applications gets the same set of published messages from the topic."
+      },
+      {
+        "title": "Choosing Pub/Sub or Cloud Tasks",
+        "url": "https://docs.cloud.google.com/pubsub/docs/choosing-pubsub-or-cloud-tasks",
+        "evidence": "Pub/Sub aims to decouple publishers of events and subscribers to those events. Publishers do not need to know anything about their subscribers."
+      }
+    ]
+  },
+  {
+    "id": "evt-002",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-tasks",
+      "rate-limiting",
+      "third-party-api"
+    ],
+    "stem": "Users upload documents to your Cloud Run service. For each upload, the service must call a partner's translation API. The partner accepts at most 5 requests per second and returns HTTP 429 above that rate. Uploads arrive in bursts, and the user does not wait for the translation. You want the Google-recommended approach with the least custom code. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a Cloud Tasks task for each upload to a queue with a maximum dispatch rate of 5 per second."
+      },
+      {
+        "id": "B",
+        "text": "Publish a Pub/Sub message for each upload, and use a push subscription to a handler that calls the partner API."
+      },
+      {
+        "id": "C",
+        "text": "Call the partner API from the upload handler, and retry each HTTP 429 response with exponential backoff."
+      },
+      {
+        "id": "D",
+        "text": "Store each upload in a table, and run a Cloud Scheduler job each minute that sends the pending uploads."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Cloud Tasks is for a producer that must control the execution of a specific webhook. The queue's dispatch rate applies to first attempts and to retries, and the queue keeps the tasks of a burst until it can send them. This is the **Google-recommended** way to control the call rate to a third-party API, with the **least custom code**.",
+    "whyWrong": {
+      "B": "Push delivery has no explicit rate control. A burst of messages becomes a burst of calls to the partner API.",
+      "C": "Each burst still goes to the partner at once. You write the retry code yourself, and the call stays in the request path.",
+      "D": "You write the storage, the batching, and the rate logic yourself. Each upload also waits up to one minute."
+    },
+    "sources": [
+      {
+        "title": "Choosing Pub/Sub or Cloud Tasks",
+        "url": "https://docs.cloud.google.com/pubsub/docs/choosing-pubsub-or-cloud-tasks",
+        "evidence": "Overall, Cloud Tasks is appropriate for use cases where a task producer needs to defer or control the execution timing of a specific webhook or remote procedure call."
+      },
+      {
+        "title": "Understand Cloud Tasks",
+        "url": "https://docs.cloud.google.com/tasks/docs/dual-overview",
+        "evidence": "Determines the rate at which tasks can be dispatched by a queue, regardless of whether the dispatch is a first task attempt or a retry."
+      }
+    ]
+  },
+  {
+    "id": "evt-003",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-tasks",
+      "token-bucket",
+      "queue-configuration"
+    ],
+    "stem": "A Cloud Tasks queue sends tasks to a legacy order service on Compute Engine. The service can handle about 2 requests per second, so the team set `--max-dispatches-per-second=2` on the queue. Traffic is low at night. Each morning, 5,000 tasks arrive in a few minutes, and the service returns HTTP 503 for the first requests of the burst. The team wants to keep the steady rate of 2 dispatches per second. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Lower `--max-dispatches-per-second` to 1, so that the bursts stay below the capacity of the service."
+      },
+      {
+        "id": "B",
+        "text": "Set `--max-attempts=-1` on the queue, so that the tasks that fail with HTTP 503 retry without a limit."
+      },
+      {
+        "id": "C",
+        "text": "Replace the queue with a Pub/Sub push subscription that uses an exponential backoff retry policy."
+      },
+      {
+        "id": "D",
+        "text": "Also set a small `--max-concurrent-dispatches` value on the queue, to limit the requests in progress."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The queue uses a token bucket. During the quiet night, the bucket fills with tokens, so the morning burst can exceed `max_dispatches_per_second`. For a slow downstream service, the docs recommend that you also set a small `max_concurrent_dispatches` value. This limits the burst and **keeps the steady rate** of 2 dispatches per second.",
+    "whyWrong": {
+      "A": "A full bucket still allows a burst above the new rate. The change also halves the steady rate, which the team wants to keep.",
+      "B": "More retries do not stop the burst. The service still gets too many requests, and the retries add more load.",
+      "C": "Push delivery has no explicit rate control for one endpoint. The burst reaches the service again."
+    },
+    "sources": [
+      {
+        "title": "Configure queue routing, limits, and retries",
+        "url": "https://docs.cloud.google.com/tasks/docs/configuring-queues",
+        "evidence": "An uneven load can allow the number of tokens in the bucket to grow significantly, which can lead to bursts of processing when a burst of requests comes in."
+      },
+      {
+        "title": "Configure queue routing, limits, and retries",
+        "url": "https://docs.cloud.google.com/tasks/docs/configuring-queues",
+        "evidence": "In cases where you are using queues to manage dispatch rates based on relatively slow SLAs for downstream services, this can lead to errors like HTTP `429` (Too Many Requests) or HTTP `503` (Service Unavailable)."
+      },
+      {
+        "title": "Configure queue routing, limits, and retries",
+        "url": "https://docs.cloud.google.com/tasks/docs/configuring-queues",
+        "evidence": "particularly when the rate needed is relatively slow, either using the `queue.yaml` method to manually set `bucket_size` to a small value, or setting your `max_concurrent_dispatches` to a small value using the Cloud Tasks API, can give you more control."
+      }
+    ]
+  },
+  {
+    "id": "evt-004",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-tasks",
+      "scheduled-delivery",
+      "cloud-scheduler"
+    ],
+    "stem": "Three days after a user signs up, your application must call a private Cloud Run endpoint once to send a follow-up offer. The application gets thousands of signups each day. You want the Google-recommended approach with the least custom code. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create one Cloud Scheduler job for each signup, with a schedule that runs three days after the signup."
+      },
+      {
+        "id": "B",
+        "text": "Create one Cloud Tasks task for each signup, with a `schedule_time` three days ahead and an OIDC token."
+      },
+      {
+        "id": "C",
+        "text": "Publish one Pub/Sub message for each signup to a subscription with a retry delay of three days."
+      },
+      {
+        "id": "D",
+        "text": "Store each signup in Cloud SQL, and run a Cloud Scheduler job each hour that finds the users that are due."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Cloud Scheduler is for repeating jobs. For a call that runs **once** at a set time, the docs point to Cloud Tasks, which can schedule a task up to 30 days in advance. The task carries an OIDC token for the private Cloud Run endpoint, and the queue retries failures. This needs the **least custom code**.",
+    "whyWrong": {
+      "A": "Cloud Scheduler is for repeating jobs. Thousands of one-time jobs each day also need code to create and delete them.",
+      "C": "Pub/Sub has no scheduled delivery. The longest retry backoff that you can set is 600 seconds.",
+      "D": "This works, but you write and operate the polling query and the state tracking yourself."
+    },
+    "sources": [
+      {
+        "title": "Manage cron jobs",
+        "url": "https://docs.cloud.google.com/scheduler/docs/creating",
+        "evidence": "Cloud Scheduler is intended for repeating jobs. If you need to run a job only once, consider using Cloud Tasks, which can schedule a task up to 30 days in advance."
+      },
+      {
+        "title": "Subscription properties",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-properties",
+        "evidence": "The longest backoff duration that you can specify is 600 seconds."
+      }
+    ]
+  },
+  {
+    "id": "evt-005",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-tasks",
+      "deduplication",
+      "task-name"
+    ],
+    "stem": "A payment API adds a Cloud Tasks task that sends a receipt email for each payment. Mobile clients retry the API call when the network is slow, so some payments create two tasks, and customers get two receipts. Each payment has a unique `payment_id`. The API creates the task with this code:\n\n```python\ntask = tasks_v2.Task(\n    http_request=tasks_v2.HttpRequest(\n        http_method=tasks_v2.HttpMethod.POST,\n        url=receipt_url,\n        oidc_token=tasks_v2.OidcToken(service_account_email=sa_email),\n        body=payload,\n    ),\n)\nclient.create_task(\n    tasks_v2.CreateTaskRequest(parent=queue_path, task=task)\n)\n```\n\nHow should you change the code so that each payment creates at most one task?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `name=client.task_path(project, location, queue, payment_id)` on the task, so that Cloud Tasks rejects a second task."
+      },
+      {
+        "id": "B",
+        "text": "Read the `X-CloudTasks-TaskETA` header in the receipt handler, and skip a request with an ETA that it already saw."
+      },
+      {
+        "id": "C",
+        "text": "Set `--max-attempts=1` on the queue, so that Cloud Tasks dispatches each task only once to the receipt handler."
+      },
+      {
+        "id": "D",
+        "text": "Set `schedule_time` 60 seconds ahead, so that the client retries arrive before Cloud Tasks dispatches the task."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Cloud Tasks deduplicates by task name. If you create a task with a name that already exists in the queue, the request fails. The code sets no name, so Cloud Tasks generates a unique name for each call, and no deduplication occurs. A task name made from the **unique `payment_id`** makes the second create request fail instead of adding a second task.",
+    "whyWrong": {
+      "B": "The docs say that the `X-CloudTasks-TaskETA` header is not reliable for deduplication. Also, the two tasks still exist.",
+      "C": "`--max-attempts` limits the attempts of one task. The duplicate is a second task, which also runs.",
+      "D": "A delay does not merge two tasks. Both tasks still run when their schedule time arrives."
+    },
+    "sources": [
+      {
+        "title": "Understand Cloud Tasks",
+        "url": "https://docs.cloud.google.com/tasks/docs/dual-overview",
+        "evidence": "Task deduplication is achieved by assigning a unique name to a task. If you attempt to create a task with a name that already exists in the queue, the creation request will fail."
+      },
+      {
+        "title": "Understand Cloud Tasks",
+        "url": "https://docs.cloud.google.com/tasks/docs/dual-overview",
+        "evidence": "Note that the `X-CloudTasks-TaskETA` and `X-AppEngine-TaskETA` headers shouldn't be used for reliable deduplication."
+      }
+    ]
+  },
+  {
+    "id": "evt-006",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "workflows",
+      "orchestration",
+      "callbacks"
+    ],
+    "stem": "An order process calls an inventory service first. Then it calls a payment service and a shipping service at the same time. For large orders, it then waits for the approval of a manager, which can take hours. All services run on Cloud Run. The team wants one place to see and change the flow, with the same timeout and retry policy for every call. Which approach should you take?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish an event to Pub/Sub after each step, and make each service subscribe to the events that start its work."
+      },
+      {
+        "id": "B",
+        "text": "Write a Managed Service for Apache Airflow DAG that calls the services and polls for the approval each minute."
+      },
+      {
+        "id": "C",
+        "text": "Define a workflow in Workflows, with a parallel step for payment and shipping and a callback for the approval."
+      },
+      {
+        "id": "D",
+        "text": "Chain Cloud Tasks queues, so that each service adds a task for the next service when it finishes its work."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "In orchestration, a central service controls the flow, so you change and monitor the flow in one place and apply consistent timeout and error policies. Workflows is the Google Cloud product for orchestration. A parallel step runs payment and shipping at the same time, and a callback waits for the approval without polling. This meets the need for **one place to see and change the flow**.",
+    "whyWrong": {
+      "A": "This is choreography. No service controls the flow, so the flow and its policies are harder to trace and change.",
+      "B": "Managed Airflow is for batch data pipelines and has latency in seconds. Polling also wastes work during a wait of hours.",
+      "D": "Each service must know the next step. Each service holds a part of the flow, and a queue cannot wait for an approval."
+    },
+    "sources": [
+      {
+        "title": "Better service orchestration with Workflows",
+        "url": "https://cloud.google.com/blog/topics/developers-practitioners/better-service-orchestration-workflows",
+        "evidence": "In Orchestration, a central service defines and controls the flow of communication between services. With centralization, it becomes easier to change and monitor the flow and apply consistent timeout and error policies."
+      },
+      {
+        "title": "Wait using callbacks",
+        "url": "https://docs.cloud.google.com/workflows/docs/creating-callback-endpoints",
+        "evidence": "With callbacks, you can signal to your workflow that a specified event has occurred, and wait on that event without polling."
+      }
+    ]
+  },
+  {
+    "id": "evt-007",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "workflows",
+      "callbacks",
+      "polling"
+    ],
+    "stem": "A workflow waits for a person to approve an expense report. The approval usually comes within a few hours. The workflow uses this loop:\n\n```yaml\n- check_approval:\n    call: http.get\n    args: {url: \"${approval_url}\", auth: {type: OIDC}}\n    result: status\n- is_pending:\n    switch:\n      - condition: ${status.body.state == \"PENDING\"}\n        next: pause\n    next: record_decision\n- pause:\n    call: sys.sleep\n    args: {seconds: 60}\n    next: check_approval\n```\n\nYou want the workflow to continue only when the approval happens, with no polling. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the `sys.sleep` time to 3,600 seconds, so that the workflow makes fewer calls while it waits."
+      },
+      {
+        "id": "B",
+        "text": "Create a callback endpoint, send its URL to the approval service, and wait with `events.await_callback`."
+      },
+      {
+        "id": "C",
+        "text": "Replace the loop with a Cloud Scheduler job that checks the state and starts a new execution after approval."
+      },
+      {
+        "id": "D",
+        "text": "Add `retry: ${http.default_retry}` to the `check_approval` step, so that it repeats until the state changes."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A callback lets a workflow wait for an external request **without polling**. The workflow creates a callback endpoint, gives its URL to the approval service, and waits in `events.await_callback`. When the approval service calls the URL, the execution continues. The default wait is 12 hours, which covers this approval.",
+    "whyWrong": {
+      "A": "This is still polling. It also adds up to an hour of delay after the approval.",
+      "C": "This is still polling, from outside the workflow. It also splits one process into several executions.",
+      "D": "A retry policy reacts to errors, such as HTTP 503. A successful response with a pending state does not cause a retry."
+    },
+    "sources": [
+      {
+        "title": "Wait using callbacks",
+        "url": "https://docs.cloud.google.com/workflows/docs/creating-callback-endpoints",
+        "evidence": "Callbacks allow workflow executions to wait for another service to make a request to the callback endpoint; that request resumes the execution of the workflow."
+      }
+    ]
+  },
+  {
+    "id": "evt-008",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "workflows",
+      "oidc",
+      "cloud-run"
+    ],
+    "stem": "A workflow calls a Cloud Run service that requires authentication. The service account of the workflow has `roles/run.invoker` on the service. This step fails, and the Cloud Run logs show that the request was not authenticated:\n\n```yaml\n- create_invoice:\n    call: http.post\n    args:\n      url: https://invoice-abc123-uc.a.run.app/invoices\n      body: ${order}\n    result: invoice\n```\n\nThe service must keep IAM authentication. How should you change the step?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `auth: {type: OAuth2}` to the `args` of the step, so that Workflows sends an access token."
+      },
+      {
+        "id": "B",
+        "text": "Grant `roles/cloudfunctions.invoker` to the service account of the workflow, in addition to its current role."
+      },
+      {
+        "id": "C",
+        "text": "Deploy the service with `--allow-unauthenticated`, and set its ingress to `internal` to block the internet."
+      },
+      {
+        "id": "D",
+        "text": "Add `auth: {type: OIDC}` to the `args` of the step, and set `audience` to the root URL of the service."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "HTTP requests from a workflow carry **no token by default**. Cloud Run expects an ID token, so add `auth` with `type: OIDC`. The audience defaults to the full `url`, but the docs say to set it to the root URL of the service. The service account already has `roles/run.invoker`, so no IAM change is necessary.",
+    "whyWrong": {
+      "A": "An access token (OAuth 2.0) is for APIs on `*.googleapis.com`. Cloud Run services expect an ID token (OIDC).",
+      "B": "The problem is the missing token, not the role. For Cloud Run, the correct role is `roles/run.invoker`, which the account already has.",
+      "C": "This removes IAM authentication, which the service must keep."
+    },
+    "sources": [
+      {
+        "title": "Make authenticated requests from a workflow",
+        "url": "https://docs.cloud.google.com/workflows/docs/authenticate-from-workflow",
+        "evidence": "By default, HTTP requests don't contain identity or access tokens for security reasons. You must explicitly add authentication information to your workflow definition."
+      },
+      {
+        "title": "Make authenticated requests from a workflow",
+        "url": "https://docs.cloud.google.com/workflows/docs/authenticate-from-workflow",
+        "evidence": "When connecting with Cloud Run functions or Cloud Run, use an ID token (OIDC). For APIs hosted on `googleapis.com`, use an access token (OAuth 2.0)."
+      },
+      {
+        "title": "Invoke Cloud Run functions or Cloud Run",
+        "url": "https://docs.cloud.google.com/workflows/docs/calling-run-functions",
+        "evidence": "The `audience` parameter can be used to specify the OIDC audience for the token. By default, it's set to the same value as `url`; however, it should be set to your service's root URL."
+      }
+    ]
+  },
+  {
+    "id": "evt-009",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-scheduler",
+      "oidc",
+      "oauth",
+      "workflows"
+    ],
+    "stem": "You create two Cloud Scheduler HTTP jobs. Job 1 calls a Cloud Run service that requires authentication. Job 2 starts executions of a workflow through the Workflow Executions API at `workflowexecutions.googleapis.com`. Each job uses its own user-managed service account. Which two configurations should you use? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Job 1: set `--oauth-service-account-email`, and grant the service account `roles/run.invoker` on the service."
+      },
+      {
+        "id": "B",
+        "text": "Job 1: set `--oidc-service-account-email`, and grant the service account `roles/run.invoker` on the service."
+      },
+      {
+        "id": "C",
+        "text": "Job 2: set `--oidc-service-account-email`, and grant the service account `roles/workflows.invoker`."
+      },
+      {
+        "id": "D",
+        "text": "Job 1: use the Cloud Scheduler service agent as the service account, with `roles/run.invoker`."
+      },
+      {
+        "id": "E",
+        "text": "Job 2: set `--oauth-service-account-email`, and grant the service account `roles/workflows.invoker`."
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "Cloud Scheduler uses an ID token (OIDC) for most targets, but Google APIs on `*.googleapis.com` expect an OAuth access token. Job 1 calls **Cloud Run**, so it uses OIDC with `roles/run.invoker`. Job 2 calls the **Workflow Executions API**, a Google API, so it uses OAuth with `roles/workflows.invoker`.",
+    "whyWrong": {
+      "A": "Cloud Run expects an ID token. An OAuth access token is for Google APIs on `*.googleapis.com`.",
+      "C": "The Workflow Executions API is a Google API on `*.googleapis.com`. It expects an OAuth access token, not an ID token.",
+      "D": "The docs say not to use the Cloud Scheduler service agent as the service account of a job. Use a user-managed service account."
+    },
+    "sources": [
+      {
+        "title": "Use authentication with HTTP targets",
+        "url": "https://docs.cloud.google.com/scheduler/docs/http-target-auth",
+        "evidence": "You can use either an ID (OIDC) token or an OAuth (access) token. OIDC is generally used except for Google APIs hosted on `*.googleapis.com` as these APIs expect an OAuth token."
+      },
+      {
+        "title": "Schedule a workflow using Cloud Scheduler",
+        "url": "https://docs.cloud.google.com/workflows/docs/schedule-workflow",
+        "evidence": "Grant your new service account the workflows.invoker role so that the account has permission to trigger your workflow"
+      }
+    ]
+  },
+  {
+    "id": "evt-010",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "eventarc",
+      "workflows",
+      "retries"
+    ],
+    "stem": "An Eventarc trigger starts a workflow for each new file in a Cloud Storage bucket. The trigger has retries enabled. The workflow calls a Cloud Run service. During a deploy, that service sometimes returns HTTP 503 for a few seconds, and the workflow execution fails. Eventarc does not deliver the event again, and the file stays unprocessed. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Put the call to the service in a `try` block with a `retry` policy in the workflow definition."
+      },
+      {
+        "id": "B",
+        "text": "Set an exponential backoff retry policy on the Pub/Sub subscription of the Eventarc trigger."
+      },
+      {
+        "id": "C",
+        "text": "Add a dead-letter topic to the subscription of the trigger, and replay the failed events from it."
+      },
+      {
+        "id": "D",
+        "text": "Set the acknowledgment deadline of the subscription of the trigger to 600 seconds."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "With a Workflows destination, an event counts as delivered **as soon as the execution starts**. If the execution fails later, Eventarc does not retry it, so the settings of the subscription cannot help. Handle the transient HTTP 503 inside the workflow with `try` and `retry`.",
+    "whyWrong": {
+      "B": "Backoff applies only to events that are not acknowledged. Workflows acknowledges the event when the execution starts.",
+      "C": "The event was delivered, so Pub/Sub never forwards it to a dead-letter topic.",
+      "D": "Workflows acknowledges the event when the execution starts, well within the deadline. A longer deadline changes nothing."
+    },
+    "sources": [
+      {
+        "title": "Retry events",
+        "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+        "evidence": "Note that Workflows acknowledges events as soon as the workflow execution starts. If the workflow execution starts but later fails, the executions are not retried. To resolve such service issues, you should handle errors and retries within the workflow."
+      },
+      {
+        "title": "Trigger a workflow with events or Pub/Sub messages",
+        "url": "https://docs.cloud.google.com/workflows/docs/trigger-workflow-eventarc",
+        "evidence": "Events are considered delivered as soon as the workflow execution starts, and the actual execution takes place asynchronously in the Workflows services."
+      }
+    ]
+  },
+  {
+    "id": "evt-011",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "workflows",
+      "retries",
+      "idempotency"
+    ],
+    "stem": "A workflow step sends an HTTP POST to a payment provider to charge a customer. The API of the provider does not accept an idempotency key, so a repeated request can charge the customer twice. The step must still retry when the provider is temporarily unavailable. Which retry configuration should you add to the step?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`retry: ${http.default_retry}`, which retries HTTP 429, 502, 503, and 504, connection errors, and timeouts."
+      },
+      {
+        "id": "B",
+        "text": "A custom retry policy with `predicate: ${http.default_retry_predicate}` and `max_retries: 1`."
+      },
+      {
+        "id": "C",
+        "text": "`retry: ${http.default_retry_non_idempotent}`, which retries HTTP 429 and 503 and connection failures."
+      },
+      {
+        "id": "D",
+        "text": "A custom retry policy with `predicate: ${http.default_retry_predicate}` and a longer `max_delay`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The charge is **not safe to repeat**. The docs say to use the non-idempotent policy for steps that are not safe to repeat. That policy retries only HTTP 429, HTTP 503, and connection failures. The idempotent policy also retries timeouts and HTTP 502 and 504, which can occur after the provider charged the customer.",
+    "whyWrong": {
+      "A": "The docs say to use this policy only for idempotent steps. A retry after a timeout or HTTP 504 can charge the customer twice.",
+      "B": "The default predicate still retries timeouts and HTTP 502 and 504, so one retry can still charge twice.",
+      "D": "A longer delay does not change which errors cause a retry. A timeout still repeats the charge."
+    },
+    "sources": [
+      {
+        "title": "Retry steps",
+        "url": "https://docs.cloud.google.com/workflows/docs/reference/syntax/retrying",
+        "evidence": "You should use the non-idempotent retry policy only for non-idempotent steps (steps that can't be safely repeated)."
+      },
+      {
+        "title": "Retry steps",
+        "url": "https://docs.cloud.google.com/workflows/docs/reference/syntax/retrying",
+        "evidence": "This policy retries HTTP status codes [`429`, `503`] or connection failures."
+      }
+    ]
+  },
+  {
+    "id": "evt-012",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "pubsub",
+      "ordering-keys",
+      "subscriptions"
+    ],
+    "stem": "A banking service publishes a high volume of account events to a Pub/Sub topic. A consumer must process the events of each account in the order that the publisher sent them. The order between different accounts does not matter. The consumer reads from an existing pull subscription that does not have message ordering. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the account ID as the ordering key, and publish all events for a key in one region."
+      },
+      {
+        "id": "B",
+        "text": "Publish all events with one ordering key, so that Pub/Sub delivers the whole topic in one global order."
+      },
+      {
+        "id": "C",
+        "text": "Update the existing subscription with `--enable-message-ordering`, and keep the consumer on it."
+      },
+      {
+        "id": "D",
+        "text": "Create a new subscription with `--enable-message-ordering`, and move the consumer to the new subscription."
+      },
+      {
+        "id": "E",
+        "text": "Enable exactly-once delivery on the existing subscription, so that Pub/Sub delivers each event in sequence."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Pub/Sub orders messages only inside one ordering key, so the **account ID** is the key. You must publish all messages with the same key in the same region. Message ordering is a property of the subscription that you **cannot change after you create the subscription**, so the consumer needs a new subscription with ordering enabled.",
+    "whyWrong": {
+      "B": "One key puts every message into one sequence. Each ordering key has a throughput limit, which does not fit a high volume. The consumer also needs order only inside each account.",
+      "C": "You cannot change the message ordering property after you create a subscription.",
+      "E": "Exactly-once delivery stops the redelivery of acknowledged messages. It does not give ordered delivery."
+    },
+    "sources": [
+      {
+        "title": "Order messages",
+        "url": "https://docs.cloud.google.com/pubsub/docs/ordering",
+        "evidence": "To receive the messages in order, set the message ordering property on the subscription you receive messages from. Receiving messages in order might increase latency. You can't change the message ordering property after you create a subscription."
+      },
+      {
+        "title": "Order messages",
+        "url": "https://docs.cloud.google.com/pubsub/docs/ordering",
+        "evidence": "To achieve message ordering, set the same ordering key on all related messages that should be received in order. In addition, you must publish all messages with the same ordering key in the same region."
+      }
+    ]
+  },
+  {
+    "id": "evt-013",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "eventarc",
+      "pubsub",
+      "cloudevents"
+    ],
+    "stem": "Your application publishes order messages to an existing Pub/Sub topic. You deploy a new Cloud Run service to process them. The service already receives Cloud Storage events from an Eventarc trigger, and the team wants one CloudEvents parser for both sources. You want the least operational overhead. How should you deliver the order messages to the service?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create an Eventarc Advanced bus, an enrollment that matches the order events, and a pipeline to the service."
+      },
+      {
+        "id": "B",
+        "text": "Create an Eventarc Standard trigger with the `google.cloud.pubsub.topic.v1.messagePublished` type on the existing topic."
+      },
+      {
+        "id": "C",
+        "text": "Create a Pub/Sub push subscription on the existing topic, with the URL of the service as the push endpoint."
+      },
+      {
+        "id": "D",
+        "text": "Create a Cloud Storage subscription on the topic, and add an Eventarc trigger for the files that it writes."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "An Eventarc Pub/Sub trigger can use an existing topic, and it delivers each message to the service as a CloudEvent. This gives **one CloudEvents format** for both sources, which a direct push subscription does not give. Google recommends Eventarc Standard when an application only delivers events from a provider to a destination, so it has the **least operational overhead**.",
+    "whyWrong": {
+      "A": "Eventarc Advanced is for complex routing across many teams and projects. A bus, an enrollment, and a pipeline add parts that a simple route does not need.",
+      "C": "A push subscription sends the Pub/Sub JSON envelope, not a CloudEvent. The service then needs a second parser.",
+      "D": "This adds files and a second step, which adds latency and cost. The service then gets file events, not one event for each order."
+    },
+    "sources": [
+      {
+        "title": "Eventarc Standard overview",
+        "url": "https://docs.cloud.google.com/eventarc/standard/docs/overview",
+        "evidence": "Events from Pub/Sub sources can use an existing Pub/Sub topic or Eventarc will automatically create a topic and manage it for you."
+      },
+      {
+        "title": "Event routes",
+        "url": "https://docs.cloud.google.com/eventarc/standard/docs/run/event-routing-options",
+        "evidence": "If using Pub/Sub, is there any advantage to receiving events through Eventarc and a common CloudEvents format? For example, are there multiple event sources?"
+      },
+      {
+        "title": "Eventarc overview",
+        "url": "https://docs.cloud.google.com/eventarc/docs/overview",
+        "evidence": "Eventarc Standard is recommended for applications where the focus is on simply delivering events from event provider to event destination."
+      }
+    ]
+  },
+  {
+    "id": "evt-014",
+    "objective": "1.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "pubsub",
+      "product-choice",
+      "pubsub-lite",
+      "kafka"
+    ],
+    "stem": "A team designs a new event pipeline on Google Cloud. Several services publish events, and several other services consume them. The team has no existing Kafka code and is new to streaming on Google Cloud. They want a service that is easy to use and that Google supports for the long term. Which service should they choose?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pub/Sub Lite, with a reservation that sets the throughput capacity for the topics."
+      },
+      {
+        "id": "B",
+        "text": "Managed Service for Apache Kafka, with one Kafka topic for each type of event."
+      },
+      {
+        "id": "C",
+        "text": "Cloud Tasks, with one queue for each consumer service and its HTTP endpoint."
+      },
+      {
+        "id": "D",
+        "text": "Pub/Sub, with one topic for each type of event and a subscription for each consumer."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "For **new workloads** or users new to streaming on Google Cloud, Google recommends Pub/Sub because it is easy to use. Each consumer gets its own subscription, and the publishers do not need to know the consumers.",
+    "whyWrong": {
+      "A": "Pub/Sub Lite is deprecated. Google turns it down on January 31, 2027.",
+      "B": "Managed Service for Apache Kafka fits existing Kafka workloads or portability across clouds. The team has neither need.",
+      "C": "Cloud Tasks sends each task to one endpoint that the producer names. It is not a publish and subscribe service."
+    },
+    "sources": [
+      {
+        "title": "Choose Pub/Sub or Cloud Managed Service for Apache Kafka",
+        "url": "https://docs.cloud.google.com/pubsub/docs/choose-pubsub-kafka",
+        "evidence": "For new workloads or users new to streaming on Google Cloud, Pub/Sub is recommended due to its ease of use."
+      },
+      {
+        "title": "Choose Pub/Sub or Pub/Sub Lite",
+        "url": "https://docs.cloud.google.com/pubsub/docs/choosing-pubsub-or-lite",
+        "evidence": "Pub/Sub Lite is deprecated. Effective January 31, 2027, Pub/Sub Lite will be turned down."
+      }
+    ]
+  },
+  {
+    "id": "evt-015",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "eventarc",
+      "iam",
+      "run-invoker"
+    ],
+    "stem": "You create an Eventarc trigger that sends Cloud Storage events to a Cloud Run service that requires authentication. The trigger uses a user-managed service account that has the Eventarc Event Receiver role. The trigger is active, but the service never processes an event. The Cloud Run logs show this message:\n\n```text\nThe request was not authenticated. Either allow unauthenticated invocations or set the proper Authorization header.\n```\n\nThe service must stay private. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Eventarc Event Receiver role to the runtime service account of the Cloud Run service."
+      },
+      {
+        "id": "B",
+        "text": "Deploy the service again with `--allow-unauthenticated`, and keep the current service account of the trigger."
+      },
+      {
+        "id": "C",
+        "text": "Grant the Cloud Run Invoker role on the service to the service account of the trigger."
+      },
+      {
+        "id": "D",
+        "text": "Grant the Service Account Token Creator role to the Cloud Storage service agent of the project."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Eventarc creates and activates a trigger to an authenticated service even when its service account **does not have the Cloud Run Invoker role**. Each event then fails with this authentication message. Grant the Cloud Run Invoker role on the service to the service account of the trigger, and the service **stays private**.",
+    "whyWrong": {
+      "A": "The runtime service account is the identity for the calls that the service makes. It does not authorize the requests of the trigger.",
+      "B": "This makes the service public, which the requirement does not allow.",
+      "D": "The Cloud Storage service agent needs the Pub/Sub Publisher role to publish events. Token Creator does not authorize calls to Cloud Run."
+    },
+    "sources": [
+      {
+        "title": "Roles and permissions for Cloud Run targets",
+        "url": "https://docs.cloud.google.com/eventarc/docs/roles-permissions",
+        "evidence": "Note that if you create a trigger for an authenticated Cloud Run service without granting the Cloud Run Invoker role, the trigger is created successfully and is active."
+      },
+      {
+        "title": "Roles and permissions for Cloud Run targets",
+        "url": "https://docs.cloud.google.com/eventarc/docs/roles-permissions",
+        "evidence": "Grant Cloud Run service permissions to the trigger service account: The Cloud Run Invoker role allows your Eventarc trigger to call the target Cloud Run service."
+      }
+    ]
+  },
+  {
+    "id": "evt-016",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "eventarc",
+      "ack-deadline",
+      "duplicates"
+    ],
+    "stem": "A Cloud Run function processes Cloud Storage events from an Eventarc trigger that you created with gcloud. The function needs about 90 seconds for each event. The logs show that most events start two or more executions, although no execution fails. You must keep retries for real failures. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the acknowledgment deadline of the Pub/Sub subscription of the trigger to 600 seconds."
+      },
+      {
+        "id": "B",
+        "text": "Increase the request timeout of the function, so that each execution has more time."
+      },
+      {
+        "id": "C",
+        "text": "Create the trigger again with `--max-retry-attempts=1`, so that each event has one attempt."
+      },
+      {
+        "id": "D",
+        "text": "Enable exactly-once delivery on the Pub/Sub subscription of the trigger."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The Pub/Sub subscription of an Eventarc trigger has a **10-second** acknowledgment deadline by default. The function answers after about 90 seconds, so Pub/Sub sends the event again. Google recommends that you set the deadline to the maximum of 600 seconds. Retries stay on for real failures.",
+    "whyWrong": {
+      "B": "The request timeout does not change the acknowledgment deadline. Pub/Sub still sends the event again after 10 seconds.",
+      "C": "This turns off retries, which you must keep for real failures.",
+      "D": "Eventarc delivers through a push subscription. Only pull subscriptions support exactly-once delivery."
+    },
+    "sources": [
+      {
+        "title": "Create triggers with Eventarc",
+        "url": "https://docs.cloud.google.com/run/docs/triggering/trigger-with-events",
+        "evidence": "By default, the acknowledgement (`ack`) deadline of this Pub/Sub subscription is 10 seconds. This setting is insufficient for many functions, and can have the effect of causing unwanted duplicate executions."
+      },
+      {
+        "title": "Create triggers with Eventarc",
+        "url": "https://docs.cloud.google.com/run/docs/triggering/trigger-with-events",
+        "evidence": "We recommend that you set the `ack` deadline for your service or function to the maximum value of 600 seconds"
+      },
+      {
+        "title": "Exactly-once delivery",
+        "url": "https://docs.cloud.google.com/pubsub/docs/exactly-once-delivery",
+        "evidence": "Only the pull subscription type supports exactly-once delivery, including subscribers that use the StreamingPull API. Push and export subscriptions don't support exactly-once delivery."
+      }
+    ]
+  },
+  {
+    "id": "evt-017",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "eventarc",
+      "retries",
+      "console-defaults"
+    ],
+    "stem": "A developer created an Eventarc trigger for a Cloud Run service from the Cloud Run page of the Google Cloud console. When the service returns HTTP 500 for an event, Eventarc never delivers that event again. Other triggers that the team created with gcloud retry failed events. What is the most likely cause?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Eventarc does not retry an event when the destination returns an HTTP 5xx status code."
+      },
+      {
+        "id": "B",
+        "text": "A trigger that you create from the Cloud Run page of the console makes one delivery attempt by default."
+      },
+      {
+        "id": "C",
+        "text": "Eventarc discards an event after the first failure when the trigger has no dead-letter topic."
+      },
+      {
+        "id": "D",
+        "text": "The service account of the trigger does not have the Eventarc Event Receiver role on the project."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Eventarc can make a single delivery attempt with no retries. This is the **default for a trigger that you create from the Cloud Run page** of the console. A trigger that you create with gcloud, Terraform, or the Eventarc page of the console retries by default.",
+    "whyWrong": {
+      "A": "Eventarc retries failed deliveries, including HTTP 5xx responses, unless the trigger makes a single attempt. The triggers that the team created with gcloud show this.",
+      "C": "Without a dead-letter topic, Pub/Sub retries the event until the retention period ends. Then Eventarc discards the event.",
+      "D": "Without that role, the trigger does not receive the events. Here, the events arrive and fail only once."
+    },
+    "sources": [
+      {
+        "title": "Retry events",
+        "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+        "evidence": "Optionally, for Cloud Run destinations (including Cloud Run functions), you can configure a single delivery attempt with no retries. When you create an Eventarc trigger in the Google Cloud console from the Cloud Run page, this is the default configuration."
+      },
+      {
+        "title": "Retry events",
+        "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+        "evidence": "Otherwise, when creating a trigger using the Google Cloud CLI, Terraform, or in the Google Cloud console from the Eventarc page, retries are enabled by default."
+      }
+    ]
+  },
+  {
+    "id": "evt-018",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub-push",
+      "dead-letter-topics",
+      "status-codes"
+    ],
+    "stem": "A Cloud Run service receives messages from a Pub/Sub push subscription. When a message has an incorrect format, the service returns HTTP 400 so that Pub/Sub drops the message. Instead, Pub/Sub delivers these messages again and again. The team wants to stop these repeated deliveries and keep each incorrect message for later inspection, with no change to the service code. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Configure a dead-letter topic on the Pub/Sub topic that the subscription reads, and attach a subscription to the dead-letter topic."
+      },
+      {
+        "id": "B",
+        "text": "Set an exponential backoff retry policy on the subscription, with a maximum delay of 600 seconds."
+      },
+      {
+        "id": "C",
+        "text": "Set the message retention duration of the subscription to 10 minutes, the minimum value."
+      },
+      {
+        "id": "D",
+        "text": "Add a dead-letter topic and a maximum number of delivery attempts to the subscription, and subscribe to that topic."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A push endpoint acknowledges a message only with HTTP 102, 200, 201, 202, or 204. **HTTP 400 is a negative acknowledgment**, so Pub/Sub sends the message again. A dead-letter topic on the subscription receives a message after the maximum number of delivery attempts. A subscription on the dead-letter topic **keeps the incorrect messages** for inspection, and the service code does not change.",
+    "whyWrong": {
+      "A": "A dead-letter topic is a property of the subscription, not of the topic.",
+      "B": "Backoff only adds a delay before each redelivery. Pub/Sub still sends the messages again until they expire.",
+      "C": "The messages expire sooner, so Pub/Sub deletes them. The team cannot inspect them later."
+    },
+    "sources": [
+      {
+        "title": "Push subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/push",
+        "evidence": "To send a negative acknowledgment for the message, return any other status code. If you send a negative acknowledgment or the acknowledgment deadline expires, Pub/Sub resends the message."
+      },
+      {
+        "title": "Dead-letter topics",
+        "url": "https://docs.cloud.google.com/pubsub/docs/dead-letter-topics",
+        "evidence": "You configure a dead-letter topic on a subscription, not on the topic it pulls from."
+      }
+    ]
+  },
+  {
+    "id": "evt-019",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "pubsub-push",
+      "oidc",
+      "cloud-run",
+      "iam"
+    ],
+    "stem": "You deploy a Cloud Run service with `--no-allow-unauthenticated`. A Pub/Sub push subscription must deliver messages to the service. You want only the identity of the subscription to call the service, with the least custom code. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add code to the service that gets the public keys of Google and verifies the signature of each JWT."
+      },
+      {
+        "id": "B",
+        "text": "Grant `roles/pubsub.subscriber` on the subscription to the runtime service account of the service."
+      },
+      {
+        "id": "C",
+        "text": "Create a service account for the subscription, and grant it `roles/run.invoker` on the service."
+      },
+      {
+        "id": "D",
+        "text": "Allow unauthenticated invocations, and check a shared secret in a query parameter of the push URL."
+      },
+      {
+        "id": "E",
+        "text": "Create the push subscription with `--push-auth-service-account` set to the new service account."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "With authentication enabled, Pub/Sub sends an OIDC token for the push service account. For Cloud Run, a **built-in check** validates the token and confirms that the account can invoke the service. You only create the service account, grant it `roles/run.invoker`, and set it on the subscription. This needs **no custom code**.",
+    "whyWrong": {
+      "A": "Cloud Run already checks the token and the invoker permission. Your own validation code is not necessary.",
+      "B": "A push subscription does not use the identity of the receiver. This role does not authorize the calls of Pub/Sub to the service.",
+      "D": "This makes the service public, so any caller that gets the secret can reach it. It also adds custom code."
+    },
+    "sources": [
+      {
+        "title": "Use Pub/Sub with Cloud Run tutorial",
+        "url": "https://docs.cloud.google.com/run/docs/tutorials/pubsub",
+        "evidence": "For Cloud Run only, there is a built-in authentication check that the token is valid and an authorization check that the service account has permission to invoke the Cloud Run service."
+      },
+      {
+        "title": "Authentication for push subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/authenticate-push-subscriptions",
+        "evidence": "Triggering from Pub/Sub push: Your push auth service account must have the `roles/run.invoker` role and be bound to a Cloud Run service to invoke a corresponding Cloud Run service"
+      }
+    ]
+  },
+  {
+    "id": "evt-020",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "eventarc",
+      "trigger-location",
+      "cloud-storage"
+    ],
+    "stem": "The `images-eu` bucket is in the `eu` multi-region. You run this command to send its new objects to a Cloud Run service in `europe-west1`, and the command fails:\n\n```bash\ngcloud eventarc triggers create image-trigger \\\n    --location=europe-west1 \\\n    --destination-run-service=thumbnailer \\\n    --destination-run-region=europe-west1 \\\n    --event-filters=\"type=google.cloud.storage.object.v1.finalized\" \\\n    --event-filters=\"bucket=images-eu\" \\\n    --service-account=trigger-sa@my-project.iam.gserviceaccount.com\n```\n\nHow should you change the command?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `--location=eu`, and keep `europe-west1` as the region of the destination service."
+      },
+      {
+        "id": "B",
+        "text": "Remove the `bucket` filter, and filter on the bucket name in the code of the service."
+      },
+      {
+        "id": "C",
+        "text": "Set `--destination-run-region=eu`, so that the location of the service matches the bucket."
+      },
+      {
+        "id": "D",
+        "text": "Replace the `type` filter with a Cloud Audit Logs event type for object creation."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "For a Cloud Storage trigger, the **location of the bucket** sets the location of the trigger, and the two must match. The bucket is in the `eu` multi-region, so the trigger location is `eu`. The destination service can be in a different region from the trigger, so it stays in `europe-west1`.",
+    "whyWrong": {
+      "B": "A Cloud Storage trigger requires the `bucket` filter. The location of the trigger must also match the location of the bucket.",
+      "C": "A Cloud Run service runs in a region, and `eu` is not a region. The problem is the location of the trigger.",
+      "D": "A Cloud Audit Logs trigger cannot filter by bucket, and it has more latency. Google recommends the direct event when one exists."
+    },
+    "sources": [
+      {
+        "title": "Understand Eventarc locations",
+        "url": "https://docs.cloud.google.com/eventarc/docs/understand-locations",
+        "evidence": "The location of the Cloud Storage bucket dictates the location of the Eventarc trigger, and they must match."
+      },
+      {
+        "title": "Understand Eventarc locations",
+        "url": "https://docs.cloud.google.com/eventarc/docs/understand-locations",
+        "evidence": "Cloud Storage triggers are available in single-region, dual-region, and multi-region locations; you can't create a global Eventarc trigger."
+      },
+      {
+        "title": "Route Cloud Storage events to Cloud Run",
+        "url": "https://docs.cloud.google.com/eventarc/standard/docs/run/route-trigger-cloud-storage",
+        "evidence": "The service can be in any of the Cloud Run supported locations and doesn't need to be in the same location as the trigger."
+      }
+    ]
+  },
+  {
+    "id": "evt-021",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "eventarc",
+      "direct-events",
+      "cloud-storage"
+    ],
+    "stem": "A Cloud Run service must process each new object in one Cloud Storage bucket as soon as possible. The project has many other buckets in the same region. Which Eventarc trigger should you create?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A trigger on Cloud Audit Logs events for `storage.objects.create`, in the region of the bucket."
+      },
+      {
+        "id": "B",
+        "text": "A Pub/Sub trigger on a topic that a Cloud Scheduler job fills with a list of new objects each minute."
+      },
+      {
+        "id": "C",
+        "text": "A trigger on the direct event `google.cloud.storage.object.v1.finalized`, with a filter on the bucket."
+      },
+      {
+        "id": "D",
+        "text": "A global trigger on Cloud Audit Logs events for `storage.objects.create`, with a filter on the region."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "If a direct event exists for a source, Google recommends it instead of a Cloud Audit Logs event. A direct event has **lower latency**, and the trigger can filter on **one bucket**. A Cloud Audit Logs trigger matches all buckets in its location.",
+    "whyWrong": {
+      "A": "Audit log events add latency, and the trigger cannot filter by bucket. It matches every bucket in the region.",
+      "B": "You write the listing code yourself, and objects wait up to a minute. This is polling, not an event.",
+      "D": "A global audit log trigger matches buckets in all regions, and it cannot filter by bucket. It also has more latency."
+    },
+    "sources": [
+      {
+        "title": "Event routes",
+        "url": "https://docs.cloud.google.com/eventarc/standard/docs/run/event-routing-options",
+        "evidence": "For the event that you want to route, if both direct and audit log options are supported, we recommend that you create a trigger to route the direct event."
+      },
+      {
+        "title": "Understand Eventarc locations",
+        "url": "https://docs.cloud.google.com/eventarc/docs/understand-locations",
+        "evidence": "As there's no filtering by bucket when you use a Cloud Audit Logs trigger, this will match all buckets in the `europe-west1` region."
+      }
+    ]
+  },
+  {
+    "id": "evt-022",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "ingress",
+      "eventarc",
+      "pubsub-push"
+    ],
+    "stem": "A Cloud Run service receives events only from an Eventarc trigger and a Pub/Sub push subscription in the same project. Both use the default `run.app` URL. A security review requires that no request from the internet can reach the service. You want the least change. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Put an external Application Load Balancer with a Cloud Armor policy in front of the service."
+      },
+      {
+        "id": "B",
+        "text": "Set the ingress of the service to `internal` with `gcloud run services update SERVICE --ingress internal`."
+      },
+      {
+        "id": "C",
+        "text": "Configure Direct VPC egress for the service, and send all of its traffic through the VPC network."
+      },
+      {
+        "id": "D",
+        "text": "Map a custom domain to the service, and change the trigger and the subscription to use that domain."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "With **internal** ingress, requests from the internet cannot reach the service. Eventarc and Pub/Sub subscriptions in the same project still reach it through the default `run.app` URL. One setting meets the requirement with the **least change**.",
+    "whyWrong": {
+      "A": "This adds new resources, and the `run.app` URL stays open to the internet until you also change the ingress.",
+      "C": "Egress controls the requests that the service sends. It does not block the requests that come in.",
+      "D": "A custom domain does not block internet requests. With internal ingress, these products must use the `run.app` URL."
+    },
+    "sources": [
+      {
+        "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+        "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+        "evidence": "and if they're using the default `run.app` URL and not a custom URL or custom domain: Cloud Scheduler Cloud Tasks Dialogflow CX Eventarc Gemini Enterprise Pub/Sub subscriptions"
+      },
+      {
+        "title": "Restrict network endpoint ingress for Cloud Run services and instances",
+        "url": "https://docs.cloud.google.com/run/docs/securing/ingress",
+        "evidence": "Requests from other sources, including the internet, cannot reach your service or instance at the `run.app` URL, custom URL, or custom domain."
+      }
+    ]
+  },
+  {
+    "id": "evt-023",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloudevents",
+      "event-receivers",
+      "eventarc"
+    ],
+    "stem": "A Cloud Run service receives Cloud Storage events from an Eventarc trigger. The handler must log the CloudEvent type and the CloudEvent ID of each event. It logs `None` for the type, and the ID that it logs is not the CloudEvent ID:\n\n```python\n@app.route(\"/\", methods=[\"POST\"])\ndef index():\n    body = request.get_json()\n    event_type = body.get(\"type\")\n    event_id = body.get(\"id\")\n    print(f\"{event_type} {event_id}\")\n    return (\"\", 204)\n```\n\nHow should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Base64-decode `body[\"message\"][\"data\"]`, and read `type` and `id` from the decoded JSON."
+      },
+      {
+        "id": "B",
+        "text": "Read `type` and `id` from `body[\"message\"][\"attributes\"]`, which holds the event attributes."
+      },
+      {
+        "id": "C",
+        "text": "Keep the code, and configure the trigger to send the events in structured content mode."
+      },
+      {
+        "id": "D",
+        "text": "Create the event with `from_http(request.headers, request.data)`, and read `event[\"type\"]` and `event[\"id\"]`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Eventarc sends events in **binary content mode**. The event attributes, such as the type and the ID, are `ce-*` HTTP headers, and the body holds only the event data. The CloudEvents SDK makes one CloudEvent object from the headers and the body, so the handler reads the attributes from that object.",
+    "whyWrong": {
+      "A": "This is the format of a direct Pub/Sub push request. A Cloud Storage event from Eventarc has no `message` envelope.",
+      "B": "Eventarc does not put the event attributes in the body. They arrive as `ce-*` HTTP headers.",
+      "C": "Eventarc delivers events in binary content mode. The fix is in the receiver code."
+    },
+    "sources": [
+      {
+        "title": "Eventarc Standard overview",
+        "url": "https://docs.cloud.google.com/eventarc/standard/docs/overview",
+        "evidence": "Eventarc delivers events, regardless of provider, to the target destination in a CloudEvents format using an HTTP request in binary content mode."
+      },
+      {
+        "title": "Develop event receivers",
+        "url": "https://docs.cloud.google.com/eventarc/standard/docs/run/event-receivers",
+        "evidence": "These libraries are open source and make it easier to transform your HTTP request into a language-idiomatic CloudEvents object."
+      }
+    ]
+  },
+  {
+    "id": "evt-024",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "pubsub-push",
+      "event-receivers",
+      "base64"
+    ],
+    "stem": "A Cloud Run service receives messages directly from a Pub/Sub push subscription, without Eventarc. The publisher sends JSON order data. The handler fails with `JSONDecodeError` on this line:\n\n```python\norder = json.loads(envelope[\"message\"][\"data\"])\n```\n\nWhat should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Read the order from the `ce-data` HTTP header instead of from the request body."
+      },
+      {
+        "id": "B",
+        "text": "Parse the request body as a Protocol Buffers message instead of as JSON."
+      },
+      {
+        "id": "C",
+        "text": "Base64-decode `envelope[\"message\"][\"data\"]` before you parse it as JSON."
+      },
+      {
+        "id": "D",
+        "text": "Decompress `envelope[\"message\"][\"data\"]` with gzip before you parse it as JSON."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A push request has a JSON body. The message data is in the `message.data` field, and it is **base64-encoded**. Decode it first, for example with `base64.b64decode()`, and then parse the JSON.",
+    "whyWrong": {
+      "A": "A push request has no `ce-data` header. The message data is in the JSON body.",
+      "B": "The push body is JSON. The handler already reads the envelope without an error.",
+      "D": "Pub/Sub does not compress the data. It encodes the data in base64."
+    },
+    "sources": [
+      {
+        "title": "Push subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/push",
+        "evidence": "The body of a POST request is a JSON object. The message data is in the `message.data` field and is base64-encoded."
+      }
+    ]
+  },
+  {
+    "id": "evt-025",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run-functions",
+      "retries",
+      "error-handling"
+    ],
+    "stem": "An event-driven Cloud Run function updates stock levels for each order event. Its Eventarc trigger has retries enabled. When an order contains a product ID that does not exist, the function raises `ValueError`, and the logs show the same event again and again. Transient database errors must still cause a retry. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Catch `ValueError`, log the event ID, and return normally. Raise exceptions only for transient errors."
+      },
+      {
+        "id": "B",
+        "text": "Create the trigger again with `--max-retry-attempts=1`, so that each event has one delivery attempt."
+      },
+      {
+        "id": "C",
+        "text": "Set the acknowledgment deadline of the subscription of the trigger to 600 seconds."
+      },
+      {
+        "id": "D",
+        "text": "Set an exponential backoff retry policy with a maximum delay of 600 seconds on the subscription."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "With retries enabled, **any unhandled error** causes a retry. A product ID that does not exist is a permanent error, so a retry never succeeds. Catch that error in the code and return. Keep the exception for **transient errors**, so that they still retry.",
+    "whyWrong": {
+      "B": "This turns off retries for all events, also for transient database errors.",
+      "C": "The function fails fast. The deadline does not stop the retry of a failed event.",
+      "D": "Backoff only adds time between the retries. The event still fails on each attempt until it expires."
+    },
+    "sources": [
+      {
+        "title": "Configure event-driven function retries",
+        "url": "https://docs.cloud.google.com/run/docs/tips/function-retries",
+        "evidence": "If your function has retries enabled, any unhandled error will trigger a retry. Make sure that your code captures any errors that shouldn't result in a retry."
+      },
+      {
+        "title": "Configure event-driven function retries",
+        "url": "https://docs.cloud.google.com/run/docs/tips/function-retries",
+        "evidence": "Because your function is retried continuously until successful execution, permanent errors like bugs should be eliminated from your code through testing before enabling retries."
+      }
+    ]
+  },
+  {
+    "id": "evt-026",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "idempotency",
+      "eventarc",
+      "duplicates"
+    ],
+    "stem": "A Cloud Run service charges customers through an external payment API when it receives an `order-created` event from an Eventarc trigger. The service runs on many instances. The service charges some customers twice when Eventarc delivers the same event again. The payment API accepts an idempotency key. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the CloudEvent `id` as the idempotency key in each call to the payment API."
+      },
+      {
+        "id": "B",
+        "text": "Keep a set of processed event IDs in the memory of each instance, and skip a known ID."
+      },
+      {
+        "id": "C",
+        "text": "Record each processed event ID in a database in a transaction, and skip an ID that exists."
+      },
+      {
+        "id": "D",
+        "text": "Enable exactly-once delivery on the Pub/Sub subscription of the Eventarc trigger."
+      },
+      {
+        "id": "E",
+        "text": "Create the trigger again with `--max-retry-attempts=1`, so that Eventarc does not resend events."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Eventarc can deliver the same event more than once, so the handler must be **idempotent**. When an external API accepts an idempotency key, the docs say to use the event ID as the key. A record of processed event IDs **outside the service** also blocks duplicates across all instances.",
+    "whyWrong": {
+      "B": "Each instance has its own memory, and a restart clears it. A duplicate can go to a different instance.",
+      "D": "Eventarc delivers through a push subscription, and push does not support exactly-once delivery.",
+      "E": "This turns off retries, so a failed charge never runs again. It does not make the handler safe for duplicates."
+    },
+    "sources": [
+      {
+        "title": "Retry events",
+        "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+        "evidence": "Many external APIs let you supply an idempotency key as a parameter. If you are using such an API, you should use the event ID as the idempotency key."
+      },
+      {
+        "title": "Retry events",
+        "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+        "evidence": "Impose a transactional check outside your service, independent of the code. For example, persist state somewhere recording that a given event ID has already been processed."
+      }
+    ]
+  },
+  {
+    "id": "evt-027",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "pubsub",
+      "pull",
+      "worker-pools",
+      "lease-management"
+    ],
+    "stem": "A Cloud Run service receives video jobs from a Pub/Sub push subscription. Each transcode takes 15 to 25 minutes. The service has a 45-minute request timeout, but Pub/Sub delivers each job again while the first transcode still runs. Other teams consume the same topic, so the publisher must not change. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the acknowledgment deadline of the push subscription to 1,800 seconds, longer than a transcode."
+      },
+      {
+        "id": "B",
+        "text": "Use a pull subscription, with a high-level client library subscriber in a Cloud Run worker pool."
+      },
+      {
+        "id": "C",
+        "text": "Return HTTP 102 when a request arrives, and continue the transcode after the response."
+      },
+      {
+        "id": "D",
+        "text": "Enable exactly-once delivery on the push subscription, so that Pub/Sub sends each job only once."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Pub/Sub sends a push message again when its **acknowledgment deadline** expires, and that deadline is at most 600 seconds. The Cloud Run request timeout does not change it. A pull subscriber can extend the deadline while it works. The high-level client library extends it for up to an hour by default. A worker pool runs the pull subscriber as an always-on background workload, and the topic and the publisher do not change.",
+    "whyWrong": {
+      "A": "The maximum acknowledgment deadline is 600 seconds. A push subscriber also cannot extend the deadline of one message.",
+      "C": "HTTP 102 acknowledges the message. If the transcode then fails, you lose the job.",
+      "D": "Push subscriptions do not support exactly-once delivery. Only pull subscriptions support it."
+    },
+    "sources": [
+      {
+        "title": "Choose a subscription type",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscriber",
+        "evidence": "The subscriber client controls the rate of delivery. The subscriber can dynamically modify the acknowledgment deadline, allowing message processing to take an arbitrarily long time."
+      },
+      {
+        "title": "Extend ack time with lease management",
+        "url": "https://docs.cloud.google.com/pubsub/docs/lease-management",
+        "evidence": "By default, the client libraries can extend the deadline to an hour by issuing periodic modifyAckDeadline requests."
+      },
+      {
+        "title": "Push subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/push",
+        "evidence": "You can't modify the acknowledgment deadline of individual messages that you receive from push subscriptions."
+      }
+    ]
+  },
+  {
+    "id": "evt-028",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "eventarc",
+      "trigger-location",
+      "duplicates"
+    ],
+    "stem": "For high availability, a team creates the same Eventarc trigger in `us-central1` and in `europe-west1`. Both triggers read from the global Pub/Sub topic `orders` and send events to a Cloud Run service in their own region. Now the services process each order twice. What is the cause?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pub/Sub topics are regional, so Pub/Sub copies each message to a topic in each region."
+      },
+      {
+        "id": "B",
+        "text": "The 10-second acknowledgment deadline expires, so Pub/Sub sends each event to the other region."
+      },
+      {
+        "id": "C",
+        "text": "Eventarc has no first-in-first-out guarantee, so each region processes the events in a different order."
+      },
+      {
+        "id": "D",
+        "text": "Each trigger creates its own subscription, and Pub/Sub delivers every message to every subscription."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Each identical trigger is a **separate subscriber** of the global topic. Pub/Sub delivers every message to all active subscriptions (fan-out), so the services in both regions process the same message.",
+    "whyWrong": {
+      "A": "Pub/Sub topics are global. The duplicates come from two subscriptions, not from two topics.",
+      "B": "A redelivery goes to the same subscription. One subscription does not send its messages to the trigger in another region.",
+      "C": "The order of the events does not make copies. Order and duplication are separate issues."
+    },
+    "sources": [
+      {
+        "title": "Understand Eventarc locations",
+        "url": "https://docs.cloud.google.com/eventarc/docs/understand-locations",
+        "evidence": "If you deploy identical triggers in multiple regions pointing to the same global Pub/Sub topic, each trigger acts as a separate subscriber."
+      },
+      {
+        "title": "Understand Eventarc locations",
+        "url": "https://docs.cloud.google.com/eventarc/docs/understand-locations",
+        "evidence": "Because Pub/Sub delivers messages to all active subscriptions (fan-out), your services in all regions will receive and process the same message, resulting in duplication."
+      }
+    ]
+  },
+  {
+    "id": "evt-029",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 1,
+    "tags": [
+      "eventarc",
+      "iam",
+      "least-privilege",
+      "service-accounts"
+    ],
+    "stem": "You create an Eventarc trigger that routes Cloud Storage events to a Cloud Run service that requires authentication. The Cloud Storage service agent already has the Pub/Sub Publisher role. You want the trigger to use an identity with the least privilege. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the Compute Engine default service account as the service account of the trigger."
+      },
+      {
+        "id": "B",
+        "text": "Create a user-managed service account, and grant it the Eventarc Event Receiver role."
+      },
+      {
+        "id": "C",
+        "text": "Grant the service account of the trigger the Eventarc Admin role on the project."
+      },
+      {
+        "id": "D",
+        "text": "Grant the service account of the trigger the Cloud Run Invoker role on the service."
+      },
+      {
+        "id": "E",
+        "text": "Grant the service account of the trigger the Cloud Run Admin role on the service."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "The service account of the trigger needs two roles: **Eventarc Event Receiver** to receive events, and **Cloud Run Invoker** to call the authenticated service. A user-managed service account with only these roles follows least privilege.",
+    "whyWrong": {
+      "A": "The default service account automatically gets the basic Editor role, which is highly privileged. Google says not to use it.",
+      "C": "Eventarc Admin is for the person who manages triggers. The trigger itself only needs to receive events.",
+      "E": "Cloud Run Admin can change and delete the service. A call to the service needs only Cloud Run Invoker."
+    },
+    "sources": [
+      {
+        "title": "Roles and permissions for Cloud Run targets",
+        "url": "https://docs.cloud.google.com/eventarc/docs/roles-permissions",
+        "evidence": "Grant Eventarc trigger permissions to the trigger service account: The Eventarc Event Receiver role allows your Eventarc trigger to receive events from event providers."
+      },
+      {
+        "title": "Roles and permissions for Cloud Run targets",
+        "url": "https://docs.cloud.google.com/eventarc/docs/roles-permissions",
+        "evidence": "Grant Cloud Run service permissions to the trigger service account: The Cloud Run Invoker role allows your Eventarc trigger to call the target Cloud Run service."
+      },
+      {
+        "title": "Roles and permissions for Cloud Run targets",
+        "url": "https://docs.cloud.google.com/eventarc/docs/roles-permissions",
+        "evidence": "You shouldn't use the default service account since it is automatically granted the highly privileged basic Editor role."
+      }
+    ]
+  },
+  {
+    "id": "evt-030",
+    "objective": "3.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "eventarc",
+      "retries",
+      "dead-letter-topics"
+    ],
+    "stem": "During development, your team created an Eventarc trigger with `--max-retry-attempts=1` to prevent runaway retries. The service is now ready for production. Events must not be lost when the service fails for a short time. Events that fail again and again must be kept for analysis. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create the trigger again without the `--max-retry-attempts` flag, so that the default retries apply."
+      },
+      {
+        "id": "B",
+        "text": "Configure a dead-letter topic on the Pub/Sub topic that the trigger uses as its transport."
+      },
+      {
+        "id": "C",
+        "text": "Keep the single delivery attempt, and log each failed event in the service code."
+      },
+      {
+        "id": "D",
+        "text": "Enable exactly-once delivery on the Pub/Sub subscription of the trigger."
+      },
+      {
+        "id": "E",
+        "text": "Configure a dead-letter topic on the Pub/Sub subscription of the trigger, and attach a subscription to it."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "Google recommends **no retries during development** and **retries in production**. With retries, Pub/Sub delivers a failed event again, so a short failure does not lose it. A dead-letter topic on the subscription of the trigger receives the events that fail again and again. A subscription on the dead-letter topic keeps them for analysis.",
+    "whyWrong": {
+      "B": "You set a dead-letter topic on a Pub/Sub subscription, not on the topic that Eventarc uses.",
+      "C": "One attempt loses each event that fails during a short outage. A log line is not a copy of the event that you can process again.",
+      "D": "Eventarc delivers through a push subscription, and push does not support exactly-once delivery."
+    },
+    "sources": [
+      {
+        "title": "Retry events",
+        "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+        "evidence": "Conversely, we recommend enabling retries when your code is in production, and to follow the best practices for handling retries so that every message is processed as expected."
+      },
+      {
+        "title": "Retry events",
+        "url": "https://docs.cloud.google.com/eventarc/docs/retry-events",
+        "evidence": "You must set a dead-letter topic when you create or update a Pub/Sub subscription, not when you create a Pub/Sub topic or when Eventarc creates a Pub/Sub topic."
+      },
+      {
+        "title": "Create triggers with Eventarc",
+        "url": "https://docs.cloud.google.com/run/docs/triggering/trigger-with-events",
+        "evidence": "Optionally, to specify a single event delivery attempt with no retries, use the `--max-retry-attempts` flag. The only valid value is `1`. If you omit the flag, the standard retry behavior applies."
+      }
+    ]
+  },
+  {
+    "id": "evt-031",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "publisher",
+      "flow-control"
+    ],
+    "stem": "A nightly job reads 200,000 rows and publishes one Pub/Sub message for each row with this code:\n\n```python\npublisher = pubsub_v1.PublisherClient()\nfor row in rows:\n    publisher.publish(topic_path, row.encode(\"utf-8\"))\n```\n\nMany publishes fail with `DEADLINE_EXCEEDED`, and the job does not know which rows failed. You want high throughput with the Google-recommended pattern. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `max_messages=1` in `BatchSettings`, so that each message goes out in its own request."
+      },
+      {
+        "id": "B",
+        "text": "Use `PublishFlowControl` with `LimitExceededBehavior.BLOCK`, and handle each returned future asynchronously."
+      },
+      {
+        "id": "C",
+        "text": "Pass a `Retry` object with a much longer total timeout to each `publish()` call."
+      },
+      {
+        "id": "D",
+        "text": "Call `future.result()` after each `publish()` call, so that each message completes before the next."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The loop creates requests faster than the client can send them. The requests **wait in memory** until they fail with `DEADLINE_EXCEEDED`. Publisher flow control limits the outstanding messages and blocks the loop until there is space. When you handle each future asynchronously, for example with a callback, you learn which rows failed **without blocking** each publish.",
+    "whyWrong": {
+      "A": "This turns off batching, so the client sends more requests and gets less throughput.",
+      "C": "The docs say that a large number of messages does not need longer retry settings. Adjust flow control and batching instead.",
+      "D": "Each publish then blocks until it completes, which decreases throughput. The docs recommend that you handle the result asynchronously."
+    },
+    "sources": [
+      {
+        "title": "Flow control",
+        "url": "https://docs.cloud.google.com/pubsub/docs/flow-control-messages",
+        "evidence": "requests accumulate in memory until they fail with a `DEADLINE_EXCEEDED` error. This is especially likely when tens of thousands of messages are published in a loop"
+      },
+      {
+        "title": "Best practices to publish to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+        "evidence": "For example, publishing a large number of messages wouldn't require you to increase the `initialRetryDelay` and `maxRetryDelay` values. However, you can adjust flow control and batching in such circumstances."
+      },
+      {
+        "title": "Best practices to publish to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+        "evidence": "To avoid blocking individual publish requests, handle the result asynchronously."
+      }
+    ]
+  },
+  {
+    "id": "evt-032",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "pubsub",
+      "subscriber",
+      "acknowledgment"
+    ],
+    "stem": "A pull subscriber saves each order to a database. When the database write fails, the order is lost, and Pub/Sub never delivers it again. This is the callback:\n\n```python\ndef callback(message):\n    message.ack()\n    order = json.loads(message.data)\n    save_order(order)\n```\n\nHow should you change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Move `message.ack()` to after `save_order(order)`, so that it runs only when the save succeeds."
+      },
+      {
+        "id": "B",
+        "text": "Keep `message.ack()` first, and call `message.nack()` when `save_order` raises an exception."
+      },
+      {
+        "id": "C",
+        "text": "Set the acknowledgment deadline of the subscription to 600 seconds to give the save more time."
+      },
+      {
+        "id": "D",
+        "text": "Enable exactly-once delivery on the subscription, so that Pub/Sub does not lose a message."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Pub/Sub discards a message after the subscriber acknowledges it. If the save fails after the acknowledgment, Pub/Sub does not deliver the message again. **Process the message first**, and acknowledge it only after the save succeeds.",
+    "whyWrong": {
+      "B": "After the acknowledgment, Pub/Sub has already discarded the message. A nack after that does not bring it back.",
+      "C": "The deadline is not the problem. The code acknowledges the message before the save, so a failed save loses it.",
+      "D": "Exactly-once delivery stops the redelivery of an acknowledged message. It does not save an order that failed after the acknowledgment."
+    },
+    "sources": [
+      {
+        "title": "Best practices to subscribe to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscribe-best-practices",
+        "evidence": "By default, Pub/Sub discards a message from a subscription after the message is acknowledged. If you don't process a message before sending an acknowledgment and the processing fails, the service does not redeliver the message."
+      }
+    ]
+  },
+  {
+    "id": "evt-033",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "pubsub",
+      "flow-control",
+      "lease-management"
+    ],
+    "stem": "A pull subscriber uses the high-level Python client library with the default flow control settings. Each message takes 2 to 8 minutes to process. After a large backlog builds up, Pub/Sub delivers many messages several times. A teammate proposes to set the acknowledgment deadline of the subscription to 600 seconds. What should you do instead?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use the unary Pull API, and pull one message at a time in a loop on each instance."
+      },
+      {
+        "id": "B",
+        "text": "Enable exactly-once delivery on the subscription, so that Pub/Sub stops the redeliveries."
+      },
+      {
+        "id": "C",
+        "text": "Lower `max_messages` in the `FlowControl` settings, and add subscriber instances if the load continues."
+      },
+      {
+        "id": "D",
+        "text": "Create a second subscription on the topic, and move half of the subscriber instances to it."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The client library already extends the deadline of each message, by default for up to an hour. With the default flow control, each instance holds **more messages than it can process** in that time, so the leases end and Pub/Sub delivers the messages again. A lower `max_messages` limit keeps each instance to the work that it can complete. For a **continued** overload, add subscriber instances. A 600-second deadline does not fix the overload.",
+    "whyWrong": {
+      "A": "The unary Pull API does not guarantee high throughput. Google recommends StreamingPull with the high-level library, which also manages the leases.",
+      "B": "Exactly-once delivery does not fix an overloaded subscriber. When a lease expires, Pub/Sub still delivers the message again.",
+      "D": "Each subscription gets a copy of every message. Two subscriptions double the work instead of sharing it."
+    },
+    "sources": [
+      {
+        "title": "Best practices to subscribe to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscribe-best-practices",
+        "evidence": "If you are experiencing cases where many messages are always getting redelivered, then your subscribers are overloaded or they are not acknowledging the messages before the deadline expires."
+      },
+      {
+        "title": "Extend ack time with lease management",
+        "url": "https://docs.cloud.google.com/pubsub/docs/lease-management",
+        "evidence": "By default, the client libraries can extend the deadline to an hour by issuing periodic modifyAckDeadline requests."
+      },
+      {
+        "title": "Handle transient spikes with flow control",
+        "url": "https://docs.cloud.google.com/pubsub/docs/flow-control",
+        "evidence": "If this scenario is a persistent state, rather than a transient spike in message volume, consider increasing the number of subscriber client instances."
+      }
+    ]
+  },
+  {
+    "id": "evt-034",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "filters",
+      "attributes"
+    ],
+    "stem": "You own a publisher that sends order messages to a Pub/Sub topic. The country code is a field in the JSON message data. A new service in Germany must receive only the orders where the country is `DE`, and no other orders. Other consumers already use the topic. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a subscription with the filter `data.country = \"DE\"`, and connect the new service to it."
+      },
+      {
+        "id": "B",
+        "text": "Create a subscription without a filter, and make the new service acknowledge and skip other orders."
+      },
+      {
+        "id": "C",
+        "text": "Add the filter `attributes.country = \"DE\"` to the existing subscription of another consumer."
+      },
+      {
+        "id": "D",
+        "text": "Publish the country as a `country` attribute, and create a subscription with `attributes.country = \"DE\"`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Pub/Sub filters messages by their **attributes**, not by the data in the message. The publisher must therefore send the country as an attribute. A new subscription with the filter delivers only the matching orders, and Pub/Sub automatically acknowledges the other messages.",
+    "whyWrong": {
+      "A": "A filter cannot read the message data. You can filter only on attributes.",
+      "B": "The service then receives every order, which the requirement does not allow.",
+      "C": "You cannot add or change the filter of an existing subscription. That subscription also belongs to another consumer."
+    },
+    "sources": [
+      {
+        "title": "Filter messages from a subscription",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-message-filter",
+        "evidence": "The Pub/Sub service automatically acknowledges the messages that don't match the filter. You can filter messages by their attributes, but not by the data in the message."
+      },
+      {
+        "title": "Filter messages from a subscription",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-message-filter",
+        "evidence": "The filter is an immutable property of a subscription. After you create a subscription, you cannot update the subscription to modify the filter."
+      }
+    ]
+  },
+  {
+    "id": "evt-035",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "pubsub",
+      "filters",
+      "snapshots",
+      "seek"
+    ],
+    "stem": "A subscription has the filter `attributes.region = \"emea\"`. The business now also needs the messages where `region` is `\"apac\"`. The subscription has a backlog of unacknowledged messages, and no message may be lost during the change. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud pubsub subscriptions update` with a new `--message-filter` that matches both values."
+      },
+      {
+        "id": "B",
+        "text": "Snapshot the subscription, create a subscription with the new filter, seek it to the snapshot, and move the subscribers."
+      },
+      {
+        "id": "C",
+        "text": "Create a subscription with the new filter, move the subscribers to it, and then delete the old subscription."
+      },
+      {
+        "id": "D",
+        "text": "Delete the subscription, and create it again with the same name and the new filter."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A filter is an **immutable** property of a subscription. To change it, take a snapshot of the old subscription, create a new subscription with the new filter, and seek the new subscription to the snapshot. The new subscription then gets the backlog, so **no message is lost** during the change.",
+    "whyWrong": {
+      "A": "You cannot update the filter of an existing subscription.",
+      "C": "A new subscription gets only the messages that arrive after you create it. When you delete the old subscription, you lose its backlog.",
+      "D": "A subscription that you create again with the same name has no backlog. You lose the unacknowledged messages."
+    },
+    "sources": [
+      {
+        "title": "Filter messages from a subscription",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-message-filter",
+        "evidence": "You cannot update the filter for an existing subscription. Instead, follow this workaround."
+      },
+      {
+        "title": "Filter messages from a subscription",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-message-filter",
+        "evidence": "Take a snapshot of the subscription for which you want to change the filter."
+      },
+      {
+        "title": "Filter messages from a subscription",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-message-filter",
+        "evidence": "You don't lose any messages during the transition."
+      }
+    ]
+  },
+  {
+    "id": "evt-036",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "snapshots",
+      "seek",
+      "deployment"
+    ],
+    "stem": "A team deploys a new version of a pull subscriber. The subscription and the topic use the default settings, so neither keeps acknowledged messages. The team is concerned that a bug in the new code can acknowledge messages without processing them. They want a way to recover those messages. What should they do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create a snapshot of the subscription before the deployment, and seek to it if the new code fails."
+      },
+      {
+        "id": "B",
+        "text": "Record the deployment time, and seek the subscription back to that time if the new code fails."
+      },
+      {
+        "id": "C",
+        "text": "Create a new subscription after the deployment, and read the lost messages from it if the code fails."
+      },
+      {
+        "id": "D",
+        "text": "Set the acknowledgment deadline to 600 seconds, so that the new code acknowledges messages later."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A snapshot keeps the acknowledgment state of the subscription at the time that you create it. If the new code acknowledges messages by mistake, a seek to the snapshot makes them available again. This needs **no retention settings**, which matters because the subscription and the topic use the **default settings**.",
+    "whyWrong": {
+      "B": "A seek to a past time needs topic retention or retained acknowledged messages. With the default settings, neither exists.",
+      "C": "A new subscription gets only the messages that arrive after you create it. It cannot get the messages that the code already acknowledged.",
+      "D": "The deadline does not protect against wrong acknowledgments. Pub/Sub still discards an acknowledged message."
+    },
+    "sources": [
+      {
+        "title": "Replay and purge messages with seek",
+        "url": "https://docs.cloud.google.com/pubsub/docs/replay-overview",
+        "evidence": "A concern with deploying new subscriber code is that the new executable may erroneously acknowledge messages, leading to message loss. Incorporating snapshots into your deployment process gives you a way to recover from bugs in new subscriber code."
+      },
+      {
+        "title": "Replay and purge messages with seek",
+        "url": "https://docs.cloud.google.com/pubsub/docs/replay-overview",
+        "evidence": "To seek to a time in the past and replay previously-acknowledged messages, you must configure message retention on the topic, or configure the subscription to retain acknowledged messages."
+      }
+    ]
+  },
+  {
+    "id": "evt-037",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "pubsub",
+      "exactly-once",
+      "duplicates",
+      "idempotency"
+    ],
+    "stem": "A subscription has exactly-once delivery enabled. All subscribers run in one region and connect through the locational endpoint of that region. They use the acknowledgment with response interface of the client library. Sometimes the subscribers still get the same order twice. The two messages have the same data but different message IDs. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Increase the minimum lease extension of the subscribers, so that the message leases do not expire."
+      },
+      {
+        "id": "B",
+        "text": "Enable message ordering on a new subscription, and publish each order with an ordering key."
+      },
+      {
+        "id": "C",
+        "text": "Deduplicate orders on a business key, such as the order ID, and record the processed keys in a database."
+      },
+      {
+        "id": "D",
+        "text": "Deduplicate on the Pub/Sub message ID, and record each processed message ID in a database."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Exactly-once delivery stops the redelivery of a message that was acknowledged. It does not remove **publisher duplicates**. When a publish retry stores the same data twice, the two copies have **different message IDs**, and Pub/Sub delivers both. Only a business key that the publisher sets, such as the order ID, identifies the duplicate.",
+    "whyWrong": {
+      "A": "Lease settings affect the redelivery of one message, which keeps its message ID. These duplicates are two separate messages.",
+      "B": "Ordering does not remove duplicates. A publish retry can also repeat a message in an ordered sequence.",
+      "D": "The duplicates have different message IDs, so a check on the message ID does not find them."
+    },
+    "sources": [
+      {
+        "title": "Exactly-once delivery",
+        "url": "https://docs.cloud.google.com/pubsub/docs/exactly-once-delivery",
+        "evidence": "A subscription might receive multiple copies of the same message due to publish side duplicates, even with exactly-once delivery enabled."
+      },
+      {
+        "title": "Exactly-once delivery",
+        "url": "https://docs.cloud.google.com/pubsub/docs/exactly-once-delivery",
+        "evidence": "Multiple unique publishes by the publishing client, across retries, leads to redeliveries with different message IDs."
+      },
+      {
+        "title": "Retry requests",
+        "url": "https://docs.cloud.google.com/pubsub/docs/retry-requests",
+        "evidence": "As a result, you can have two identical messages with different message IDs."
+      }
+    ]
+  },
+  {
+    "id": "evt-038",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "ordering-keys",
+      "publisher"
+    ],
+    "stem": "A publisher sends account events with message ordering enabled and the account ID as the ordering key. After a publish for the key `account-42` fails with an error that is not retryable, each later publish for that key fails at once. Publishes for other keys still succeed. The team fixed the cause and wants to continue to publish for `account-42` in order. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish the next events for `account-42` without an ordering key until the error clears."
+      },
+      {
+        "id": "B",
+        "text": "Remove the locational endpoint from the publisher, so that a different region accepts the key."
+      },
+      {
+        "id": "C",
+        "text": "Pass a `Retry` object with a longer total timeout to the next `publish()` call for the key."
+      },
+      {
+        "id": "D",
+        "text": "Call `publisher.resume_publish(topic_path, \"account-42\")`, and then publish the events again."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "When a publish with an ordering key fails with an error that is not retryable, the client library **stops publishing** other messages with the same key. This keeps the order. When you are ready to continue, call `resume_publish` for that key.",
+    "whyWrong": {
+      "A": "Messages without an ordering key have no order, so the account events can arrive out of order.",
+      "B": "You must publish all messages for one key in one region to keep the order. The client library blocks the key, not the region.",
+      "C": "The client library already retries ordered messages repeatedly. The key stays blocked until you call `resume_publish`."
+    },
+    "sources": [
+      {
+        "title": "Best practices to publish to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+        "evidence": "If a non-retryable error occurs, the client library doesn't publish the message and stops publishing other messages with the same ordering key."
+      },
+      {
+        "title": "Best practices to publish to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+        "evidence": "When you are ready to continue publishing on an ordering key that has a failed publish, call the `resumePublish` method."
+      }
+    ]
+  },
+  {
+    "id": "evt-039",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "dead-letter-topics",
+      "iam"
+    ],
+    "stem": "You set a dead-letter topic with a maximum of 5 delivery attempts on a pull subscription, and you attach a subscription to the dead-letter topic. A bug makes the subscriber nack every message. After an hour, Pub/Sub still delivers the messages again, and the dead-letter subscription is still empty. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Pub/Sub Publisher role on the dead-letter topic to the service account of the subscriber."
+      },
+      {
+        "id": "B",
+        "text": "Grant the Pub/Sub service agent Publisher on the dead-letter topic and Subscriber on the source subscription."
+      },
+      {
+        "id": "C",
+        "text": "Set the dead-letter topic to the source topic, so that the failed messages go back to the same topic."
+      },
+      {
+        "id": "D",
+        "text": "Add an exponential backoff retry policy to the dead-letter topic, so that it accepts forwarded messages."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The **Pub/Sub service agent** forwards the undeliverable messages, not your subscriber. It needs the Publisher role on the dead-letter topic and the Subscriber role on the source subscription. Pub/Sub counts delivery attempts only when the dead-letter topic and these IAM roles are correct.",
+    "whyWrong": {
+      "A": "The subscriber does not forward messages. The Pub/Sub service agent forwards them, so it needs the roles.",
+      "C": "The dead-letter topic must be a different topic from the source topic.",
+      "D": "A retry policy is a property of a subscription, not of a topic. It does not authorize the forwarding."
+    },
+    "sources": [
+      {
+        "title": "Dead-letter topics",
+        "url": "https://docs.cloud.google.com/pubsub/docs/dead-letter-topics",
+        "evidence": "Pub/Sub only counts delivery attempts when a dead-letter topic is configured correctly and includes the correct IAM permissions."
+      },
+      {
+        "title": "Dead-letter topics",
+        "url": "https://docs.cloud.google.com/pubsub/docs/dead-letter-topics",
+        "evidence": "Pub/Sub creates and maintains a service account for each project: `service-project-number@gcp-sa-pubsub.iam.gserviceaccount.com`. You can grant forwarding permissions by assigning publisher and subscriber roles to this service account."
+      }
+    ]
+  },
+  {
+    "id": "evt-040",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "pubsub",
+      "schemas",
+      "validation"
+    ],
+    "stem": "Several teams publish sensor readings to one Pub/Sub topic. Some publishers send messages with missing fields or fields of the wrong type, and the consumers fail on them. You want Pub/Sub to reject these messages when they are published, so that the publishers get an error. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create an Avro or Protocol Buffer schema, and associate it with the topic."
+      },
+      {
+        "id": "B",
+        "text": "Create a subscription filter that matches only the messages with correct fields."
+      },
+      {
+        "id": "C",
+        "text": "Validate each message in the consumers, and nack the messages that are not correct."
+      },
+      {
+        "id": "D",
+        "text": "Configure a dead-letter topic on each subscription for the messages that are not correct."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A schema is a contract that Pub/Sub enforces on a topic. If a message does not conform to the schema, Pub/Sub **does not publish** it, so the publisher gets an error at once. Pub/Sub supports Apache Avro and Protocol Buffer schemas.",
+    "whyWrong": {
+      "B": "A filter reads only attributes, and it acts on a subscription after the publish. The publisher gets no error.",
+      "C": "A nack makes Pub/Sub deliver the message again and again. The publisher still gets no error.",
+      "D": "A dead-letter topic collects messages after failed delivery attempts. It does not reject them at publish time."
+    },
+    "sources": [
+      {
+        "title": "Schema overview",
+        "url": "https://docs.cloud.google.com/pubsub/docs/schemas",
+        "evidence": "You can create a schema and associate it with a topic to enforce the schema for published messages. If a specific message does not conform to the schema, the message is not published."
+      }
+    ]
+  },
+  {
+    "id": "evt-041",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "publisher",
+      "error-handling"
+    ],
+    "stem": "An order service publishes each order to a Pub/Sub topic. Every order must reach the topic, also when a publish fails. You write the code that handles the result of each publish future. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Log the error and continue, because Pub/Sub keeps a failed message on the topic for a later delivery."
+      },
+      {
+        "id": "B",
+        "text": "Ignore the error, because the client library retries every error until the message is published."
+      },
+      {
+        "id": "C",
+        "text": "Retry the publish with a delay after a transient error, such as `DEADLINE_EXCEEDED`."
+      },
+      {
+        "id": "D",
+        "text": "Store the message to publish it later after an error such as `NOT_FOUND` or `PERMISSION_DENIED`."
+      },
+      {
+        "id": "E",
+        "text": "Retry the publish in a loop after any error until it succeeds, with no delay between the attempts."
+      }
+    ],
+    "answer": [
+      "C",
+      "D"
+    ],
+    "explanation": "The docs give options for a failed publish. A **transient** error, such as `DEADLINE_EXCEEDED`, can succeed on a retry. An error that needs a person to act, such as `NOT_FOUND` or `PERMISSION_DENIED`, does not succeed on a retry. Store that message and publish it after the fix, so that **every order** reaches the topic.",
+    "whyWrong": {
+      "A": "Pub/Sub does not keep a message that failed to publish. Logging fits only when the use case does not need every message.",
+      "B": "The client library does not retry errors that do not warrant a retry. You lose those messages unless you handle them.",
+      "E": "A permanent error does not clear with retries, so the loop never ends. A loop with no delay also adds load during an outage."
+    },
+    "sources": [
+      {
+        "title": "Best practices to publish to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+        "evidence": "Retry the publish on a potentially transient failure like a `Deadline exceeded` error."
+      },
+      {
+        "title": "Best practices to publish to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+        "evidence": "Persist the message to a file or storage to retry its publish later, especially on an error that requires user intervention like `Not found` or `Permission denied`."
+      },
+      {
+        "title": "Retry requests",
+        "url": "https://docs.cloud.google.com/pubsub/docs/retry-requests",
+        "evidence": "Publishing failures are automatically retried, except for errors that don't warrant retries."
+      }
+    ]
+  },
+  {
+    "id": "evt-042",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "batching",
+      "publisher"
+    ],
+    "stem": "An IoT gateway publishes many small sensor readings each second with the default batch settings of the Python client library. The consumers accept up to one second of extra latency. You want to increase the publish throughput and decrease the number of publish requests. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `max_messages=1` in `BatchSettings`, so that the client sends each reading at once."
+      },
+      {
+        "id": "B",
+        "text": "Publish each reading with its own ordering key, so that Pub/Sub sends the readings in parallel."
+      },
+      {
+        "id": "C",
+        "text": "Increase `max_messages`, `max_bytes`, and `max_latency` in `BatchSettings`, within the request limits."
+      },
+      {
+        "id": "D",
+        "text": "Call `future.result()` after each publish, so that the client sends one request at a time."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Batching **trades latency for throughput** and cost. The client sends a batch when it reaches any one threshold, and the Python default latency is only 10 ms. Higher thresholds put more readings in each request, and the consumers **accept up to one second** of delay.",
+    "whyWrong": {
+      "A": "This turns off batching, so each reading needs its own request.",
+      "B": "Ordering keys add order, not batching. Ordered publishing also decreases publish availability.",
+      "D": "This blocks the publisher after each message, which decreases throughput."
+    },
+    "sources": [
+      {
+        "title": "Best practices to publish to a Pub/Sub topic",
+        "url": "https://docs.cloud.google.com/pubsub/docs/publish-best-practices",
+        "evidence": "The batching (or grouping) of messages helps the publisher to improve its efficiency and send messages at a higher throughput. Batching reduces the cost to publish data."
+      },
+      {
+        "title": "Batch messaging",
+        "url": "https://docs.cloud.google.com/pubsub/docs/batch-messaging",
+        "evidence": "To turn off batching in your client library, set the value of `max_messages` to 1."
+      }
+    ]
+  },
+  {
+    "id": "evt-043",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "pubsub",
+      "pull",
+      "streamingpull",
+      "subscription-type"
+    ],
+    "stem": "A subscriber runs in an on-premises data center. It can make outbound HTTPS connections, but it has no public HTTPS endpoint. It must process a large volume of messages from a Pub/Sub topic with high throughput. Which approach should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A push subscription that sends the messages to the private IP address of the on-premises server."
+      },
+      {
+        "id": "B",
+        "text": "A BigQuery subscription, and a job that reads the new rows from the table every few seconds."
+      },
+      {
+        "id": "C",
+        "text": "A pull subscription, and a loop that calls the unary Pull API with the low-level client library."
+      },
+      {
+        "id": "D",
+        "text": "A pull subscription, and a subscriber that uses the high-level client library with StreamingPull."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Pull fits a **large volume** and a subscriber with **no public HTTPS endpoint**, because the subscriber opens the connection. For most use cases, Google recommends the high-level client library with the StreamingPull API and asynchronous processing.",
+    "whyWrong": {
+      "A": "A push endpoint must be a public HTTPS server. Pub/Sub cannot push messages to private addresses.",
+      "B": "This adds a table and a polling job. It also adds latency compared with direct delivery.",
+      "C": "The low-level library has no lease management or flow control, so you must write them yourself. Google recommends StreamingPull for throughput."
+    },
+    "sources": [
+      {
+        "title": "Choose a subscription type",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscriber",
+        "evidence": "Large volume of messages (GBs per second). Efficiency and throughput of message processing is critical. Environments where it's not feasible to set up a public HTTPS endpoint with a non-self-signed SSL certificate."
+      },
+      {
+        "title": "Pull subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/pull",
+        "evidence": "For most use cases, we recommend the Google-provided high-level client library with the StreamingPull API and asynchronous message processing."
+      },
+      {
+        "title": "Create push subscriptions",
+        "url": "https://docs.cloud.google.com/pubsub/docs/create-push-subscription",
+        "evidence": "Pub/Sub operates outside of VPC networks and cannot directly push messages to private VPC addresses."
+      }
+    ]
+  },
+  {
+    "id": "evt-044",
+    "objective": "4.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "pubsub",
+      "retry-policy",
+      "nack"
+    ],
+    "stem": "A pull subscriber writes each message to a database. Sometimes the database is unavailable for several minutes. During these outages, the subscriber nacks each message, and Pub/Sub delivers it again at once. This fills the logs and wastes resources. No message may be lost. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Acknowledge each message during an outage, and write it to a local file on the instance for a later retry."
+      },
+      {
+        "id": "B",
+        "text": "Keep the nack, and set an exponential backoff retry policy on the subscription."
+      },
+      {
+        "id": "C",
+        "text": "Keep the nack, and set the retry policy of the subscription to Retry immediately."
+      },
+      {
+        "id": "D",
+        "text": "Stop the nack, and let each message wait for its 10-second acknowledgment deadline."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A nack makes Pub/Sub deliver a message again **immediately**, unless a retry policy sets a delay. With an exponential backoff retry policy, Pub/Sub waits longer between redeliveries, up to 600 seconds. The nack keeps the message in Pub/Sub, so **no message is lost**.",
+    "whyWrong": {
+      "A": "Pub/Sub discards an acknowledged message. If the instance stops, you lose the local file and the message.",
+      "C": "Retry immediately is the default policy, which causes the current flood of redeliveries.",
+      "D": "The client library continues to extend the deadline of a message that is not acknowledged. The messages hold the capacity of the subscriber, and no controlled delay occurs."
+    },
+    "sources": [
+      {
+        "title": "Overview of the Pub/Sub service",
+        "url": "https://docs.cloud.google.com/pubsub/docs/pubsub-basics",
+        "evidence": "Nacking a message by a subscriber causes Pub/Sub to redeliver it immediately based on default retry settings, which can be modified."
+      },
+      {
+        "title": "Subscription properties",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-properties",
+        "evidence": "You can also set the value to Retry after exponential backoff delay. In this case, you must specify the maximum and minimum backoff values."
+      },
+      {
+        "title": "Subscription properties",
+        "url": "https://docs.cloud.google.com/pubsub/docs/subscription-properties",
+        "evidence": "The longest backoff duration that you can specify is 600 seconds."
+      }
+    ]
+  }
+]

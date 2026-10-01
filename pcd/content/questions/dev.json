@@ -1,0 +1,2137 @@
+[
+  {
+    "id": "dev-001",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "emulators",
+      "pubsub",
+      "gcloud"
+    ],
+    "stem": "A developer installs the Pub/Sub emulator component and starts the emulator for local tests with this command:\n\n```bash\ngcloud emulators pubsub start --project=test-project\n```\n\nThe command fails with an `Invalid choice: 'pubsub'` error. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud components install pubsub-emulator` again, and then run the same command."
+      },
+      {
+        "id": "B",
+        "text": "Run the command in the beta group: `gcloud beta emulators pubsub start --project=test-project`."
+      },
+      {
+        "id": "C",
+        "text": "Run the command in the Pub/Sub group: `gcloud pubsub emulator start --project=test-project`."
+      },
+      {
+        "id": "D",
+        "text": "Run `$(gcloud emulators pubsub env-init)` first, and then run the same command."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The Pub/Sub emulator is only in the `gcloud beta emulators` group. The GA `gcloud emulators` group has commands for Firestore and Spanner only, so the command without `beta` fails. The component is already installed, so the developer only needs the correct command group.",
+    "whyWrong": {
+      "A": "The component is already installed. The error comes from the command group, not from a missing component.",
+      "C": "The `gcloud pubsub` group has no `emulator` command. The emulator commands are in `gcloud beta emulators pubsub`.",
+      "D": "`env-init` is also only in the beta group, and it only prints the variables for a running emulator. It does not start the emulator."
+    },
+    "sources": [
+      {
+        "title": "Testing apps locally with the emulator",
+        "url": "https://docs.cloud.google.com/pubsub/docs/emulator",
+        "evidence": "See `gcloud beta emulators pubsub start` for a complete list of flags."
+      }
+    ]
+  },
+  {
+    "id": "dev-002",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "emulators",
+      "pubsub",
+      "client-libraries"
+    ],
+    "stem": "A team runs tests against the Pub/Sub emulator on a laptop. The setup script contains these commands:\n\n```bash\n$(gcloud beta emulators pubsub env-init)\ngcloud pubsub topics create orders --project=test-project\npython -m pytest tests/\n```\n\nThe tests fail with `NOT_FOUND` errors for the `orders` topic. What should the team change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create the `orders` topic in the Google Cloud console, in a project with the ID `test-project`."
+      },
+      {
+        "id": "B",
+        "text": "Use `gcloud beta pubsub topics create` instead, because the beta command group supports the emulator."
+      },
+      {
+        "id": "C",
+        "text": "Run the `gcloud pubsub topics create` command before the `env-init` command in the script."
+      },
+      {
+        "id": "D",
+        "text": "Create the `orders` topic in the test setup code with the Pub/Sub client library."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The Pub/Sub emulator works only with the Cloud Client Libraries. It does not support `gcloud pubsub` commands or the Google Cloud console, so the topic never exists in the emulator. Setup code that uses the client library, with `PUBSUB_EMULATOR_HOST` set, creates the topic in the emulator.",
+    "whyWrong": {
+      "A": "The emulator does not support the console. A topic in a real project does not exist in the local emulator.",
+      "B": "The Pub/Sub emulator does not support `gcloud pubsub` commands in any release group. Only the emulator commands are in the beta group.",
+      "C": "The order of the commands does not matter. `gcloud pubsub` commands do not reach the Pub/Sub emulator."
+    },
+    "sources": [
+      {
+        "title": "Testing apps locally with the emulator",
+        "url": "https://docs.cloud.google.com/pubsub/docs/emulator",
+        "evidence": "To use the emulator, you must have an application built using the Cloud Client Libraries. The emulator does not support Google Cloud console or `gcloud pubsub` commands."
+      }
+    ]
+  },
+  {
+    "id": "dev-003",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "emulators",
+      "pubsub",
+      "env-init"
+    ],
+    "stem": "A developer starts the Pub/Sub emulator in one terminal. In a second terminal, the developer runs `$(gcloud beta emulators pubsub env-init)` and then the tests, which pass. Later, the developer stops and restarts the emulator. Now the tests in the second terminal fail with connection errors. Nothing else changed. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `$(gcloud beta emulators pubsub env-init)` again in the second terminal before the tests."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud auth application-default login` again, because the restart cleared the credentials."
+      },
+      {
+        "id": "C",
+        "text": "Run the tests in the first terminal, because the emulator accepts connections only from its own shell."
+      },
+      {
+        "id": "D",
+        "text": "Run `unset PUBSUB_EMULATOR_HOST` in the second terminal, so that the client finds the emulator itself."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The emulator variables depend on port numbers that the emulator assigns when it starts, and the port can change after a restart. The second terminal still has the old address in `PUBSUB_EMULATOR_HOST`. Run `env-init` again each time you start the emulator.",
+    "whyWrong": {
+      "B": "Emulators do not check identity, so credentials do not cause this failure. The address in the variable is old.",
+      "C": "The docs run the client in a second terminal on the same machine. The emulator does not accept connections only from the shell that started it.",
+      "D": "Without `PUBSUB_EMULATOR_HOST`, the client library sends calls to the production Pub/Sub service, not to the emulator."
+    },
+    "sources": [
+      {
+        "title": "Testing apps locally with the emulator",
+        "url": "https://docs.cloud.google.com/pubsub/docs/emulator",
+        "evidence": "You must set the environment variables each time you start the emulator. The environment variables depend on dynamically assigned port numbers that could change when you restart the emulator."
+      }
+    ]
+  },
+  {
+    "id": "dev-004",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "emulators",
+      "firestore",
+      "indexes"
+    ],
+    "stem": "A team tests the data layer of an app that uses Firestore in Native mode. The tests run against the Firestore emulator in each pull request, and all tests pass. After a release, one query fails in production with an error that says that the query requires an index. The team wants to find missing indexes before each release. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Start the emulator with `--require-indexes` and an index file, so that it rejects queries that have no index."
+      },
+      {
+        "id": "B",
+        "text": "Start the emulator with `--import-data` from an export of production, so that it loads the indexes."
+      },
+      {
+        "id": "C",
+        "text": "Run the query tests against a Firestore database in a separate test project before each release."
+      },
+      {
+        "id": "D",
+        "text": "Set `FIRESTORE_EMULATOR_HOST` in the release pipeline, so that the emulator checks the production indexes."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The Firestore emulator does not track manual (composite) indexes, and it runs any valid query. The docs tell you to test against a real Firestore database to find the indexes that your queries need. A test project before each release meets the requirement to find missing indexes early.",
+    "whyWrong": {
+      "A": "`--require-indexes` is supported only in Datastore mode. This app uses Firestore in Native mode.",
+      "B": "`--import-data` loads documents when the emulator starts. It does not make the emulator check indexes.",
+      "D": "The variable only sends client library calls to the emulator. The emulator still runs queries without index checks."
+    },
+    "sources": [
+      {
+        "title": "Use Firestore emulator locally",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/emulator",
+        "evidence": "The emulator does not track composite indexes and will instead execute any valid query. Make sure to test your app against a real Firestore instance to determine which indexes you require."
+      },
+      {
+        "title": "gcloud emulators firestore start",
+        "url": "https://docs.cloud.google.com/sdk/gcloud/reference/emulators/firestore/start",
+        "evidence": "Only supported in Datastore Mode in conjunction with `--index-file`."
+      }
+    ]
+  },
+  {
+    "id": "dev-005",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "emulators",
+      "datastore-mode",
+      "consistency"
+    ],
+    "stem": "A service uses Firestore in Datastore mode. Its tests run against the legacy Datastore emulator. Some tests fail because a query right after a write returns old data, but the same code works in production. The team wants a local emulator that behaves like Firestore in Datastore mode, as the current docs recommend. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud emulators firestore start --database-mode=firestore-native`, and move the code to the Native mode client."
+      },
+      {
+        "id": "B",
+        "text": "Keep the legacy Datastore emulator, and add a short wait after each write in the tests."
+      },
+      {
+        "id": "C",
+        "text": "Run `gcloud emulators firestore start` with no flags, because Datastore mode is its default mode."
+      },
+      {
+        "id": "D",
+        "text": "Run `gcloud emulators firestore start --database-mode=datastore-mode`, and keep the current client code."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The legacy Datastore emulator simulates eventual consistency by default, but Firestore in Datastore mode is strongly consistent. The docs tell you to emulate Firestore in Datastore mode with the Firestore emulator and `--database-mode=datastore-mode`. The client code does not change.",
+    "whyWrong": {
+      "A": "Native mode is a different database mode with a different API. The service uses Datastore mode, so the tests must use it too.",
+      "B": "A wait hides the symptom. The legacy emulator still does not behave like the production database.",
+      "C": "The default mode of the Firestore emulator is `firestore-native`, not Datastore mode."
+    },
+    "sources": [
+      {
+        "title": "Running the Datastore Emulator",
+        "url": "https://docs.cloud.google.com/datastore/docs/tools/datastore-emulator",
+        "evidence": "This content applies to the emulator for legacy Cloud Datastore. To emulate Firestore in Datastore mode, use `gcloud emulators firestore start --database-mode=datastore-mode` instead."
+      },
+      {
+        "title": "Running the Datastore Emulator",
+        "url": "https://docs.cloud.google.com/datastore/docs/tools/datastore-emulator",
+        "evidence": "The emulator simulates eventual consistency, by default. Firestore in Datastore mode is strongly consistent."
+      }
+    ]
+  },
+  {
+    "id": "dev-006",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "emulators",
+      "spanner",
+      "pubsub",
+      "integration-tests"
+    ],
+    "stem": "A team runs tests against the Spanner emulator and the Pub/Sub emulator in each pull request. The team wants to know which checks still need real resources in a test project. Which two behaviors must the team test with real resources? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "The SQL queries and the mutations that the data layer sends to Spanner."
+      },
+      {
+        "id": "B",
+        "text": "The IAM roles that the service account needs for Spanner and for Pub/Sub."
+      },
+      {
+        "id": "C",
+        "text": "The publish and receive logic in the Pub/Sub client code."
+      },
+      {
+        "id": "D",
+        "text": "The latency and the throughput of Spanner queries under production load."
+      },
+      {
+        "id": "E",
+        "text": "The Spanner schema that the tests create with DDL statements."
+      }
+    ],
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Emulators do not check identity. The Spanner emulator has no authentication or IAM, and the Pub/Sub emulator does not support IAM operations. The Spanner docs also say that the performance and scalability of the emulator do not compare to the production service. Test IAM and performance against real resources.",
+    "whyWrong": {
+      "A": "The Spanner emulator runs SQL queries and mutations, so an emulator test can check them.",
+      "C": "The Pub/Sub emulator supports publish and receive through the Cloud Client Libraries.",
+      "E": "The Spanner emulator supports schema changes. It locks the whole database while they run, but the DDL statements work."
+    },
+    "sources": [
+      {
+        "title": "Emulate Spanner locally",
+        "url": "https://docs.cloud.google.com/spanner/docs/emulator",
+        "evidence": "TLS/HTTPS, authentication, Identity and Access Management (IAM), permissions, or roles."
+      },
+      {
+        "title": "Emulate Spanner locally",
+        "url": "https://docs.cloud.google.com/spanner/docs/emulator",
+        "evidence": "The emulator's performance and scalability don't compare to the production service."
+      }
+    ]
+  },
+  {
+    "id": "dev-007",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "local-development",
+      "adc"
+    ],
+    "stem": "A developer runs a Cloud Run service locally with `gcloud beta code dev`. The service reads from Cloud Storage with a client library. Every request fails with an error that says that default credentials were not found. Company policy forbids service account keys on laptops. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud beta code dev --service-account=SA_EMAIL` to give the container the identity of the service."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud auth application-default login`, then `gcloud beta code dev --application-default-credential`."
+      },
+      {
+        "id": "C",
+        "text": "Run `gcloud auth login`, and then run `gcloud beta code dev` again without any extra flags."
+      },
+      {
+        "id": "D",
+        "text": "Set `GOOGLE_CLOUD_PROJECT` in the container, so that the client uses the default service account."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A local container does not get the service account of a Cloud Run service. The `--application-default-credential` flag passes your ADC credentials to the container, so no key is necessary. This meets the policy against service account keys.",
+    "whyWrong": {
+      "A": "The `--service-account` flag downloads a service account key and caches it locally. This breaks the policy.",
+      "C": "`gcloud auth login` gives credentials to the gcloud CLI only. The container still has no credentials.",
+      "D": "A project ID is not a credential. A local container does not get a default service account."
+    },
+    "sources": [
+      {
+        "title": "Test a Cloud Run service locally",
+        "url": "https://docs.cloud.google.com/run/docs/testing/local",
+        "evidence": "To give the container access to a credential using your own account, log in using gcloud and use the `--application-default-credential` flag:"
+      },
+      {
+        "title": "Test a Cloud Run service locally",
+        "url": "https://docs.cloud.google.com/run/docs/testing/local",
+        "evidence": "The `--service-account` flag causes a service account key to be downloaded and cached locally."
+      }
+    ]
+  },
+  {
+    "id": "dev-008",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "functions-framework",
+      "cloudevents",
+      "local-development"
+    ],
+    "stem": "A developer writes a Cloud Run function in Python that handles Pub/Sub messages as CloudEvents. The developer wants to run the function on a laptop and send it a sample message. The test must not use cloud resources. Which approach should the developer use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `functions-framework --target=handle_message`, and publish a message with `gcloud pubsub topics publish`."
+      },
+      {
+        "id": "B",
+        "text": "Start the Pub/Sub emulator, and create a push subscription to `localhost:8080` with a `gcloud pubsub` command."
+      },
+      {
+        "id": "C",
+        "text": "Run `functions-framework --target=handle_message --signature-type=cloudevent`, and send a CloudEvent with `curl`."
+      },
+      {
+        "id": "D",
+        "text": "Run `python main.py`, and send a `curl` POST request with a plain JSON body that holds the message text."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The Functions Framework runs the function as a local HTTP server, and `--signature-type=cloudevent` selects an event-driven function. A `curl` request with `ce-*` headers and a base64-encoded `data` value sends a sample Pub/Sub event. No cloud resources are necessary.",
+    "whyWrong": {
+      "A": "The default signature type is `http`, not `cloudevent`. Also, `gcloud pubsub topics publish` sends the message to a real topic, which is a cloud resource.",
+      "B": "The Pub/Sub emulator does not support `gcloud pubsub` commands, so the command cannot create the subscription in the emulator.",
+      "D": "A function file has no HTTP server of its own. The Functions Framework supplies the server, and a plain JSON body is not a CloudEvent."
+    },
+    "sources": [
+      {
+        "title": "Local functions development",
+        "url": "https://docs.cloud.google.com/run/docs/local-dev-functions",
+        "evidence": "You can send sample events to event-driven functions using `curl`. The following `curl` requests show how to send sample Pub/Sub and Cloud Storage events to an event-driven function running at `localhost:8080`."
+      },
+      {
+        "title": "Local functions development",
+        "url": "https://docs.cloud.google.com/run/docs/local-dev-functions",
+        "evidence": "The signature type used by your function. Can be `http` (the default) or `cloudevent`."
+      }
+    ]
+  },
+  {
+    "id": "dev-009",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "emulators",
+      "firestore",
+      "pytest"
+    ],
+    "stem": "A developer adds pytest tests for code that writes to Firestore with the Python server client library. The Firestore emulator runs on `localhost:8080`. Each test must start with an empty database, and no test may write to a real database. Which two actions should the developer take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Export `FIRESTORE_EMULATOR_HOST=localhost:8080` in the shell that runs pytest."
+      },
+      {
+        "id": "B",
+        "text": "Start the emulator with `--export-on-exit`, so that each test starts from a clean copy."
+      },
+      {
+        "id": "C",
+        "text": "Start the emulator with `--import-data` from an export of the production database."
+      },
+      {
+        "id": "D",
+        "text": "Set the `auth/disable_credentials` property to `true` in the active gcloud configuration."
+      },
+      {
+        "id": "E",
+        "text": "Send an HTTP `DELETE` request to the documents endpoint of the emulator between tests."
+      }
+    ],
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "When `FIRESTORE_EMULATOR_HOST` is set, the server client libraries connect to the emulator, so no test writes to a real database. The emulator also has a REST endpoint that deletes all its data. Call it between tests, so that each test starts with an empty database and the emulator keeps running.",
+    "whyWrong": {
+      "B": "`--export-on-exit` saves the data when the emulator stops. It does not clear data between tests.",
+      "C": "`--import-data` loads data at start, so the database is not empty. It also copies production data to the laptop.",
+      "D": "This property affects gcloud CLI commands, for example commands to the Spanner emulator. It does not send client library calls to the Firestore emulator."
+    },
+    "sources": [
+      {
+        "title": "Use Firestore emulator locally",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/emulator",
+        "evidence": "To connect a Firestore server client library (C#, Go, Java, Node.js, PHP, Python, and Ruby), set the `FIRESTORE_EMULATOR_HOST` environment variable. When this environment variable is set, the server client libraries automatically connect to the emulator."
+      },
+      {
+        "title": "Use Firestore emulator locally",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/emulator",
+        "evidence": "The Firestore emulator includes a REST endpoint for deleting all the data currently in the emulator. You can use this endpoint to clear data between tests without shutting down the emulator."
+      }
+    ]
+  },
+  {
+    "id": "dev-010",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "adc",
+      "gcloud-auth",
+      "client-libraries"
+    ],
+    "stem": "A developer runs `gcloud auth login` on a new laptop, and `gcloud storage ls` works. A Python script that uses the Cloud Storage client library fails with an error that says that default credentials were not found. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud auth application-default login` to create a local ADC file for the user account."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud config set account` with the email address of the developer, and run the script again."
+      },
+      {
+        "id": "C",
+        "text": "Set `GOOGLE_APPLICATION_CREDENTIALS` to the output of the `gcloud auth print-access-token` command."
+      },
+      {
+        "id": "D",
+        "text": "Set `CLOUDSDK_ACTIVE_CONFIG_NAME` to the name of the configuration that holds the account."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "`gcloud auth login` gives credentials to the gcloud CLI only. The client library gets credentials from Application Default Credentials (ADC). `gcloud auth application-default login` stores your user credentials in the local file that ADC uses.",
+    "whyWrong": {
+      "B": "The `account` property is a gcloud CLI setting. It does not create credentials for ADC.",
+      "C": "`GOOGLE_APPLICATION_CREDENTIALS` must point to a credential file, not contain an access token. An access token also expires after a short time.",
+      "D": "The variable selects a gcloud configuration for gcloud commands. It does not create the ADC file that the client library needs."
+    },
+    "sources": [
+      {
+        "title": "Authenticate for the gcloud CLI",
+        "url": "https://docs.cloud.google.com/sdk/docs/authenticate",
+        "evidence": "This document is only about authentication for the Google Cloud CLI to access Google Cloud resources. If you need to authenticate workloads using Cloud Client Libraries or Google API Client Libraries, see How Application Default Credentials works."
+      },
+      {
+        "title": "Set up ADC for a local development environment",
+        "url": "https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment",
+        "evidence": "A sign-in screen appears. After you sign in, your credentials are stored in the local credential file used by ADC."
+      }
+    ]
+  },
+  {
+    "id": "dev-011",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gcloud-configurations",
+      "adc"
+    ],
+    "stem": "A developer has two gcloud configurations: `dev` uses `dev@example.com`, and `qa` uses `qa@example.com`. The developer runs `gcloud config configurations activate qa`, and `gcloud auth list` shows `qa@example.com` as active. A local app that uses the Cloud Client Libraries still acts as `dev@example.com`. The app must act as `qa@example.com`. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud config set account qa@example.com` in the `qa` configuration, and restart the app."
+      },
+      {
+        "id": "B",
+        "text": "Set `CLOUDSDK_ACTIVE_CONFIG_NAME=qa` in the shell that starts the app, and restart the app."
+      },
+      {
+        "id": "C",
+        "text": "Run `gcloud auth login qa@example.com` to refresh the gcloud credentials, and restart the app."
+      },
+      {
+        "id": "D",
+        "text": "Run `gcloud auth application-default login`, sign in as `qa@example.com`, and restart the app."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The local ADC file belongs to the user account that created it, not to a gcloud configuration. A configuration change affects only the gcloud CLI. To change the identity of the app, create a new ADC file as `qa@example.com`.",
+    "whyWrong": {
+      "A": "The `qa` configuration already uses this account. The property affects the gcloud CLI, not the ADC file.",
+      "B": "The variable selects the gcloud configuration for gcloud commands. It does not change the ADC file that the client libraries use.",
+      "C": "`gcloud auth login` changes only the gcloud CLI credentials. The ADC file still holds the credentials of `dev@example.com`."
+    },
+    "sources": [
+      {
+        "title": "Set up ADC for a local development environment",
+        "url": "https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment",
+        "evidence": "Changing to a different gcloud CLI configuration might change the identity used by the gcloud CLI, but it does not affect your local ADC file or the ADC configuration."
+      },
+      {
+        "title": "Set up ADC for a local development environment",
+        "url": "https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment",
+        "evidence": "Your local ADC file is associated with your user account, not your gcloud CLI configuration."
+      }
+    ]
+  },
+  {
+    "id": "dev-012",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "impersonation",
+      "adc",
+      "service-accounts"
+    ],
+    "stem": "A developer must test a local app with the permissions of the `orders-sa` service account before deployment. Security policy forbids service account keys. Which two actions should the developer take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the developer the Service Account User role (`roles/iam.serviceAccountUser`) on `orders-sa`."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud config set auth/impersonate_service_account ORDERS_SA_EMAIL` in the active configuration."
+      },
+      {
+        "id": "C",
+        "text": "Grant the developer the Service Account Token Creator role (`roles/iam.serviceAccountTokenCreator`) on `orders-sa`."
+      },
+      {
+        "id": "D",
+        "text": "Run `gcloud auth application-default login --impersonate-service-account ORDERS_SA_EMAIL`."
+      },
+      {
+        "id": "E",
+        "text": "Create a key for `orders-sa`, and set `GOOGLE_APPLICATION_CREDENTIALS` to the path of the key file."
+      }
+    ],
+    "answer": [
+      "C",
+      "D"
+    ],
+    "explanation": "Impersonation gives the app the permissions of the service account without a key. `gcloud auth application-default login --impersonate-service-account` creates a local ADC file that client libraries use automatically. To impersonate the service account, the developer needs the Service Account Token Creator role on it.",
+    "whyWrong": {
+      "A": "Service Account User does not contain `iam.serviceAccounts.getAccessToken`. Impersonation needs this permission, and Token Creator contains it.",
+      "B": "This property makes gcloud commands impersonate the service account. It does not change the ADC file that the app uses.",
+      "E": "A service account key breaks the security policy. Impersonation gives the same permissions without a key."
+    },
+    "sources": [
+      {
+        "title": "Set up ADC for a local development environment",
+        "url": "https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment",
+        "evidence": "You can use service account impersonation to set up a local Application Default Credentials (ADC) file. Client libraries that support impersonation can use those credentials automatically."
+      },
+      {
+        "title": "Set up ADC for a local development environment",
+        "url": "https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment",
+        "evidence": "You must have the Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`) IAM role on the service account you are impersonating."
+      }
+    ]
+  },
+  {
+    "id": "dev-013",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-shell",
+      "persistence"
+    ],
+    "stem": "A developer installs a command-line tool in `/usr/local/bin` in Cloud Shell. The next day, in a new session, the tool is gone. The developer wants the tool to stay available in later sessions. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Install the tool with `sudo apt-get install`, and hold the package with `apt-mark hold`."
+      },
+      {
+        "id": "B",
+        "text": "Increase the size of the Cloud Shell persistent disk, so that the tool fits on the disk."
+      },
+      {
+        "id": "C",
+        "text": "Install the tool in a folder under `$HOME`, and add that folder to the `PATH` variable."
+      },
+      {
+        "id": "D",
+        "text": "Start Cloud Shell in ephemeral mode, so that the VM keeps its system folders."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Each Cloud Shell session runs on a new VM, and only the `$HOME` directory persists between sessions. Software that you install in `$HOME` stays available.",
+    "whyWrong": {
+      "A": "`apt-get` installs the package outside `$HOME`, so the package is lost when the VM ends. `apt-mark hold` only stops upgrades.",
+      "B": "You cannot make the Cloud Shell persistent disk larger. Disk size is also not the cause, because only `$HOME` persists.",
+      "D": "In ephemeral mode, nothing persists when the session ends, not even `$HOME`."
+    },
+    "sources": [
+      {
+        "title": "How Cloud Shell works",
+        "url": "https://docs.cloud.google.com/shell/docs/how-cloud-shell-works",
+        "evidence": "You can install additional software packages on the virtual machine instance but the installation will not persist after the instance terminates unless you install the software in your `$HOME` directory or create a custom environment."
+      }
+    ]
+  },
+  {
+    "id": "dev-014",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-workstations",
+      "cloud-shell",
+      "dev-environment"
+    ],
+    "stem": "A platform team supports 40 developers. Each developer needs a browser-based development environment that can reach private services in the company VPC network. Developers work in the environment all day and need large persistent disks for repositories and build caches. The team wants to define the environment once, with the least operational overhead. What should the team use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cloud Shell, with a custom Cloud Shell environment image that holds the tools of the team."
+      },
+      {
+        "id": "B",
+        "text": "Cloud Workstations, with one workstation configuration in a cluster on the company VPC network."
+      },
+      {
+        "id": "C",
+        "text": "Compute Engine VMs, one for each developer, from an instance template with Code OSS installed."
+      },
+      {
+        "id": "D",
+        "text": "A GKE cluster that runs one Code OSS pod for each developer, with a persistent volume for each pod."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Cloud Workstations is a managed service that runs workstations in your project and VPC network. A workstation configuration defines the environment once, and the cluster sets the region and the VPC network. Each workstation has a persistent disk for `/home`, and Cloud Workstations has no weekly usage limit.",
+    "whyWrong": {
+      "A": "Cloud Shell runs on a VM that Google owns, outside your VPC network. It has a weekly usage limit, and you cannot make its persistent disk larger.",
+      "C": "VMs can work, but the team must build, patch, and manage each VM and its IDE access. This adds operational overhead.",
+      "D": "A GKE cluster for IDEs is custom work to build and run. It adds operational overhead that a managed service avoids."
+    },
+    "sources": [
+      {
+        "title": "Cloud Workstations overview",
+        "url": "https://docs.cloud.google.com/workstations/docs/overview",
+        "evidence": "Workstation clusters define a group of workstations in a particular region and the VPC network they're attached to."
+      },
+      {
+        "title": "Quotas and limits",
+        "url": "https://docs.cloud.google.com/shell/docs/quotas-limits",
+        "evidence": "If you need more quota, we strongly recommend upgrading to Cloud Workstations, which does not have weekly usage limitations."
+      },
+      {
+        "title": "How Cloud Shell works",
+        "url": "https://docs.cloud.google.com/shell/docs/how-cloud-shell-works",
+        "evidence": "When using Cloud Shell, you cannot expand persistent disk storage space. For more control of your storage persistence, and for more storage space, you can use Cloud Workstations."
+      }
+    ]
+  },
+  {
+    "id": "dev-015",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-workstations",
+      "timeouts"
+    ],
+    "stem": "An administrator updates a Cloud Workstations configuration to use a new container image with security fixes. A week later, some developers still use the old image, because they never stop their workstations. The administrator wants every workstation to get configuration updates within a known time. What should the administrator do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set a running timeout in the workstation configuration, so that workstations stop after a set time."
+      },
+      {
+        "id": "B",
+        "text": "Increase the quick start pool size, so that more VMs are ready with the new image."
+      },
+      {
+        "id": "C",
+        "text": "Delete the workstation cluster, and create it again with the same workstation configuration."
+      },
+      {
+        "id": "D",
+        "text": "Push the new image again with the same tag, so that running workstations pull it."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A configuration update applies to a workstation when the workstation starts again. A running timeout stops each workstation after a set time, so every workstation gets the update within a known period.",
+    "whyWrong": {
+      "B": "The pool affects only workstations that start. Running workstations keep the old image.",
+      "C": "Deleting and creating the cluster again is disruptive work, and it is not necessary. A configuration update already applies at the next start of each workstation.",
+      "D": "A running workstation does not pull a new image. The image changes only when the workstation starts again."
+    },
+    "sources": [
+      {
+        "title": "Cloud Workstations overview",
+        "url": "https://docs.cloud.google.com/workstations/docs/overview",
+        "evidence": "Administrators and platform teams can configure an idle timeout or running timeout in the workstation configuration to help make sure that workstations synchronize with configuration updates within a bounded period of time."
+      },
+      {
+        "title": "Cloud Workstations overview",
+        "url": "https://docs.cloud.google.com/workstations/docs/overview",
+        "evidence": "Updates to a workstation configuration automatically apply to workstations when each workstation restarts after the configuration update."
+      }
+    ]
+  },
+  {
+    "id": "dev-016",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "cloud-workstations",
+      "custom-images",
+      "startup-scripts"
+    ],
+    "stem": "A team builds a custom Cloud Workstations image from this Dockerfile:\n\n```dockerfile\nFROM us-central1-docker.pkg.dev/cloud-workstations-images/predefined/code-oss:latest\nCOPY team-settings.json /home/user/.config/team/settings.json\nCOPY githooks/ /home/user/.githooks/\n```\n\nWorkstations start with the new image, but the files are not in `/home/user`. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Disable the quick start pool, so that each workstation pulls the new image from the registry when it starts."
+      },
+      {
+        "id": "B",
+        "text": "Add a `VOLUME /home/user` instruction at the end of the Dockerfile, so that the copied files persist."
+      },
+      {
+        "id": "C",
+        "text": "Push the image again with a new tag, and update the workstation configuration so that it uses the new tag."
+      },
+      {
+        "id": "D",
+        "text": "Copy the files to another image folder, and add a `/etc/workstation-startup.d/` script that copies them to `/home/user`."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Each workstation mounts its persistent disk on `/home`, which hides the changes that the Dockerfile makes there. A script in `/etc/workstation-startup.d/` runs at container runtime, at each start, so the files that it copies into `/home/user` stay there.",
+    "whyWrong": {
+      "A": "The workstations already use the new image. The quick start pool does not change what happens to `/home`.",
+      "B": "The persistent home disk still mounts on `/home`. The files from the image stay hidden.",
+      "C": "The workstations already start with the new image. A new tag does not stop the home disk from hiding the files."
+    },
+    "sources": [
+      {
+        "title": "Customize container images",
+        "url": "https://docs.cloud.google.com/workstations/docs/customize-container-images",
+        "evidence": "This process overwrites modifications made to the `/home` directory at container image build time."
+      },
+      {
+        "title": "Customize container images",
+        "url": "https://docs.cloud.google.com/workstations/docs/customize-container-images",
+        "evidence": "To preserve updates, modify the `/home` directory at container runtime by adding a script in the in the `/etc/workstation-startup.d` directory, or by adding per-user configuration in the `/etc/profile.d` directory."
+      }
+    ]
+  },
+  {
+    "id": "dev-017",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "cloud-code",
+      "ide"
+    ],
+    "stem": "A developer uses VS Code to build applications for GKE and Cloud Run. The developer wants to deploy and debug from the IDE and to run a Cloud Run service locally in an emulator. The developer also wants to manage Secret Manager secrets without leaving the IDE. What should the developer install?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The `kubectl` component of the gcloud CLI, with the Kubernetes command-line tools."
+      },
+      {
+        "id": "B",
+        "text": "The Gemini Code Assist extension for VS Code, with the Standard edition enabled."
+      },
+      {
+        "id": "C",
+        "text": "The Cloud Code extension for VS Code, which uses Skaffold for GKE development."
+      },
+      {
+        "id": "D",
+        "text": "The Firebase Local Emulator Suite, with the Cloud Functions and Pub/Sub emulators."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Cloud Code is an IDE extension for GKE and Cloud Run applications. It deploys and debugs applications, runs Cloud Run services locally in the Cloud Run emulator, and manages Secret Manager secrets from the IDE.",
+    "whyWrong": {
+      "A": "`kubectl` is a command-line tool. It does not run Cloud Run services locally or manage secrets in the IDE.",
+      "B": "Gemini Code Assist is an AI coding assistant, and it is a separate plugin from Cloud Code. It does not supply the Cloud Run emulator or the Secret Manager view.",
+      "D": "The Firebase suite emulates Firebase services. It does not deploy to GKE or manage Secret Manager secrets."
+    },
+    "sources": [
+      {
+        "title": "Cloud Code overview",
+        "url": "https://docs.cloud.google.com/code/docs/vscode/overview",
+        "evidence": "You have support for the full development cycle of GKE and Cloud Run applications, from creating an app using an existing template to monitoring your deployed app's resources."
+      },
+      {
+        "title": "Cloud Code overview",
+        "url": "https://docs.cloud.google.com/code/docs/vscode/overview",
+        "evidence": "Protect sensitive information and keep your app secure with Cloud Code integrated Secret Manager support. You can create, view, update, and use secrets in the Secret Manager view without having them in your codebase."
+      }
+    ]
+  },
+  {
+    "id": "dev-018",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini-cloud-assist",
+      "data-residency",
+      "cmek"
+    ],
+    "stem": "A company wants its developers to use Gemini Cloud Assist (Preview) in the Google Cloud console. One project, `payments-prod`, has data residency and customer-managed encryption key (CMEK) requirements. The other projects have no such requirements. What should the platform team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enable the Gemini Cloud Assist API in all projects, and set a resource locations policy on `payments-prod`."
+      },
+      {
+        "id": "B",
+        "text": "Enable the Gemini Cloud Assist API in the other projects, and do not enable it in `payments-prod`."
+      },
+      {
+        "id": "C",
+        "text": "Enable the Gemini Cloud Assist API in all projects, and create a CMEK key for it in `payments-prod`."
+      },
+      {
+        "id": "D",
+        "text": "Enable the Gemini Cloud Assist API in all projects, and grant its user role only to `payments-prod` owners."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Gemini Cloud Assist can store data in any Google Cloud data center. The docs say not to enable the Gemini Cloud Assist API for projects with data residency or CMEK requirements. So enable it only in the projects without these requirements.",
+    "whyWrong": {
+      "A": "A resource locations policy does not control where Gemini Cloud Assist stores data. It can store data in any Google Cloud data center.",
+      "C": "The docs say not to enable the API in projects with CMEK requirements. A key does not change where Gemini Cloud Assist stores data.",
+      "D": "Fewer users do not change where the data goes. Any use in `payments-prod` breaks its requirements."
+    },
+    "sources": [
+      {
+        "title": "Set up Gemini Cloud Assist",
+        "url": "https://docs.cloud.google.com/cloud-assist/set-up-gemini",
+        "evidence": "Gemini Cloud Assist can store data in any Google Cloud data center globally. You shouldn't enable the Gemini Cloud Assist API for projects that have data residency or customer-managed encryption key requirements."
+      }
+    ]
+  },
+  {
+    "id": "dev-019",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "console",
+      "equivalent-code",
+      "gcloud"
+    ],
+    "stem": "A developer uses the Google Cloud console to choose the settings for a new Compute Engine VM. Before the developer creates the VM, the developer decides to put the same VM creation in a deployment script. The developer wants the least effort. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Copy the gcloud command from **Equivalent code** in the console, and add it to the script."
+      },
+      {
+        "id": "B",
+        "text": "Create the VM, run `gcloud compute instances describe` on it, and copy the output into the script."
+      },
+      {
+        "id": "C",
+        "text": "Create the VM, export it with Cloud Asset Inventory, and convert the export into a gcloud command."
+      },
+      {
+        "id": "D",
+        "text": "Create the VM, find its creation entry in Cloud Audit Logs, and rebuild the request from the entry."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "When you create a resource in the console, **Equivalent code** shows the gcloud command and the REST request for the same action. Copying the command takes the least effort.",
+    "whyWrong": {
+      "B": "`describe` prints the properties of the VM, not a command. The developer must write the command by hand.",
+      "C": "An asset export holds resource metadata, not a command. The conversion is extra manual work.",
+      "D": "Rebuilding a request from an audit log entry is slow manual work."
+    },
+    "sources": [
+      {
+        "title": "Google Cloud console",
+        "url": "https://docs.cloud.google.com/compute/docs/console",
+        "evidence": "When you create a resource using the Google Cloud console, the console generates the equivalent command for the gcloud CLI that would perform the same action."
+      }
+    ]
+  },
+  {
+    "id": "dev-020",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini-code-assist",
+      "aiexclude",
+      "code-customization"
+    ],
+    "stem": "A team uses Gemini Code Assist Enterprise with code customization on its GitHub repository. The folder `services/billing/rules/` holds committed files with confidential pricing logic. The files must stay in Git. Gemini Code Assist must not use them as local context or in the code customization index. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add `services/billing/rules/` to the `.gitignore` file in the root folder of the repository."
+      },
+      {
+        "id": "B",
+        "text": "Add `rules/` to a new `.gitignore` file in the `services/billing/` folder of the repository."
+      },
+      {
+        "id": "C",
+        "text": "Add `services/billing/rules/` to an `.aiexclude` file in the root folder of the repository."
+      },
+      {
+        "id": "D",
+        "text": "Add `services/billing/rules/` to a `.geminiignore` file in the root folder of the repository."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Code customization uses only the `.aiexclude` file. Gemini Code Assist also excludes the files in `.aiexclude` from local context. So an `.aiexclude` file in the root folder meets both requirements, and the files stay in Git.",
+    "whyWrong": {
+      "A": "A root `.gitignore` excludes the files from local context, but code customization uses only `.aiexclude`. The files still go into the index.",
+      "B": "Gemini Code Assist reads only the `.gitignore` file in the root working folder. It ignores `.gitignore` files in subfolders.",
+      "D": "The Gemini CLI uses `.geminiignore`. Gemini Code Assist in the IDE and code customization use `.aiexclude`."
+    },
+    "sources": [
+      {
+        "title": "Exclude files from Gemini Code Assist use",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/create-aiexclude-file",
+        "evidence": "By default, the `.gitignore` file is enabled for context exclusion. The file must be located in the root working folder for Gemini Code Assist. `.gitignore` files located in subdirectories won't be considered or merged."
+      },
+      {
+        "title": "Exclude files from Gemini Code Assist use",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/create-aiexclude-file",
+        "evidence": "For code customization only the `.aiexclude` file is used."
+      }
+    ]
+  },
+  {
+    "id": "dev-021",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "mcp",
+      "iam",
+      "bigquery"
+    ],
+    "stem": "An agent runs on Cloud Run as the service account `agent-sa`. The agent calls the BigQuery remote MCP server to get the metadata of the tables in the `sales` dataset. Every tool call fails with a permission error. Which two roles should you grant to `agent-sa`? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`) on `agent-sa`"
+      },
+      {
+        "id": "B",
+        "text": "MCP Tool User (`roles/mcp.toolUser`) on the project"
+      },
+      {
+        "id": "C",
+        "text": "Service Usage Admin (`roles/serviceusage.serviceUsageAdmin`) on the project"
+      },
+      {
+        "id": "D",
+        "text": "Cloud Run Invoker (`roles/run.invoker`) on the Cloud Run service of the agent"
+      },
+      {
+        "id": "E",
+        "text": "BigQuery Metadata Viewer (`roles/bigquery.metadataViewer`) on the `sales` dataset"
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "A call to a Google Cloud remote MCP server needs two kinds of permission. MCP Tool User gives the `mcp.tools.call` permission in the project. The caller also needs the normal permissions on the resource, here read access to the metadata in the `sales` dataset.",
+    "whyWrong": {
+      "A": "The agent runs as its attached service account, and no impersonation happens. Token Creator is not necessary.",
+      "C": "The MCP endpoint is available when the BigQuery API is enabled. The agent does not need to manage services.",
+      "D": "Cloud Run Invoker lets a principal call a Cloud Run service. The agent makes outbound calls to a Google endpoint, so it does not need this role."
+    },
+    "sources": [
+      {
+        "title": "Manage MCP servers",
+        "url": "https://docs.cloud.google.com/mcp/manage-mcp-servers",
+        "evidence": "To use Google and Google Cloud remote MCP servers, AI applications must have the MCP Tool User role (`roles/mcp.toolUser`) and the necessary service permissions for the tool's Google Cloud service."
+      },
+      {
+        "title": "Control MCP use with Identity and Access Management",
+        "url": "https://docs.cloud.google.com/mcp/control-mcp-use-iam",
+        "evidence": "For example, if an MCP tool call is sent to get a BigQuery Dataset's metadata, and the caller has the `mcp.tools.call` permission but lacks the `bigquery.datasets.get` permission, the tool call fails."
+      }
+    ]
+  },
+  {
+    "id": "dev-022",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "mcp",
+      "iam-deny",
+      "read-only-tools"
+    ],
+    "stem": "Developers in a project have the Editor role, and they use agents with Google Cloud remote MCP servers. The security team wants every MCP client in the project to use only read-only MCP tools. Developers must keep the Editor role for their normal work. What should the security team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace the Editor role with the Viewer role for all developers in the project."
+      },
+      {
+        "id": "B",
+        "text": "Add a condition to the allow policy that removes read-write tools from the `tools/list` result."
+      },
+      {
+        "id": "C",
+        "text": "Add the read-write tools to `excludeTools` in the `~/.gemini/settings.json` file of each developer."
+      },
+      {
+        "id": "D",
+        "text": "Create an IAM deny policy that denies `mcp.googleapis.com/tools.call` when `tool.isReadOnly` is false."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "An IAM deny policy with the `tool.isReadOnly` attribute blocks MCP tools that create, change, or delete resources. The policy applies to every principal and every MCP client in the project, and the developers keep the Editor role.",
+    "whyWrong": {
+      "A": "This breaks the requirement that developers keep the Editor role for their normal work.",
+      "B": "IAM does not filter the tool list. When a client calls `tools/list`, it gets all tools, including read-write tools.",
+      "C": "This is a client setting that each developer controls. It does not apply to other MCP clients, and a developer can change it."
+    },
+    "sources": [
+      {
+        "title": "Control MCP use with Identity and Access Management",
+        "url": "https://docs.cloud.google.com/mcp/control-mcp-use-iam",
+        "evidence": "The following IAM deny policy prevents use of any tool that isn't read-only. Tools that create, modify, or delete resources aren't permitted."
+      },
+      {
+        "title": "Control MCP use with Identity and Access Management",
+        "url": "https://docs.cloud.google.com/mcp/control-mcp-use-iam",
+        "evidence": "When an MCP client calls `tools/list`, a list of all tools is returned, including read-write tools."
+      }
+    ]
+  },
+  {
+    "id": "dev-023",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "mcp",
+      "cloud-run",
+      "streamable-http"
+    ],
+    "stem": "A team built an MCP server that uses stdio transport, and developers start it locally with `npx`. The team wants to host one shared copy on Cloud Run. The agents of the developers must reach it over the network with IAM authentication. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the server to streamable HTTP transport, and deploy it as a Cloud Run service that requires authentication."
+      },
+      {
+        "id": "B",
+        "text": "Deploy the stdio server unchanged as a Cloud Run service, and allow unauthenticated invocations."
+      },
+      {
+        "id": "C",
+        "text": "Deploy the stdio server as a Cloud Run job, and run the job each time an agent needs a tool."
+      },
+      {
+        "id": "D",
+        "text": "Keep the stdio server on each laptop, and share it with the team through `gcloud run services proxy`."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Cloud Run hosts MCP servers that use streamable HTTP transport, not stdio transport. A Cloud Run service that requires authentication lets IAM control which principals can call the server.",
+    "whyWrong": {
+      "B": "Cloud Run does not support stdio MCP servers. Unauthenticated invocations also break the IAM requirement.",
+      "C": "A job runs a task to completion and does not serve requests. Agents cannot connect to it as an MCP server.",
+      "D": "`gcloud run services proxy` connects a local client to a Cloud Run service. It does not share a server that runs on a laptop."
+    },
+    "sources": [
+      {
+        "title": "Host MCP servers on Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/host-mcp-servers",
+        "evidence": "Cloud Run supports hosting MCP servers with streamable HTTP transport, but not MCP servers with stdio transport."
+      }
+    ]
+  },
+  {
+    "id": "dev-024",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "mcp",
+      "agent-identity",
+      "service-accounts"
+    ],
+    "stem": "During development, an agent on a laptop called Google Cloud remote MCP servers with the ADC credentials of the developer. The team now deploys the agent to Cloud Run for production. The team wants to limit what the agent can do and to see the actions of the agent in the logs. Which identity should the agent use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The ADC file of the developer, stored in Secret Manager and mounted into the container."
+      },
+      {
+        "id": "B",
+        "text": "A dedicated service account with only the roles that the agent needs, attached to the service."
+      },
+      {
+        "id": "C",
+        "text": "The Compute Engine default service account, which Cloud Run uses when no account is set."
+      },
+      {
+        "id": "D",
+        "text": "A shared service account with the Editor role that all of the services of the team use."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "For production, Google recommends a separate agent or workload identity instead of your own identity. A dedicated service account with minimum roles limits what the agent can do. Its actions appear in the logs under its own identity.",
+    "whyWrong": {
+      "A": "The agent then has all the permissions of the developer, and the logs show the developer, not the agent.",
+      "C": "Other workloads share the default service account, and it often has broad roles. You cannot limit the agent or separate its actions in the logs.",
+      "D": "Editor is a broad role, and the docs say not to grant it in production. A shared account also mixes the actions of many services in the logs."
+    },
+    "sources": [
+      {
+        "title": "Authenticate to Google and Google Cloud MCP servers",
+        "url": "https://docs.cloud.google.com/mcp/authenticate-mcp",
+        "evidence": "For production workloads, we recommend that you create a separate agent or workload identity, instead of using your identity."
+      },
+      {
+        "title": "Authenticate to Google and Google Cloud MCP servers",
+        "url": "https://docs.cloud.google.com/mcp/authenticate-mcp",
+        "evidence": "Using a separate identity to access MCP servers means you can limit the permissions and actions taken by the MCP client and view actions taken through MCP requests in your logs."
+      },
+      {
+        "title": "Authenticate to Google and Google Cloud MCP servers",
+        "url": "https://docs.cloud.google.com/mcp/authenticate-mcp",
+        "evidence": "In production environments, do not grant the Owner, Editor, or Viewer roles. Instead, grant a predefined role or custom role that meets your needs."
+      }
+    ]
+  },
+  {
+    "id": "dev-025",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "agent-mode",
+      "coretools",
+      "gemini-code-assist"
+    ],
+    "stem": "A team uses Gemini Code Assist agent mode (Preview) in VS Code to add tests. The agent must be able to run `pytest` in the terminal. It must not run any other shell command. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "In `~/.gemini/settings.json`, add `ShellTool(pytest)` to the `excludeTools` list."
+      },
+      {
+        "id": "B",
+        "text": "Turn on yolo mode in a trusted workspace, so that the agent runs `pytest` without prompts."
+      },
+      {
+        "id": "C",
+        "text": "In `~/.gemini/settings.json`, add `ShellTool(pytest)` to the `coreTools` list."
+      },
+      {
+        "id": "D",
+        "text": "Add the rule `Run only pytest in the terminal` to the `Geminicodeassist: Rules` setting."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "`coreTools` lists the tools that are available to the model, and it can limit a tool to specific commands. With `ShellTool(pytest)` in `coreTools`, the shell tool can run only `pytest`. Because `coreTools` is an allow list, it must also contain the other tools that the agent needs, such as the file tools.",
+    "whyWrong": {
+      "A": "`excludeTools` blocks the tools and commands that it lists. This blocks `pytest` and allows all other shell commands.",
+      "B": "Yolo mode allows all agent actions without prompts. It does not limit the shell commands.",
+      "D": "A rule is an instruction in the prompt, not a control. It does not stop the agent from running other commands."
+    },
+    "sources": [
+      {
+        "title": "Use the Gemini Code Assist agent mode",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
+        "evidence": "Lets you specify a list of tools that you want to be available to the model."
+      },
+      {
+        "title": "Use the Gemini Code Assist agent mode",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
+        "evidence": "For example—adding the following to your Gemini settings JSON will only allow the shell `ls -l` command to be executed"
+      }
+    ]
+  },
+  {
+    "id": "dev-026",
+    "objective": "2.1",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "gemini-code-assist",
+      "data-governance",
+      "logging"
+    ],
+    "stem": "A compliance team reviews Gemini Code Assist Standard before a rollout. The team asks whether Google trains models on the prompts and whether a record of the prompts exists. Which two statements are correct? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Gemini does not use the prompts or the responses as data to train its models."
+      },
+      {
+        "id": "B",
+        "text": "Gemini Code Assist processes the prompts only in the region of the selected project."
+      },
+      {
+        "id": "C",
+        "text": "Prompts and responses are not stored unless an administrator turns on logging to Cloud Logging."
+      },
+      {
+        "id": "D",
+        "text": "Gemini Code Assist keeps a prompt history in the project, and administrators can export it."
+      },
+      {
+        "id": "E",
+        "text": "Open file snippets that go with a prompt are not Customer Data, so Google can train on them."
+      }
+    ],
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Gemini does not train on your prompts or its responses. Gemini Code Assist Standard and Enterprise are stateless, so they do not store prompts and responses in Google Cloud. If the company needs a record, an administrator can store user input and responses in a Cloud Logging bucket.",
+    "whyWrong": {
+      "B": "Gemini Code Assist processes data on the global Google network. Regionality is not guaranteed.",
+      "D": "Gemini Code Assist is stateless and keeps no prompt history. A record exists only if you turn on logging to Cloud Logging.",
+      "E": "Context such as open file snippets is Customer Data, and Gemini does not train on it."
+    },
+    "sources": [
+      {
+        "title": "How Gemini products in Google Cloud use your data",
+        "url": "https://docs.cloud.google.com/gemini/docs/discover/data-governance",
+        "evidence": "Gemini doesn't use your prompts or its responses as data to train its models."
+      },
+      {
+        "title": "Security, privacy, and compliance for Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/security-privacy-compliance",
+        "evidence": "Because Gemini Code Assist Standard and Enterprise are stateless Google Cloud services, they don't store prompts and responses in Google Cloud."
+      },
+      {
+        "title": "Security, privacy, and compliance for Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/security-privacy-compliance",
+        "evidence": "If required, you can set up Gemini Code Assist Standard and Enterprise to store user input and responses in a Cloud Logging bucket."
+      }
+    ]
+  },
+  {
+    "id": "dev-027",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "gemini-code-assist",
+      "smart-actions",
+      "unit-tests"
+    ],
+    "stem": "A developer uses Gemini Code Assist in VS Code. The developer wants unit tests for one function in the open file, with the fewest steps. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Turn on Next Edit Predictions (Preview), and start to type a new test function."
+      },
+      {
+        "id": "B",
+        "text": "Ask Gemini Cloud Assist (Preview) in the console for tests, and copy them into the IDE."
+      },
+      {
+        "id": "C",
+        "text": "Write a `GEMINI.md` file that asks for tests, and then start a task in agent mode (Preview)."
+      },
+      {
+        "id": "D",
+        "text": "Select the function, and use the **Generate unit tests** smart action."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Smart actions run common tasks on selected code. When you select the function, **Generate unit tests** asks Gemini Code Assist for tests in one step, with the selected code as context.",
+    "whyWrong": {
+      "A": "Next Edit Predictions suggests edits in other places in the same file. It is not a way to ask for tests.",
+      "B": "Gemini Cloud Assist is the console assistant for Google Cloud resources. Copying code between the console and the IDE adds steps and loses the IDE context.",
+      "C": "A context file and an agent task can work, but they take more steps for one function."
+    },
+    "sources": [
+      {
+        "title": "Code with Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/write-code-gemini",
+        "evidence": "When you select your code in your code editor, you can view and select from a list of actions relevant to your context."
+      },
+      {
+        "title": "Code with Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/write-code-gemini",
+        "evidence": "Select an action such as Generate unit tests."
+      }
+    ]
+  },
+  {
+    "id": "dev-028",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini-code-assist",
+      "context",
+      "unit-tests"
+    ],
+    "stem": "A team has many pytest tests with shared fixtures and a fixed naming style. The tests that Gemini Code Assist chat generates use a different structure. A developer wants new tests for `billing.py` to follow the existing tests. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send the same prompt again until the output matches the structure of the existing tests."
+      },
+      {
+        "id": "B",
+        "text": "Add an existing test file with `@` in chat, and ask for tests for `billing.py` based on it."
+      },
+      {
+        "id": "C",
+        "text": "Turn on Next Edit Predictions (Preview), so that Gemini learns the structure from edits."
+      },
+      {
+        "id": "D",
+        "text": "Add the `tests/` folder to `.aiexclude`, so that Gemini does not mix the old and new styles."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "By default, chat uses the current open file as context. When you add an existing test file with `@`, Gemini can generate tests that follow the examples in that file.",
+    "whyWrong": {
+      "A": "The context stays the same, so the output does not reliably follow the existing tests. This wastes time.",
+      "C": "Next Edit Predictions suggests edits in the same file. It does not give chat the existing tests as examples.",
+      "D": "This removes the examples from the context. The new tests then follow the existing style even less."
+    },
+    "sources": [
+      {
+        "title": "Code with Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/write-code-gemini",
+        "evidence": "`@UNIT_TEST_FILE_NAME Generate unit tests for module-x based on the examples in the selected file.`"
+      },
+      {
+        "title": "Chat with Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/chat-gemini",
+        "evidence": "By default, Gemini Code Assist uses the current open file as context. You can specify files or folders in your workspace for Gemini Code Assist to use as additional context."
+      }
+    ]
+  },
+  {
+    "id": "dev-029",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini-code-assist",
+      "rules",
+      "unit-tests"
+    ],
+    "stem": "A team uses Gemini Code Assist chat in VS Code. Every prompt must include this instruction: \"Always generate unit tests when creating a new function\". Developers must not need to type the instruction. What should each developer configure?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A rule with the instruction in the `Geminicodeassist: Rules` setting."
+      },
+      {
+        "id": "B",
+        "text": "A custom command with the instruction, which the developer runs from Quick Pick."
+      },
+      {
+        "id": "C",
+        "text": "A `.gemini/styleguide.md` file with the instruction in the repository."
+      },
+      {
+        "id": "D",
+        "text": "A comment with the instruction at the top of each source file."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Gemini Code Assist adds rules to every chat prompt. A rule in the `Geminicodeassist: Rules` setting applies the instruction, and developers do not type it.",
+    "whyWrong": {
+      "B": "A custom command is a saved prompt. The developer must run it each time, so it is not added to every prompt.",
+      "C": "`.gemini/styleguide.md` sets the rules for Gemini Code Assist on GitHub reviews of pull requests. It is not a setting for chat in the IDE.",
+      "D": "Chat uses the current open file as context by default. A comment in the other files does not reach every prompt."
+    },
+    "sources": [
+      {
+        "title": "Chat with Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/chat-gemini",
+        "evidence": "You can create rules for Gemini Code Assist to follow, and the rules are included in every chat prompt you enter."
+      },
+      {
+        "title": "Chat with Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/chat-gemini",
+        "evidence": "In the text field, enter a rule such as: `Always generate unit tests when creating a new function`."
+      }
+    ]
+  },
+  {
+    "id": "dev-030",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini-code-assist",
+      "intellij",
+      "agent-mode",
+      "gemini-md"
+    ],
+    "stem": "A team uses Gemini Code Assist in IntelliJ. A Project rule says that all tests use JUnit 5 and the shared test fixtures, and chat follows the rule. When developers use agent mode (Preview) to add tests in several modules, the agent ignores the rule. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the scope of the rule from Project to IDE in the settings of each developer."
+      },
+      {
+        "id": "B",
+        "text": "Add the `.idea` folder to version control, so that agent mode can read the Project rules."
+      },
+      {
+        "id": "C",
+        "text": "Put the test conventions in a `GEMINI.md` file at the root of the project."
+      },
+      {
+        "id": "D",
+        "text": "Put the test conventions in a `.gemini/styleguide.md` file at the root of the repository."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "In IntelliJ, agent mode does not use rules. Agent mode reads a `GEMINI.md` or `AGENT.md` context file at the root of the project and includes it with every prompt to the agent.",
+    "whyWrong": {
+      "A": "IDE rules are also rules. IntelliJ does not use any rules in agent mode.",
+      "B": "Version control shares Project rules among teammates. Agent mode still does not use rules.",
+      "D": "`.gemini/styleguide.md` sets the rules for Gemini Code Assist on GitHub reviews. Agent mode reads `GEMINI.md`."
+    },
+    "sources": [
+      {
+        "title": "Use the Gemini Code Assist agent mode",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
+        "evidence": "Create a file named either `GEMINI.md` or `AGENT.md` at the root of your project."
+      },
+      {
+        "title": "Use the Gemini Code Assist agent mode",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
+        "evidence": "The agent includes the information in your context file along with any prompts you send to it."
+      }
+    ]
+  },
+  {
+    "id": "dev-031",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "unit-tests",
+      "cloudevents",
+      "cloud-run-functions"
+    ],
+    "stem": "Gemini Code Assist generates a test for a Cloud Run function that handles Cloud Storage `finalized` events. The test uploads a file to a real bucket and then waits for a log line from the deployed function. The team wants a fast unit test that needs no project and no cloud resources. How should the developer change the test?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Upload the file to a local Cloud Storage emulator that `gcloud beta emulators storage start` runs."
+      },
+      {
+        "id": "B",
+        "text": "Deploy the function to a test project, and send the event to its URL with `curl` from the test."
+      },
+      {
+        "id": "C",
+        "text": "Mock the upload call with `unittest.mock`, and keep the wait for the log line of the function."
+      },
+      {
+        "id": "D",
+        "text": "Build a `CloudEvent` with the event attributes and the object data, and call the function directly."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "A unit test checks the logic of the function. The docs sample builds a `CloudEvent` in the test and calls the function directly, so no emulator, project, or bucket is necessary.",
+    "whyWrong": {
+      "A": "The gcloud CLI has no Cloud Storage emulator. The `gcloud beta emulators` groups are Bigtable, Datastore, Firestore, Pub/Sub, and Spanner.",
+      "B": "A deployed function needs a project and cloud resources. This breaks the requirement.",
+      "C": "With a mocked upload, no event reaches the function, so the test waits for a log line that never comes."
+    },
+    "sources": [
+      {
+        "title": "Cloud Storage (2nd Gen) Unit Test",
+        "url": "https://docs.cloud.google.com/functions/docs/samples/functions-cloudevent-storage-unit-test",
+        "evidence": "Example unit test for a Cloud Storage-triggered function running on Cloud Functions (2nd Gen)."
+      }
+    ]
+  },
+  {
+    "id": "dev-032",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "unit-tests",
+      "firestore",
+      "test-review"
+    ],
+    "stem": "A developer asks Gemini Code Assist for a test of `orders.create()`, which writes an order document to Firestore. The developer runs pytest in a shell where no emulator variable is set. Review the generated test:\n\n```python\nfrom google.cloud import firestore\nimport orders\n\ndef test_create_order():\n    db = firestore.Client()\n    order_id = orders.create(db, {\"sku\": \"A1\", \"qty\": 2})\n    assert order_id\n```\n\nWhich two problems should the developer fix before accepting the test? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "The test needs a service account key file, because the Firestore client cannot use ADC."
+      },
+      {
+        "id": "B",
+        "text": "The test must create the client inside `orders.create()`, because a client cannot be an argument."
+      },
+      {
+        "id": "C",
+        "text": "The test writes to a real Firestore database, because `FIRESTORE_EMULATOR_HOST` is not set."
+      },
+      {
+        "id": "D",
+        "text": "The test must use the legacy Datastore emulator, because the Firestore emulator does not support Python."
+      },
+      {
+        "id": "E",
+        "text": "The assertion passes for any non-empty ID, so it does not check that the stored order is correct."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Without `FIRESTORE_EMULATOR_HOST`, the client library connects to a real Firestore database, so the test writes real data. The assertion is also weak. Generated output can look correct and still be wrong, so each test must check a specific expected result.",
+    "whyWrong": {
+      "A": "The Firestore client uses ADC, and the emulator does not check identity. A key file is also a security risk.",
+      "B": "Passing a client as an argument is a normal design for testable code. It is not a problem.",
+      "D": "The Firestore emulator supports the Python server client library. The legacy Datastore emulator is for legacy Cloud Datastore."
+    },
+    "sources": [
+      {
+        "title": "Use Firestore emulator locally",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/emulator",
+        "evidence": "To connect a Firestore server client library (C#, Go, Java, Node.js, PHP, Python, and Ruby), set the `FIRESTORE_EMULATOR_HOST` environment variable. When this environment variable is set, the server client libraries automatically connect to the emulator."
+      },
+      {
+        "title": "Gemini Code Assist Standard and Enterprise overview",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/overview",
+        "evidence": "As an early-stage technology, Gemini Code Assist can generate output that seems plausible but is factually incorrect. We recommend that you validate all output from Gemini Code Assist before you use it."
+      }
+    ]
+  },
+  {
+    "id": "dev-033",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini-code-assist-github",
+      "code-review",
+      "config-yaml"
+    ],
+    "stem": "A team uses Gemini Code Assist on GitHub to review pull requests. The team also wants review comments for low-severity issues, such as minor refactorings. The reviews show only issues with a severity of medium or higher. What should the team do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set `max_review_comments` to `-1` under `code_review` in `.gemini/config.yaml`."
+      },
+      {
+        "id": "B",
+        "text": "Set `comment_severity_threshold` to `LOW` under `code_review` in `.gemini/config.yaml`."
+      },
+      {
+        "id": "C",
+        "text": "Comment `/gemini review` on each pull request after the first review is posted."
+      },
+      {
+        "id": "D",
+        "text": "Add a rule to `.gemini/styleguide.md` that asks the reviewer to comment on all issues."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Gemini Code Assist does not add comments below the minimum severity threshold of the repository, and the default threshold is `MEDIUM`. Set `comment_severity_threshold` to `LOW` in `.gemini/config.yaml` to get comments for low-severity issues.",
+    "whyWrong": {
+      "A": "This setting removes the limit on the number of comments. The severity threshold still filters out `LOW` issues.",
+      "C": "A new review uses the same threshold, so it still skips `LOW` issues.",
+      "D": "The style guide gives rules for the review, but the severity threshold still filters out comments below `MEDIUM`."
+    },
+    "sources": [
+      {
+        "title": "Customize Gemini Code Assist behavior in GitHub",
+        "url": "https://docs.cloud.google.com/gemini/docs/code-review/customize-repo-review",
+        "evidence": "For example, if you have set `code_review: comment_severity_threshold: HIGH`, Gemini Code Assist won't provide pull request comments for issues it considers to be of `LOW` or `MEDIUM` severity, such as minor refactorings."
+      },
+      {
+        "title": "Use Gemini Code Assist on GitHub",
+        "url": "https://docs.cloud.google.com/gemini/docs/code-review/use-code-assist-github",
+        "evidence": "Gemini Code Assist does not add comments that have a severity less than the minimum severity threshold that is set for the repository."
+      }
+    ]
+  },
+  {
+    "id": "dev-034",
+    "objective": "2.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "agent-mode",
+      "recitation",
+      "citations"
+    ],
+    "stem": "Company policy says that developers must block AI code suggestions that match cited sources. The team sets **Recitation: Max Cited Length** to `0` in VS Code. The team now wants to generate tests for many modules. Which approach meets the policy?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use chat and smart actions for the tests, because agent mode cannot block code that matches cited sources."
+      },
+      {
+        "id": "B",
+        "text": "Use agent mode (Preview) for the tests, because the recitation setting also applies to agent mode."
+      },
+      {
+        "id": "C",
+        "text": "Use agent mode (Preview), and approve each file change, because the approval step checks for citations."
+      },
+      {
+        "id": "D",
+        "text": "Use agent mode (Preview), and add open source folders to `.aiexclude`, so that the agent cannot copy them."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Recitation is not available in agent mode. In agent mode, Gemini does not cite sources, and you cannot turn off suggestions that match cited sources. With the recitation setting at `0`, Gemini Code Assist does not suggest code that matches cited sources, so chat and smart actions meet the policy.",
+    "whyWrong": {
+      "B": "The recitation setting does not apply to agent mode. Agent mode does not cite sources.",
+      "C": "Approval lets you review each change, but it does not check for code that matches cited sources.",
+      "D": "`.aiexclude` keeps your local files out of context. It does not stop the model from suggesting code that matches public sources."
+    },
+    "sources": [
+      {
+        "title": "Agent mode overview",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/agent-mode",
+        "evidence": "Recitation is not available in agent mode. While in agent mode, Gemini doesn't cite sources and you can't disable code suggestions that match cited sources."
+      },
+      {
+        "title": "Code with Gemini Code Assist Standard and Enterprise",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/write-code-gemini",
+        "evidence": "Gemini Code Assist no longer suggests code to you that matches cited sources."
+      }
+    ]
+  },
+  {
+    "id": "dev-035",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini",
+      "structured-output",
+      "json"
+    ],
+    "stem": "An app asks Gemini for product data as JSON. The request sets `response_mime_type` to `application/json` but has no schema. Sometimes `json.loads()` fails, and sometimes the `price` field is missing. How should the developer change the request?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Describe the JSON structure and the required fields in the prompt, and keep the JSON MIME type."
+      },
+      {
+        "id": "B",
+        "text": "Set `temperature` to `0`, so that the model always returns the same JSON structure."
+      },
+      {
+        "id": "C",
+        "text": "Add a `response_schema` that defines the fields and lists `price` in `required`."
+      },
+      {
+        "id": "D",
+        "text": "Change `response_mime_type` to `text/x.enum`, so that the model returns only fixed values."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "A JSON MIME type without a schema is only a strong hint, so the model can return malformed JSON. A response schema makes the output follow the schema. Fields are optional by default, so list `price` in `required`.",
+    "whyWrong": {
+      "A": "A description in the prompt is still only a hint. The docs also say not to repeat the schema in the prompt.",
+      "B": "A low temperature makes the output more deterministic, but it does not guarantee valid JSON or the required fields.",
+      "D": "`text/x.enum` returns one value from a fixed list, for example a label. It does not return an object with fields."
+    },
+    "sources": [
+      {
+        "title": "Structured output",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/control-generated-output",
+        "evidence": "Setting `response_mime_type` to `application/json` without specifying a `response_schema` acts only as a strong hint and carries a small risk of generating malformed JSON."
+      },
+      {
+        "title": "Structured output",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/control-generated-output",
+        "evidence": "By default, fields are optional, meaning the model can populate the fields or skip them. You can set fields as required to force the model to provide a value."
+      }
+    ]
+  },
+  {
+    "id": "dev-036",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "gemini",
+      "function-calling"
+    ],
+    "stem": "An app sends a prompt and a `get_order_status` function declaration to Gemini. The response contains a function call with the name `get_order_status` and the argument `order_id` set to `A123`. What should the app do next?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Wait for a second response, because Agent Platform runs the function and returns the result."
+      },
+      {
+        "id": "B",
+        "text": "Run `get_order_status` with `A123`, and send the result back to the model in the next request."
+      },
+      {
+        "id": "C",
+        "text": "Send the prompt again with the function calling mode set to `ANY`, so that the model runs the function."
+      },
+      {
+        "id": "D",
+        "text": "Show the function call to the user as the final answer, because the model cannot read function results."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "In function calling, the model does not run your function. It returns the function name and the arguments. Your application runs the function and sends the result back, and then the model writes the final answer.",
+    "whyWrong": {
+      "A": "Agent Platform does not run your function. No second response comes until the app sends the result.",
+      "C": "`ANY` makes the model always return a function call. The model still does not run the function.",
+      "D": "The model uses the function result to complete its answer, so the app must send the result back."
+    },
+    "sources": [
+      {
+        "title": "Introduction to function calling",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/tools/function-calling",
+        "evidence": "Your application then executes this tool, feeds the result back to the model, allowing it to complete its response with dynamic, real-world information or the outcome of an action."
+      }
+    ]
+  },
+  {
+    "id": "dev-037",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "grounding",
+      "function-calling"
+    ],
+    "stem": "A travel assistant sends one `generate_content` request with two tools: Grounding with Google Search for current travel news, and a `book_flight` function declaration. The API rejects the request because of the tool combination. The assistant needs current public news and flight booking. What should the developer do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the function calling mode to `VALIDATED`, so that the model can use both tools in one request."
+      },
+      {
+        "id": "B",
+        "text": "Replace Google Search with the RAG Engine `retrieval` tool, and keep `book_flight` in the request."
+      },
+      {
+        "id": "C",
+        "text": "Set `temperature` to `1.0`, as the docs recommend for grounding, and send the same tools again."
+      },
+      {
+        "id": "D",
+        "text": "Send Google Search grounding and the `book_flight` function in separate requests, and combine the results."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The Gemini API does not support a search tool, such as Google Search, together with function calling in the same request. Separate requests keep both capabilities: current public news from Google Search and the booking function.",
+    "whyWrong": {
+      "A": "The mode controls how the model returns function calls. It does not allow a search tool together with function calling.",
+      "B": "RAG Engine retrieves from your own corpus, not current public news. So it does not meet the news requirement.",
+      "C": "Temperature affects the output. It does not change which tools can share a request."
+    },
+    "sources": [
+      {
+        "title": "Grounding with Google Search",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/grounding-with-google-search",
+        "evidence": "Tool combinations: The Gemini API doesn't support combining search tools (such as `googleSearch`) with non-search tools (such as function calling or the Gemini Enterprise Agent Platform RAG Engine `retrieval` tool) in the same `generateContent` request."
+      }
+    ]
+  },
+  {
+    "id": "dev-038",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "gemini",
+      "429",
+      "retries",
+      "global-endpoint"
+    ],
+    "stem": "An app on Standard PayGo sends Gemini requests to the `us-central1` endpoint and answers users in real time. During busy hours, some requests fail with `429` errors. The app has no data residency or ML processing location requirements. Which two actions should the developer take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Change the client location to `global`."
+      },
+      {
+        "id": "B",
+        "text": "Request a quota increase for the model in `us-central1`."
+      },
+      {
+        "id": "C",
+        "text": "Retry each failed request at once, with no delay, up to 20 times."
+      },
+      {
+        "id": "D",
+        "text": "Retry failed requests with truncated exponential backoff and jitter."
+      },
+      {
+        "id": "E",
+        "text": "Move the requests to batch inference, which processes them asynchronously."
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "On Standard PayGo, a `429` error shows temporary contention for shared capacity, not a fixed quota. Google recommends exponential backoff and the global endpoint. The app has no location requirements, so the global endpoint fits.",
+    "whyWrong": {
+      "B": "Standard PayGo `429` errors do not mean that the app hit a fixed quota. A quota increase is not the fix.",
+      "C": "Retries with no delay add load during contention. The API errors page recommends no more than two retries, with a minimum delay of one second and exponential backoff.",
+      "E": "Batch jobs are asynchronous and can take up to 24 hours. They do not fit answers in real time."
+    },
+    "sources": [
+      {
+        "title": "Standard PayGo",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo",
+        "evidence": "If you receive a `429` error, it doesn't indicate that you've hit a fixed quota. It indicates temporary high contention for a specific shared resource."
+      },
+      {
+        "title": "Standard PayGo",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo",
+        "evidence": "We recommend implementing an exponential backoff retry strategy to handle these errors, as availability in this dynamic environment can change quickly."
+      },
+      {
+        "title": "Standard PayGo",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo",
+        "evidence": "In addition to a retry strategy, we recommend using the global endpoint."
+      }
+    ]
+  },
+  {
+    "id": "dev-039",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "gemini",
+      "adc",
+      "api-keys"
+    ],
+    "stem": "A developer built a prototype that calls Gemini on Agent Platform (`aiplatform.googleapis.com`) with a hard-coded API key. The team now deploys the app to Cloud Run for production. Which authentication method does Google recommend for the production app?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep the API key, but move it from the code to Secret Manager."
+      },
+      {
+        "id": "B",
+        "text": "Copy the local ADC file of the developer into the container image."
+      },
+      {
+        "id": "C",
+        "text": "Use ADC with a service account that is attached to the Cloud Run service."
+      },
+      {
+        "id": "D",
+        "text": "Put a service account key in the image, and set `GOOGLE_APPLICATION_CREDENTIALS`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Google recommends an API key for testing and ADC for production. On Cloud Run, ADC uses the attached service account. Grant that service account the Gemini Enterprise Agent Platform User role (`roles/aiplatform.user`) or a role with `aiplatform.endpoints.predict`.",
+    "whyWrong": {
+      "A": "Secret Manager protects the key, but Google recommends ADC, not an API key, for production.",
+      "B": "The app then runs with the identity and permissions of the developer. Credentials in an image are also a security risk.",
+      "D": "A key in an image can leak. It is also not necessary, because Cloud Run gives credentials through the attached service account."
+    },
+    "sources": [
+      {
+        "title": "Configure application default credentials",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/gcp-auth",
+        "evidence": "We recommend using an API key for testing and using application default credentials for production."
+      },
+      {
+        "title": "Get a Google Cloud API key",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/api-keys",
+        "evidence": "For initial testing, you can hard code an API key, but this should only be temporary since it is not secure."
+      }
+    ]
+  },
+  {
+    "id": "dev-040",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini",
+      "safety-filters",
+      "finish-reason"
+    ],
+    "stem": "An app sets a safety setting of `BLOCK_MEDIUM_AND_ABOVE` for dangerous content, and the app must keep this setting. For some user prompts, this line raises `AttributeError: 'NoneType' object has no attribute 'strip'`:\n\n```python\nsummary = response.text.strip()\n```\n\nHow should the developer change the code?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Check `response.candidates[0].finish_reason` before the code uses `response.text`, and handle `SAFETY` blocks."
+      },
+      {
+        "id": "B",
+        "text": "Retry the same request with exponential backoff until `response.text` has a value."
+      },
+      {
+        "id": "C",
+        "text": "Set the threshold to `BLOCK_NONE` for all harm categories, so that no response is ever empty."
+      },
+      {
+        "id": "D",
+        "text": "Add a system instruction that tells the model never to produce content that a filter blocks."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "When a filter blocks a response, the candidate content is empty, so `response.text` is `None`. The finish reason shows the cause, for example `SAFETY`. Check it before you use the text, and keep the required safety setting.",
+    "whyWrong": {
+      "B": "A safety block is not a transient error. The same prompt is likely to be blocked again.",
+      "C": "This removes the blocking that the app must keep.",
+      "D": "A system instruction can steer the model, but it does not guarantee that no response is blocked. The code still fails on a blocked response."
+    },
+    "sources": [
+      {
+        "title": "Safety and content filters",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/configure-safety-filters",
+        "evidence": "If a filter blocks the response, it clears the response's `Candidate.content` field. It does not provide any feedback to the model."
+      },
+      {
+        "title": "Safety and content filters",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/configure-safety-filters",
+        "evidence": "The token generation was stopped because the response was flagged for harmful content."
+      }
+    ]
+  },
+  {
+    "id": "dev-041",
+    "objective": "4.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "gemini",
+      "endpoints",
+      "data-residency"
+    ],
+    "stem": "A company in Germany calls Gemini on Agent Platform with `location=\"global\"`. A new compliance rule requires that ML processing of customer data stays inside the European Union. What should the developer change?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Keep `global`, and add a resource locations organization policy that allows only EU locations."
+      },
+      {
+        "id": "B",
+        "text": "Set the client location to `eu`, the European Union multi-region endpoint."
+      },
+      {
+        "id": "C",
+        "text": "Keep `global`, and put the project inside a VPC Service Controls perimeter."
+      },
+      {
+        "id": "D",
+        "text": "Set the client location to `us`, and store all prompts and responses in an EU bucket."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The endpoint decides where ML processing happens. You cannot control where the global endpoint processes a request. A multi-region endpoint keeps ML processing in its jurisdiction, so the `eu` endpoint keeps it inside the European Union.",
+    "whyWrong": {
+      "A": "A resource locations policy controls where you create resources. It does not control where the global endpoint processes requests.",
+      "C": "VPC Service Controls limits access to services. It does not decide where the global endpoint processes requests.",
+      "D": "The `us` endpoint keeps ML processing in the United States. The storage location of the results does not change where ML processing happens."
+    },
+    "sources": [
+      {
+        "title": "Data residency",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/data-residency",
+        "evidence": "Jurisdictional multi-region endpoints: When you use jurisdictional endpoints, ML processing stays within that specific geographical region (such as the United States or the European Union)."
+      },
+      {
+        "title": "Deployments and endpoints",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/locations",
+        "evidence": "Don't use the global endpoint if you have ML processing requirements, because you can't control or know which region your ML processing requests are sent to when a request is made."
+      }
+    ]
+  }
+]
