@@ -1,0 +1,15 @@
+# Lab 51: the wrong way to push. The image goes to Artifact Registry through an explicit
+# docker push step, and there is no images field. Cloud Build generates no provenance and
+# no built-by-cloud-build attestation for this image, so the policy blocks it.
+steps:
+- id: build
+  name: gcr.io/cloud-builders/docker
+  # The label changes the image metadata, so this image gets a digest of its own.
+  args: ['build', '--label', 'lab51.pipeline=docker-push',
+         '-t', '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/lab51-repo/lab51-app:docker-push', '.']
+- id: push
+  name: gcr.io/cloud-builders/docker
+  args: ['push', '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/lab51-repo/lab51-app:docker-push']
+
+options:
+  logging: CLOUD_LOGGING_ONLY

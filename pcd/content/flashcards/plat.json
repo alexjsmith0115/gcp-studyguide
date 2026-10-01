@@ -1,0 +1,600 @@
+[
+  {
+    "id": "plat-f001",
+    "note": "1.1-platform-choice",
+    "kind": "concept",
+    "front": "Which runtime environment does Google recommend that you consider first for a new containerized workload?",
+    "back": "Serverless first: Cloud Run, unless you want or need Kubernetes. If a criterion makes the workload a poor fit for serverless, Google recommends GKE Autopilot.",
+    "aws": null,
+    "source": {
+      "title": "Select a managed container runtime environment",
+      "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+      "evidence": "If you don't need Kubernetes, then we recommend that you consider whether your application is a good fit for serverless. If there are criteria that make your workload less suitable for serverless, then we recommend using Autopilot."
+    }
+  },
+  {
+    "id": "plat-f002",
+    "note": "1.1-platform-choice",
+    "kind": "concept",
+    "front": "Which inbound protocols does a Cloud Run service accept?",
+    "back": "HTTP, HTTP/2, WebSockets, and gRPC. An app that needs another protocol, for example a public TCP or UDP server, is not a fit for a Cloud Run service. Use GKE or Compute Engine instead.",
+    "aws": null,
+    "source": {
+      "title": "Is my app a good fit for a Cloud Run service?",
+      "url": "https://docs.cloud.google.com/run/docs/fit-for-run",
+      "evidence": "Serves requests, streams, or events delivered using HTTP, HTTP/2, WebSockets, or gRPC, or executes to completion."
+    }
+  },
+  {
+    "id": "plat-f003",
+    "note": "1.1-platform-choice",
+    "kind": "term",
+    "front": "Cloud Run job",
+    "back": "A Cloud Run resource that runs one or more tasks to completion and has no public endpoint. Use it for scripts, data processing, and scheduled work. A task can run for up to 168 hours (7 days).",
+    "aws": "AWS Batch, scheduled Lambda functions",
+    "source": {
+      "title": "Set task timeout for jobs",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/task-timeout",
+      "evidence": "By default, each task runs for a maximum of 10 minutes: you can change this to a shorter time or a longer time up to 168 hours (7 days)."
+    }
+  },
+  {
+    "id": "plat-f004",
+    "note": "1.1-platform-choice",
+    "kind": "term",
+    "front": "Cloud Run worker pool",
+    "back": "A Cloud Run resource for always-on, pull-based background work, such as Kafka or Pub/Sub consumers. It has no URL, and its container does not have to listen on a port. With Direct VPC ingress, only resources in the VPC network can connect to it.",
+    "aws": null,
+    "source": {
+      "title": "Deployment options and resource model",
+      "url": "https://docs.cloud.google.com/run/docs/resource-model",
+      "evidence": "Worker pools are a Cloud Run resource specifically designed for non-request workloads, such as pull queues."
+    }
+  },
+  {
+    "id": "plat-f005",
+    "note": "1.1-platform-choice",
+    "kind": "term",
+    "front": "Cloud Run functions",
+    "back": "Single-purpose, event-driven code that Cloud Run builds into a container and deploys as a Cloud Run service (formerly Cloud Functions 2nd gen). One instance can process up to 1,000 requests at the same time. A Cloud Run functions (1st gen) instance processes one.",
+    "aws": "AWS Lambda",
+    "source": {
+      "title": "Compare Cloud Run functions",
+      "url": "https://docs.cloud.google.com/run/docs/functions/comparison",
+      "evidence": "Cloud Run functions, is the latest version of functions, deployed as a service on Cloud Run."
+    }
+  },
+  {
+    "id": "plat-f006",
+    "note": "1.1-platform-choice",
+    "kind": "term",
+    "front": "GKE Autopilot",
+    "back": "The recommended GKE mode of operation. GKE manages the nodes, scaling, and security settings, and bills general-purpose Pods by their resource requests. Use it when a workload needs Kubernetes or does not fit Cloud Run.",
+    "aws": "Amazon EKS",
+    "source": {
+      "title": "About GKE modes of operation",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/choose-cluster-mode",
+      "evidence": "Autopilot (recommended): a managed experience in which GKE handles most of your infrastructure for you so that you can focus on your applications."
+    }
+  },
+  {
+    "id": "plat-f007",
+    "note": "1.1-platform-choice",
+    "kind": "concept",
+    "front": "An app calls Kubernetes APIs and deploys with Helm. Which platform does Google recommend for it?",
+    "back": "GKE Autopilot. Cloud Run does not support Kubernetes, so an explicit dependency on Kubernetes APIs, custom resources, or Helm makes Autopilot the target runtime.",
+    "aws": null,
+    "source": {
+      "title": "Select a managed container runtime environment",
+      "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+      "evidence": "In these scenarios, Autopilot is the target runtime environment because Cloud Run doesn't support Kubernetes."
+    }
+  },
+  {
+    "id": "plat-f008",
+    "note": "1.1-platform-choice",
+    "kind": "concept",
+    "front": "Which managed container platform must you use for a workload that requires Arm processors?",
+    "back": "GKE Autopilot. Cloud Run does not support Arm processors, but Autopilot supports managed nodes with Arm processors.",
+    "aws": null,
+    "source": {
+      "title": "Select a managed container runtime environment",
+      "url": "https://docs.cloud.google.com/architecture/select-managed-container-runtime-environment",
+      "evidence": "Cloud Run doesn't support Arm architecture processors, but Autopilot supports managed nodes that are backed by Arm architecture. If your workload requires Arm architecture, you will need to use Autopilot."
+    }
+  },
+  {
+    "id": "plat-f009",
+    "note": "1.1-platform-choice",
+    "kind": "concept",
+    "front": "What is the maximum request timeout of a Cloud Run service?",
+    "back": "60 minutes. For work that runs longer, use a Cloud Run job instead of an HTTP request.",
+    "aws": null,
+    "source": {
+      "title": "Configure request timeout for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/request-timeout",
+      "evidence": "The timeout is set by default to 5 minutes (300 seconds) and can be extended up to 60 minutes (3600 seconds)."
+    }
+  },
+  {
+    "id": "plat-f010",
+    "note": "1.1-platform-choice",
+    "kind": "concept",
+    "front": "Which GKE mode of operation must you use to run Windows Server containers?",
+    "back": "GKE Standard. Windows Server node images and containers are not available in Autopilot mode.",
+    "aws": null,
+    "source": {
+      "title": "Windows Server containers on GKE",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/windows-server-gke",
+      "evidence": "Windows Server node images and containers aren't available in GKE Autopilot mode."
+    }
+  },
+  {
+    "id": "plat-f011",
+    "note": "1.1-platform-choice",
+    "kind": "term",
+    "front": "Compute Engine",
+    "back": "Google Cloud's VM service, where you control the OS, the kernel, and all software. Choose it to migrate a legacy app with specific licensing, OS, kernel, or networking requirements, for example a Windows-based app or SAP HANA.",
+    "aws": "Amazon EC2",
+    "source": {
+      "title": "Where should I run my stuff? Choosing a Google Cloud compute option",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/where-should-i-run-my-stuff-choosing-google-cloud-compute-option",
+      "evidence": "Use Compute Engine if you are migrating a legacy application with specific licensing, OS, kernel, or networking requirements. Examples: Windows-based applications, genomics processing, SAP HANA."
+    }
+  },
+  {
+    "id": "plat-f012",
+    "note": "1.1-platform-choice",
+    "kind": "term",
+    "front": "App Engine",
+    "back": "A platform that runs apps in a standard environment or a flexible environment. For new Google Cloud users, Google recommends Cloud Run as the preferred alternative. Google also recommends that you evaluate Cloud Run for new projects and use it to modernize existing apps.",
+    "aws": "AWS Elastic Beanstalk",
+    "source": {
+      "title": "Choose an App Engine environment",
+      "url": "https://docs.cloud.google.com/appengine/docs/the-appengine-environments",
+      "evidence": "For new Google Cloud users, we recommend using Cloud Run as the preferred alternative over App Engine."
+    }
+  },
+  {
+    "id": "plat-f013",
+    "note": "1.1-resources-and-cost",
+    "kind": "term",
+    "front": "Maximum concurrent requests per instance",
+    "back": "The Cloud Run setting for the most requests that one instance processes at the same time, up to 1,000. A higher value lets fewer instances serve the same load, which can reduce the cost. Google recommends the default value.",
+    "aws": "One Lambda instance per concurrent request",
+    "source": {
+      "title": "Maximum concurrent requests for services",
+      "url": "https://docs.cloud.google.com/run/docs/about-concurrency",
+      "evidence": "Cloud Run provides a maximum concurrent requests per instance setting that specifies the maximum number of requests that can be processed simultaneously by a given instance."
+    }
+  },
+  {
+    "id": "plat-f014",
+    "note": "1.1-resources-and-cost",
+    "kind": "concept",
+    "front": "When should you set the maximum concurrency of a Cloud Run service to 1?",
+    "back": "When the code cannot process parallel requests, for example because two requests cannot share its global state, or when each request uses most of the CPU or memory. A concurrency of 1 slows scaling, because a traffic spike needs many new instances.",
+    "aws": null,
+    "source": {
+      "title": "Maximum concurrent requests for services",
+      "url": "https://docs.cloud.google.com/run/docs/about-concurrency",
+      "evidence": "Your container image is not designed for handling multiple requests at the same time, for example, if your container relies on global state that two requests cannot share."
+    }
+  },
+  {
+    "id": "plat-f015",
+    "note": "1.1-resources-and-cost",
+    "kind": "term",
+    "front": "Request-based billing",
+    "back": "The default Cloud Run billing setting (formerly called CPU only allocated during request processing). Instances are charged only while they start, process requests, and shut down. Google recommends it for sporadic, bursty, or spiky traffic.",
+    "aws": null,
+    "source": {
+      "title": "Billing settings for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+      "evidence": "Request-based billing (default): Cloud Run instances are only charged when they process requests, when they start, and when they shut down. See instance lifecycle for more details. This setting was previously called CPU only allocated during request processing."
+    }
+  },
+  {
+    "id": "plat-f016",
+    "note": "1.1-resources-and-cost",
+    "kind": "term",
+    "front": "Instance-based billing",
+    "back": "A Cloud Run billing setting (formerly called CPU always allocated) that charges for the whole instance lifetime and allocates CPU outside requests. Use it for background work after the response, or for steady traffic. The gcloud flag is `--no-cpu-throttling`.",
+    "aws": null,
+    "source": {
+      "title": "Billing settings for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/billing-settings",
+      "evidence": "Instance-based billing can be useful for running short-lived background tasks and other asynchronous processing tasks. This setting was previously called CPU always allocated."
+    }
+  },
+  {
+    "id": "plat-f017",
+    "note": "1.1-resources-and-cost",
+    "kind": "term",
+    "front": "Cloud Run minimum instances",
+    "back": "A setting that keeps a number of instances warm and ready, so that requests do not wait for slow container starts. You also pay for these instances while they are idle, at a lower rate with request-based billing.",
+    "aws": "Lambda provisioned concurrency",
+    "source": {
+      "title": "Set minimum instances for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/min-instances",
+      "evidence": "you can set a minimum number of instances to avoid slow container start times and reduce service latency."
+    }
+  },
+  {
+    "id": "plat-f018",
+    "note": "1.1-resources-and-cost",
+    "kind": "term",
+    "front": "Cloud Run maximum instances",
+    "back": "A limit on the number of instances of a service. Use it to control cost, or to limit the connections to a backing service such as a database. The default is 100 instances for each revision.",
+    "aws": "Lambda reserved concurrency",
+    "source": {
+      "title": "Set maximum instances for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/max-instances",
+      "evidence": "You can use this setting as a way to control your costs or to limit the number of connections to a backing service, such as to a database."
+    }
+  },
+  {
+    "id": "plat-f019",
+    "note": "1.1-resources-and-cost",
+    "kind": "term",
+    "front": "Startup CPU boost",
+    "back": "A Cloud Run setting that adds CPU while an instance starts and for 10 seconds after it starts, to reduce startup latency. You pay for the boosted CPU during that time.",
+    "aws": "Lambda SnapStart",
+    "source": {
+      "title": "Configure CPU limits for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/cpu",
+      "evidence": "The startup CPU boost feature for revisions provides additional CPU during instance startup time and for 10 seconds after the instance has started."
+    }
+  },
+  {
+    "id": "plat-f020",
+    "note": "1.1-resources-and-cost",
+    "kind": "concept",
+    "front": "How should you set the memory request and the memory limit of a GKE container?",
+    "back": "Set them to the same value. Memory cannot be compressed, so when a node runs out of memory, Kubernetes must take Pods down. Equal values prevent this.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for running cost-optimized Kubernetes applications on GKE",
+      "url": "https://docs.cloud.google.com/architecture/best-practices-for-running-cost-effective-kubernetes-applications-on-gke",
+      "evidence": "However, because memory is an incompressible resource, when memory is exhausted, the Pod needs to be taken down. To avoid having Pods taken down—and consequently, destabilizing your environment—you must set requested memory to the memory limit."
+    }
+  },
+  {
+    "id": "plat-f021",
+    "note": "1.1-resources-and-cost",
+    "kind": "concept",
+    "front": "What does GKE Autopilot do with a Pod resource request that is below the allowed minimum?",
+    "back": "It raises the request to the minimum, and you pay for the raised value, because Autopilot bills general-purpose Pods by their resource requests.",
+    "aws": null,
+    "source": {
+      "title": "Resource requests in Autopilot",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-resource-requests",
+      "evidence": "If your requests are less than the minimum, Autopilot automatically modifies your workload configuration to bring your requests within the allowed range."
+    }
+  },
+  {
+    "id": "plat-f022",
+    "note": "1.1-resources-and-cost",
+    "kind": "term",
+    "front": "Spot VMs",
+    "back": "Compute Engine VMs at a much lower price than standard VMs (the latest version of preemptible VMs). Compute Engine can preempt them at any time, and no SLA covers them. Use them only for fault-tolerant work, such as batch jobs.",
+    "aws": null,
+    "source": {
+      "title": "Spot VMs",
+      "url": "https://docs.cloud.google.com/compute/docs/instances/spot",
+      "evidence": "Spot VMs have significant discounts, but Compute Engine might preemptively stop or delete (preempt) Spot VMs to reclaim the capacity at any time. Spot VMs are the latest version of preemptible VMs."
+    }
+  },
+  {
+    "id": "plat-f023",
+    "note": "1.1-resources-and-cost",
+    "kind": "concept",
+    "front": "Which commitment should you buy today for a committed use discount on Cloud Run or GKE Autopilot?",
+    "back": "A Compute flexible commitment, a spend-based commitment that covers Compute Engine, GKE, and Cloud Run. The service-specific commitments for Cloud Run and GKE Autopilot are no longer for sale.",
+    "aws": null,
+    "source": {
+      "title": "Committed use discounts",
+      "url": "https://docs.cloud.google.com/docs/cuds",
+      "evidence": "Cloud Run service-specific commitments are no longer available for purchase. Google supports any existing and active commitments until they expire. If you want new commitments for this service, then purchase Compute flexible commitments instead."
+    }
+  },
+  {
+    "id": "plat-f024",
+    "note": "1.1-resources-and-cost",
+    "kind": "concept",
+    "front": "In a Cloud Run service YAML file, where must labels be for Cloud Billing to receive them?",
+    "back": "In `spec.template.metadata.labels`. Cloud Billing and Cloud Logging do not receive labels that are only in the service `metadata.labels`. The console and the gcloud CLI set both places.",
+    "aws": null,
+    "source": {
+      "title": "Configure labels for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/labels",
+      "evidence": "Cloud Billing and Cloud Logging only receive labels that are specified in the `spec.template.metadata.labels` attribute in YAML, or under `template` in Terraform."
+    }
+  },
+  {
+    "id": "plat-f025",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "What must the manifest list of a multi-architecture image include to run on Cloud Run?",
+    "back": "A `linux/amd64` image. Cloud Run supports only the Linux x86_64 ABI, so an image built only for Arm, for example on an Arm laptop, might not run. Build the image with Cloud Build instead.",
+    "aws": null,
+    "source": {
+      "title": "Container runtime contract",
+      "url": "https://docs.cloud.google.com/run/docs/container-contract",
+      "evidence": "If deploying a multi-architecture image, the manifest list must include `linux/amd64`."
+    }
+  },
+  {
+    "id": "plat-f026",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "Where does a Cloud Run container store a file that it writes to its local file system?",
+    "back": "In the instance memory. The file system is in memory, so the file counts against the memory limit. The file does not persist after the instance stops.",
+    "aws": null,
+    "source": {
+      "title": "Container runtime contract",
+      "url": "https://docs.cloud.google.com/run/docs/container-contract",
+      "evidence": "It is an in-memory file system, so writing to it uses the instance's memory."
+    }
+  },
+  {
+    "id": "plat-f027",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "How long does a Cloud Run container have between `SIGTERM` and `SIGKILL` when its instance shuts down?",
+    "back": "10 seconds. Cloud Run allocates and bills CPU during this period. Use a `SIGTERM` handler to flush telemetry, log the shutdown, and close database connections.",
+    "aws": null,
+    "source": {
+      "title": "Container runtime contract",
+      "url": "https://docs.cloud.google.com/run/docs/container-contract",
+      "evidence": "Before shutting down an instance, Cloud Run sends a `SIGTERM` signal to all the containers in an instance, indicating the start of a 10 second period before the actual shutdown occurs, at which point Cloud Run sends a `SIGKILL` signal."
+    }
+  },
+  {
+    "id": "plat-f028",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "Can a Cloud Run container use `sudo` or Docker's privileged mode?",
+    "back": "No. Cloud Run has no privileged mode and does not support `sudo` or `setuid` binaries. Tools such as `sudo` can fail with insufficient permissions.",
+    "aws": null,
+    "source": {
+      "title": "Container runtime contract",
+      "url": "https://docs.cloud.google.com/run/docs/container-contract",
+      "evidence": "Privilege escalation is also disabled in your containers. Use of `sudo` and `setuid` binaries are not supported in Cloud Run."
+    }
+  },
+  {
+    "id": "plat-f029",
+    "note": "1.1-containers",
+    "kind": "term",
+    "front": "In-memory volume",
+    "back": "A Cloud Run volume mount that uses container memory as scratch space, and that the containers of one instance can share. Set a size limit: then writes to a full volume fail, and Cloud Run does not terminate the instance.",
+    "aws": "Lambda ephemeral storage",
+    "source": {
+      "title": "Configure in-memory volume mounts for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/in-memory-volume-mounts",
+      "evidence": "Limit the size of the in-memory volume. When you limit the size of a volume, writes to a full volume will fail, which is preferable to having Cloud Run terminate instances due to the volume consuming too much memory."
+    }
+  },
+  {
+    "id": "plat-f030",
+    "note": "1.1-containers",
+    "kind": "term",
+    "front": "Cloud Storage volume mount",
+    "back": "A Cloud Run volume that shows the objects of a bucket as files in the container file system. Cloud Run uses Cloud Storage FUSE, so you install nothing in the container. Use it when the app needs a file path to the data.",
+    "aws": "Amazon S3 (Lambda has no S3 volume mount)",
+    "source": {
+      "title": "Configure Cloud Storage volume mounts for Cloud Run services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/cloud-storage-volume-mounts",
+      "evidence": "Mounting the bucket as a volume in Cloud Run presents the bucket content as files in the container file system."
+    }
+  },
+  {
+    "id": "plat-f031",
+    "note": "1.1-containers",
+    "kind": "term",
+    "front": "Second generation execution environment",
+    "back": "A Cloud Run execution environment that runs each instance in a microVM with full Linux compatibility, faster CPU and network, and NFS support. Use it for steady traffic, CPU-heavy work, NFS, or software that needs all system calls. Jobs and worker pools always use it.",
+    "aws": null,
+    "source": {
+      "title": "Select an execution environment for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/execution-environments",
+      "evidence": "The second generation execution environment is a microVM and provides full Linux compatibility rather than system call emulation."
+    }
+  },
+  {
+    "id": "plat-f032",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "Why does a Cloud Run app that starts with `ENTRYPOINT node server.js` never receive `SIGTERM`?",
+    "back": "This shell form runs the app under `/bin/sh -c`, and the shell does not forward signals to child processes. Use the exec form, `ENTRYPOINT [\"node\", \"server.js\"]`, so that the app receives the signal.",
+    "aws": null,
+    "source": {
+      "title": "Graceful shutdowns on Cloud Run: Deep dive",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/graceful-shutdowns-cloud-run-deep-dive",
+      "evidence": "Most notably, the GNU /bin/sh and other shells like bash do not forward signals to child processes by default."
+    }
+  },
+  {
+    "id": "plat-f033",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "Does a smaller container image reduce the startup time of a Cloud Run instance?",
+    "back": "No. Because of container image streaming, the image size does not affect startup time or request processing time on Cloud Run. To reduce startup time, use startup CPU boost, minimum instances, or fewer dependencies.",
+    "aws": null,
+    "source": {
+      "title": "General development tips",
+      "url": "https://docs.cloud.google.com/run/docs/tips/general",
+      "evidence": "Because of Cloud Run's container image streaming technology, the size of your container image does not affect container startup times or request processing time."
+    }
+  },
+  {
+    "id": "plat-f034",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "When should you write a Dockerfile instead of relying on Google Cloud's buildpacks?",
+    "back": "When you must customize the environment with system libraries, utilities, configuration files, or startup processes. Buildpacks fit apps in a supported language that need only the common build steps of that language.",
+    "aws": null,
+    "source": {
+      "title": "Using system packages tutorial",
+      "url": "https://docs.cloud.google.com/run/docs/tutorials/system-packages",
+      "evidence": "Use your `Dockerfile` to customize your environment with libraries, utilities, environment variables, configuration files, and startup processes."
+    }
+  },
+  {
+    "id": "plat-f035",
+    "note": "1.1-containers",
+    "kind": "concept",
+    "front": "When you split a monolith into services, how should the services get their data?",
+    "back": "Each service gets its own data source. A shared database couples the services tightly, so one schema change forces an update to every service that uses it. It can also become a bottleneck.",
+    "aws": null,
+    "source": {
+      "title": "Learning Path: Transform a monolith into a GKE app - Modularize the monolith",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/learn/cymbal-books/lp1/modular",
+      "evidence": "A frequent mistake people make during modularization is allowing multiple modules to access the same data, such as a single database."
+    }
+  },
+  {
+    "id": "plat-f036",
+    "note": "1.1-regions-and-replication",
+    "kind": "concept",
+    "front": "What does Cloud Run do with incoming traffic when its whole region has an outage?",
+    "back": "It never routes the traffic to another region, so the service is unavailable until the outage ends. For region failover, deploy the service to several regions behind a global external Application Load Balancer.",
+    "aws": null,
+    "source": {
+      "title": "Architecting disaster recovery for cloud infrastructure outages",
+      "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+      "evidence": "Customer traffic will never be routed to a different region by Cloud Run. In the case of a regional failure, Cloud Run will become available again as soon as the outage is resolved."
+    }
+  },
+  {
+    "id": "plat-f037",
+    "note": "1.1-regions-and-replication",
+    "kind": "term",
+    "front": "Regional GKE cluster",
+    "back": "A GKE cluster with control plane replicas in several zones of one region. Google recommends it for production. Autopilot clusters are always regional, and a Standard cluster cannot change between zonal and regional after creation.",
+    "aws": "Amazon EKS",
+    "source": {
+      "title": "About cluster configuration choices",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/configuration-overview",
+      "evidence": "You can choose between regional clusters that have multiple control plane replicas across multiple compute zones in a Google Cloud region, or zonal clusters with a single control plane in a single zone. Autopilot clusters are always regional."
+    }
+  },
+  {
+    "id": "plat-f038",
+    "note": "1.1-regions-and-replication",
+    "kind": "term",
+    "front": "Regional managed instance group (MIG)",
+    "back": "A group of identical Compute Engine VMs spread across several zones of one region. Google recommends it over a zonal MIG, because the app continues to serve from the other zones during a zone failure.",
+    "aws": "Amazon EC2 Auto Scaling",
+    "source": {
+      "title": "About regional MIGs",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+      "evidence": "You can use regional MIGs to spread your application load across multiple zones, rather than confining your application to a single zone or managing multiple zonal MIGs across different zones."
+    }
+  },
+  {
+    "id": "plat-f039",
+    "note": "1.1-regions-and-replication",
+    "kind": "concept",
+    "front": "Does Cloud SQL high availability (HA) keep a database available during a region outage?",
+    "back": "No. The HA primary and standby instances are in two zones of one region, so HA protects against a zone outage only. For a region outage, add a cross-region read replica and promote it manually.",
+    "aws": null,
+    "source": {
+      "title": "Architecting disaster recovery for cloud infrastructure outages",
+      "url": "https://docs.cloud.google.com/architecture/disaster-recovery",
+      "evidence": "It offers a high availability configuration for regional redundancy, protecting the database from a zone outage. Cross-region replicas can be provisioned to protect the database from a region outage."
+    }
+  },
+  {
+    "id": "plat-f040",
+    "note": "1.1-regions-and-replication",
+    "kind": "concept",
+    "front": "Which Cloud Storage location types keep a bucket available in a region outage, with no change to storage paths?",
+    "back": "Dual-region and multi-region. Each is one bucket with no primary or secondary location, so failover is automatic. New objects reach the second region asynchronously, so objects not yet copied can be unavailable until the region recovers.",
+    "aws": null,
+    "source": {
+      "title": "Data availability and durability",
+      "url": "https://docs.cloud.google.com/storage/docs/availability-durability",
+      "evidence": "In the unlikely event of a region-wide outage, such as one caused by a natural disaster, dual-region and multi-region buckets remain available, with no need to change storage paths."
+    }
+  },
+  {
+    "id": "plat-f041",
+    "note": "1.1-regions-and-replication",
+    "kind": "term",
+    "front": "Regional Persistent Disk",
+    "back": "A Compute Engine disk that replicates data synchronously to a second zone of the same region. After a zone outage, you force-attach the disk to a VM in the other zone.",
+    "aws": null,
+    "source": {
+      "title": "Build HA services using synchronously replicated disks",
+      "url": "https://docs.cloud.google.com/compute/docs/disks/high-availability-regional-persistent-disk",
+      "evidence": "Regional Persistent Disk and Hyperdisk Balanced High Availability synchronously replicate data between two zones in the same region and ensure HA for disk data for up to one zonal failure."
+    }
+  },
+  {
+    "id": "plat-f042",
+    "note": "1.1-regions-and-replication",
+    "kind": "concept",
+    "front": "By how much should you overprovision a regional MIG in three zones to survive a zone outage?",
+    "back": "By at least 50%, to 150% of the size that the app needs. After a zone outage, the MIG adds no VMs in the other zones unless autoscaling is on, so the remaining VMs must carry the full load.",
+    "aws": null,
+    "source": {
+      "title": "About regional MIGs",
+      "url": "https://docs.cloud.google.com/compute/docs/instance-groups/regional-migs",
+      "evidence": "When you create a regional MIG in a region with at least three zones, Google recommends overprovisioning your group by at least 50%."
+    }
+  },
+  {
+    "id": "plat-f043",
+    "note": "1.1-regions-and-replication",
+    "kind": "term",
+    "front": "Cloud Run service health",
+    "back": "A Cloud Run feature for automatic failover between regions behind a global external or cross-region internal Application Load Balancer. A regional service is healthy when 60% or more of its instances pass their readiness probes. Each region needs at least one minimum instance.",
+    "aws": null,
+    "source": {
+      "title": "Automate cross-region failover with Cloud Run service health",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/configure-service-health",
+      "evidence": "A Cloud Run service in a region is healthy and receives traffic if 60% or more of its instances pass their readiness probes. If a region becomes unhealthy, the load balancer automatically reroutes traffic to a healthy region."
+    }
+  },
+  {
+    "id": "plat-f044",
+    "note": "1.1-regions-and-replication",
+    "kind": "concept",
+    "front": "How long can the automatic, Google-managed failover of a Spanner dual-region configuration take?",
+    "back": "Up to 45 minutes after Google detects the failure. For a shorter RTO, monitor the dual-region quorum health metric and fail over manually. A manual failover usually completes within one minute, but you must also fail back manually.",
+    "aws": null,
+    "source": {
+      "title": "Regional, dual-region, and multi-region configurations",
+      "url": "https://docs.cloud.google.com/spanner/docs/instance-configurations",
+      "evidence": "Spanner also supports automatic, Google-managed failovers, which might take up to 45 minutes from the time the failure is first detected."
+    }
+  },
+  {
+    "id": "plat-f045",
+    "note": "1.1-regions-and-replication",
+    "kind": "term",
+    "front": "Premium Tier",
+    "back": "The default Network Service Tier: internet traffic enters Google's network at the point of presence (PoP) closest to the user. Global load balancers and Cloud CDN need it. Standard Tier costs less, but traffic enters near the region.",
+    "aws": "AWS Global Accelerator",
+    "source": {
+      "title": "Network Service Tiers overview",
+      "url": "https://docs.cloud.google.com/network-tiers/docs/overview",
+      "evidence": "With Premium Tier, incoming traffic from systems on the internet enters Google's high-performance network at the PoP closest to the sending system."
+    }
+  },
+  {
+    "id": "plat-f046",
+    "note": "1.1-regions-and-replication",
+    "kind": "concept",
+    "front": "Does a BigQuery multi-region location give a dataset cross-region redundancy?",
+    "back": "No. BigQuery stores the data of a multi-region dataset in a single region inside that geographic area. For cross-region redundancy, use BigQuery managed disaster recovery.",
+    "aws": null,
+    "source": {
+      "title": "BigQuery locations",
+      "url": "https://docs.cloud.google.com/bigquery/docs/locations",
+      "evidence": "Data is stored in a single region and compute is only provided within that region. For cross-region redundancy BigQuery offers managed disaster recovery."
+    }
+  }
+]

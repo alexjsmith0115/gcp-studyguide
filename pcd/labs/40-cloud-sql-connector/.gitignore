@@ -1,0 +1,2 @@
+# The Cloud SQL Auth Proxy binary that step 5 downloads. teardown.sh deletes it.
+cloud-sql-proxy

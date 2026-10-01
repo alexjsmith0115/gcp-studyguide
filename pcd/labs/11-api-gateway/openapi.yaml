@@ -1,0 +1,56 @@
+# Lab 11 API config (OpenAPI 2.0): every call to /hello needs an API key, and each
+# consumer project can make 5 calls per minute.
+# Step 4 of the README replaces BACKEND_URL with the Cloud Run service URL.
+swagger: "2.0"
+info:
+  title: lab11-api
+  description: Lab 11 API on API Gateway with a private Cloud Run backend
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+# Top-level backend: API Gateway appends the request path (/hello) to this address.
+# It calls the backend with an ID token for the gateway service account.
+x-google-backend:
+  address: BACKEND_URL
+  protocol: h2  # the API Gateway docs recommend h2 for serverless backends
+# Quota: a metric, and a limit on that metric. The only supported unit is
+# 1/min/{project}: API Gateway counts calls for each consumer project and resets
+# the count every minute. It finds the consumer project from the API key.
+x-google-management:
+  metrics:
+    - name: hello-requests
+      displayName: Hello requests
+      valueType: INT64
+      metricKind: DELTA
+  quota:
+    limits:
+      - name: hello-requests-limit
+        metric: hello-requests
+        unit: 1/min/{project}
+        values:
+          STANDARD: 5
+paths:
+  /hello:
+    get:
+      summary: Call the Cloud Run sample service
+      operationId: hello
+      # Each call adds 1 to the hello-requests metric. A method without
+      # x-google-quota has no quota limit.
+      x-google-quota:
+        metricCosts:
+          hello-requests: 1
+      security:
+        - api_key: []
+      responses:
+        "200":
+          description: A successful response
+          schema:
+            type: string
+securityDefinitions:
+  # The client sends the key in a query parameter named "key".
+  api_key:
+    type: "apiKey"
+    name: "key"
+    in: "query"

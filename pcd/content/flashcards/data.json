@@ -1,0 +1,626 @@
+[
+  {
+    "id": "data-f001",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Cloud SQL",
+    "back": "A fully managed relational database service for MySQL, PostgreSQL, and SQL Server. Google suggests it for any general-purpose SQL database, such as a web app, CRM, ERP, or e-commerce app.",
+    "aws": "Amazon RDS, Amazon Aurora",
+    "source": {
+      "title": "Your Google Cloud database options, explained",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/your-google-cloud-database-options-explained",
+      "evidence": "In Google Cloud use Cloud SQL for any general-purpose SQL database and Cloud Spanner for large-scale globally scalable, strongly consistent use cases."
+    }
+  },
+  {
+    "id": "data-f002",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "AlloyDB for PostgreSQL",
+    "back": "A fully managed, PostgreSQL-compatible database service for demanding workloads. Choose it when a PostgreSQL app must run analytical queries on its live transactional data (HTAP).",
+    "aws": "Amazon Aurora",
+    "source": {
+      "title": "AlloyDB overview",
+      "url": "https://docs.cloud.google.com/alloydb/docs/overview",
+      "evidence": "Hybrid Transactional and Analytical Processing (HTAP): run complex analytical queries against your live transactional data without impacting performance or availability."
+    }
+  },
+  {
+    "id": "data-f003",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Spanner",
+    "back": "A relational database (formerly Cloud Spanner) that scales horizontally, with strong consistency and up to 99.999% availability. Use it for large-scale, globally consistent workloads, such as payments, ledgers, and inventory.",
+    "aws": "Amazon Aurora, Amazon DynamoDB, Amazon Keyspaces, Amazon Neptune",
+    "source": {
+      "title": "Your Google Cloud database options, explained",
+      "url": "https://cloud.google.com/blog/topics/developers-practitioners/your-google-cloud-database-options-explained",
+      "evidence": "Cloud Spanner is an enterprise-grade, globally-distributed, and strongly-consistent database that offers up to 99.999% availability, built specifically to combine the benefits of relational database structure with non-relational horizontal scale."
+    }
+  },
+  {
+    "id": "data-f004",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Bigtable",
+    "back": "A wide-column NoSQL database (formerly Cloud Bigtable) for terabytes to petabytes of single-keyed data, with high throughput and low latency. Use it for time-series, IoT, marketing, and financial data.",
+    "aws": "Amazon DynamoDB",
+    "source": {
+      "title": "Bigtable overview",
+      "url": "https://docs.cloud.google.com/bigtable/docs/overview",
+      "evidence": "Bigtable is a sparsely populated table that can scale to billions of rows and thousands of columns, enabling you to store terabytes or even petabytes of data. Bigtable is ideal for storing large amounts of single-keyed data with low latency."
+    }
+  },
+  {
+    "id": "data-f005",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Firestore",
+    "back": "A serverless document database with automatic scaling, ACID transactions, and single-digit millisecond reads. Use it for web, mobile, and server apps, also when clients need real-time updates and offline support.",
+    "aws": "Amazon DynamoDB, Amazon DocumentDB",
+    "source": {
+      "title": "Firestore overview",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/overview",
+      "evidence": "Firestore uses a pay-per-use model. Firestore does not require any pre-provisioning of resources and auto scales to match your load."
+    }
+  },
+  {
+    "id": "data-f006",
+    "note": "1.3-storage-choice",
+    "kind": "term",
+    "front": "Filestore",
+    "back": "A managed NFS file server. Use it when several VMs, GKE Pods, or Cloud Run services must use one shared file system at the same time.",
+    "aws": "Amazon EFS",
+    "source": {
+      "title": "Filestore overview",
+      "url": "https://docs.cloud.google.com/filestore/docs/overview",
+      "evidence": "As a type of persistent file storage, Filestore supports multiple concurrent application instances accessing the same file system simultaneously."
+    }
+  },
+  {
+    "id": "data-f007",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "When is Bigtable a poor choice because of the amount of data?",
+    "back": "When the dataset is small. Until a table holds several GB, Bigtable keeps all of its tablets on one node. Bigtable performs best with large tables that get frequent requests.",
+    "aws": null,
+    "source": {
+      "title": "Understand performance",
+      "url": "https://docs.cloud.google.com/bigtable/docs/performance",
+      "evidence": "If you have written less than several GB of data to the table, Bigtable stores all tablets on a single node within your cluster"
+    }
+  },
+  {
+    "id": "data-f008",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "Which Spanner edition do you need for a multi-region configuration with 99.999% availability?",
+    "back": "The Enterprise Plus edition. It adds dual-region and multi-region configurations, with up to 99.999% availability. The Standard and Enterprise editions use regional configurations, with a 99.99% availability SLA.",
+    "aws": null,
+    "source": {
+      "title": "Spanner editions overview",
+      "url": "https://docs.cloud.google.com/spanner/docs/editions-overview",
+      "evidence": "Enterprise Plus edition: designed for the most demanding workloads that require 99.999% availability with multi-region instance configurations and geo-partitioning support."
+    }
+  },
+  {
+    "id": "data-f009",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "How fast can you read an object in the Archive storage class?",
+    "back": "Within milliseconds, with no restore step, unlike the coldest storage of other cloud providers. The trade-offs are a 365-day minimum storage duration and higher costs for data access.",
+    "aws": null,
+    "source": {
+      "title": "Storage classes",
+      "url": "https://docs.cloud.google.com/storage/docs/storage-classes",
+      "evidence": "Unlike the \"coldest\" storage services offered by other Cloud providers, your data is available within milliseconds, not hours or days."
+    }
+  },
+  {
+    "id": "data-f010",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "Which object names slow down Cloud Storage autoscaling at high request rates?",
+    "back": "Sequential names, for example names that start with a timestamp or a sequence number. Add a short hash prefix before the sequential part to spread the load across the key index.",
+    "aws": null,
+    "source": {
+      "title": "Request rate and access distribution guidelines",
+      "url": "https://docs.cloud.google.com/storage/docs/request-rate",
+      "evidence": "Auto-scaling of an index range can be slowed when using sequential names, such as object keys based on a sequence of numbers or timestamp."
+    }
+  },
+  {
+    "id": "data-f011",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "What happens when two Cloud Run instances write the same file through a Cloud Storage volume mount?",
+    "back": "The last write wins, and the earlier writes are lost. Cloud Storage FUSE, which the volume mount uses, has no file locking for writes to the same file.",
+    "aws": null,
+    "source": {
+      "title": "Configure Cloud Storage volume mounts for Cloud Run services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/cloud-storage-volume-mounts",
+      "evidence": "Cloud Storage FUSE does not provide concurrency control for multiple writes (file locking) to the same file. When multiple writes try to replace a file, the last write wins and all previous writes are lost."
+    }
+  },
+  {
+    "id": "data-f012",
+    "note": "1.3-storage-choice",
+    "kind": "concept",
+    "front": "What happens when an app writes to one Cloud Storage object name more than once per second?",
+    "back": "The writes can fail with throttling errors. Cloud Storage allows one write per second to the same object name.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Storage quotas and limits",
+      "url": "https://docs.cloud.google.com/storage/quotas",
+      "evidence": "Writing to the same object name at a rate above the limit might result in throttling errors."
+    }
+  },
+  {
+    "id": "data-f013",
+    "note": "1.3-relational-schema",
+    "kind": "term",
+    "front": "Interleaved table",
+    "back": "A Spanner child table whose rows Spanner stores with their parent row. The child primary key starts with the parent primary key. Use it when the app often reads a parent row together with its child rows.",
+    "aws": null,
+    "source": {
+      "title": "Schemas overview",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-and-data-model",
+      "evidence": "With interleaving, Spanner physically colocates child rows with parent rows in storage. Co-location can significantly improve performance."
+    }
+  },
+  {
+    "id": "data-f014",
+    "note": "1.3-relational-schema",
+    "kind": "term",
+    "front": "Bit-reversed sequence",
+    "back": "A Spanner sequence that reverses the bits of an internal counter, so the values spread evenly over the key space. Use it when an app needs integer primary keys without hotspots.",
+    "aws": null,
+    "source": {
+      "title": "Primary key default values management",
+      "url": "https://docs.cloud.google.com/spanner/docs/primary-key-default-value",
+      "evidence": "Bit-reversed sequences are especially useful for primary keys, because bit-reversed values are evenly distributed across the key space so that they don't cause hotspots."
+    }
+  },
+  {
+    "id": "data-f015",
+    "note": "1.3-relational-schema",
+    "kind": "term",
+    "front": "`STORING` clause",
+    "back": "A Spanner secondary index option that copies extra columns into the index (`INCLUDE` in the PostgreSQL dialect). A query then reads those columns from the index, with no join back to the base table.",
+    "aws": null,
+    "source": {
+      "title": "Secondary indexes",
+      "url": "https://docs.cloud.google.com/spanner/docs/secondary-indexes",
+      "evidence": "To avoid this extra join, use a STORING clause (GoogleSQL-dialect databases) or INCLUDE clause (PostgreSQL-dialect databases) to store the additional columns in the index."
+    }
+  },
+  {
+    "id": "data-f016",
+    "note": "1.3-relational-schema",
+    "kind": "term",
+    "front": "Commit timestamp column",
+    "back": "A Spanner `TIMESTAMP` column with `allow_commit_timestamp=true`. It stores the commit time of each transaction, from TrueTime. Use it to put changes in order, for example in a changelog table.",
+    "aws": null,
+    "source": {
+      "title": "Commit timestamps in GoogleSQL-dialect databases",
+      "url": "https://docs.cloud.google.com/spanner/docs/commit-timestamp",
+      "evidence": "Using the commit timestamps stored in tables, you can determine the exact ordering of mutations and build features like changelogs."
+    }
+  },
+  {
+    "id": "data-f017",
+    "note": "1.3-relational-schema",
+    "kind": "term",
+    "front": "AlloyDB columnar engine",
+    "back": "An AlloyDB feature that keeps selected columns in memory in a column format. It speeds up scans, joins, and aggregates for analytical queries on live transactional data.",
+    "aws": null,
+    "source": {
+      "title": "AlloyDB overview",
+      "url": "https://docs.cloud.google.com/alloydb/docs/overview",
+      "evidence": "A columnar engine can accelerate the performance of analytical queries by storing data in memory using a columnar format."
+    }
+  },
+  {
+    "id": "data-f018",
+    "note": "1.3-relational-schema",
+    "kind": "term",
+    "front": "AlloyDB index advisor",
+    "back": "An AlloyDB feature that tracks the queries of a database and recommends new indexes for them. It lists the recommendations in the `google_db_advisor_recommended_indexes` view.",
+    "aws": null,
+    "source": {
+      "title": "Use the index advisor",
+      "url": "https://docs.cloud.google.com/alloydb/docs/use-index-advisor",
+      "evidence": "AlloyDB for PostgreSQL offers an index advisor that tracks the queries your database regularly handles. Periodically, it analyzes these queries to recommend new indexes that can increase the queries' performance."
+    }
+  },
+  {
+    "id": "data-f019",
+    "note": "1.3-relational-schema",
+    "kind": "concept",
+    "front": "Why does a timestamp as the first part of a Spanner primary key cause a hotspot?",
+    "back": "Spanner divides rows among servers by key range. Increasing keys send every insert to the end of the key space, so one server gets all the inserts.",
+    "aws": null,
+    "source": {
+      "title": "Schema design best practices",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-design",
+      "evidence": "Because Spanner uses key ranges to distribute data across servers, a monotonic key directs all insert traffic to a single server, creating a bottleneck."
+    }
+  },
+  {
+    "id": "data-f020",
+    "note": "1.3-relational-schema",
+    "kind": "concept",
+    "front": "Which UUID version should a Spanner primary key use?",
+    "back": "Version 4, which uses random values in the high-order bits. Do not use version 1, because it stores a timestamp in the high-order bits.",
+    "aws": null,
+    "source": {
+      "title": "Schemas overview",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-and-data-model",
+      "evidence": "Use a Universally Unique Identifier (UUID). Version 4 UUID is recommended, because it uses random values in the high-order bits. Don't use a UUID algorithm (such as version 1 UUID) that stores the timestamp in the high order bits."
+    }
+  },
+  {
+    "id": "data-f021",
+    "note": "1.3-relational-schema",
+    "kind": "concept",
+    "front": "Why can a Spanner global index on an increasing timestamp column cause a hotspot?",
+    "back": "Spanner implements an index as a table, so the increasing value becomes the first key part of the index table. Interleave the index in the parent table, or add a shard column.",
+    "aws": null,
+    "source": {
+      "title": "Schema design best practices",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-design",
+      "evidence": "because Spanner implements indexes as tables under the hood, and the resulting index table uses a column whose value monotonically increases as its first key part."
+    }
+  },
+  {
+    "id": "data-f022",
+    "note": "1.3-relational-schema",
+    "kind": "concept",
+    "front": "How do you create a new Spanner table and its indexes without an index backfill?",
+    "back": "Put the `CREATE TABLE` statement and its `CREATE INDEX` statements in one batch. The table is then empty when Spanner creates the indexes, so no backfill runs.",
+    "aws": null,
+    "source": {
+      "title": "Schema update best practices",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-updates-best-practices",
+      "evidence": "If you are creating a new table with indexes, on the other hand, the best practice is to place them together (CREATE TABLE followed by CREATE INDEX) in a single batch to avoid backfill entirely."
+    }
+  },
+  {
+    "id": "data-f023",
+    "note": "1.3-relational-schema",
+    "kind": "concept",
+    "front": "Can you remove the interleaving from a Spanner table later?",
+    "back": "No. Interleaving is permanent. To undo it, create the table again and migrate the data to it.",
+    "aws": null,
+    "source": {
+      "title": "Schemas overview",
+      "url": "https://docs.cloud.google.com/spanner/docs/schema-and-data-model",
+      "evidence": "After you interleave a table, it's permanent. You can't undo the interleaving. Instead, you need to create the table again and migrate data to it."
+    }
+  },
+  {
+    "id": "data-f024",
+    "note": "1.3-relational-schema",
+    "kind": "concept",
+    "front": "When does the AlloyDB columnar engine work poorly for a table?",
+    "back": "When its rows change often, because frequent updates invalidate the columnar data. Reduce the update frequency, or schedule columnar engine refreshes more often.",
+    "aws": null,
+    "source": {
+      "title": "About the AlloyDB columnar engine",
+      "url": "https://docs.cloud.google.com/alloydb/docs/columnar-engine/about",
+      "evidence": "Frequent updates to rows invalidate columnar data. To validate a table or a materialized view in the columnar store, you can either reduce the update frequency, or schedule the columnar engine refreshes more frequently."
+    }
+  },
+  {
+    "id": "data-f025",
+    "note": "1.3-nosql-schema",
+    "kind": "term",
+    "front": "Bigtable row key",
+    "back": "The only indexed value of a Bigtable table. Rows sort lexicographically by its bytes, so design it for your most frequent queries: reads by key, key prefix, or row range.",
+    "aws": null,
+    "source": {
+      "title": "Schema design best practices",
+      "url": "https://docs.cloud.google.com/bigtable/docs/schema-design",
+      "evidence": "Each table has an index: the row key. Each row key must be unique. To create a secondary index, use a continuous materialized view."
+    }
+  },
+  {
+    "id": "data-f026",
+    "note": "1.3-nosql-schema",
+    "kind": "term",
+    "front": "Bigtable key salting",
+    "back": "A row key prefix that is the hash of the row key modulo N. Use it for a few very active keys. It spreads one hotspot into N smaller hotspots, and a point read still needs one request.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Bigtable schema optimization: Key Salting",
+      "url": "https://cloud.google.com/blog/products/databases/cloud-bigtable-schema-optimization-key-salting/",
+      "evidence": "A point lookup and write will still work as the physical key can be computed from the logical key. Salting won't eliminate the hotspots, but it spreads them into N hotspots of strength 1/N."
+    }
+  },
+  {
+    "id": "data-f029",
+    "note": "1.3-nosql-schema",
+    "kind": "term",
+    "front": "Bigtable asynchronous secondary index",
+    "back": "A continuous materialized view with a different row key, for a second lookup pattern such as a phone number. Bigtable keeps it eventually consistent with the source table. The app writes only to the source table.",
+    "aws": null,
+    "source": {
+      "title": "Create an asynchronous secondary index",
+      "url": "https://docs.cloud.google.com/bigtable/docs/asynchronous-secondary-index",
+      "evidence": "An asynchronous secondary index is a continuous materialized view that contains a subset of columns from a source table, along with a row key that is different from the row key in the source table."
+    }
+  },
+  {
+    "id": "data-f027",
+    "note": "1.3-nosql-schema",
+    "kind": "term",
+    "front": "Subcollection",
+    "back": "A Firestore collection inside a document. Use it for data that grows over time, such as the messages of a chat room. The parent document does not grow with it.",
+    "aws": null,
+    "source": {
+      "title": "Structure data",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/concepts/structure-data",
+      "evidence": "You can create collections within documents when you have data that might expand over time."
+    }
+  },
+  {
+    "id": "data-f028",
+    "note": "1.3-nosql-schema",
+    "kind": "term",
+    "front": "Distributed counter",
+    "back": "A Firestore counter document with a subcollection of shards. Each update increments one random shard, and the count is the sum of all shards. Use it for a counter with frequent updates.",
+    "aws": null,
+    "source": {
+      "title": "Support frequent and distributed counters",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/solutions/counters",
+      "evidence": "To support more frequent counter updates, create a distributed counter. Each counter is a document with a subcollection of \"shards,\" and the value of the counter is the sum of the value of the shards."
+    }
+  },
+  {
+    "id": "data-f030",
+    "note": "1.3-nosql-schema",
+    "kind": "term",
+    "front": "Firestore in Datastore mode",
+    "back": "Firestore with the Datastore API (formerly Cloud Datastore). Use it only for apps that depend on the Datastore API, such as legacy App Engine apps. New apps use the Firestore APIs.",
+    "aws": null,
+    "source": {
+      "title": "Datastore overview",
+      "url": "https://docs.cloud.google.com/datastore/docs/concepts/overview",
+      "evidence": "Firestore's Datastore compatible API is intended to support legacy App Engine applications. If you're looking for a document-oriented NoSQL database for a new application, we recommended that you use one of the Firestore APIs instead of the Datastore API"
+    }
+  },
+  {
+    "id": "data-f031",
+    "note": "1.3-nosql-schema",
+    "kind": "concept",
+    "front": "What happens when Bigtable row keys start with a timestamp?",
+    "back": "Sequential writes go to one node and create a hotspot. Put a high-cardinality value, such as a device ID or a user ID, before the timestamp.",
+    "aws": null,
+    "source": {
+      "title": "Schema design best practices",
+      "url": "https://docs.cloud.google.com/bigtable/docs/schema-design",
+      "evidence": "This pattern causes sequential writes to be pushed onto a single node, creating a hotspot. If you put a timestamp in a row key, precede it with a high-cardinality value like a user ID to avoid hotspots."
+    }
+  },
+  {
+    "id": "data-f032",
+    "note": "1.3-nosql-schema",
+    "kind": "concept",
+    "front": "What do you lose when you hash Bigtable row keys to spread the load?",
+    "back": "The natural sort order, so you cannot read related rows as a range. Key Visualizer output also becomes hard to read. Use human-readable values.",
+    "aws": null,
+    "source": {
+      "title": "Schema design best practices",
+      "url": "https://docs.cloud.google.com/bigtable/docs/schema-design",
+      "evidence": "Hashing a row key removes your ability to take advantage of Bigtable's natural sorting order, making it impossible to store rows in a way that are optimal for querying."
+    }
+  },
+  {
+    "id": "data-f033",
+    "note": "1.3-nosql-schema",
+    "kind": "concept",
+    "front": "Which Bigtable writes are atomic?",
+    "back": "Only the changes to one row. In a batch write (`MutateRows`), each entry is atomic, but the batch as a whole is not.",
+    "aws": null,
+    "source": {
+      "title": "Writes",
+      "url": "https://docs.cloud.google.com/bigtable/docs/writes",
+      "evidence": "Each entry in a MutateRows request is atomic, but the request as a whole is not."
+    }
+  },
+  {
+    "id": "data-f034",
+    "note": "1.3-nosql-schema",
+    "kind": "concept",
+    "front": "Why can Bigtable reads return cells that a garbage collection policy already expired?",
+    "back": "Garbage collection runs during compaction, and the deletion can take up to a week. Add a read filter that matches the garbage collection rule.",
+    "aws": null,
+    "source": {
+      "title": "Garbage collection overview",
+      "url": "https://docs.cloud.google.com/bigtable/docs/garbage-collection",
+      "evidence": "Because it can take up to a week for expired data to be deleted, you should never rely solely on garbage collection policies to ensure that read requests return the selected data."
+    }
+  },
+  {
+    "id": "data-f035",
+    "note": "1.3-nosql-schema",
+    "kind": "concept",
+    "front": "Which Firestore document IDs avoid write hotspots?",
+    "back": "Automatic document IDs, which Firestore allocates with a scatter algorithm. Your own monotonically increasing IDs, such as `Customer1`, `Customer2`, can create hotspots.",
+    "aws": null,
+    "source": {
+      "title": "Firestore best practices",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/best-practices",
+      "evidence": "Firestore allocates document IDs using a scatter algorithm. You should not encounter hotspotting on writes if you create new documents using automatic document IDs."
+    }
+  },
+  {
+    "id": "data-f036",
+    "note": "1.3-nosql-schema",
+    "kind": "concept",
+    "front": "What limits the write rate to a Firestore collection with an indexed timestamp field?",
+    "back": "An indexed field with sequential values limits the collection to 500 writes per second. If you do not query the field, exempt it from automatic indexing.",
+    "aws": null,
+    "source": {
+      "title": "Firestore best practices",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/best-practices",
+      "evidence": "If you index a field that increases or decreases sequentially between documents in a collection, like a timestamp, then the maximum write rate to the collection is 500 writes per second."
+    }
+  },
+  {
+    "id": "data-f037",
+    "note": "1.3-consistency-and-replication",
+    "kind": "term",
+    "front": "Spanner stale read",
+    "back": "A read at a timestamp in the past, with exact or bounded staleness. Use it when the app is sensitive to latency and can accept data that is a few seconds old.",
+    "aws": null,
+    "source": {
+      "title": "Reads outside of transactions",
+      "url": "https://docs.cloud.google.com/spanner/docs/reads",
+      "evidence": "A stale read is read at a timestamp in the past. If your application is latency sensitive but tolerant of stale data, then stale reads can provide performance benefits."
+    }
+  },
+  {
+    "id": "data-f038",
+    "note": "1.3-consistency-and-replication",
+    "kind": "term",
+    "front": "Cloud SQL high availability (HA)",
+    "back": "A regional Cloud SQL configuration with a primary instance and a standby instance in another zone. Each write goes synchronously to the disks in both zones before the commit, and failover is automatic.",
+    "aws": null,
+    "source": {
+      "title": "About high availability",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/high-availability",
+      "evidence": "Through synchronous replication to each zone's persistent disk, all writes made to the primary instance are replicated to disks in both zones before a transaction is reported as committed."
+    }
+  },
+  {
+    "id": "data-f039",
+    "note": "1.3-consistency-and-replication",
+    "kind": "term",
+    "front": "AlloyDB read pool instance",
+    "back": "A read-only AlloyDB instance with load-balanced nodes that scales reads. Its nodes receive and replay the write-ahead log (WAL) of the primary instance, so flush lag and replay lag can make reads stale.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot replication issues",
+      "url": "https://docs.cloud.google.com/alloydb/docs/troubleshoot/replication-issues",
+      "evidence": "If you are concerned about the freshness of data on your read replicas, then you must pay close attention to both flush lag and replay lag."
+    }
+  },
+  {
+    "id": "data-f040",
+    "note": "1.3-consistency-and-replication",
+    "kind": "term",
+    "front": "Bigtable app profile",
+    "back": "Settings that tell Bigtable how to handle the requests of an application, including the routing policy: single-cluster or multi-cluster. Create a separate app profile for each workload.",
+    "aws": null,
+    "source": {
+      "title": "App profiles overview",
+      "url": "https://docs.cloud.google.com/bigtable/docs/app-profiles",
+      "evidence": "An application profile, or app profile, stores settings that tell your Bigtable instance how to handle incoming requests from an application."
+    }
+  },
+  {
+    "id": "data-f041",
+    "note": "1.3-consistency-and-replication",
+    "kind": "term",
+    "front": "Turbo replication",
+    "back": "A Cloud Storage option for dual-region buckets. It copies 100% of new objects to both regions within a 15-minute recovery point objective (RPO). Default replication targets 100% in 12 hours.",
+    "aws": null,
+    "source": {
+      "title": "Data availability and durability",
+      "url": "https://docs.cloud.google.com/storage/docs/availability-durability",
+      "evidence": "When enabled, turbo replication is designed to replicate 100% of newly written objects to the two regions that constitute a dual-region within the recovery point objective of 15 minutes, regardless of object size."
+    }
+  },
+  {
+    "id": "data-f042",
+    "note": "1.3-consistency-and-replication",
+    "kind": "concept",
+    "front": "What read type does Spanner use by default?",
+    "back": "Strong reads. A strong read sees all data that was committed before the read started, from any replica. Google advises strong reads whenever possible.",
+    "aws": null,
+    "source": {
+      "title": "Reads outside of transactions",
+      "url": "https://docs.cloud.google.com/spanner/docs/reads",
+      "evidence": "A strong read is a read at a current timestamp and is guaranteed to see all data that has been committed up until the start of this read. Spanner defaults to using strong reads to serve read requests."
+    }
+  },
+  {
+    "id": "data-f043",
+    "note": "1.3-consistency-and-replication",
+    "kind": "concept",
+    "front": "Does a Cloud SQL read replica give failover when the primary instance fails?",
+    "back": "No. Read replicas only offload reads. For automatic failover, configure the instance for high availability (HA). You can promote a replica manually, for example for regional disaster recovery.",
+    "aws": null,
+    "source": {
+      "title": "About replication in Cloud SQL",
+      "url": "https://docs.cloud.google.com/sql/docs/postgres/replication",
+      "evidence": "Read replicas don't provide failover capability. To provide failover capability for an instance, see Configuring an instance for high availability."
+    }
+  },
+  {
+    "id": "data-f044",
+    "note": "1.3-consistency-and-replication",
+    "kind": "concept",
+    "front": "How much committed data can an AlloyDB HA failover lose?",
+    "back": "None. AlloyDB writes the write-ahead log (WAL) synchronously to a regional log persistor. Automatic failover to the standby node in another zone loses no data.",
+    "aws": null,
+    "source": {
+      "title": "AlloyDB high availability overview",
+      "url": "https://docs.cloud.google.com/alloydb/docs/high-availability",
+      "evidence": "No data loss occurs during failover due to synchronous WAL writes to the regional log persistor."
+    }
+  },
+  {
+    "id": "data-f045",
+    "note": "1.3-consistency-and-replication",
+    "kind": "concept",
+    "front": "Which Bigtable app profile routing gives read-your-writes consistency in a replicated instance?",
+    "back": "Single-cluster routing, with every app profile that you use routed to the same cluster. Multi-cluster routing gives eventual consistency.",
+    "aws": null,
+    "source": {
+      "title": "Replication overview",
+      "url": "https://docs.cloud.google.com/bigtable/docs/replication-overview",
+      "evidence": "If you use single-cluster routing, Bigtable can provide read-your-writes consistency when replication is enabled. This consistency model ensures that an application never reads data that is older than its most recent writes."
+    }
+  },
+  {
+    "id": "data-f046",
+    "note": "1.3-consistency-and-replication",
+    "kind": "concept",
+    "front": "Can a Bigtable app profile with multi-cluster routing run increments and check-and-mutate writes?",
+    "back": "No. These single-row transactions can cause data conflicts between clusters. Only single-cluster routing allows them.",
+    "aws": null,
+    "source": {
+      "title": "Routing options",
+      "url": "https://docs.cloud.google.com/bigtable/docs/routing",
+      "evidence": "You can't enable single-row transactions with multi-cluster routing, because single-row transactions can cause data conflicts when you use multi-cluster routing."
+    }
+  },
+  {
+    "id": "data-f047",
+    "note": "1.3-consistency-and-replication",
+    "kind": "concept",
+    "front": "How soon does a revoked Cloud Storage permission take effect?",
+    "back": "Usually in about a minute, sometimes several minutes. Access changes are eventually consistent, so a user can keep access for a short time after you remove it.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Storage consistency",
+      "url": "https://docs.cloud.google.com/storage/docs/consistency",
+      "evidence": "if you remove a user's access to a bucket, this change is immediately reflected in the metadata for the bucket; however, the user may still have access to the bucket for a short period of time."
+    }
+  },
+  {
+    "id": "data-f048",
+    "note": "1.3-consistency-and-replication",
+    "kind": "concept",
+    "front": "Why can clients read the old version of a public Cloud Storage object after an update?",
+    "back": "A cached public object stays in the cache until its `Cache-Control` lifetime ends. For objects that change, set `Cache-Control: no-store` or a short `max-age`.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Storage consistency",
+      "url": "https://docs.cloud.google.com/storage/docs/consistency",
+      "evidence": "If you allow an object to be cached, and the object is in the cache when it is updated or deleted, the cached object is not updated or deleted until its cache lifetime expires."
+    }
+  }
+]

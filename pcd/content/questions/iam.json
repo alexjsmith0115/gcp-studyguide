@@ -1,0 +1,1023 @@
+[
+  {
+    "id": "iam-001",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "adc",
+      "local-development",
+      "gcloud-cli"
+    ],
+    "stem": "A developer writes a Python script that uses the Cloud Client Library for Cloud Storage. On a laptop, the developer ran `gcloud auth login`, and `gcloud storage ls` lists the buckets. The script fails because the client library cannot find credentials. The organization blocks service account key creation, and you want no code changes. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Run `gcloud config set account` with the developer's email address, and run the script again."
+      },
+      {
+        "id": "B",
+        "text": "Run `gcloud auth application-default login`, and run the script again."
+      },
+      {
+        "id": "C",
+        "text": "Create a service account key, and set `GOOGLE_APPLICATION_CREDENTIALS` to the path of the key file."
+      },
+      {
+        "id": "D",
+        "text": "Change the script to pass the output of `gcloud auth print-access-token` to the client."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The gcloud CLI and the client libraries use different credentials. `gcloud auth login` gives credentials only to gcloud commands. The client library finds credentials with Application Default Credentials (ADC). `gcloud auth application-default login` stores the developer's user credentials in the local ADC file, so the script works with no code changes.",
+    "whyWrong": {
+      "A": "`gcloud config set account` selects the account for gcloud commands. It does not create the local ADC file that the client library reads.",
+      "C": "The organization blocks key creation. On a workstation, Google recommends user credentials or service account impersonation instead of a key.",
+      "D": "This is a code change, which the requirement does not allow. Also, the access token expires after one hour by default, so the script fails again later."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot your ADC setup",
+        "url": "https://docs.cloud.google.com/docs/authentication/troubleshoot-adc",
+        "evidence": "When you use the gcloud CLI, you are using the credentials you provided to the gcloud CLI by using the `gcloud auth login` command. You are not using the credentials you provided to ADC."
+      },
+      {
+        "title": "Set up Application Default Credentials",
+        "url": "https://docs.cloud.google.com/docs/authentication/provide-credentials-adc",
+        "evidence": "You can provide credentials to ADC by using the `gcloud auth application-default login` command. This makes credentials available to the Cloud Client Libraries and Google API Client Libraries."
+      }
+    ]
+  },
+  {
+    "id": "iam-002",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "impersonation",
+      "service-account-token-creator",
+      "least-privilege"
+    ],
+    "stem": "A developer has the Owner role on the `shop-dev` project. To test code with the permissions of a production workload, the developer runs this command on a laptop:\n\n```bash\ngcloud auth application-default login \\\n    --impersonate-service-account=orders-sa@shop-dev.iam.gserviceaccount.com\n```\n\nThe Service Account Credentials API is enabled. The code then fails, because the developer does not have the `iam.serviceAccounts.getAccessToken` permission on `orders-sa`. Other service accounts in `shop-dev` have roles in production projects. You want least privilege. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the developer the Service Account User role on the `orders-sa` service account."
+      },
+      {
+        "id": "B",
+        "text": "Grant the developer the Service Account Token Creator role on the `shop-dev` project."
+      },
+      {
+        "id": "C",
+        "text": "Grant the developer the Service Account Token Creator role on the `orders-sa` service account."
+      },
+      {
+        "id": "D",
+        "text": "Grant the developer the Service Account OpenID Connect Identity Token Creator role on `orders-sa`."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "Impersonation for API calls needs the `iam.serviceAccounts.getAccessToken` permission on the service account. The Owner role does not include it, so a project Owner also needs the Service Account Token Creator role. The least privilege requirement decides the scope: grant the role on `orders-sa` only.",
+    "whyWrong": {
+      "A": "Service Account User gives `iam.serviceAccounts.actAs`, which lets a principal attach the service account to a resource. It does not allow short-lived credentials or the `--impersonate-service-account` flag.",
+      "B": "Token Creator on the project lets the developer impersonate every service account in the project, also the accounts with roles in production projects.",
+      "D": "This role creates ID tokens only. The client libraries call Google APIs with access tokens, and those need the `iam.serviceAccounts.getAccessToken` permission."
+    },
+    "sources": [
+      {
+        "title": "Authenticate with REST",
+        "url": "https://docs.cloud.google.com/docs/authentication/rest",
+        "evidence": "If you are using your user account, you need to add this permission even if you have the Owner role (`roles/owner`) on the project."
+      },
+      {
+        "title": "Roles for service account authentication",
+        "url": "https://docs.cloud.google.com/iam/docs/service-account-permissions",
+        "evidence": "This role does not allow principals to create short-lived credentials for service accounts, or to use the `--impersonate-service-account` flag for the Google Cloud CLI."
+      },
+      {
+        "title": "Best practices for using service accounts securely",
+        "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts",
+        "evidence": "For example, if you grant a user the Service Account Token Creator role in a Google Cloud project, the user can impersonate any service account in the Google Cloud project."
+      }
+    ]
+  },
+  {
+    "id": "iam-003",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "adc",
+      "workload-identity-federation-for-gke",
+      "service-account-keys"
+    ],
+    "stem": "A team moves a Python app from Compute Engine to a GKE Autopilot cluster. The Dockerfile copies a service account key file into the image and sets `GOOGLE_APPLICATION_CREDENTIALS` to its path. On GKE, you granted the needed IAM roles to the principal identifier of the Pod's Kubernetes ServiceAccount. Then you deleted the old key. Now every Google Cloud API call from the app fails with an authentication error. You want the app to use the identity of its Kubernetes ServiceAccount. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove the key file and the `GOOGLE_APPLICATION_CREDENTIALS` variable from the image, and redeploy the app."
+      },
+      {
+        "id": "B",
+        "text": "Enable Workload Identity Federation for GKE on the cluster, and then recreate the app's Pods."
+      },
+      {
+        "id": "C",
+        "text": "Annotate the Kubernetes ServiceAccount with the email address of an IAM service account."
+      },
+      {
+        "id": "D",
+        "text": "Create a new key, store it in a Kubernetes Secret, and mount the Secret at the old key path."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "ADC checks the `GOOGLE_APPLICATION_CREDENTIALS` environment variable first. The file that it points to wins over all other credentials, also over Workload Identity Federation for GKE. So the app still tries to use the deleted key. Without the variable, ADC gets a token for the Kubernetes ServiceAccount from the GKE metadata server, and the app needs no code change.",
+    "whyWrong": {
+      "B": "In Autopilot, Workload Identity Federation for GKE is always enabled. The environment variable still wins over it.",
+      "C": "The annotation links the Kubernetes ServiceAccount to an IAM service account. You need it only for that setup, and the environment variable still wins over it.",
+      "D": "A new key makes the calls work again, but the app then uses a long-lived credential for another identity, not the Kubernetes ServiceAccount."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot your ADC setup",
+        "url": "https://docs.cloud.google.com/docs/authentication/troubleshoot-adc",
+        "evidence": "The credentials pointed to by the environment variable take precedence over other credentials, including for Workload Identity Federation for GKE."
+      },
+      {
+        "title": "Authenticate to Google Cloud APIs from GKE workloads",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/workload-identity",
+        "evidence": "In Autopilot, Workload Identity Federation for GKE is always enabled."
+      }
+    ]
+  },
+  {
+    "id": "iam-004",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "access-token",
+      "id-token",
+      "cloud-run"
+    ],
+    "stem": "A nightly Cloud Run job reads files from a Cloud Storage bucket. Then it sends a summary to `report-api`, a Cloud Run service that requires authentication. The job's service account has the Storage Object Viewer role on the bucket and the Cloud Run Invoker role on `report-api`. Which tokens should the job send?",
+    "options": [
+      {
+        "id": "A",
+        "text": "An ID token with the bucket URL as the audience to Cloud Storage, and an access token to `report-api`"
+      },
+      {
+        "id": "B",
+        "text": "An access token with the `cloud-platform` scope to both Cloud Storage and `report-api`"
+      },
+      {
+        "id": "C",
+        "text": "An ID token with the `report-api` URL as the audience to both Cloud Storage and `report-api`"
+      },
+      {
+        "id": "D",
+        "text": "An access token to Cloud Storage, and an ID token with the `report-api` URL as the audience to `report-api`"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The target of each request decides the token type. Google APIs, such as the Cloud Storage API, need an access token. Cloud Run services need an ID token, and its audience is the URL of the receiving service. The job gets both tokens for its service account from the metadata server.",
+    "whyWrong": {
+      "A": "ID tokens cannot call Google APIs, and a Cloud Run service needs an ID token, not an access token.",
+      "B": "The access token works for Cloud Storage, but `report-api` is a Cloud Run service and needs an ID token.",
+      "C": "The ID token works for `report-api`, but ID tokens cannot call Google APIs such as Cloud Storage."
+    },
+    "sources": [
+      {
+        "title": "Authentication and authorization use cases",
+        "url": "https://docs.cloud.google.com/docs/authentication/use-cases",
+        "evidence": "Applications hosted on Cloud Run and Cloud Run functions require ID tokens for authentication."
+      },
+      {
+        "title": "Authentication and authorization use cases",
+        "url": "https://docs.cloud.google.com/docs/authentication/use-cases",
+        "evidence": "Google APIs require a valid access token or API key with every request."
+      },
+      {
+        "title": "Token types",
+        "url": "https://docs.cloud.google.com/docs/authentication/token-types",
+        "evidence": "They can't be used for making Google API calls, which distinguishes them from access tokens."
+      }
+    ]
+  },
+  {
+    "id": "iam-005",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "access-scopes",
+      "compute-engine",
+      "iam"
+    ],
+    "stem": "An app on a Compute Engine VM uploads reports to a Cloud Storage bucket. The VM runs as a dedicated service account that has the Storage Object Admin role on the bucket. The VM was created with the Cloud Storage read-only access scope. Reads from the bucket work, but uploads fail with a permission error. You want to follow Google-recommended practice. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add the Cloud Storage read-write access scope to the VM, and keep the current IAM role."
+      },
+      {
+        "id": "B",
+        "text": "Set the VM's access scope to `cloud-platform`, and control access with the IAM roles of the service account."
+      },
+      {
+        "id": "C",
+        "text": "Grant the service account the Storage Admin role on the project, and keep the current access scope."
+      },
+      {
+        "id": "D",
+        "text": "Create a key for the service account, and point `GOOGLE_APPLICATION_CREDENTIALS` on the VM to the key file."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "On a VM, both the access scopes and the IAM roles must allow a request. The read-only scope blocks the uploads, although the IAM role allows them. Access scopes are the legacy method, and they are coarse. Google recommends the `cloud-platform` scope on the VM and IAM roles to control access. To change the access scopes, stop the VM first.",
+    "whyWrong": {
+      "A": "The read-write scope also makes the uploads work. But it keeps access control in the legacy, coarse access scopes, which is not the recommended practice.",
+      "C": "IAM already allows the uploads, so a broader role does not help. The read-only scope still blocks them, and the broader role breaks least privilege.",
+      "D": "A key is a long-lived credential and the least secure way to use a service account. Google recommends the attached service account instead."
+    },
+    "sources": [
+      {
+        "title": "Service accounts (Compute Engine)",
+        "url": "https://docs.cloud.google.com/compute/docs/access/service-accounts",
+        "evidence": "The authorization provided to applications hosted on a Compute Engine instance is limited by two separate configurations: the roles granted to the attached service account, and the access scopes that you set on the instance."
+      },
+      {
+        "title": "Service accounts (Compute Engine)",
+        "url": "https://docs.cloud.google.com/compute/docs/access/service-accounts",
+        "evidence": "The best practice is to set the full `cloud-platform` access scope on the instance, then control the service account's access using IAM roles."
+      },
+      {
+        "title": "Change the attached service account",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/change-service-account",
+        "evidence": "To change a VM's service account and access scopes, you must first stop the VM."
+      }
+    ]
+  },
+  {
+    "id": "iam-006",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-sql",
+      "iam-database-authentication",
+      "cloud-sql-language-connectors"
+    ],
+    "stem": "A Cloud Run service connects to Cloud SQL for PostgreSQL with the Cloud SQL Python Connector and automatic IAM database authentication. The service runs as `orders-sa`, which has the Cloud SQL Client role. The instance has the `cloudsql.iam_authentication` flag set to `on`, and `orders-sa` is an IAM database user. Each login fails with this error:\n\n```\nThe caller does not have permission Connection matched pg_hba.conf line 20: \"local all +cloudsqliamuser cloudsql-iam-user\"\n```\n\nWhat should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant `orders-sa` the Cloud SQL Instance User role in the project that contains the instance."
+      },
+      {
+        "id": "B",
+        "text": "Run `GRANT` statements that give `orders-sa` privileges on the tables."
+      },
+      {
+        "id": "C",
+        "text": "Grant `orders-sa` the Service Account Token Creator role on itself."
+      },
+      {
+        "id": "D",
+        "text": "Switch to manual IAM database authentication with an access token as the password."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "IAM database authentication needs two IAM roles. Cloud SQL Client allows the connection, and Cloud SQL Instance User gives the `cloudsql.instances.login` permission. The error shows that the connection reached the instance, but the login was not allowed. The Cloud SQL docs name this error and tell you to add the Cloud SQL Instance User role.",
+    "whyWrong": {
+      "B": "Database privileges apply only after a successful login. The login fails first, because the IAM permission to log in is missing.",
+      "C": "The connector gets credentials for the attached service account with ADC, so it needs no Token Creator role. Token Creator also does not give the `cloudsql.instances.login` permission that the login needs.",
+      "D": "Manual mode does not add the missing login permission. Also, its tokens expire after one hour, so Google recommends automatic mode for connection pools."
+    },
+    "sources": [
+      {
+        "title": "Roles and permissions (Cloud SQL for PostgreSQL)",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/roles-and-permissions",
+        "evidence": "If `The caller does not have permission Connection matched pg_hba.conf line 20: \"local all +cloudsqliamuser cloudsql-iam-user\"` error message appears when the service account connects to the instance, add the Cloud SQL Instance User role to the account."
+      },
+      {
+        "title": "Log in using IAM database authentication",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/iam-logins",
+        "evidence": "Add the `roles/cloudsql.instanceUser` IAM role to your IAM user, service account, or group. It's a predefined role that contains the necessary Cloud SQL IAM `cloudsql.instances.login` permission."
+      }
+    ]
+  },
+  {
+    "id": "iam-007",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-sql",
+      "connector-enforcement",
+      "cloud-sql-auth-proxy"
+    ],
+    "stem": "Three services connect to a Cloud SQL for PostgreSQL instance through its private IP address. Two of them use the Cloud SQL Python Connector. The third, a legacy PHP service, connects directly with a database driver and a password. A new security rule says that IAM must authorize every connection and that all database traffic must be encrypted. The rule must also stop future services from connecting in any other way. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Remove all authorized networks from the instance, and move the PHP service to the Cloud SQL Auth Proxy."
+      },
+      {
+        "id": "B",
+        "text": "Require SSL connections on the instance, and keep the PHP service on its direct connection."
+      },
+      {
+        "id": "C",
+        "text": "Enable connector enforcement on the instance, and move the PHP service to the Cloud SQL Auth Proxy."
+      },
+      {
+        "id": "D",
+        "text": "Set the `cloudsql.iam_authentication` flag to `on`, and move the PHP service to the Cloud SQL Auth Proxy."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The Cloud SQL Auth Proxy and the Cloud SQL Language Connectors authorize each connection with IAM and encrypt the traffic. PHP has no Language Connector, so the PHP service uses the Auth Proxy. The requirement to stop future services decides the instance setting: with connector enforcement, Cloud SQL rejects direct connections to the database.",
+    "whyWrong": {
+      "A": "Authorized networks apply to direct connections to a public IP address. Direct connections through the private IP address still work, so a future service can skip the connectors.",
+      "B": "SSL encrypts the traffic, but a direct connection has no IAM authorization. Future services can also still connect directly.",
+      "D": "This flag allows IAM database logins. It does not block password logins or direct connections, so a future service can still skip the connectors."
+    },
+    "sources": [
+      {
+        "title": "Connect using Cloud SQL Language Connectors",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/connect-connectors",
+        "evidence": "By using connector enforcement, you can enforce using only the Cloud SQL Auth Proxy or Cloud SQL Language Connectors to connect to Cloud SQL instances. With connector enforcement, Cloud SQL rejects direct connections to the database."
+      },
+      {
+        "title": "IAM authentication (Cloud SQL for PostgreSQL)",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/iam-authentication",
+        "evidence": "Setting the flag does not prevent existing, non-IAM users from using their usernames and passwords to log in."
+      },
+      {
+        "title": "Authorize with authorized networks",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/authorize-networks",
+        "evidence": "Your client application is connecting directly to a Cloud SQL instance on its public IP address."
+      }
+    ]
+  },
+  {
+    "id": "iam-008",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "alloydb",
+      "iam-database-authentication",
+      "alloydb-language-connectors"
+    ],
+    "stem": "A Python service on Cloud Run connects to an AlloyDB for PostgreSQL instance with the AlloyDB Python Connector and automatic IAM authentication. Its service account has the `roles/alloydb.client`, `roles/alloydb.databaseUser`, and `roles/serviceusage.serviceUsageConsumer` roles. You added the service account to the cluster as an IAM database user. The connection reaches the instance, but every login is rejected. Nobody has changed the database flags of the instance. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the service account the Cloud SQL Instance User role on the project."
+      },
+      {
+        "id": "B",
+        "text": "Replace the connector with the AlloyDB Auth Proxy, and turn on automatic IAM authentication in it."
+      },
+      {
+        "id": "C",
+        "text": "Configure Direct VPC egress for the service, so that the connector has a network path to the instance."
+      },
+      {
+        "id": "D",
+        "text": "Set the `alloydb.iam_authentication` database flag to `on` for the instance."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "IAM authentication is disabled on AlloyDB instances by default, and nobody changed the flags. So the instance rejects IAM logins, although the roles are correct. Set the `alloydb.iam_authentication` flag to `on`. This default differs from Cloud SQL, where the console turns on IAM database authentication when it creates an instance.",
+    "whyWrong": {
+      "A": "Cloud SQL Instance User is a Cloud SQL role. For AlloyDB, the login role is `roles/alloydb.databaseUser`, which the service account already has.",
+      "B": "The AlloyDB Auth Proxy also logs in with IAM authentication. The instance rejects these logins too while IAM authentication is off.",
+      "C": "The connection already reaches the instance, so a network path exists. Connectors use the existing path, and the failure happens at login."
+    },
+    "sources": [
+      {
+        "title": "Manage IAM authentication (AlloyDB)",
+        "url": "https://docs.cloud.google.com/alloydb/docs/database-users/manage-iam-auth",
+        "evidence": "IAM authentication is disabled on AlloyDB instances by default."
+      },
+      {
+        "title": "IAM authentication (Cloud SQL for PostgreSQL)",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/iam-authentication",
+        "evidence": "This flag is enabled by default if you create the instances using the Google Cloud console."
+      },
+      {
+        "title": "AlloyDB Language Connectors overview",
+        "url": "https://docs.cloud.google.com/alloydb/docs/language-connectors-overview",
+        "evidence": "They don't provide a network path to an AlloyDB instance if one is not already present."
+      }
+    ]
+  },
+  {
+    "id": "iam-009",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "workload-identity-federation",
+      "github-actions",
+      "attribute-condition"
+    ],
+    "stem": "Your team deploys from GitHub Actions with Workload Identity Federation. `gcloud iam workload-identity-pools providers describe` shows this part of the provider configuration:\n\n```yaml\nattributeCondition: assertion.ref=='refs/heads/main'\nattributeMapping:\n  attribute.ref: assertion.ref\n  attribute.repository_owner: assertion.repository_owner\n  attribute.repository_owner_id: assertion.repository_owner_id\n  google.subject: assertion.sub\noidc:\n  issuerUri: https://token.actions.githubusercontent.com/\n```\n\nA security review finds that the provider accepts tokens from workflows in any GitHub organization. The security team also wants the setup to stay safe if your organization is deleted and someone claims its name. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Extend the condition to require that `assertion.repository_owner` equals the name of your organization."
+      },
+      {
+        "id": "B",
+        "text": "Extend the condition to require that `assertion.repository_owner_id` equals the numeric ID of your organization."
+      },
+      {
+        "id": "C",
+        "text": "Move the workload identity pool and the provider to a dedicated project for federation."
+      },
+      {
+        "id": "D",
+        "text": "Replace federation with a service account key that you store as an encrypted GitHub secret."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "GitHub uses one issuer URL for all organizations. The current condition checks only the branch, so it accepts the `main` branch of any repository. Google says that you must add an attribute condition for your organization. The requirement about a claimed name decides between the two claims: use `repository_owner_id`, because numeric IDs are unique and cannot be reused.",
+    "whyWrong": {
+      "A": "This blocks other organizations today. But if your organization is deleted, someone can claim the same name, so Google recommends the numeric `*_id` claims.",
+      "C": "A dedicated project for pools and providers is a best practice. It does not change which GitHub organizations the provider accepts.",
+      "D": "A key is a long-lived credential that can leak. Workload Identity Federation removes the need for keys in deployment pipelines."
+    },
+    "sources": [
+      {
+        "title": "Configure Workload Identity Federation with deployment pipelines",
+        "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines",
+        "evidence": "To help protect against spoofing threats, you must use an attribute condition that restricts access to tokens issued by your GitHub organization, GitLab group, or HCP Terraform organization."
+      },
+      {
+        "title": "Configure Workload Identity Federation with deployment pipelines",
+        "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines",
+        "evidence": "To protect against this situation, use the numeric `*_id` fields instead, which are unique and can't be reused."
+      }
+    ]
+  },
+  {
+    "id": "iam-010",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "workload-identity-federation-for-gke",
+      "identity-sameness",
+      "gke"
+    ],
+    "stem": "Project `retail-prod` has a GKE cluster that uses Workload Identity Federation for GKE. The Kubernetes ServiceAccount `api` in the `payments` namespace has the Pub/Sub Publisher role on the `orders` topic through its principal identifier. A contractor team needs its own GKE cluster for tests. The contractor team has full administrator access to its cluster and can create any namespace. Contractor workloads must not get the access of `payments/api`. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create the contractor cluster in a separate project, so that it uses a different workload identity pool."
+      },
+      {
+        "id": "B",
+        "text": "Create the contractor cluster in `retail-prod`, and tell the contractor team not to create a `payments` namespace."
+      },
+      {
+        "id": "C",
+        "text": "Create the contractor cluster in `retail-prod`, and add a Kubernetes NetworkPolicy that blocks traffic to Pub/Sub."
+      },
+      {
+        "id": "D",
+        "text": "Create the contractor cluster in `retail-prod`, and link `payments/api` to an IAM service account with an annotation."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "All GKE clusters in a project share one workload identity pool. IAM treats the same namespace and Kubernetes ServiceAccount name in any of these clusters as the same principal. The contractor team can create a `payments` namespace with an `api` ServiceAccount and get the same access. A separate project gives the contractor cluster a different pool, so its principal identifiers cannot match.",
+    "whyWrong": {
+      "B": "A rule about names does not stop a team with administrator access. The team can still create a `payments` namespace with an `api` ServiceAccount, as the example in the docs shows.",
+      "C": "A NetworkPolicy does not change IAM access. Also, the contractor team administers its own cluster and can remove the policy.",
+      "D": "The Workload Identity User grant on the IAM service account names the same pool, namespace, and Kubernetes ServiceAccount. A matching ServiceAccount in the contractor cluster can also use it."
+    },
+    "sources": [
+      {
+        "title": "About Workload Identity Federation for GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+        "evidence": "This identity sameness also means that you must be able to trust every cluster in a specific workload identity pool."
+      },
+      {
+        "title": "About Workload Identity Federation for GKE",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/workload-identity",
+        "evidence": "To avoid untrusted access, place your clusters in separate projects to ensure that they get different workload identity pools, or ensure that the namespace names are distinct from each other to avoid a common principal identifier."
+      }
+    ]
+  },
+  {
+    "id": "iam-011",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "identity-platform",
+      "cloud-run",
+      "end-user-authentication"
+    ],
+    "stem": "A company builds a consumer mobile app. Customers sign in through Identity Platform with email and password or with Google. The app calls a REST API on Cloud Run and sends the customer's ID token in the `Authorization` header. The service was deployed with `--no-allow-unauthenticated`, and Cloud Run rejects every call from the app. Only signed-in customers may get data. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant the Cloud Run Invoker role to each customer account when the customer signs up."
+      },
+      {
+        "id": "B",
+        "text": "Put IAP with Identity Platform in front of the service, and keep IAM authentication on the service."
+      },
+      {
+        "id": "C",
+        "text": "Create a service account for the app, embed its key in the app, and send ID tokens for that account."
+      },
+      {
+        "id": "D",
+        "text": "Allow unauthenticated invocations, and verify the Identity Platform ID token in the service code."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "Customers are end users, and they usually have no IAM permissions on your project or Cloud Run service. So Cloud Run IAM authentication rejects their calls. For end users, Google tells you to deploy the Cloud Run service publicly and to add code that verifies the ID token. The code then serves data only for a valid token, and it uses the user ID from the token.",
+    "whyWrong": {
+      "A": "Customers who sign in through Identity Platform are external identities, and you cannot use IAM to manage their access. Also, end users usually have no IAM permissions on your project.",
+      "B": "IAP does not support programmatic access for Identity Platform users. The mobile app calls the API from code, so IAP cannot accept these calls.",
+      "C": "Every copy of the app carries the key, so anyone can extract it and call the API. The key also proves only the app's identity, not which customer signed in."
+    },
+    "sources": [
+      {
+        "title": "Authenticating users (Cloud Run)",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/end-users",
+        "evidence": "Users do not typically have IAM permission on your Google Cloud project or Cloud Run service."
+      },
+      {
+        "title": "Authenticating users (Cloud Run)",
+        "url": "https://docs.cloud.google.com/run/docs/authenticating/end-users",
+        "evidence": "Add code to your Cloud Run service to verify ID tokens."
+      },
+      {
+        "title": "Programmatic authentication (IAP)",
+        "url": "https://docs.cloud.google.com/iap/docs/authentication-howto",
+        "evidence": "Only Google Identities are supported for user account programmatic access in IAP. Identity Platform and Workforce Identity Federation identities are not supported for programmatic access."
+      }
+    ]
+  },
+  {
+    "id": "iam-012",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "identity-platform",
+      "firebase-authentication",
+      "multi-tenancy"
+    ],
+    "stem": "A B2B SaaS app uses Firebase Authentication with email and password sign-in. New enterprise customers require sign-in through their own SAML identity providers. They also require multi-factor authentication (MFA) and a separate set of users and settings for each customer. You want the fewest changes to the app code. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Put the app behind IAP, and grant the IAP-secured Web App User role to the users of each customer."
+      },
+      {
+        "id": "B",
+        "text": "Create a separate Firebase project for each customer, and turn on MFA in each project."
+      },
+      {
+        "id": "C",
+        "text": "Upgrade to Identity Platform, and create a tenant with a SAML provider and MFA for each customer."
+      },
+      {
+        "id": "D",
+        "text": "Write a SAML handler in the backend that signs custom tokens with the Firebase Admin SDK."
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "SAML providers, MFA, and multi-tenancy are Identity Platform features that Firebase Authentication does not have. Identity Platform is the backend of Firebase Authentication, so the upgrade needs no app change. A tenant is a separate set of users and configuration for one customer, inside one project.",
+    "whyWrong": {
+      "A": "IAP with IAM roles is for your own workforce, such as employees and partners. Identity Platform is the product for enterprise SaaS customers who sign in through their own SAML providers.",
+      "B": "Firebase Authentication has no MFA and no SAML providers, so separate projects do not meet the requirements. They also add projects to manage.",
+      "D": "A custom SAML handler is a large amount of new code. Identity Platform supports SAML providers as a built-in feature."
+    },
+    "sources": [
+      {
+        "title": "Differences between Identity Platform and Firebase Authentication",
+        "url": "https://docs.cloud.google.com/identity-platform/docs/product-comparison",
+        "evidence": "You do not need to change your apps when upgrading from Firebase Authentication to Identity Platform (or Firebase Authentication with Identity Platform) and your app continues to work with existing Firebase services."
+      },
+      {
+        "title": "Identity Platform multi-tenancy",
+        "url": "https://docs.cloud.google.com/identity-platform/docs/multi-tenancy",
+        "evidence": "Using tenants, you can create unique silos of users and configurations within a single Identity Platform project."
+      },
+      {
+        "title": "Authentication and authorization use cases",
+        "url": "https://docs.cloud.google.com/docs/authentication/use-cases",
+        "evidence": "Identity Platform is intended for building enterprise-focused SaaS applications. It lets you integrate with enterprise IdPs using inbound OIDC or SAML."
+      }
+    ]
+  },
+  {
+    "id": "iam-013",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "jwt",
+      "id-token-verification",
+      "sign-in-with-google"
+    ],
+    "stem": "A web app uses Sign In With Google. Its Python backend receives the user's Google ID token and uses this function to identify the user:\n\n```python\nimport base64, json\n\ndef user_key(token: str) -> str:\n    payload = token.split(\".\")[1]\n    claims = json.loads(base64.urlsafe_b64decode(payload + \"==\"))\n    return claims[\"email\"]\n```\n\nA security review flags this function. You want to follow Google's guidance for production. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Send each token to the `tokeninfo` endpoint, and trust the claims that it returns."
+      },
+      {
+        "id": "B",
+        "text": "Check that the `exp` claim is in the future, and keep the rest of the function."
+      },
+      {
+        "id": "C",
+        "text": "Verify the token with `google.oauth2.id_token.verify_oauth2_token`, and pass your OAuth client ID as the audience."
+      },
+      {
+        "id": "D",
+        "text": "Reject each token whose `iss` claim is not `https://securetoken.google.com/PROJECT_ID`."
+      },
+      {
+        "id": "E",
+        "text": "Use the `sub` claim instead of the `email` claim as the unique key for the user."
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "The function decodes the payload but does not check the signature, so anyone can forge the claims. `verify_oauth2_token` checks the signature, the `aud` claim against your client ID, and the `exp` claim. After verification, identify the user by `sub`, because it is unique and never reused. A Google Account can have different email addresses over time.",
+    "whyWrong": {
+      "A": "The `tokeninfo` endpoint is for development and debugging. In production, verify tokens locally with a library and cached public keys.",
+      "B": "An expiry check without a signature check still trusts claims that anyone can forge. The function also still uses `email` as the key.",
+      "D": "That issuer is for Identity Platform and Firebase ID tokens. Google ID tokens use `https://accounts.google.com` or `accounts.google.com`."
+    },
+    "sources": [
+      {
+        "title": "Verify the Google ID token on your server side",
+        "url": "https://developers.google.com/identity/gsi/web/guides/verify-google-id-token",
+        "evidence": "The `verify_oauth2_token` function verifies the JWT signature, the `aud` claim, and the `exp` claim."
+      },
+      {
+        "title": "Verify the Google ID token on your server side",
+        "url": "https://developers.google.com/identity/gsi/web/guides/verify-google-id-token",
+        "evidence": "Only use Google ID token `sub` field as identifier for the user as it is unique among all Google Accounts and never reused."
+      },
+      {
+        "title": "Verify the Google ID token on your server side",
+        "url": "https://developers.google.com/identity/gsi/web/guides/verify-google-id-token",
+        "evidence": "For development and debugging, you can call our `tokeninfo` validation endpoint."
+      }
+    ]
+  },
+  {
+    "id": "iam-014",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "oauth2",
+      "refresh-token",
+      "google-auth-platform"
+    ],
+    "stem": "A web app reads files from the Google Drive of each user in a nightly job. The users are consumers with personal Google Accounts. The app uses the OAuth 2.0 authorization code flow with `access_type=offline` and stores each refresh token. In the Google Auth Platform, the app's user type is External and its publishing status is Testing. For each user, the nightly job starts to fail about one week after the user gave consent. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Publish the app to In production status, and complete verification if its scopes require it."
+      },
+      {
+        "id": "B",
+        "text": "Add `prompt=consent` to the authorization request, so that each user gets a new refresh token."
+      },
+      {
+        "id": "C",
+        "text": "Change the user type to Internal, so that the refresh tokens of the users do not expire."
+      },
+      {
+        "id": "D",
+        "text": "Replace the user flow with a service account that calls the Drive API with its own credentials."
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "In Testing status, an authorization by a test user expires seven days after consent, and so does its refresh token. Only requests for the name, email address, and profile scopes are exempt, and the Drive scopes are not. Publish the app to In production status for real users. Sensitive or restricted scopes can need verification, or users see an unverified app warning.",
+    "whyWrong": {
+      "B": "`prompt=consent` shows the consent screen again, so the user must be present. In Testing status, each new authorization also expires after seven days.",
+      "C": "An Internal app accepts only users in your Google Cloud organization. Consumers with personal Google Accounts get an `org_internal` error.",
+      "D": "A service account belongs to your app, not to a user, and it calls APIs without user consent. To read each user's files, the app needs OAuth 2.0 user authorization."
+    },
+    "sources": [
+      {
+        "title": "Manage App Audience",
+        "url": "https://support.google.com/cloud/answer/15549945",
+        "evidence": "Authorizations by a test user will expire seven days from the time of consent. If your OAuth client requests an `offline` access type and receives a refresh token, that token will also expire."
+      },
+      {
+        "title": "Manage App Audience",
+        "url": "https://support.google.com/cloud/answer/15549945",
+        "evidence": "Projects configured with a publishing status of In production are available to any user with a Google Account."
+      },
+      {
+        "title": "Manage App Audience",
+        "url": "https://support.google.com/cloud/answer/15549945",
+        "evidence": "An `org_internal` authorization error is displayed when authorization is requested from users outside the Google Cloud project's parent."
+      }
+    ]
+  },
+  {
+    "id": "iam-015",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "cloud-run",
+      "deployer-roles",
+      "service-account-user"
+    ],
+    "stem": "A developer must deploy new revisions of the existing Cloud Run service `orders`. The image is in the `apps` Artifact Registry repository in the same project. The service identity is the `orders-sa` service account, also in the same project. The developer has no roles yet. You want least privilege. Which three roles should you grant to the developer? (Choose three.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cloud Run Developer on the `orders` service"
+      },
+      {
+        "id": "B",
+        "text": "Service Account Token Creator on the `orders-sa` service account"
+      },
+      {
+        "id": "C",
+        "text": "Service Account User on the project"
+      },
+      {
+        "id": "D",
+        "text": "Service Account User on the `orders-sa` service account"
+      },
+      {
+        "id": "E",
+        "text": "Cloud Run Admin on the project"
+      },
+      {
+        "id": "F",
+        "text": "Artifact Registry Reader on the `apps` repository"
+      }
+    ],
+    "answer": [
+      "A",
+      "D",
+      "F"
+    ],
+    "explanation": "The Cloud Run docs list three roles for a deployer. Cloud Run Developer on the service allows the deployment. Service Account User on the service identity gives `iam.serviceAccounts.actAs`, which the developer needs to attach `orders-sa` to the revisions. Artifact Registry Reader on the repository of the image is the third role. Each grant is on the smallest resource, which meets the least privilege requirement.",
+    "whyWrong": {
+      "B": "Token Creator is for impersonation. A deployer needs it on the service identity only when that service account is in a different project.",
+      "C": "Service Account User on the project lets the developer attach every service account in the project, which breaks least privilege.",
+      "E": "An admin role on the whole project gives more access than the deployment of one service needs."
+    },
+    "sources": [
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "Cloud Run Developer (`roles/run.developer`) on the Cloud Run service"
+      },
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "Service Account User (`roles/iam.serviceAccountUser`) on the service identity"
+      },
+      {
+        "title": "Deploy container images to Cloud Run services",
+        "url": "https://docs.cloud.google.com/run/docs/deploying",
+        "evidence": "Artifact Registry Reader (`roles/artifactregistry.reader`) on the Artifact Registry repository of the deployed container image"
+      }
+    ]
+  },
+  {
+    "id": "iam-016",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "default-service-account",
+      "cloud-run",
+      "least-privilege"
+    ],
+    "stem": "The Cloud Run service `invoice-api` was deployed without the `--service-account` flag. It reads objects from the `invoices` bucket and publishes messages to the `invoice-events` topic. It calls no other Google Cloud APIs. A security review finds that the service runs as an account with the Editor role on the project. You must apply least privilege. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Replace Editor on the Compute Engine default service account with Storage Object Viewer and Pub/Sub Publisher on the project."
+      },
+      {
+        "id": "B",
+        "text": "Deploy `invoice-api` with a new service account that has Storage Object Viewer on the bucket and Pub/Sub Publisher on the topic."
+      },
+      {
+        "id": "C",
+        "text": "Enforce the `iam.automaticIamGrantsForDefaultServiceAccounts` constraint on the project's folder, and keep the service on the default service account."
+      },
+      {
+        "id": "D",
+        "text": "Deploy `invoice-api` with a new service account that has Storage Admin and Pub/Sub Editor on the project."
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Without `--service-account`, Cloud Run uses the Compute Engine default service account, which can have the Editor role. Google recommends a dedicated user-managed service account for each service. Grant each role on the smallest resource that the task needs: Storage Object Viewer on the bucket and Pub/Sub Publisher on the topic. Then deploy the service with `--service-account` to attach the new account.",
+    "whyWrong": {
+      "A": "Other workloads can also run as the default service account, so they get these permissions too. Grants on the project also cover every bucket and topic in it.",
+      "C": "The constraint stops automatic Editor grants to new default service accounts. It does not remove the Editor role from an existing one.",
+      "D": "A dedicated account is correct, but admin and editor roles on the project give much more access than one bucket and one topic need."
+    },
+    "sources": [
+      {
+        "title": "Introduction to service identity",
+        "url": "https://docs.cloud.google.com/run/docs/securing/service-identity",
+        "evidence": "By default, the Compute Engine default service account is automatically created. If you don't specify a service account when the Cloud Run resource is created, Cloud Run uses this service account."
+      },
+      {
+        "title": "Best practices for using service accounts securely",
+        "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts",
+        "evidence": "Applying the constraint doesn't remove the Editor role from existing default service accounts."
+      },
+      {
+        "title": "Use IAM securely",
+        "url": "https://docs.cloud.google.com/iam/docs/using-iam-securely",
+        "evidence": "Grant roles at the smallest scope needed. For example, if a user only needs access to publish Pub/Sub topics, grant the Publisher role to the user for that topic."
+      }
+    ]
+  },
+  {
+    "id": "iam-017",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "iam-conditions",
+      "basic-roles",
+      "least-privilege"
+    ],
+    "stem": "A contractor must upload new files to the `exports/` folder of the `partner-data` bucket for the next 14 days. An administrator tried to grant the Editor role on the project with an IAM condition that expires in 14 days, but the request failed. The bucket uses uniform bucket-level access. You want least privilege. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Grant Storage Object Admin on the `partner-data` bucket with a condition that ends the grant in 14 days."
+      },
+      {
+        "id": "B",
+        "text": "Grant Storage Object Creator on the project with a condition that ends the grant in 14 days."
+      },
+      {
+        "id": "C",
+        "text": "Grant the Writer basic role on the project with a condition that ends the grant in 14 days."
+      },
+      {
+        "id": "D",
+        "text": "Grant Storage Object Creator on the `partner-data` bucket with a condition on the `exports/` prefix and an end time."
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "You cannot add conditions to the legacy basic roles Owner, Editor, and Viewer, so the request failed. Use a predefined role with a condition instead. Storage Object Creator on the bucket lets the contractor create objects, but not view, delete, or overwrite them. A condition on the object name prefix and on `request.time` limits the grant to `exports/` and to 14 days. Conditions in a bucket's allow policy need uniform bucket-level access, which the bucket has.",
+    "whyWrong": {
+      "A": "The time limit is correct, but Storage Object Admin gives full control of all objects in the bucket, also listing, viewing, and deleting them.",
+      "B": "A grant on the project applies to every bucket in the project, not only to `partner-data` and `exports/`.",
+      "C": "Writer is one of the new basic roles (Preview). Basic roles include thousands of permissions across all Google Cloud services, which breaks least privilege."
+    },
+    "sources": [
+      {
+        "title": "Overview of IAM Conditions",
+        "url": "https://docs.cloud.google.com/iam/docs/conditions-overview",
+        "evidence": "You cannot use conditions when you grant legacy basic roles, including Owner (`roles/owner`), Editor (`roles/editor`), and Viewer (`roles/viewer`)."
+      },
+      {
+        "title": "IAM roles for Cloud Storage",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/iam-roles",
+        "evidence": "Allows users to create objects. Does not give permission to view, delete, or overwrite objects."
+      },
+      {
+        "title": "Overview of IAM Conditions",
+        "url": "https://docs.cloud.google.com/iam/docs/conditions-overview",
+        "evidence": "To use conditions in the allow policy for a Cloud Storage bucket, you must enable uniform bucket-level access on the bucket."
+      }
+    ]
+  },
+  {
+    "id": "iam-018",
+    "objective": "1.2",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 2,
+    "tags": [
+      "role-recommendations",
+      "policy-simulator",
+      "default-service-account"
+    ],
+    "stem": "In the `shop-prod` project, the Compute Engine default service account has had the Editor role for a year. Three Cloud Run services and one Compute Engine VM run as this account. You must replace the Editor role with less permissive roles without breaking the workloads. Which two actions should you take? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Enforce the `iam.automaticIamGrantsForDefaultServiceAccounts` constraint to remove the Editor role."
+      },
+      {
+        "id": "B",
+        "text": "Use the role recommendations for the account to find the roles that match its permission use."
+      },
+      {
+        "id": "C",
+        "text": "Use Policy Simulator to see the effect of the role change before you apply it."
+      },
+      {
+        "id": "D",
+        "text": "Add an IAM condition to the Editor binding that limits it to the resources that the workloads use."
+      },
+      {
+        "id": "E",
+        "text": "Revoke the roles that Google granted to the Cloud Run service agent to reduce excess access."
+      }
+    ],
+    "answer": [
+      "B",
+      "C"
+    ],
+    "explanation": "Role recommendations compare the permissions of the account with the permissions that it used in the last 90 days. They suggest the roles to grant instead. Policy Simulator shows the effect of a role change before you apply it. Google recommends both tools when you replace the Editor role of a default service account.",
+    "whyWrong": {
+      "A": "The constraint stops automatic Editor grants to new default service accounts. It does not remove the Editor role from an existing account.",
+      "D": "You cannot add conditions to legacy basic roles, such as Editor.",
+      "E": "The Cloud Run service agent is not the default service account. If you revoke service agent roles without a role recommendation, some services stop working."
+    },
+    "sources": [
+      {
+        "title": "Types of service accounts",
+        "url": "https://docs.cloud.google.com/iam/docs/service-account-types",
+        "evidence": "If you are replacing a role binding that has existed for more than 90 days, role recommendations can help you determine which roles to grant instead."
+      },
+      {
+        "title": "Types of service accounts",
+        "url": "https://docs.cloud.google.com/iam/docs/service-account-types",
+        "evidence": "You can also use the Policy Simulator to help ensure that changing the role won't affect the service account's access."
+      },
+      {
+        "title": "Best practices for using service accounts securely",
+        "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts",
+        "evidence": "Applying the constraint doesn't remove the Editor role from existing default service accounts."
+      }
+    ]
+  }
+]

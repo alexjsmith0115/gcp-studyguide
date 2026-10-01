@@ -5,6 +5,9 @@ Usage:
   python3 tools/check_questions.py content/questions/net.json [more.json ...]
   python3 tools/check_questions.py --all            # every file in content/questions/
   python3 tools/check_questions.py --all --no-evidence   # schema only (no network)
+  python3 tools/check_questions.py --guide pcd --all     # the PCD guide (pcd/content/questions/)
+
+A file under pcd/ is checked against the PCD exam guide without --guide.
 
 Grounding check: every question needs at least one source whose "evidence"
 string appears verbatim in that page's article text, as printed by
@@ -19,11 +22,21 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fetch_doc import fetch, extract, render  # noqa: E402
+import guides  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-EXAM = json.load(open(os.path.join(ROOT, "content", "exam.json")))
-OBJECTIVES = {o["id"] for s in EXAM["sections"] for o in s["objectives"]}
-CASES = {c["id"] for c in EXAM["caseStudies"]}
+OBJECTIVES, CASES = set(), set()
+
+
+def load_exam(guide):
+    """Set the objective and case study IDs of one guide's exam guide."""
+    exam = json.load(open(guides.content_dir(guide, "exam.json")))
+    OBJECTIVES.clear()
+    OBJECTIVES.update(o["id"] for s in exam["sections"] for o in s["objectives"])
+    CASES.clear()
+    CASES.update(c["id"] for c in exam["caseStudies"])
+
+
 REQUIRED = ["id", "objective", "type", "difficulty", "stem", "options", "answer", "explanation", "whyWrong", "sources"]
 
 
@@ -120,9 +133,12 @@ def check_question(q, errors, warnings, evidence=True):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    argv = guides.strip_guide(sys.argv[1:])
+    args = [a for a in argv if not a.startswith("--")]
+    guide = guides.select(sys.argv[1:], args)
+    load_exam(guide)
     evidence = "--no-evidence" not in sys.argv
-    files = sorted(glob.glob(os.path.join(ROOT, "content", "questions", "*.json"))) if "--all" in sys.argv else args
+    files = sorted(glob.glob(guides.content_dir(guide, "questions", "*.json"))) if "--all" in sys.argv else args
     if not files:
         print(__doc__)
         sys.exit(1)

@@ -1,0 +1,769 @@
+[
+  {
+    "id": "dev-f001",
+    "note": "2.1-emulators",
+    "kind": "concept",
+    "front": "Which gcloud command starts the Pub/Sub emulator?",
+    "back": "`gcloud beta emulators pubsub start --project=PROJECT_ID`. The Pub/Sub, Bigtable, and Datastore emulators are only in the `beta` group. The GA `gcloud emulators` group has only Firestore and Spanner.",
+    "aws": null,
+    "source": {
+      "title": "Testing apps locally with the emulator",
+      "url": "https://docs.cloud.google.com/pubsub/docs/emulator",
+      "evidence": "See `gcloud beta emulators pubsub start` for a complete list of flags."
+    }
+  },
+  {
+    "id": "dev-f002",
+    "note": "2.1-emulators",
+    "kind": "term",
+    "front": "`PUBSUB_EMULATOR_HOST`",
+    "back": "The environment variable that sends Pub/Sub client library calls to the local emulator. Java and C# need extra code to use it. When the variable is not set, calls go to the production service.",
+    "aws": null,
+    "source": {
+      "title": "Testing apps locally with the emulator",
+      "url": "https://docs.cloud.google.com/pubsub/docs/emulator",
+      "evidence": "In all languages except for Java and C#, if you have set `PUBSUB_EMULATOR_HOST` as described in Setting environment variables, the Pub/Sub client libraries automatically call the API running in the local instance rather than Pub/Sub."
+    }
+  },
+  {
+    "id": "dev-f003",
+    "note": "2.1-emulators",
+    "kind": "concept",
+    "front": "Why must you set the Pub/Sub emulator environment variables again after each emulator start?",
+    "back": "The variables depend on a port number that can change at each start. Run `$(gcloud beta emulators pubsub env-init)` to set them again.",
+    "aws": null,
+    "source": {
+      "title": "Testing apps locally with the emulator",
+      "url": "https://docs.cloud.google.com/pubsub/docs/emulator",
+      "evidence": "You must set the environment variables each time you start the emulator. The environment variables depend on dynamically assigned port numbers that could change when you restart the emulator."
+    }
+  },
+  {
+    "id": "dev-f004",
+    "note": "2.1-emulators",
+    "kind": "concept",
+    "front": "How do you create topics and subscriptions in the Pub/Sub emulator?",
+    "back": "Use a Cloud Client Library in your code. The emulator does not support the Google Cloud console or `gcloud pubsub` commands.",
+    "aws": null,
+    "source": {
+      "title": "Testing apps locally with the emulator",
+      "url": "https://docs.cloud.google.com/pubsub/docs/emulator",
+      "evidence": "To use the emulator, you must have an application built using the Cloud Client Libraries. The emulator does not support Google Cloud console or `gcloud pubsub` commands."
+    }
+  },
+  {
+    "id": "dev-f005",
+    "note": "2.1-emulators",
+    "kind": "term",
+    "front": "Firestore emulator",
+    "back": "A local, in-memory copy of Firestore for development and tests. Start it with `gcloud emulators firestore start`. It keeps no data after it stops, so do not use it in production.",
+    "aws": "DynamoDB local",
+    "source": {
+      "title": "Use Firestore emulator locally",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/emulator",
+      "evidence": "Do not use the emulator for production deployments. Because the emulator stores data only in memory, it will not persist data across runs."
+    }
+  },
+  {
+    "id": "dev-f006",
+    "note": "2.1-emulators",
+    "kind": "concept",
+    "front": "Why can a Firestore query run on the emulator but fail in production?",
+    "back": "The Firestore emulator does not track manual indexes (formerly composite indexes), so it runs any valid query. Test against a real Firestore database to find the indexes that your queries need.",
+    "aws": null,
+    "source": {
+      "title": "Use Firestore emulator locally",
+      "url": "https://docs.cloud.google.com/firestore/native/docs/emulator",
+      "evidence": "The emulator does not track composite indexes and will instead execute any valid query. Make sure to test your app against a real Firestore instance to determine which indexes you require."
+    }
+  },
+  {
+    "id": "dev-f007",
+    "note": "2.1-emulators",
+    "kind": "concept",
+    "front": "Can an emulator test show that a service account has the correct IAM roles?",
+    "back": "No. The Spanner emulator has no TLS, authentication, or IAM, and the Pub/Sub emulator does not support IAM operations. Test IAM against real resources in a test project.",
+    "aws": null,
+    "source": {
+      "title": "Emulate Spanner locally",
+      "url": "https://docs.cloud.google.com/spanner/docs/emulator",
+      "evidence": "TLS/HTTPS, authentication, Identity and Access Management (IAM), permissions, or roles."
+    }
+  },
+  {
+    "id": "dev-f008",
+    "note": "2.1-emulators",
+    "kind": "concept",
+    "front": "Which emulator should you use for an app on Firestore in Datastore mode?",
+    "back": "The Firestore emulator in Datastore mode: `gcloud emulators firestore start --database-mode=datastore-mode`. The legacy Datastore emulator simulates eventual consistency by default, but Datastore mode is strongly consistent.",
+    "aws": null,
+    "source": {
+      "title": "Running the Datastore Emulator",
+      "url": "https://docs.cloud.google.com/datastore/docs/tools/datastore-emulator",
+      "evidence": "This content applies to the emulator for legacy Cloud Datastore. To emulate Firestore in Datastore mode, use `gcloud emulators firestore start --database-mode=datastore-mode` instead."
+    }
+  },
+  {
+    "id": "dev-f009",
+    "note": "2.1-emulators",
+    "kind": "term",
+    "front": "Firebase Local Emulator Suite",
+    "back": "A set of emulators that the Firebase CLI starts together, for example Cloud Firestore, Cloud Storage for Firebase, Authentication, and Pub/Sub (beta). Use it when one test needs several services, such as a Firestore write that triggers a function.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to Firebase Local Emulator Suite",
+      "url": "https://firebase.google.com/docs/emulator-suite",
+      "evidence": "For example, you could connect your app to the Cloud Firestore emulator to safely read and write documents in testing. These writes may trigger functions in the Cloud Functions emulator."
+    }
+  },
+  {
+    "id": "dev-f010",
+    "note": "2.1-emulators",
+    "kind": "term",
+    "front": "`gcloud beta code dev`",
+    "back": "A Beta gcloud command that runs a Cloud Run service on your machine. It builds the container from a Dockerfile or with buildpacks, serves it on a local port, and rebuilds it when the source changes.",
+    "aws": "AWS SAM CLI local invoke",
+    "source": {
+      "title": "Test a Cloud Run service locally",
+      "url": "https://docs.cloud.google.com/run/docs/testing/local",
+      "evidence": "Google Cloud CLI contains a local development environment for emulating Cloud Run that can build a container from source, run the container on your local machine, and automatically rebuild the container upon source code changes."
+    }
+  },
+  {
+    "id": "dev-f011",
+    "note": "2.1-emulators",
+    "kind": "concept",
+    "front": "How should a local `gcloud beta code dev` container get credentials without a service account key?",
+    "back": "Run `gcloud auth application-default login`, then add the `--application-default-credential` flag. The `--service-account` flag downloads a service account key, which is a security risk.",
+    "aws": null,
+    "source": {
+      "title": "Test a Cloud Run service locally",
+      "url": "https://docs.cloud.google.com/run/docs/testing/local",
+      "evidence": "To give the container access to a credential using your own account, log in using gcloud and use the `--application-default-credential` flag"
+    }
+  },
+  {
+    "id": "dev-f012",
+    "note": "2.1-emulators",
+    "kind": "term",
+    "front": "Functions Framework",
+    "back": "An open source library that runs a function as a local HTTP server, so you can test the function before you deploy it. Cloud Run uses it to wrap deployed Cloud Run functions (formerly Cloud Functions).",
+    "aws": "AWS SAM CLI local invoke",
+    "source": {
+      "title": "Local functions development",
+      "url": "https://docs.cloud.google.com/run/docs/local-dev-functions",
+      "evidence": "Cloud Run uses the open-source Functions Framework libraries to wrap your deployed functions in a persistent HTTP application."
+    }
+  },
+  {
+    "id": "dev-f013",
+    "note": "2.1-developer-tools",
+    "kind": "term",
+    "front": "gcloud configuration",
+    "back": "A named set of gcloud CLI properties, such as the project and the account. Only one configuration is active at a time. The `--configuration` flag selects another one for a single command.",
+    "aws": "AWS CLI named profiles",
+    "source": {
+      "title": "Managing gcloud CLI configurations",
+      "url": "https://docs.cloud.google.com/sdk/docs/configurations",
+      "evidence": "A configuration is a named set of Google Cloud CLI properties. These properties are key-value pairs, organized in sections, that govern the behavior of the gcloud CLI."
+    }
+  },
+  {
+    "id": "dev-f014",
+    "note": "2.1-developer-tools",
+    "kind": "concept",
+    "front": "Why can local code fail to authenticate after `gcloud auth login` succeeds?",
+    "back": "`gcloud auth login` gives credentials only to the gcloud CLI. Client libraries use Application Default Credentials (ADC), so run `gcloud auth application-default login`.",
+    "aws": null,
+    "source": {
+      "title": "Authenticate for the gcloud CLI",
+      "url": "https://docs.cloud.google.com/sdk/docs/authenticate",
+      "evidence": "This document is only about authentication for the Google Cloud CLI to access Google Cloud resources. If you need to authenticate workloads using Cloud Client Libraries or Google API Client Libraries, see How Application Default Credentials works."
+    }
+  },
+  {
+    "id": "dev-f015",
+    "note": "2.1-developer-tools",
+    "kind": "concept",
+    "front": "Does activating another gcloud configuration change the account that your code uses through ADC?",
+    "back": "No. The local ADC file belongs to your user account, not to a gcloud configuration. A configuration change can change only the identity of the gcloud CLI.",
+    "aws": null,
+    "source": {
+      "title": "Set up ADC for a local development environment",
+      "url": "https://docs.cloud.google.com/docs/authentication/set-up-adc-local-dev-environment",
+      "evidence": "Changing to a different gcloud CLI configuration might change the identity used by the gcloud CLI, but it does not affect your local ADC file or the ADC configuration."
+    }
+  },
+  {
+    "id": "dev-f016",
+    "note": "2.1-developer-tools",
+    "kind": "concept",
+    "front": "Which role must you have on a service account to impersonate it with the gcloud CLI?",
+    "back": "Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`). It contains `iam.serviceAccounts.getAccessToken`, the permission that impersonation needs.",
+    "aws": null,
+    "source": {
+      "title": "Authenticate for the gcloud CLI",
+      "url": "https://docs.cloud.google.com/sdk/docs/authenticate",
+      "evidence": "To ensure that the principal has the necessary permission to impersonate a service account, ask your administrator to grant the Service Account Token Creator (`roles/iam.serviceAccountTokenCreator`) IAM role to the principal on the service account."
+    }
+  },
+  {
+    "id": "dev-f017",
+    "note": "2.1-developer-tools",
+    "kind": "concept",
+    "front": "Which gcloud flags give a script predictable output?",
+    "back": "`--format` sets the output format, for example `json`, `yaml`, `csv`, or `value(...)`. `--filter` selects the resources in the output. Do not parse the default table layout.",
+    "aws": null,
+    "source": {
+      "title": "Scripting gcloud CLI commands",
+      "url": "https://docs.cloud.google.com/sdk/docs/scripting-gcloud",
+      "evidence": "In order to script with the gcloud CLI, it's important to have predictable output; this is where `--filter` and `--format` flags help."
+    }
+  },
+  {
+    "id": "dev-f018",
+    "note": "2.1-developer-tools",
+    "kind": "term",
+    "front": "Cloud Shell",
+    "back": "A browser terminal and editor on a temporary VM that Google owns, with the gcloud CLI and other tools installed. Only the 5 GB `$HOME` directory persists between sessions. Use it for interactive work.",
+    "aws": "AWS CloudShell",
+    "source": {
+      "title": "How Cloud Shell works",
+      "url": "https://docs.cloud.google.com/shell/docs/how-cloud-shell-works",
+      "evidence": "Cloud Shell provisions 5 GB of free persistent disk storage mounted as your `$HOME` directory on the virtual machine instance. This storage is on a per-user basis and is available across projects."
+    }
+  },
+  {
+    "id": "dev-f019",
+    "note": "2.1-developer-tools",
+    "kind": "concept",
+    "front": "Why is Cloud Shell a poor choice for a long batch job?",
+    "back": "Cloud Shell is for interactive use only. It ends non-interactive sessions after 40 minutes, and all sessions end after 12 hours.",
+    "aws": null,
+    "source": {
+      "title": "Quotas and limits",
+      "url": "https://docs.cloud.google.com/shell/docs/quotas-limits",
+      "evidence": "Cloud Shell is intended for interactive use only. Non-interactive sessions are ended automatically after 40 minutes."
+    }
+  },
+  {
+    "id": "dev-f020",
+    "note": "2.1-developer-tools",
+    "kind": "term",
+    "front": "Cloud Code",
+    "back": "An IDE extension for VS Code and JetBrains IDEs, also built into the Cloud Shell Editor. It helps you develop, deploy, and debug GKE and Cloud Run apps. It can run a Cloud Run service locally in an emulator.",
+    "aws": "AWS Toolkit for VS Code and JetBrains",
+    "source": {
+      "title": "Cloud Code overview",
+      "url": "https://docs.cloud.google.com/code/docs/vscode/overview",
+      "evidence": "Cloud Code is an extension that brings many Google Cloud services, like Google Kubernetes Engine and Cloud Run, directly into your IDE, so you can develop your applications without having to context switch."
+    }
+  },
+  {
+    "id": "dev-f021",
+    "note": "2.1-developer-tools",
+    "kind": "term",
+    "front": "Cloud Workstations",
+    "back": "Managed development environments that run on Compute Engine VMs in your project and VPC network, with a persistent disk for home data. Use it for a standard, secured environment without the weekly limit of Cloud Shell.",
+    "aws": "AWS Cloud9",
+    "source": {
+      "title": "Cloud Workstations overview",
+      "url": "https://docs.cloud.google.com/workstations/docs/overview",
+      "evidence": "Workstations can be started or stopped on demand, and run on Compute Engine VMs in your project, with a persistent disk attached to store data between sessions."
+    }
+  },
+  {
+    "id": "dev-f022",
+    "note": "2.1-developer-tools",
+    "kind": "term",
+    "front": "Workstation configuration",
+    "back": "The template for Cloud Workstations: machine type, persistent storage, container image, IDE, and timeouts. Developers create workstations from it. A change applies to each workstation the next time that workstation starts.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Workstations overview",
+      "url": "https://docs.cloud.google.com/workstations/docs/overview",
+      "evidence": "Any updates to a workstation configuration automatically apply to workstations the next time they start."
+    }
+  },
+  {
+    "id": "dev-f023",
+    "note": "2.1-developer-tools",
+    "kind": "concept",
+    "front": "Why do files that a custom workstation image adds to `/home` disappear?",
+    "back": "The persistent home disk attaches at runtime and overwrites the `/home` changes from the image build. Change `/home` at startup instead, with a script in `/etc/workstation-startup.d/`.",
+    "aws": null,
+    "source": {
+      "title": "Customize container images",
+      "url": "https://docs.cloud.google.com/workstations/docs/customize-container-images",
+      "evidence": "a persistent disk backing the home directory is dynamically attached to the container at runtime. This process overwrites modifications made to the `/home` directory at container image build time."
+    }
+  },
+  {
+    "id": "dev-f024",
+    "note": "2.1-developer-tools",
+    "kind": "term",
+    "front": "Gemini Cloud Assist",
+    "back": "An AI assistant (Preview) in the Google Cloud console that helps you design, troubleshoot, and optimize workloads. It can store data in any Google Cloud data center, so do not enable it for projects with data residency or CMEK requirements.",
+    "aws": "Amazon Q in the AWS console",
+    "source": {
+      "title": "Set up Gemini Cloud Assist",
+      "url": "https://docs.cloud.google.com/cloud-assist/set-up-gemini",
+      "evidence": "Gemini Cloud Assist can store data in any Google Cloud data center globally. You shouldn't enable the Gemini Cloud Assist API for projects that have data residency or customer-managed encryption key requirements."
+    }
+  },
+  {
+    "id": "dev-f025",
+    "note": "2.1-ai-assisted-development",
+    "kind": "term",
+    "front": "Gemini Code Assist",
+    "back": "Google's AI coding assistant for VS Code, JetBrains IDEs, Android Studio, the Cloud Shell Editor, and Cloud Workstations. It gives code completion, code generation, chat, and agent mode (Preview). Organizations buy the Standard or Enterprise edition.",
+    "aws": "Amazon Q Developer in the IDE",
+    "source": {
+      "title": "Gemini Code Assist Standard and Enterprise overview",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/overview",
+      "evidence": "You can use Gemini Code Assist in supported IDEs, such as VS Code, JetBrains IDEs, or Android Studio, for AI-powered coding assistance in many popular languages."
+    }
+  },
+  {
+    "id": "dev-f026",
+    "note": "2.1-ai-assisted-development",
+    "kind": "concept",
+    "front": "What does Gemini Code Assist Enterprise add to the Standard edition?",
+    "back": "Code customization: suggestions that use your private repositories on GitHub, GitLab, or Bitbucket. Enterprise also adds Gemini in Apigee and Application Integration.",
+    "aws": null,
+    "source": {
+      "title": "Gemini Code Assist Standard and Enterprise overview",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/overview",
+      "evidence": "The Enterprise edition offers all of the supported features in the Standard edition, but you can also customize it based on your private source code repositories"
+    }
+  },
+  {
+    "id": "dev-f027",
+    "note": "2.1-ai-assisted-development",
+    "kind": "concept",
+    "front": "Which IAM role must a developer have to use a Gemini Code Assist license?",
+    "back": "Gemini for Google Cloud User (`roles/cloudaicompanion.user`), on a project where the Gemini for Google Cloud API (`cloudaicompanion.googleapis.com`) is enabled.",
+    "aws": null,
+    "source": {
+      "title": "Set up Gemini Code Assist Standard and Enterprise",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/set-up-gemini",
+      "evidence": "Before using a Gemini Code Assist license, users must have the Gemini for Google Cloud User role or analogous permissions on a project where the API is already enabled."
+    }
+  },
+  {
+    "id": "dev-f028",
+    "note": "2.1-ai-assisted-development",
+    "kind": "term",
+    "front": "`GEMINI.md`",
+    "back": "A Markdown context file with rules, style information, and context that agent mode (Preview) sends with your prompts. `~/.gemini/GEMINI.md` applies to all projects. A more specific file, for example for one module, overrides or adds to it.",
+    "aws": null,
+    "source": {
+      "title": "Use the Gemini Code Assist agent mode",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/use-agentic-chat-pair-programmer",
+      "evidence": "Context from more specific files, like those for specific components or modules, overrides or supplements content from more general context files like the global context file at `~/.gemini/GEMINI.md`."
+    }
+  },
+  {
+    "id": "dev-f029",
+    "note": "2.1-ai-assisted-development",
+    "kind": "term",
+    "front": "`.aiexclude`",
+    "back": "A file with `.gitignore` syntax that keeps files, such as keys and secrets, out of Gemini Code Assist context. Code customization uses only `.aiexclude`, not `.gitignore`.",
+    "aws": null,
+    "source": {
+      "title": "Exclude files from Gemini Code Assist use",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/create-aiexclude-file",
+      "evidence": "For code customization only the `.aiexclude` file is used."
+    }
+  },
+  {
+    "id": "dev-f030",
+    "note": "2.1-ai-assisted-development",
+    "kind": "term",
+    "front": "Context engineering",
+    "back": "The process of managing the information that an agent needs, such as documents, history, and constraints. Strategies include isolating context for each agent, persisting information across steps, and compressing large data. Prompt engineering covers only the instructions.",
+    "aws": null,
+    "source": {
+      "title": "Choose a design pattern for your agentic AI system",
+      "url": "https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system",
+      "evidence": "The process of managing this information flow is called context engineering. Context engineering includes strategies such as isolating context for a specific agent, persisting information across multiple steps, or compressing large amounts of data to improve efficiency."
+    }
+  },
+  {
+    "id": "dev-f031",
+    "note": "2.1-ai-assisted-development",
+    "kind": "term",
+    "front": "Agent mode",
+    "back": "A Gemini Code Assist chat mode (Preview) in VS Code and IntelliJ that completes multi-step tasks with built-in tools and MCP servers. It asks before a tool changes files or resources, unless you always allow that tool.",
+    "aws": null,
+    "source": {
+      "title": "Agent mode overview",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/agent-mode",
+      "evidence": "For tool requests that modify the file system, or perform mutating operations on any resources, Gemini will ask you to allow the operation unless you have configured Gemini to always allow the tool or tools."
+    }
+  },
+  {
+    "id": "dev-f032",
+    "note": "2.1-ai-assisted-development",
+    "kind": "term",
+    "front": "Gemini CLI",
+    "back": "An open source AI agent for the terminal, ready to use in Cloud Shell. It uses a reason and act (ReAct) loop with built-in tools and MCP servers, for example to fix bugs and improve test coverage. It shares its quota with agent mode (Preview).",
+    "aws": "Amazon Q Developer CLI",
+    "source": {
+      "title": "Gemini CLI",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/gemini-cli",
+      "evidence": "The Gemini CLI uses a reason and act (ReAct) loop with your built-in tools and local or remote MCP servers to complete complex use cases like fixing bugs, creating new features, and improving test coverage."
+    }
+  },
+  {
+    "id": "dev-f033",
+    "note": "2.1-ai-assisted-development",
+    "kind": "term",
+    "front": "Model Context Protocol (MCP)",
+    "back": "An open source protocol that standardizes how AI applications, such as VS Code or the Gemini CLI, connect to tools and data. A local MCP server usually uses stdio. A remote MCP server, such as a Google Cloud one, has an HTTP endpoint.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud MCP servers overview",
+      "url": "https://docs.cloud.google.com/mcp/overview",
+      "evidence": "MCP is an open source protocol developed by Anthropic that standardizes how AI applications connect to data sources."
+    }
+  },
+  {
+    "id": "dev-f034",
+    "note": "2.1-ai-assisted-development",
+    "kind": "concept",
+    "front": "Which permissions does an agent need to call a tool on a Google Cloud remote MCP server?",
+    "back": "`mcp.tools.call` on the project, for example from the MCP Tool User role (`roles/mcp.toolUser`), and the normal permissions for the resource. Without either one, the tool call fails.",
+    "aws": null,
+    "source": {
+      "title": "Control MCP use with Identity and Access Management",
+      "url": "https://docs.cloud.google.com/mcp/control-mcp-use-iam",
+      "evidence": "For example, if an MCP tool call is sent to get a BigQuery Dataset's metadata, and the caller has the `mcp.tools.call` permission but lacks the `bigquery.datasets.get` permission, the tool call fails."
+    }
+  },
+  {
+    "id": "dev-f035",
+    "note": "2.1-ai-assisted-development",
+    "kind": "concept",
+    "front": "Which identity should a production agent use to call Google Cloud MCP servers?",
+    "back": "A separate agent identity or workload identity with the minimum permissions, not your own user identity. Then you can limit what the agent does and see its actions in the logs.",
+    "aws": null,
+    "source": {
+      "title": "Authenticate to Google and Google Cloud MCP servers",
+      "url": "https://docs.cloud.google.com/mcp/authenticate-mcp",
+      "evidence": "For production workloads, we recommend that you create a separate agent or workload identity, instead of using your identity."
+    }
+  },
+  {
+    "id": "dev-f036",
+    "note": "2.1-ai-assisted-development",
+    "kind": "concept",
+    "front": "Does Gemini use your prompts and its responses to train its models?",
+    "back": "No. Gemini does not use your prompts or its responses as data to train its models.",
+    "aws": null,
+    "source": {
+      "title": "How Gemini products in Google Cloud use your data",
+      "url": "https://docs.cloud.google.com/gemini/docs/discover/data-governance",
+      "evidence": "Gemini doesn't use your prompts or its responses as data to train its models."
+    }
+  },
+  {
+    "id": "dev-f037",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "term",
+    "front": "Generate unit tests smart action",
+    "back": "A Gemini Code Assist smart action that writes unit tests for the code that you select. In VS Code, open it from the lightbulb next to the code. In IntelliJ, right-click the code.",
+    "aws": "Amazon Q Developer unit test generation",
+    "source": {
+      "title": "Code with Gemini Code Assist Standard and Enterprise",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/write-code-gemini",
+      "evidence": "Right-click the selected code and select a smart action, like Generate unit tests."
+    }
+  },
+  {
+    "id": "dev-f038",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "concept",
+    "front": "How do you ask Gemini Code Assist chat about a test that fails in the terminal?",
+    "back": "Add the terminal output to the Context Drawer, then ask about the failure. Gemini answers based on the terminal output that you selected.",
+    "aws": null,
+    "source": {
+      "title": "Chat with Gemini Code Assist Standard and Enterprise",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/chat-gemini",
+      "evidence": "Gemini Code Assist responds to your prompt based on your selected terminal output in the Context Drawer."
+    }
+  },
+  {
+    "id": "dev-f039",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "concept",
+    "front": "Why must you review unit tests that Gemini Code Assist generates before you accept them?",
+    "back": "Generated output can seem plausible but be factually incorrect. Check that each assertion is correct and that every class and method exists. You are responsible for the code.",
+    "aws": null,
+    "source": {
+      "title": "Gemini Code Assist Standard and Enterprise overview",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/overview",
+      "evidence": "As an early-stage technology, Gemini Code Assist can generate output that seems plausible but is factually incorrect. We recommend that you validate all output from Gemini Code Assist before you use it."
+    }
+  },
+  {
+    "id": "dev-f040",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "concept",
+    "front": "Does Gemini Code Assist agent mode cite sources for code that it copies?",
+    "back": "No. Recitation is not available in agent mode (Preview), and you cannot block suggestions that match cited sources. Check agent output for copied code yourself.",
+    "aws": null,
+    "source": {
+      "title": "Agent mode overview",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/agent-mode",
+      "evidence": "Recitation is not available in agent mode. While in agent mode, Gemini doesn't cite sources and you can't disable code suggestions that match cited sources."
+    }
+  },
+  {
+    "id": "dev-f041",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "concept",
+    "front": "Where do you put a test convention so that every Gemini Code Assist chat prompt includes it?",
+    "back": "In a rule, for example `Always generate unit tests when creating a new function`. Gemini Code Assist adds rules to every chat prompt. In IntelliJ, agent mode (Preview) does not use rules.",
+    "aws": null,
+    "source": {
+      "title": "Chat with Gemini Code Assist Standard and Enterprise",
+      "url": "https://docs.cloud.google.com/gemini/docs/codeassist/chat-gemini",
+      "evidence": "You can create rules for Gemini Code Assist to follow, and the rules are included in every chat prompt you enter."
+    }
+  },
+  {
+    "id": "dev-f042",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "term",
+    "front": "Gemini Code Assist on GitHub",
+    "back": "A GitHub integration that reviews pull requests and writes pull request summaries. Each review comment has a severity (Critical, High, Medium, or Low) and can include a code suggestion. Its enterprise version, set up through Google Cloud, is in Preview.",
+    "aws": "Amazon Q Developer code reviews",
+    "source": {
+      "title": "Use Gemini Code Assist on GitHub",
+      "url": "https://docs.cloud.google.com/gemini/docs/code-review/use-code-assist-github",
+      "evidence": "Gemini Code Assist on GitHub lets you automate code reviews and generate pull request summaries directly in your repositories."
+    }
+  },
+  {
+    "id": "dev-f043",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "concept",
+    "front": "Which files does Gemini Code Assist on GitHub never summarize or suggest changes for?",
+    "back": "Files in the `.github/workflows` directory. Google excludes them to help prevent insecure configurations in the repository.",
+    "aws": null,
+    "source": {
+      "title": "Review GitHub code using Gemini Code Assist",
+      "url": "https://docs.cloud.google.com/gemini/docs/code-review/review-repo-code",
+      "evidence": "Gemini Code Assist on GitHub does not generate summaries or code suggestions for any files located within the `.github/workflows` directory."
+    }
+  },
+  {
+    "id": "dev-f044",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "term",
+    "front": "`.gemini/config.yaml`",
+    "back": "A file in the `.gemini/` folder of the repository root that changes how Gemini Code Assist on GitHub reviews code. For example, `comment_severity_threshold` sets the lowest severity that gets a comment. The default is `MEDIUM`.",
+    "aws": null,
+    "source": {
+      "title": "Customize Gemini Code Assist behavior in GitHub",
+      "url": "https://docs.cloud.google.com/gemini/docs/code-review/customize-repo-review",
+      "evidence": "You modify Gemini Code Assist on GitHub behavior by adding a `config.yaml` file to a `.gemini/` folder located in the root of each of your repositories."
+    }
+  },
+  {
+    "id": "dev-f045",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "concept",
+    "front": "How do you keep a `pytest` report from a Cloud Build run in Cloud Storage?",
+    "back": "Run `pytest` with `--junitxml` to write the report file. Then list the file under `artifacts.objects` with a bucket location, and Cloud Build uploads it.",
+    "aws": null,
+    "source": {
+      "title": "Build and test Python applications",
+      "url": "https://docs.cloud.google.com/build/docs/building/build-python",
+      "evidence": "You can configure Cloud Build to store any test logs in Cloud Storage by specifying an existing bucket location and path to the test logs."
+    }
+  },
+  {
+    "id": "dev-f046",
+    "note": "2.3-unit-tests-with-ai",
+    "kind": "concept",
+    "front": "Which role does the build service account need to save test reports to a bucket?",
+    "back": "Storage Object Creator (`roles/storage.objectCreator`) on the Cloud Storage bucket.",
+    "aws": null,
+    "source": {
+      "title": "Build and test Python applications",
+      "url": "https://docs.cloud.google.com/build/docs/building/build-python",
+      "evidence": "grant the Storage Object Creator (`roles/storage.objectCreator`) role for the Cloud Storage bucket to your build service account."
+    }
+  },
+  {
+    "id": "dev-f047",
+    "note": "4.2-generative-ai-apis",
+    "kind": "term",
+    "front": "Google Gen AI SDK",
+    "back": "One SDK (`google-genai`) for the Gemini Developer API and the Gemini API on Gemini Enterprise Agent Platform (formerly Vertex AI). With a few exceptions, code for one runs on the other, so you can prototype on the Developer API and move without a rewrite.",
+    "aws": "Amazon Bedrock runtime APIs",
+    "source": {
+      "title": "Google Gen AI SDK",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/sdks/overview",
+      "evidence": "The Google Gen AI SDK provides a unified interface to Gemini models through both the Gemini Developer API and the Gemini API on Gemini Enterprise Agent Platform."
+    }
+  },
+  {
+    "id": "dev-f048",
+    "note": "4.2-generative-ai-apis",
+    "kind": "concept",
+    "front": "Which credential does Google recommend for Gemini API calls in production?",
+    "back": "Application Default Credentials (ADC), for example with an attached service account. Use an API key only for testing.",
+    "aws": null,
+    "source": {
+      "title": "Configure application default credentials",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/start/gcp-auth",
+      "evidence": "We recommend using an API key for testing and using application default credentials for production."
+    }
+  },
+  {
+    "id": "dev-f049",
+    "note": "4.2-generative-ai-apis",
+    "kind": "concept",
+    "front": "Which predefined role lets a service account send prompts to Gemini on Agent Platform?",
+    "back": "Gemini Enterprise Agent Platform User (`roles/aiplatform.user`). A custom role needs the `aiplatform.endpoints.predict` permission to make prompt requests.",
+    "aws": null,
+    "source": {
+      "title": "Access control",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/access-control",
+      "evidence": "You can grant the users or groups in your project one of the following predefined roles to give them access to the generative AI features on Gemini Enterprise Agent Platform"
+    }
+  },
+  {
+    "id": "dev-f050",
+    "note": "4.2-generative-ai-apis",
+    "kind": "concept",
+    "front": "Which Gemini endpoint gives the best availability and the fewest `429` errors?",
+    "back": "The global endpoint. You cannot control where it processes requests, so do not use it when you have ML processing location requirements. A multi-region endpoint (`us` or `eu`) keeps ML processing in that jurisdiction.",
+    "aws": null,
+    "source": {
+      "title": "Deployments and endpoints",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/locations",
+      "evidence": "Selecting a global endpoint for your requests can improve overall availability while reducing resource exhausted (429) errors. Don't use the global endpoint if you have ML processing requirements"
+    }
+  },
+  {
+    "id": "dev-f051",
+    "note": "4.2-generative-ai-apis",
+    "kind": "term",
+    "front": "System instructions",
+    "back": "Instructions that set the role, output format, tone, and rules for a whole Gemini request, across all turns. They do not fully prevent jailbreaks or leaks, so do not put sensitive information in them.",
+    "aws": null,
+    "source": {
+      "title": "Use system instructions",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/prompts/system-instructions",
+      "evidence": "System instructions can help guide the model to follow instructions, but they don't fully prevent jailbreaks or leaks. We recommend exercising caution around putting any sensitive information in system instructions."
+    }
+  },
+  {
+    "id": "dev-f052",
+    "note": "4.2-generative-ai-apis",
+    "kind": "concept",
+    "front": "How do you make Gemini always return valid JSON in a fixed structure?",
+    "back": "Set a `response_schema`, and set `response_mime_type` to `application/json`. JSON mode without a schema is only a strong hint, so the output can be malformed JSON.",
+    "aws": null,
+    "source": {
+      "title": "Structured output",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/control-generated-output",
+      "evidence": "To ensure 100% valid JSON objects, requests must include both a `response_schema` and `response_mime_type` set to `application/json`."
+    }
+  },
+  {
+    "id": "dev-f053",
+    "note": "4.2-generative-ai-apis",
+    "kind": "term",
+    "front": "Function calling",
+    "back": "A Gemini feature (also called tool use) in which the model returns structured data with a function name and arguments. The model does not run the function. Your application runs it and sends the result back to the model.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to function calling",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/tools/function-calling",
+      "evidence": "Your application then executes this tool, feeds the result back to the model, allowing it to complete its response with dynamic, real-world information or the outcome of an action."
+    }
+  },
+  {
+    "id": "dev-f054",
+    "note": "4.2-generative-ai-apis",
+    "kind": "concept",
+    "front": "Which grounding source fits answers that must come from your own website data or documents?",
+    "back": "Agent Search (formerly Vertex AI Search), or RAG Engine on Agent Platform for a managed, configurable RAG service. Grounding with Google Search fits world knowledge and current public information.",
+    "aws": null,
+    "source": {
+      "title": "Grounding overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/overview",
+      "evidence": "Use retrieval-augmented generation (RAG) to connect your model to your website data or your sets of documents stored in Agent Search."
+    }
+  },
+  {
+    "id": "dev-f055",
+    "note": "4.2-generative-ai-apis",
+    "kind": "concept",
+    "front": "Can one Gemini request use Grounding with Google Search and function calling together?",
+    "back": "No. The Gemini API does not combine search tools with non-search tools, such as function calling or the RAG Engine `retrieval` tool, in one request. Several search tools together are allowed.",
+    "aws": null,
+    "source": {
+      "title": "Grounding with Google Search",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/grounding/grounding-with-google-search",
+      "evidence": "The Gemini API doesn't support combining search tools (such as `googleSearch`) with non-search tools (such as function calling or the Gemini Enterprise Agent Platform RAG Engine `retrieval` tool) in the same `generateContent` request."
+    }
+  },
+  {
+    "id": "dev-f056",
+    "note": "4.2-generative-ai-apis",
+    "kind": "term",
+    "front": "Context caching",
+    "back": "A Gemini feature that reduces the cost and latency of requests that repeat the same content. Implicit caching is on by default. Explicit caching stores content that you create with the API and then reference by name in requests.",
+    "aws": "Amazon Bedrock prompt caching",
+    "source": {
+      "title": "Context caching overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/context-cache/context-cache-overview",
+      "evidence": "Context caching helps reduce the cost and latency of requests to Gemini that contain repeated content. Gemini Enterprise Agent Platform offers two types of caching"
+    }
+  },
+  {
+    "id": "dev-f057",
+    "note": "4.2-generative-ai-apis",
+    "kind": "term",
+    "front": "Batch inference",
+    "back": "Asynchronous processing of many Gemini prompts from a JSONL file in Cloud Storage or a BigQuery table, at a lower price than real-time inference. Use it for large jobs that do not need an immediate answer. Its former name is batch prediction.",
+    "aws": "Amazon Bedrock batch inference",
+    "source": {
+      "title": "Batch inference with Gemini",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/capabilities/batch-inference",
+      "evidence": "Get asynchronous, high-throughput, and cost-effective inference for your large-scale data processing needs with Gemini's batch inference (formerly known as batch prediction)."
+    }
+  },
+  {
+    "id": "dev-f058",
+    "note": "4.2-generative-ai-apis",
+    "kind": "concept",
+    "front": "What does a `429` error from Gemini on Standard PayGo usually mean?",
+    "back": "Temporary contention for shared capacity, not a fixed quota. Retry with exponential backoff, use the global endpoint, and spread the traffic evenly.",
+    "aws": null,
+    "source": {
+      "title": "Standard PayGo",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/standard-paygo",
+      "evidence": "If you receive a `429` error, it doesn't indicate that you've hit a fixed quota. It indicates temporary high contention for a specific shared resource."
+    }
+  },
+  {
+    "id": "dev-f059",
+    "note": "4.2-generative-ai-apis",
+    "kind": "term",
+    "front": "Provisioned Throughput",
+    "back": "A fixed-cost, fixed-term subscription that reserves Gemini throughput for critical workloads. Frequent `429` errors usually mean that you used all the purchased capacity, so more retries may not help. Requests over the purchase run as pay-as-you-go.",
+    "aws": "Amazon Bedrock Provisioned Throughput",
+    "source": {
+      "title": "Provisioned Throughput overview",
+      "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/provisioned-throughput",
+      "evidence": "Provisioned Throughput is a fixed-cost, fixed-term subscription available in several term-lengths that reserves throughput for supported generative AI models on Gemini Enterprise Agent Platform."
+    }
+  }
+]

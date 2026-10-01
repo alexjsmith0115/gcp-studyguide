@@ -1,0 +1,782 @@
+[
+  {
+    "id": "api-f001",
+    "note": "1.1-api-design",
+    "kind": "term",
+    "front": "Resource-oriented design",
+    "back": "The AIP-121 design pattern for Google APIs. An API is a hierarchy of named resources (nouns) with a small number of standard methods (verbs). Design the resources first and the methods last.",
+    "aws": null,
+    "source": {
+      "title": "AIP-121: Resource-oriented design",
+      "url": "https://google.aip.dev/121",
+      "evidence": "The fundamental building blocks of an API are individually-named resources (nouns) and the relationships and hierarchy that exist between them."
+    }
+  },
+  {
+    "id": "api-f002",
+    "note": "1.1-api-design",
+    "kind": "concept",
+    "front": "Why is an API that is identical to the database schema an anti-pattern?",
+    "back": "It tightly couples the API surface to the storage system under it. A resource-oriented API does not need to reflect the database schema.",
+    "aws": null,
+    "source": {
+      "title": "AIP-121: Resource-oriented design",
+      "url": "https://google.aip.dev/121",
+      "evidence": "having an API that is identical to the underlying database schema is actually an anti-pattern, as it tightly couples the surface to the underlying system."
+    }
+  },
+  {
+    "id": "api-f003",
+    "note": "1.1-api-design",
+    "kind": "term",
+    "front": "Custom method",
+    "back": "A method for an action that the standard methods cannot express, for example `ArchiveBook`. It uses `POST`, or `GET` to read data, and its URI puts the verb after a colon, as in `:archive`. Prefer standard methods when they fit.",
+    "aws": null,
+    "source": {
+      "title": "AIP-136: Custom methods",
+      "url": "https://google.aip.dev/136",
+      "evidence": "The HTTP URI must use a `:` character followed by the custom verb (`:archive` in the above example), and the verb in the URI must match the verb in the name of the RPC."
+    }
+  },
+  {
+    "id": "api-f004",
+    "note": "1.1-api-design",
+    "kind": "concept",
+    "front": "Which HTTP method does a Google API use for the standard Update method?",
+    "back": "`PATCH`, with an `update_mask` field that lists the fields to change. Google APIs generally do not support `PUT`, because a new field in a stable API breaks a `PUT` client that sends the full resource.",
+    "aws": null,
+    "source": {
+      "title": "AIP-134: Standard methods: Update",
+      "url": "https://google.aip.dev/134",
+      "evidence": "We standardize on `PATCH` because Google updates stable APIs in place with backwards-compatible improvements. It is often necessary to add a new field to an existing resource, but this becomes a breaking change when using `PUT`."
+    }
+  },
+  {
+    "id": "api-f005",
+    "note": "1.1-api-design",
+    "kind": "term",
+    "front": "HTTP/JSON transcoding",
+    "back": "A way to serve one protocol buffers API to gRPC clients and to clients that send JSON over HTTP. A `google.api.http` annotation maps each RPC to an HTTP method and path. API Gateway and the Cloud Endpoints proxy (ESP) can do the transcoding.",
+    "aws": null,
+    "source": {
+      "title": "AIP-127: HTTP and gRPC Transcoding",
+      "url": "https://google.aip.dev/127",
+      "evidence": "When using protocol buffers, each RPC must define the HTTP method and path using the `google.api.http` annotation"
+    }
+  },
+  {
+    "id": "api-f006",
+    "note": "1.1-api-design",
+    "kind": "term",
+    "front": "`ErrorInfo`",
+    "back": "The error detail that every Google API error response must include in `Status.details`. Its `reason`, `domain`, and `metadata` fields are machine-readable, so clients write code against them, not against the message text.",
+    "aws": null,
+    "source": {
+      "title": "AIP-193: Errors",
+      "url": "https://google.aip.dev/193",
+      "evidence": "All error responses must include an `ErrorInfo` within `details`. This provides machine-readable identifiers so that users can write code against specific aspects of the error."
+    }
+  },
+  {
+    "id": "api-f007",
+    "note": "1.1-api-design",
+    "kind": "concept",
+    "front": "Which error does a caller without permission get for a resource that does not exist?",
+    "back": "`PERMISSION_DENIED` (HTTP 403). The API checks permission before it checks that the resource exists. Only a caller with permission gets `NOT_FOUND` (HTTP 404).",
+    "aws": null,
+    "source": {
+      "title": "AIP-193: Errors",
+      "url": "https://google.aip.dev/193",
+      "evidence": "If the user does not have permission to access the resource or parent, regardless of whether or not it exists, the service must error with `PERMISSION_DENIED` (HTTP 403)."
+    }
+  },
+  {
+    "id": "api-f008",
+    "note": "1.1-api-design",
+    "kind": "term",
+    "front": "`request_id`",
+    "back": "A request field, usually a UUID, that makes a method such as Create safe to retry. The server detects a duplicate request ID and processes the request only once.",
+    "aws": null,
+    "source": {
+      "title": "AIP-155: Request identification",
+      "url": "https://google.aip.dev/155",
+      "evidence": "In the event of a network failure, the client can retry the request, and the server can detect duplication and ensure that the request is only processed once."
+    }
+  },
+  {
+    "id": "api-f009",
+    "note": "1.1-api-design",
+    "kind": "term",
+    "front": "Long-running operation",
+    "back": "A `google.longrunning.Operation` that an API method returns instead of the final response when the work takes a long time. AIP-151 gives about 10 seconds as a general guide for a long time.",
+    "aws": null,
+    "source": {
+      "title": "AIP-151: Long-running operations",
+      "url": "https://google.aip.dev/151",
+      "evidence": "User expectations can vary on what is considered \"a significant amount of time\" depending on what work is being done. A good rule of thumb is 10 seconds."
+    }
+  },
+  {
+    "id": "api-f010",
+    "note": "1.1-api-design",
+    "kind": "concept",
+    "front": "What does Cloud Run do by default to HTTP/2 requests before they reach the container?",
+    "back": "It downgrades them to HTTP/1, except native gRPC traffic. For end-to-end HTTP/2, which gRPC streaming needs, deploy the service with `--use-http2`.",
+    "aws": null,
+    "source": {
+      "title": "Use HTTP/2 for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/http2",
+      "evidence": "Cloud Run downgrades those requests from HTTP/2 to HTTP/1 with the exception of native gRPC traffic, which requires HTTP/2 to function correctly."
+    }
+  },
+  {
+    "id": "api-f011",
+    "note": "1.1-api-design",
+    "kind": "concept",
+    "front": "Which protocol must a container serve when its Cloud Run service uses end-to-end HTTP/2?",
+    "back": "HTTP/2 cleartext (`h2c`). The Google frontend ends TLS and forwards `h2c` traffic to the container, so the container does not serve TLS.",
+    "aws": null,
+    "source": {
+      "title": "Use HTTP/2 for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/http2",
+      "evidence": "Your Cloud Run service must handle requests in HTTP/2 cleartext (`h2c`) format. Google's frontend-serving infrastructure terminates TLS and then forwards the `h2c` traffic to Cloud Run and to your container through an encrypted channel."
+    }
+  },
+  {
+    "id": "api-f012",
+    "note": "1.1-api-design",
+    "kind": "concept",
+    "front": "What do Application Load Balancer logs report when a gRPC backend returns an error?",
+    "back": "`200 OK`. The load balancer logs and monitoring data do not show gRPC errors, so measure the gRPC error rate in the application.",
+    "aws": null,
+    "source": {
+      "title": "External Application Load Balancer overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/https",
+      "evidence": "If the gRPC endpoint returns an error, the load balancer logs and the monitoring data report the `200 OK` HTTP status code."
+    }
+  },
+  {
+    "id": "api-f013",
+    "note": "1.1-api-management",
+    "kind": "term",
+    "front": "Apigee",
+    "back": "Google Cloud's native API management platform. It puts an API proxy layer with policies for security, rate limits, and analytics between clients and backends. It supports REST, gRPC, SOAP, and GraphQL.",
+    "aws": "Amazon API Gateway",
+    "source": {
+      "title": "What is Apigee?",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/get-started/what-apigee",
+      "evidence": "Apigee is Google Cloud's native API management platform that can be used to build, manage, and secure APIs"
+    }
+  },
+  {
+    "id": "api-f014",
+    "note": "1.1-api-management",
+    "kind": "term",
+    "front": "API Gateway",
+    "back": "A fully managed gateway for serverless backends on Google Cloud, such as Cloud Run (the exam guide says Cloud API Gateway). You configure it with an OpenAPI document. It fits APIs whose consumers do not need a developer portal.",
+    "aws": "Amazon API Gateway",
+    "source": {
+      "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+      "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+      "evidence": "API Gateway is optimal for cloud-native use cases where the target backends are generally limited to services deployed on Google Cloud, and where the developer audiences consuming the APIs don't require a developer portal."
+    }
+  },
+  {
+    "id": "api-f015",
+    "note": "1.1-api-management",
+    "kind": "concept",
+    "front": "When does Google suggest Apigee instead of API Gateway?",
+    "back": "For very high API volume, enterprise-grade security, or APIs for partners and third parties that need a developer portal, API products, or monetization. API Gateway fits serverless backends whose consumers need no developer portal.",
+    "aws": null,
+    "source": {
+      "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+      "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+      "evidence": "it's especially valuable for customers who have very high API volumes, a need for high reliability and enterprise-grade security, or who rely on APIs exposed to third parties or partners"
+    }
+  },
+  {
+    "id": "api-f016",
+    "note": "1.1-api-management",
+    "kind": "term",
+    "front": "Cloud Endpoints",
+    "back": "A Google Cloud API management option in which you deploy and operate the proxy yourself (ESPv2, which is based on Envoy). Choose it when the gateway must run on your own runtime, in your private network, or on your own machine for tests.",
+    "aws": null,
+    "source": {
+      "title": "Choosing between Apigee, API Gateway, and Cloud Endpoints",
+      "url": "https://cloud.google.com/blog/products/application-modernization/choosing-between-apigee-api-gateway-and-cloud-endpoints",
+      "evidence": "Cloud Endpoints is most useful when you specifically want to host the gateway on your own runtime with private networking"
+    }
+  },
+  {
+    "id": "api-f017",
+    "note": "1.1-api-management",
+    "kind": "term",
+    "front": "API config",
+    "back": "Your API definition (an OpenAPI document or a gRPC service configuration) after you upload it to API Gateway. You cannot change an API config: each upload creates a new one. A gateway serves exactly one API config.",
+    "aws": null,
+    "source": {
+      "title": "API Gateway deployment model",
+      "url": "https://docs.cloud.google.com/api-gateway/docs/deployment-model",
+      "evidence": "Each time you upload an API definition, API Gateway creates a new API config. That is, you can create an API config but you cannot later modify it."
+    }
+  },
+  {
+    "id": "api-f018",
+    "note": "1.1-api-management",
+    "kind": "concept",
+    "front": "What must a client's project do before its API key works with your API Gateway API?",
+    "back": "Enable your API's managed service, for example with `gcloud services enable MANAGED_SERVICE_NAME`. The gateway rejects an API key unless it comes from your project or from a project that enabled your API.",
+    "aws": null,
+    "source": {
+      "title": "Use API keys",
+      "url": "https://docs.cloud.google.com/api-gateway/docs/authenticate-api-keys",
+      "evidence": "API Gateway rejects requests unless the API key was generated in your Google Cloud project or within other Google Cloud projects in which your API has been enabled."
+    }
+  },
+  {
+    "id": "api-f019",
+    "note": "1.1-api-management",
+    "kind": "concept",
+    "front": "Which role does the API Gateway service account need on a private Cloud Run backend?",
+    "back": "The Cloud Run Invoker role (`roles/run.invoker`). The gateway calls the backend with an ID token for this service account. For a Cloud Run functions backend, grant `roles/cloudfunctions.invoker`.",
+    "aws": null,
+    "source": {
+      "title": "Securing backend services",
+      "url": "https://docs.cloud.google.com/api-gateway/docs/securing-backend-services",
+      "evidence": "For API Gateway, access to Cloud Run services is enabled by granting the gateway's service account the appropriate roles and permissions: the `roles/run.invoker` role or a role containing the `run.routes.invoke` permission."
+    }
+  },
+  {
+    "id": "api-f020",
+    "note": "1.1-api-management",
+    "kind": "concept",
+    "front": "Which quota limit unit does API Gateway support?",
+    "back": "Only `1/min/{project}` (the quota extension is Beta). The limit applies to each consumer project, and the count resets every minute. A client over the limit gets HTTP `429`.",
+    "aws": null,
+    "source": {
+      "title": "OpenAPI 2.0 extensions in API Gateway",
+      "url": "https://docs.cloud.google.com/api-gateway/docs/oasv2-extensions",
+      "evidence": "Only \"1/min/{project}\" is supported, which means that the limit is enforced per-project and the usage is reset every minute."
+    }
+  },
+  {
+    "id": "api-f021",
+    "note": "1.1-api-management",
+    "kind": "term",
+    "front": "SpikeArrest policy",
+    "back": "An Apigee policy that limits the calls to an API proxy from all consumers over a short period, such as seconds or minutes. Use it to protect the backend from sudden traffic spikes.",
+    "aws": null,
+    "source": {
+      "title": "Comparing rate-limiting policies",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/develop/comparing-quota-and-spike-arrest-policies",
+      "evidence": "Limit the number of API calls that can be made against an API proxy across all consumers over a short period of time, such as seconds or minutes."
+    }
+  },
+  {
+    "id": "api-f022",
+    "note": "1.1-api-management",
+    "kind": "concept",
+    "front": "Which Apigee policy should enforce a contract limit on the calls of each partner app?",
+    "back": "The Quota policy. It counts the calls of each developer app or developer over longer periods, and it counts accurately. SpikeArrest keeps best-effort counts for all consumers, so it does not fit contract limits.",
+    "aws": null,
+    "source": {
+      "title": "Comparing rate-limiting policies",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/develop/comparing-quota-and-spike-arrest-policies",
+      "evidence": "we recommend against using SpikeArrest or PromptTokenLimit for use cases that require accurate counting. Only the synchronous Quota or LLMTokenQuota policy offers accurate counting across all regions in a given timeframe."
+    }
+  },
+  {
+    "id": "api-f023",
+    "note": "1.1-api-management",
+    "kind": "term",
+    "front": "API product",
+    "back": "An Apigee bundle of operations: API proxies, resource paths, and an optional quota, for example for a Free or a Premium tier. Apigee issues API keys for API products, not for API proxies. A developer app gets a key when it registers with at least one API product.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to API products",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/publish/what-api-product",
+      "evidence": "In Apigee, API keys are provisioned, not for APIs themselves, but for API products. In other words, API keys are provisioned for bundles of operations that define a product line or specific service plan."
+    }
+  },
+  {
+    "id": "api-f024",
+    "note": "1.1-api-management",
+    "kind": "concept",
+    "front": "What happens when an Apigee API proxy has no VerifyAPIKey or VerifyAccessToken policy?",
+    "back": "Any caller can call the API. Apigee does not enforce API keys automatically, even when the proxy is part of an API product.",
+    "aws": null,
+    "source": {
+      "title": "Introduction to API products",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/publish/what-api-product",
+      "evidence": "If you do not include a credential enforcement policy in your API Proxy, any caller can invoke your APIs."
+    }
+  },
+  {
+    "id": "api-f025",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "concept",
+    "front": "Which version number does a Google REST API put in its URI path?",
+    "back": "Only the major version, as the first part of the path, for example `/v1/...`. Google APIs do not expose minor or patch versions such as `v1.1`.",
+    "aws": null,
+    "source": {
+      "title": "AIP-185: API Versioning",
+      "url": "https://google.aip.dev/185",
+      "evidence": "unlike in traditional semantic versioning, Google APIs must not expose minor or patch version numbers. For example, Google APIs use `v1`, not `v1.0`, `v1.1`, or `v1.4.2`."
+    }
+  },
+  {
+    "id": "api-f026",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "concept",
+    "front": "Which kind of new field can you add to a request message without a new major version?",
+    "back": "An optional field. A new required field in an existing request message or resource is a breaking change.",
+    "aws": null,
+    "source": {
+      "title": "AIP-180: Backwards compatibility",
+      "url": "https://google.aip.dev/180",
+      "evidence": "New required fields must not be added to existing request messages or resources."
+    }
+  },
+  {
+    "id": "api-f027",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "concept",
+    "front": "How do you rename a field in a stable API version without a breaking change?",
+    "back": "Add the field with the new name, and keep the old field. A rename counts as a remove and an add, and you must not remove a field in the same major version.",
+    "aws": null,
+    "source": {
+      "title": "AIP-180: Backwards compatibility",
+      "url": "https://google.aip.dev/180",
+      "evidence": "Renaming a component is semantically equivalent to \"remove and add\". In cases where these sorts of changes are desirable, a service may add the new component, but must not remove the existing one."
+    }
+  },
+  {
+    "id": "api-f028",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "concept",
+    "front": "What should an API producer do when a stable API needs a breaking change?",
+    "back": "Create the next major version, for example `v2`, and start a deprecation period for the old version. A stable version must not get breaking changes.",
+    "aws": null,
+    "source": {
+      "title": "AIP-181: Stability levels",
+      "url": "https://google.aip.dev/181",
+      "evidence": "When breaking changes become necessary, the API producer should create the next major version of the API, and start a deprecation clock on the existing version."
+    }
+  },
+  {
+    "id": "api-f029",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "term",
+    "front": "Channel-based versioning",
+    "back": "The versioning pattern that AIP-185 recommends: one long-lived channel for each stability level, updated in place. Alpha and beta versions add the level to the name (`v1alpha`, `v1beta`). The stable version does not (`v1`).",
+    "aws": null,
+    "source": {
+      "title": "AIP-185: API Versioning",
+      "url": "https://google.aip.dev/185",
+      "evidence": "The alpha and beta channel must have their stability level appended to the version, but the stable channel must not have the stability level appended."
+    }
+  },
+  {
+    "id": "api-f030",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "term",
+    "front": "Proxy revision",
+    "back": "An internal, sequential number for one saved configuration of an Apigee API proxy. It is not the API version, and apps never see it. To undo a change, deploy an earlier revision.",
+    "aws": null,
+    "source": {
+      "title": "Understanding APIs and API proxies",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/fundamentals/understanding-apis-and-api-proxies",
+      "evidence": "The two numbers are unrelated, and the revision number of an API proxy is totally opaque to apps that consume your API."
+    }
+  },
+  {
+    "id": "api-f031",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "term",
+    "front": "Environment group",
+    "back": "An Apigee resource that holds the hostnames and routes requests to its environments. An environment must be in at least one environment group before clients can reach its proxies.",
+    "aws": null,
+    "source": {
+      "title": "About environments and environment groups",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/fundamentals/environments-overview",
+      "evidence": "An environment must be a member of at least one environment group before you can access proxies deployed within it."
+    }
+  },
+  {
+    "id": "api-f032",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "term",
+    "front": "Base path",
+    "back": "The first part of the request path, for example `/weather`, that routes a request to an Apigee API proxy. A base path must be unique within an environment.",
+    "aws": null,
+    "source": {
+      "title": "API proxy configuration reference",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/api-proxy-configuration-reference",
+      "evidence": "BasePath must be unique within an environment. Uniqueness is validated when an API proxy is generated or imported."
+    }
+  },
+  {
+    "id": "api-f033",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "term",
+    "front": "Cloud Run domain mapping",
+    "back": "A Cloud Run feature that maps a custom domain to a service (Preview). It is not production-ready because of latency issues. For a production custom domain, Google recommends a global external Application Load Balancer.",
+    "aws": null,
+    "source": {
+      "title": "Mapping custom domains",
+      "url": "https://docs.cloud.google.com/run/docs/mapping-custom-domains",
+      "evidence": "Cloud Run domain mappings are in the preview launch stage. Due to latency issues, they are not production-ready and are not supported at General Availability."
+    }
+  },
+  {
+    "id": "api-f034",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "concept",
+    "front": "Which `<Authentication>` element does an Apigee TargetEndpoint use to call a private Cloud Run service?",
+    "back": "`<GoogleIDToken>`. Apigee then sends an OpenID Connect ID token for its service account to the Cloud Run service. Use `<GoogleAccessToken>` when the target is a Google API.",
+    "aws": null,
+    "source": {
+      "title": "API proxy configuration reference",
+      "url": "https://docs.cloud.google.com/apigee/docs/api-platform/reference/api-proxy-configuration-reference",
+      "evidence": "The following example shows how to call a service deployed on Cloud Run as the target using the `Authentication` element to generate an OpenID Connect token needed to authenticate the call"
+    }
+  },
+  {
+    "id": "api-f035",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "concept",
+    "front": "How does Google recommend that you make a Cloud Run service public?",
+    "back": "Disable the Cloud Run Invoker IAM check, for example with `gcloud run deploy --no-invoker-iam-check`. This works even when an organization policy restricts domain sharing. The other way is to grant the Cloud Run Invoker role to `allUsers`.",
+    "aws": null,
+    "source": {
+      "title": "Allowing public (unauthenticated) access",
+      "url": "https://docs.cloud.google.com/run/docs/authenticating/public",
+      "evidence": "The recommended way to make a public service is to disable the Cloud Run Invoker IAM check. Cloud Run enforces this check by default."
+    }
+  },
+  {
+    "id": "api-f036",
+    "note": "3.1-api-versioning-and-exposure",
+    "kind": "concept",
+    "front": "Why can a standard API key not authorize access to user data?",
+    "back": "A standard API key does not identify a principal, so IAM cannot check whether the caller may do the operation. Use an OAuth 2.0 access token or a JWT for user data.",
+    "aws": null,
+    "source": {
+      "title": "Manage API keys",
+      "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
+      "evidence": "Without a principal, the request can't use Identity and Access Management (IAM) to check whether the caller is authorized to perform the requested operation."
+    }
+  },
+  {
+    "id": "api-f037",
+    "note": "4.2-calling-google-apis",
+    "kind": "term",
+    "front": "Service Usage",
+    "back": "The Google Cloud service that lists, enables, and disables services (APIs) in a project. You must enable most Google APIs in a project before code can call them, for example with `gcloud services enable`.",
+    "aws": null,
+    "source": {
+      "title": "Service Usage overview",
+      "url": "https://docs.cloud.google.com/service-usage/docs/overview",
+      "evidence": "Before you can use most Google APIs you must first enable them in a Google Cloud project."
+    }
+  },
+  {
+    "id": "api-f038",
+    "note": "4.2-calling-google-apis",
+    "kind": "concept",
+    "front": "What happens to Cloud Run resources when you disable the Cloud Run API in a project?",
+    "back": "Cloud Run deletes them. Before you disable a service, check that its resources are safe to delete.",
+    "aws": null,
+    "source": {
+      "title": "Enable and disable services",
+      "url": "https://docs.cloud.google.com/service-usage/docs/enable-disable",
+      "evidence": "In contrast, when you disable the Cloud Run API, the resources associated with Cloud Run are deleted, which you might not intend to do."
+    }
+  },
+  {
+    "id": "api-f039",
+    "note": "4.2-calling-google-apis",
+    "kind": "term",
+    "front": "`SERVICE_DISABLED`",
+    "back": "The `ErrorInfo` reason for a call to a service that is not enabled for the consumer project. Its `consumer` metadata names the project in which you must enable the service.",
+    "aws": null,
+    "source": {
+      "title": "Enum ErrorReason",
+      "url": "https://docs.cloud.google.com/java/docs/reference/proto-google-common-protos/latest/com.google.api.ErrorReason",
+      "evidence": "The request is calling a disabled service for a consumer. Example of an ErrorInfo when the consumer \"projects/123\" contacting \"pubsub.googleapis.com\" service which is disabled"
+    }
+  },
+  {
+    "id": "api-f040",
+    "note": "4.2-calling-google-apis",
+    "kind": "concept",
+    "front": "Which project does Google check for API activation when code calls a Google Cloud API?",
+    "back": "The same project that Google checks for rate quota. The error for a disabled API names this project. It is not always the project that contains the resource.",
+    "aws": null,
+    "source": {
+      "title": "Quota project overview",
+      "url": "https://docs.cloud.google.com/docs/quotas/quota-project",
+      "evidence": "The project checked for activation is the same project checked for rate quota."
+    }
+  },
+  {
+    "id": "api-f041",
+    "note": "4.2-calling-google-apis",
+    "kind": "term",
+    "front": "Cloud Client Libraries",
+    "back": "The recommended libraries for calling Google Cloud APIs from code. They give idiomatic code, find credentials with Application Default Credentials (ADC), and use gRPC for some APIs.",
+    "aws": "AWS SDKs",
+    "source": {
+      "title": "Client libraries and Cloud APIs explained",
+      "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained",
+      "evidence": "Cloud Client Libraries are the recommended option for accessing Cloud APIs programmatically, where available."
+    }
+  },
+  {
+    "id": "api-f042",
+    "note": "4.2-calling-google-apis",
+    "kind": "term",
+    "front": "Google API Client Libraries",
+    "back": "The earlier type of Google client library. They support only the REST interface, not gRPC. Use them only when no Cloud Client Library exists for your language and API.",
+    "aws": null,
+    "source": {
+      "title": "Client libraries and Cloud APIs explained",
+      "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained",
+      "evidence": "If Cloud Client Libraries aren't available for your preferred language for a specific API, you can use the Google API Client Libraries. These are an earlier type of client library provided by Google."
+    }
+  },
+  {
+    "id": "api-f043",
+    "note": "4.2-calling-google-apis",
+    "kind": "term",
+    "front": "Google APIs Explorer",
+    "back": "A tool on most REST API reference pages that runs API methods without code (the exam guide says API Explorer). It acts on real data, uses its own credentials, and supports only JSON.",
+    "aws": null,
+    "source": {
+      "title": "APIs Explorer overview",
+      "url": "https://developers.google.com/explorer-help",
+      "evidence": "The Google APIs Explorer is a tool available on most REST API method documentation pages that lets you try Google API methods without writing code."
+    }
+  },
+  {
+    "id": "api-f044",
+    "note": "4.2-calling-google-apis",
+    "kind": "concept",
+    "front": "Which project provides quota for a call to a resource-based API, such as Compute Engine?",
+    "back": "The project that contains the resource. You cannot change it. Only a client-based API, such as Cloud Translation, uses a quota project that you can set.",
+    "aws": null,
+    "source": {
+      "title": "Quota project overview",
+      "url": "https://docs.cloud.google.com/docs/quotas/quota-project",
+      "evidence": "You cannot change the quota project used by a request to a resource-based API. The request always uses the project that contains the resource that the request is operating on."
+    }
+  },
+  {
+    "id": "api-f045",
+    "note": "4.2-calling-google-apis",
+    "kind": "concept",
+    "front": "How do you set the quota project for a REST call to a client-based API?",
+    "back": "Send the `x-goog-user-project` header. The caller needs the `serviceusage.services.use` permission on that project, for example from the Service Usage Consumer role.",
+    "aws": null,
+    "source": {
+      "title": "Set the quota project",
+      "url": "https://docs.cloud.google.com/docs/quotas/set-quota-project",
+      "evidence": "You can specify the quota project in a REST request using the `x-goog-user-project` header. The principal making the request must have the required permissions on the quota project."
+    }
+  },
+  {
+    "id": "api-f046",
+    "note": "4.2-calling-google-apis",
+    "kind": "concept",
+    "front": "Which HTTP header should carry an API key in a REST call to a Google Cloud API?",
+    "back": "`x-goog-api-key`. The `key` query parameter also works, but it puts the key in the URL, where URL scans can steal it.",
+    "aws": null,
+    "source": {
+      "title": "Authenticate with REST",
+      "url": "https://docs.cloud.google.com/docs/authentication/rest",
+      "evidence": "To include an API key with a REST API call, use the `x-goog-api-key` HTTP header, as shown in the following example"
+    }
+  },
+  {
+    "id": "api-f047",
+    "note": "4.2-calling-google-apis",
+    "kind": "term",
+    "front": "Authorization key",
+    "back": "An API key that is bound to a service account. A request with this key runs as that service account, like a long-lived access token. Do not use it in production for APIs that create or manage resources.",
+    "aws": null,
+    "source": {
+      "title": "Manage API keys",
+      "url": "https://docs.cloud.google.com/docs/authentication/api-keys",
+      "evidence": "Authorization keys are API keys that are bound to a service account. When you use an authorization key to access an API, your request is processed as if you used the bound service account to make the request."
+    }
+  },
+  {
+    "id": "api-f048",
+    "note": "4.2-calling-google-apis",
+    "kind": "term",
+    "front": "Regional endpoint",
+    "back": "An API endpoint in the format `SERVICE.REGION.rep.googleapis.com`. Google processes the request and ends TLS in that region, which helps with data residency. It usually does not support resources in other regions.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud API endpoint overview",
+      "url": "https://docs.cloud.google.com/docs/security/compliance/endpoints",
+      "evidence": "Regional API endpoints provide access to Google Cloud services through an API endpoint that is scoped to a single Google Cloud region. Traffic sent to a regional endpoint is processed and TLS terminated entirely within the specified region."
+    }
+  },
+  {
+    "id": "api-f049",
+    "note": "4.2-efficient-api-calls",
+    "kind": "term",
+    "front": "`fields` system parameter",
+    "back": "A system parameter that asks for a partial response: the server returns only the fields that you list. It works across Google REST and gRPC APIs, also as the `X-Goog-FieldMask` header. It changes only the response, not the data that you send.",
+    "aws": null,
+    "source": {
+      "title": "System parameters",
+      "url": "https://docs.cloud.google.com/apis/docs/system-parameters",
+      "evidence": "`FieldMask` used for response filtering. If empty, all fields should be returned unless documented otherwise."
+    }
+  },
+  {
+    "id": "api-f050",
+    "note": "4.2-efficient-api-calls",
+    "kind": "concept",
+    "front": "How do you make both the request and the response of an update smaller?",
+    "back": "Send a `PATCH` request with only the changed fields, and add the `fields` parameter. `PATCH` makes the request smaller, and `fields` makes the response smaller.",
+    "aws": null,
+    "source": {
+      "title": "Improve Performance",
+      "url": "https://docs.cloud.google.com/compute/docs/api/how-tos/performance",
+      "evidence": "A patch request only reduces the size of the request. A partial response reduces the size of the response. So to reduce the amount of data sent in both directions, use a patch request with the `fields` parameter."
+    }
+  },
+  {
+    "id": "api-f051",
+    "note": "4.2-efficient-api-calls",
+    "kind": "concept",
+    "front": "What happens to an array field that you send in a `PATCH` request?",
+    "back": "The array in the request replaces the whole existing array. You cannot add, change, or delete single items of an array with `PATCH`.",
+    "aws": null,
+    "source": {
+      "title": "Improve Performance",
+      "url": "https://docs.cloud.google.com/compute/docs/api/how-tos/performance",
+      "evidence": "Patch requests that contain arrays replace the existing array with the one you provide. You cannot modify, add, or delete items in an array in a piecemeal fashion."
+    }
+  },
+  {
+    "id": "api-f052",
+    "note": "4.2-efficient-api-calls",
+    "kind": "term",
+    "front": "Batch request",
+    "back": "One HTTP request, with the `multipart/mixed` content type, that holds many API calls. It reduces network overhead and latency when you must make many calls, for example metadata updates on many Cloud Storage objects.",
+    "aws": null,
+    "source": {
+      "title": "Sending batch requests",
+      "url": "https://docs.cloud.google.com/storage/docs/batch",
+      "evidence": "Grouping together multiple API calls into a single request lets you reduce network overhead and latency when you need to perform many operations."
+    }
+  },
+  {
+    "id": "api-f053",
+    "note": "4.2-efficient-api-calls",
+    "kind": "concept",
+    "front": "How many requests does a batch of n API calls count toward your usage limit?",
+    "back": "n requests, not one. A batch request saves network overhead, but it does not save quota.",
+    "aws": null,
+    "source": {
+      "title": "Batching requests",
+      "url": "https://docs.cloud.google.com/compute/docs/api/how-tos/batch",
+      "evidence": "A set of n requests batched together counts toward your usage limit as n requests, not as one request."
+    }
+  },
+  {
+    "id": "api-f054",
+    "note": "4.2-efficient-api-calls",
+    "kind": "concept",
+    "front": "How does a client know that it reached the end of a paginated list?",
+    "back": "The response has an empty `next_page_token`. A page can have fewer items than `page_size`, or none, before the end, so a short page is not an end signal.",
+    "aws": null,
+    "source": {
+      "title": "AIP-158: Pagination",
+      "url": "https://google.aip.dev/158",
+      "evidence": "If the end of the collection has been reached, the `next_page_token` field must be empty. This is the only way to communicate \"end-of-collection\" to users."
+    }
+  },
+  {
+    "id": "api-f055",
+    "note": "4.2-efficient-api-calls",
+    "kind": "term",
+    "front": "Client library pager",
+    "back": "The iterator that a Cloud Client Library `list` method returns. When you iterate over it, the library requests the next pages for you. Use its `pages` attribute to work one page at a time.",
+    "aws": null,
+    "source": {
+      "title": "Using client libraries",
+      "url": "https://docs.cloud.google.com/compute/docs/api/using-libraries",
+      "evidence": "The client library silently issues any necessary API requests for additional pages to ensure your iterator automatically traverses the full set of results."
+    }
+  },
+  {
+    "id": "api-f056",
+    "note": "4.2-efficient-api-calls",
+    "kind": "term",
+    "front": "ETag",
+    "back": "A version identifier that the server returns with a resource. To cache the resource, keep the ETag with your local copy and send it in `If-None-Match`. A `304 Not Modified` response means that your copy is current.",
+    "aws": null,
+    "source": {
+      "title": "Prevent FHIR resource conflicts using ETags",
+      "url": "https://docs.cloud.google.com/healthcare-api/docs/fhir-etag",
+      "evidence": "If the ETags match, the server responds with `304 Not Modified`, and the client uses its cached copy. This saves bandwidth and reduces the server load."
+    }
+  },
+  {
+    "id": "api-f057",
+    "note": "4.2-efficient-api-calls",
+    "kind": "concept",
+    "front": "What does a BigQuery query cost when BigQuery returns cached results?",
+    "back": "Nothing, but the query still counts against BigQuery quotas. BigQuery keeps cached results for about 24 hours, on a best-effort basis, for the exact same query.",
+    "aws": null,
+    "source": {
+      "title": "Use cached query results",
+      "url": "https://docs.cloud.google.com/bigquery/docs/cached-results",
+      "evidence": "Though you are not charged for queries that use cached results, the queries are subject to the BigQuery quota policies."
+    }
+  },
+  {
+    "id": "api-f058",
+    "note": "4.2-efficient-api-calls",
+    "kind": "concept",
+    "front": "Which kind of API error should a client never retry?",
+    "back": "A permanent error, such as an authorization failure or an invalid request. A retry does not fix the cause and can trap the app in an infinite loop. Log the error and fix the cause.",
+    "aws": null,
+    "source": {
+      "title": "Retry strategy",
+      "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+      "evidence": "Some errors for example, authorization failures or invalid requests are persistent and retrying them without addressing the underlying cause won't be successful and may result in applications getting caught in an infinite loop."
+    }
+  },
+  {
+    "id": "api-f059",
+    "note": "4.2-efficient-api-calls",
+    "kind": "term",
+    "front": "Truncated exponential backoff",
+    "back": "A retry strategy with exponentially longer waits between retries: 1, 2, 4, and more seconds, plus a random fraction (jitter). The wait does not grow past a maximum backoff, and the retries stop after a deadline. The jitter stops many clients from retrying at the same time.",
+    "aws": null,
+    "source": {
+      "title": "Retry failed requests",
+      "url": "https://docs.cloud.google.com/iam/docs/retry-strategy",
+      "evidence": "A small, random delay, known as jitter, is also added between retries. This random delay helps prevent a synchronized wave of retries from multiple clients, also known as the thundering herd problem."
+    }
+  },
+  {
+    "id": "api-f060",
+    "note": "4.2-efficient-api-calls",
+    "kind": "concept",
+    "front": "When is a Cloud Storage object update safe to retry?",
+    "back": "When the request includes a precondition, such as `ifMetagenerationMatch` or an `etag`. Such a request is conditionally idempotent, so a retry is safe only when the condition passes.",
+    "aws": null,
+    "source": {
+      "title": "Retry strategy",
+      "url": "https://docs.cloud.google.com/storage/docs/retry-strategy",
+      "evidence": "A subset of requests are conditionally idempotent, which means they are only idempotent if they include specific optional arguments. Operations that are conditionally safe to retry should only be retried by default if the condition case passes."
+    }
+  }
+]

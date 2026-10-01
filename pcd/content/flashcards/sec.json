@@ -1,0 +1,639 @@
+[
+  {
+    "id": "sec-f001",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "term",
+    "front": "Object Lifecycle Management",
+    "back": "A set of rules on a bucket that delete objects, or move them to a colder storage class, when they match conditions such as age. Each rule has exactly one action and one or more conditions.",
+    "aws": "Amazon S3 object lifecycle",
+    "source": {
+      "title": "Object Lifecycle Management",
+      "url": "https://docs.cloud.google.com/storage/docs/lifecycle",
+      "evidence": "Each lifecycle management configuration contains a set of rules. Each rule contains one action and one or more conditions."
+    }
+  },
+  {
+    "id": "sec-f002",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "concept",
+    "front": "When does a lifecycle `Delete` action act on an object that has a hold or an unmet retention policy?",
+    "back": "Only after you release the hold and the object meets the retention period. A lifecycle rule cannot delete protected data early.",
+    "aws": null,
+    "source": {
+      "title": "Object Lifecycle Management",
+      "url": "https://docs.cloud.google.com/storage/docs/lifecycle",
+      "evidence": "As long as the conditions in the `Delete` action remain satisfied for the object, the `Delete` action occurs after any object hold is removed and any retention policy is fulfilled."
+    }
+  },
+  {
+    "id": "sec-f003",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "term",
+    "front": "Soft delete",
+    "back": "A Cloud Storage feature that keeps deleted or overwritten objects, and deleted buckets, for a retention duration. During that time, no one can delete them permanently, and you can restore them.",
+    "aws": null,
+    "source": {
+      "title": "Soft delete overview",
+      "url": "https://docs.cloud.google.com/storage/docs/soft-delete",
+      "evidence": "The soft delete feature preserves objects and buckets that get deleted or overwritten by retaining them in a soft-deleted state for a specified period of time."
+    }
+  },
+  {
+    "id": "sec-f004",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "concept",
+    "front": "Which soft delete setting does a new Cloud Storage bucket get by default?",
+    "back": "Soft delete is on, with a 7-day retention duration. You can set 7 to 90 days, or set 0 to disable soft delete.",
+    "aws": null,
+    "source": {
+      "title": "Soft delete overview",
+      "url": "https://docs.cloud.google.com/storage/docs/soft-delete",
+      "evidence": "Soft delete is enabled by default for all buckets that support it, with a default retention duration of 7 days."
+    }
+  },
+  {
+    "id": "sec-f005",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "term",
+    "front": "Object Versioning",
+    "back": "A bucket setting that keeps the earlier version of an object as a noncurrent version when you replace or delete the live object. Noncurrent versions stay readable until you delete them. Add a lifecycle rule that limits the number of versions.",
+    "aws": "Amazon S3 object versioning",
+    "source": {
+      "title": "Object Versioning",
+      "url": "https://docs.cloud.google.com/storage/docs/object-versioning",
+      "evidence": "Object Versioning preserves deleted objects as versioned, noncurrent objects that remain accessible in your bucket until explicitly removed."
+    }
+  },
+  {
+    "id": "sec-f006",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "concept",
+    "front": "Which Cloud Storage feature does Google recommend to protect against accidental or malicious deletion?",
+    "back": "Soft delete, not Object Versioning. Object Versioning does not protect against bucket deletion, but soft delete also keeps deleted buckets.",
+    "aws": null,
+    "source": {
+      "title": "Object Versioning",
+      "url": "https://docs.cloud.google.com/storage/docs/object-versioning",
+      "evidence": "We recommend that you use soft delete instead of Object Versioning to protect against permanent data loss from accidental or malicious deletions."
+    }
+  },
+  {
+    "id": "sec-f007",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "term",
+    "front": "Bucket Lock",
+    "back": "A Cloud Storage feature that sets a retention policy on a bucket and can lock that policy. After the lock, you can increase the retention period, but you can never reduce or remove the policy. Use it for records that must be immutable, for example for a regulation.",
+    "aws": "S3 Object Lock",
+    "source": {
+      "title": "Bucket Lock",
+      "url": "https://docs.cloud.google.com/storage/docs/bucket-lock",
+      "evidence": "The feature also lets you lock the bucket's retention policy, permanently preventing the policy from being reduced or removed."
+    }
+  },
+  {
+    "id": "sec-f008",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "concept",
+    "front": "Which object hold keeps a loan document for a set number of years after the loan is paid off?",
+    "back": "An event-based hold, with a retention policy on the bucket. When you release the hold, the retention period starts again for that object. Releasing a temporary hold does not restart the retention period.",
+    "aws": null,
+    "source": {
+      "title": "Object holds",
+      "url": "https://docs.cloud.google.com/storage/docs/object-holds",
+      "evidence": "This behavior lets you use event-based holds in conjunction with retention policies to control retention based on the occurrence of some event, such as holding loan documents for a certain period after the loan was paid."
+    }
+  },
+  {
+    "id": "sec-f009",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "term",
+    "front": "Organization Policy Service",
+    "back": "A service that sets constraints on how you can configure resources in an organization, folder, or project. Descendant resources inherit the policies. IAM decides who can act, and an organization policy decides what any principal can configure.",
+    "aws": "AWS Config",
+    "source": {
+      "title": "Organization Policy overview",
+      "url": "https://docs.cloud.google.com/organization-policy/overview",
+      "evidence": "Organization Policy focuses on what, and lets the administrator set restrictions on specific resources to determine how they can be configured."
+    }
+  },
+  {
+    "id": "sec-f010",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "term",
+    "front": "Public access prevention",
+    "back": "A bucket setting, or the organization policy constraint `storage.publicAccessPrevention`, that stops anyone from making data public through IAM policies or ACLs. It also overrides existing grants to `allUsers` and `allAuthenticatedUsers`.",
+    "aws": "Public access settings for Amazon S3",
+    "source": {
+      "title": "Public access prevention",
+      "url": "https://docs.cloud.google.com/storage/docs/public-access-prevention",
+      "evidence": "When you enforce public access prevention, no one can make data in applicable buckets public through IAM policies or ACLs."
+    }
+  },
+  {
+    "id": "sec-f011",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "concept",
+    "front": "What happens to existing resources that violate a newly enforced organization policy?",
+    "back": "Usually nothing, because most new policies are not retroactive. The resources keep working, and you must fix each violation yourself.",
+    "aws": null,
+    "source": {
+      "title": "Organization Policy overview",
+      "url": "https://docs.cloud.google.com/organization-policy/overview",
+      "evidence": "If a new organization policy sets a restriction on an action or state that a service is already in, the policy is considered to be in violation, but the service won't stop its original behavior."
+    }
+  },
+  {
+    "id": "sec-f012",
+    "note": "1.2-retention-and-org-policy",
+    "kind": "concept",
+    "front": "How can you test an organization policy change without blocking any requests?",
+    "back": "Set the policy in dry-run mode, with `dryRunSpec`. Google Cloud writes each violation to the audit logs but does not deny the request.",
+    "aws": null,
+    "source": {
+      "title": "Test organization policies",
+      "url": "https://docs.cloud.google.com/organization-policy/test-policies",
+      "evidence": "An organization policy in dry-run mode is created and enforced similarly to other organization policies, and violations of the policy are audit logged, but the violating actions aren't denied."
+    }
+  },
+  {
+    "id": "sec-f013",
+    "note": "1.2-protect-and-scan",
+    "kind": "term",
+    "front": "Identity-Aware Proxy (IAP)",
+    "back": "A central authorization layer for apps that users reach over HTTPS. IAP checks the user's identity and IAM role before a request reaches the app. Use it to give employees access to an internal app without a VPN.",
+    "aws": "AWS Application Load Balancer with Cognito, and AWS Verified Access",
+    "source": {
+      "title": "Identity-Aware Proxy overview",
+      "url": "https://docs.cloud.google.com/iap/docs/concepts-overview",
+      "evidence": "IAP lets you establish a central authorization layer for applications accessed by HTTPS, so you can use an application-level access control model instead of relying on network-level firewalls."
+    }
+  },
+  {
+    "id": "sec-f014",
+    "note": "1.2-protect-and-scan",
+    "kind": "concept",
+    "front": "Which IAM role lets a user open a Cloud Run service that IAP protects?",
+    "back": "IAP-secured Web App User (`roles/iap.httpsResourceAccessor`). The Cloud Run Invoker role goes to the IAP service agent, not to the users.",
+    "aws": null,
+    "source": {
+      "title": "Identity-Aware Proxy overview",
+      "url": "https://docs.cloud.google.com/iap/docs/concepts-overview",
+      "evidence": "If the user has the IAP-secured Web App User role on the Google Cloud console project where the resource exists, they're authorized to access the application."
+    }
+  },
+  {
+    "id": "sec-f015",
+    "note": "1.2-protect-and-scan",
+    "kind": "concept",
+    "front": "Where does Google recommend that you enable IAP for a Cloud Run service?",
+    "back": "Directly on the Cloud Run service, with the `--iap` flag. This protects all ingress paths, including the default `run.app` URL. IAP on a load balancer does not protect the `run.app` URL.",
+    "aws": null,
+    "source": {
+      "title": "Configure IAP for Cloud Run",
+      "url": "https://docs.cloud.google.com/run/docs/securing/identity-aware-proxy-cloud-run",
+      "evidence": "By enabling IAP on Cloud Run directly, you can secure traffic with a single click from all ingress paths, including default `run.app` URLs and load balancers."
+    }
+  },
+  {
+    "id": "sec-f016",
+    "note": "1.2-protect-and-scan",
+    "kind": "term",
+    "front": "`x-goog-iap-jwt-assertion` header",
+    "back": "The request header in which IAP sends a signed JWT. Your app verifies the JWT and takes the user identity from it. Do not trust the unsigned identity headers, because someone who bypasses IAP can forge them.",
+    "aws": null,
+    "source": {
+      "title": "Securing your app with signed headers",
+      "url": "https://docs.cloud.google.com/iap/docs/signed-headers-howto",
+      "evidence": "If an attacker bypasses IAP, the attacker can forge the IAP unsigned identity headers, `x-goog-authenticated-user-{email,id}`. The IAP JWT provides a more secure alternative."
+    }
+  },
+  {
+    "id": "sec-f017",
+    "note": "1.2-protect-and-scan",
+    "kind": "term",
+    "front": "Web Security Scanner",
+    "back": "A Security Command Center service that crawls App Engine, GKE, and Compute Engine web apps. It reports issues such as XSS, mixed content, and outdated libraries. It scans only public URLs and IP addresses that are not behind a firewall.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Web Security Scanner",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+      "evidence": "Web Security Scanner identifies security vulnerabilities and misconfigurations in your App Engine, Google Kubernetes Engine (GKE), and Compute Engine web applications."
+    }
+  },
+  {
+    "id": "sec-f018",
+    "note": "1.2-protect-and-scan",
+    "kind": "concept",
+    "front": "Why should Web Security Scanner scan a test environment with a test account?",
+    "back": "The scanner fills in fields, pushes buttons, and clicks links. It can change data, for example post comments or send many sign-up emails.",
+    "aws": null,
+    "source": {
+      "title": "Overview of Web Security Scanner",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview",
+      "evidence": "Because Web Security Scanner populates fields, pushes buttons, clicks links, and performs other user actions, you should use it with caution, particularly if you are scanning production resources."
+    }
+  },
+  {
+    "id": "sec-f019",
+    "note": "1.2-protect-and-scan",
+    "kind": "term",
+    "front": "Artifact Analysis",
+    "back": "A family of services that scans artifacts for known vulnerabilities and stores their metadata (formerly Container Analysis). It scans each image when you push it to Artifact Registry and keeps updating the results with new vulnerability data.",
+    "aws": "Amazon ECR image scanning",
+    "source": {
+      "title": "Artifact Analysis overview",
+      "url": "https://docs.cloud.google.com/artifact-analysis/docs/artifact-analysis",
+      "evidence": "The scanning process is triggered automatically every time you push a new image to Artifact Registry. The vulnerability information is continuously updated when new vulnerabilities are discovered."
+    }
+  },
+  {
+    "id": "sec-f020",
+    "note": "1.2-protect-and-scan",
+    "kind": "term",
+    "front": "On-Demand Scanning",
+    "back": "An Artifact Analysis feature that scans a local image or an Artifact Registry image when you run `gcloud artifacts docker images scan`. Use it in a build to stop images with severe vulnerabilities before you push them. The results are not updated after the scan.",
+    "aws": null,
+    "source": {
+      "title": "Use On-Demand Scanning in your Cloud Build pipeline",
+      "url": "https://docs.cloud.google.com/artifact-analysis/docs/ods-cloudbuild",
+      "evidence": "Using On-Demand Scanning as part of your Cloud Build pipeline allows you to block builds if the container image has vulnerabilities with a severity matching a predefined level."
+    }
+  },
+  {
+    "id": "sec-f021",
+    "note": "1.2-protect-and-scan",
+    "kind": "concept",
+    "front": "Why does adding a new tag to an image not start a new Artifact Analysis scan?",
+    "back": "Artifact Analysis scans an image only once, based on its digest. A new tag does not change the digest. To get a new scan, build and push a new image.",
+    "aws": null,
+    "source": {
+      "title": "Container scanning overview",
+      "url": "https://docs.cloud.google.com/artifact-analysis/docs/container-scanning-overview",
+      "evidence": "The images are scanned only once, based on the image's digest. This means that adding or modifying tags won't trigger new scans."
+    }
+  },
+  {
+    "id": "sec-f022",
+    "note": "1.2-protect-and-scan",
+    "kind": "term",
+    "front": "Security Command Center",
+    "back": "Google Cloud's risk management service. It collects findings from its built-in services, integrated Google Cloud services, and third-party tools, so you can see and prioritize them in one place.",
+    "aws": "Amazon GuardDuty, AWS Security Hub, AWS Config",
+    "source": {
+      "title": "Security Command Center overview",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/security-command-center-overview",
+      "evidence": "Security Command Center is a cloud-based risk management solution that helps security professionals to prevent, detect, and respond to security issues."
+    }
+  },
+  {
+    "id": "sec-f023",
+    "note": "1.2-protect-and-scan",
+    "kind": "concept",
+    "front": "Which image vulnerabilities does Artifact Registry vulnerability assessment report as Security Command Center findings?",
+    "back": "Only `HIGH` and `CRITICAL` vulnerabilities in Artifact Registry images that run on GKE, Cloud Run, or App Engine. Security Command Center does not show lower severities.",
+    "aws": null,
+    "source": {
+      "title": "Enable and use Artifact Registry vulnerability assessment",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/vulnerability-assessment-ar-overview",
+      "evidence": "Artifact Registry vulnerability assessment creates findings for vulnerabilities that are classified as `HIGH` or `CRITICAL` severity. Artifact Registry vulnerability assessment won't generate findings for vulnerabilities that have a lower severity."
+    }
+  },
+  {
+    "id": "sec-f024",
+    "note": "1.2-protect-and-scan",
+    "kind": "concept",
+    "front": "You deploy a fixed image to a new Cloud Run revision, but the vulnerability finding stays active. Why?",
+    "back": "Traffic still goes to the revision with the vulnerable image. Send all traffic to the fixed revision, so that no traffic goes to the vulnerable revision.",
+    "aws": null,
+    "source": {
+      "title": "Enable and use Artifact Registry vulnerability assessment",
+      "url": "https://docs.cloud.google.com/security-command-center/docs/vulnerability-assessment-ar-overview",
+      "evidence": "For Cloud Run services or revisions, allocate traffic to a different revision that is deployed with a fixed image version. Make sure that traffic is not allocated to the revision with the vulnerable image."
+    }
+  },
+  {
+    "id": "sec-f025",
+    "note": "1.2-secrets-and-keys",
+    "kind": "term",
+    "front": "Secret Manager",
+    "back": "A service that stores API keys, passwords, certificates, and other sensitive data. A secret holds metadata and versions, and each version holds the secret data. You grant IAM roles on each secret and pin workloads to versions.",
+    "aws": "AWS Secrets Manager",
+    "source": {
+      "title": "Secret Manager overview",
+      "url": "https://docs.cloud.google.com/secret-manager/docs/overview",
+      "evidence": "Secret Manager is a secrets and credential management service that lets you store and manage sensitive data such as API keys, usernames, passwords, certificates, and more."
+    }
+  },
+  {
+    "id": "sec-f026",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "What happens by default when you destroy a Secret Manager secret version?",
+    "back": "Secret Manager destroys the secret data immediately and permanently. To keep a recovery window, set delayed destruction on the secret.",
+    "aws": null,
+    "source": {
+      "title": "Delay destruction of secret versions",
+      "url": "https://docs.cloud.google.com/secret-manager/docs/delay-destruction-of-secret-versions",
+      "evidence": "By default, when a user chooses to destroy a secret version in Secret Manager, the secret material is destroyed immediately and permanently."
+    }
+  },
+  {
+    "id": "sec-f027",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "Which basic role can read Secret Manager secret values?",
+    "back": "Only Owner. The Editor and Viewer roles do not include `secretmanager.versions.access`. Grant the Secret Manager Secret Accessor role on the secret instead.",
+    "aws": null,
+    "source": {
+      "title": "Access control with IAM",
+      "url": "https://docs.cloud.google.com/secret-manager/docs/access-control",
+      "evidence": "The role `roles/owner` includes the `secretmanager.versions.access` permission, but the `roles/editor` and `roles/viewer` do not."
+    }
+  },
+  {
+    "id": "sec-f028",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "Why should a production workload reference a secret version number instead of the `latest` alias?",
+    "back": "A bad new version behind `latest` can reach all instances at once and cause a service-wide outage. A pinned version changes only through your release process, so you can roll out gradually and roll back.",
+    "aws": null,
+    "source": {
+      "title": "About rotation schedules",
+      "url": "https://docs.cloud.google.com/secret-manager/docs/rotation-recommendations",
+      "evidence": "The `latest` alias, while convenient for development, can be problematic for some production workloads since a bad value could be immediately rolled out and result in a service-wide outage."
+    }
+  },
+  {
+    "id": "sec-f029",
+    "note": "1.2-secrets-and-keys",
+    "kind": "term",
+    "front": "Rotation schedule (Secret Manager)",
+    "back": "A secret setting that sends a `SECRET_ROTATE` message to the secret's Pub/Sub topics at `next_rotation_time`. It does not change the secret. Your subscriber creates the new credential and adds it as a new version.",
+    "aws": null,
+    "source": {
+      "title": "Create rotation schedules in Secret Manager",
+      "url": "https://docs.cloud.google.com/secret-manager/docs/secret-rotation",
+      "evidence": "Secret Manager lets you schedule periodic rotations of your secrets. Secret Manager does this by sending notifications to Pub/Sub topics associated with your secrets, based on the rotation frequency and time that you specify."
+    }
+  },
+  {
+    "id": "sec-f030",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "When does Cloud Run read a secret that a service exposes as an environment variable?",
+    "back": "Once, when the instance starts. A new secret version does not reach running instances, so Google recommends that you pin a version number instead of `latest`.",
+    "aws": null,
+    "source": {
+      "title": "Configure secrets for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/services/secrets",
+      "evidence": "Environment variables are resolved at instance startup time, so if you use this method, Google recommends that you pin the secret to a particular version instead of using `latest` as the version."
+    }
+  },
+  {
+    "id": "sec-f031",
+    "note": "1.2-secrets-and-keys",
+    "kind": "term",
+    "front": "Cloud Key Management Service (Cloud KMS)",
+    "back": "A service that keeps encryption keys in key rings, keys, and key versions. No one can view or export the key material. Apps use it to wrap data encryption keys, and Google Cloud services use it for CMEK.",
+    "aws": "AWS Key Management Service (KMS)",
+    "source": {
+      "title": "Cloud KMS resources",
+      "url": "https://docs.cloud.google.com/kms/docs/resource-hierarchy",
+      "evidence": "For security reasons, no Google Cloud principal can view or export the raw cryptographic key material represented by a key version. Instead, Cloud KMS accesses the key material on your behalf."
+    }
+  },
+  {
+    "id": "sec-f032",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "Why can an app that has only the Cloud KMS Admin role not encrypt data?",
+    "back": "`roles/cloudkms.admin` manages keys, but it does not include the encrypt and decrypt permissions. Grant `roles/cloudkms.cryptoKeyEncrypterDecrypter`, or the Encrypter or Decrypter role, on the key.",
+    "aws": null,
+    "source": {
+      "title": "Encrypting and decrypting data with a symmetric key",
+      "url": "https://docs.cloud.google.com/kms/docs/encrypt-decrypt",
+      "evidence": "One way to permit a user to encrypt or decrypt is to add the user to the `roles/cloudkms.cryptoKeyEncrypter`, `roles/cloudkms.cryptoKeyDecrypter`, or `roles/cloudkms.cryptoKeyEncrypterDecrypter` IAM roles for that key. The `roles/cloudkms.admin` role does not provide these two permissions."
+    }
+  },
+  {
+    "id": "sec-f033",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "What happens to data that is already encrypted when Cloud KMS rotates a symmetric key?",
+    "back": "Nothing. Rotation creates a new key version, but it does not re-encrypt existing data. The old versions stay enabled and billed until you re-encrypt the data and destroy them.",
+    "aws": null,
+    "source": {
+      "title": "Key rotation",
+      "url": "https://docs.cloud.google.com/kms/docs/key-rotation",
+      "evidence": "Rotating keys creates new active key versions, but doesn't re-encrypt your data and doesn't disable or delete previous key versions."
+    }
+  },
+  {
+    "id": "sec-f034",
+    "note": "1.2-secrets-and-keys",
+    "kind": "term",
+    "front": "Envelope encryption",
+    "back": "A pattern in which a local data encryption key (DEK) encrypts the data, and a key encryption key (KEK) in Cloud KMS wraps the DEK. Use it for data larger than 64 KiB, the input limit of the Cloud KMS `Encrypt` method.",
+    "aws": null,
+    "source": {
+      "title": "Envelope encryption",
+      "url": "https://docs.cloud.google.com/kms/docs/envelope-encryption",
+      "evidence": "Cloud Key Management Service was designed to manage KEKs, and thus the maximum data input size for `Encrypt` and `Decrypt` functions is 64 KiB."
+    }
+  },
+  {
+    "id": "sec-f035",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "Which identity needs the Encrypter/Decrypter role on a customer-managed encryption key (CMEK)?",
+    "back": "The service agent of the Google Cloud service that uses the key. The principal that creates or views the resource does not need a role on the key.",
+    "aws": null,
+    "source": {
+      "title": "Customer-managed encryption keys (CMEK)",
+      "url": "https://docs.cloud.google.com/kms/docs/cmek",
+      "evidence": "The principal that creates or views resources in the CMEK-integrated service does not require the Cloud KMS CryptoKey Encrypter/Decrypter (`roles/cloudkms.cryptoKeyEncrypterDecrypter`) for the CMEK used to protect the resource."
+    }
+  },
+  {
+    "id": "sec-f036",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "Why must a Workload Identity Federation provider for GitHub Actions have an attribute condition?",
+    "back": "GitHub, GitLab SaaS, and HCP Terraform use one issuer URL for all organizations. Other organizations can have the same values in some token claims. The condition must accept only tokens from your organization.",
+    "aws": null,
+    "source": {
+      "title": "Configure Workload Identity Federation with deployment pipelines",
+      "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines",
+      "evidence": "GitHub, GitLab SaaS, and HCP Terraform use a single issuer URL across all organizations and some of the claims embedded in OIDC tokens might not be unique to your organization."
+    }
+  },
+  {
+    "id": "sec-f037",
+    "note": "1.2-secrets-and-keys",
+    "kind": "concept",
+    "front": "Why should an app on Google Cloud not read a service account key from Secret Manager?",
+    "back": "To read Secret Manager, the app already needs an identity that Google Cloud recognizes. The app can use that identity to call Google Cloud directly, so it needs no key.",
+    "aws": null,
+    "source": {
+      "title": "Best practices for managing service account keys",
+      "url": "https://docs.cloud.google.com/iam/docs/best-practices-for-managing-service-account-keys",
+      "evidence": "If your application already has an identity that Google Cloud can recognize, then your application can use that identity to authenticate to Google Cloud instead of using a service account key."
+    }
+  },
+  {
+    "id": "sec-f038",
+    "note": "1.2-service-to-service",
+    "kind": "concept",
+    "front": "Which role do you grant a calling service's service account, and where, to call a private Cloud Run service?",
+    "back": "The Cloud Run Invoker role (`roles/run.invoker`), granted on the receiving service. Do not grant it to `allUsers`, and do not grant it on the whole project.",
+    "aws": null,
+    "source": {
+      "title": "Authenticating service-to-service",
+      "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+      "evidence": "you configure the receiving service to accept requests from the calling service by making the calling service's service account a principal on the receiving service. Then you grant that service account the Cloud Run Invoker (`roles/run.invoker`) role."
+    }
+  },
+  {
+    "id": "sec-f039",
+    "note": "1.2-service-to-service",
+    "kind": "concept",
+    "front": "Which audience must an ID token have when you call a traffic tag URL of a Cloud Run service?",
+    "back": "The URL of the service, not the tag URL, or a custom audience that you configure on the service. Cloud Run does not accept a custom domain as the audience.",
+    "aws": null,
+    "source": {
+      "title": "Authenticating service-to-service",
+      "url": "https://docs.cloud.google.com/run/docs/authenticating/service-to-service",
+      "evidence": "If you are not using a custom audience, the `aud` value must remain as the URL of the service, even when making requests to a specific traffic tag."
+    }
+  },
+  {
+    "id": "sec-f040",
+    "note": "1.2-service-to-service",
+    "kind": "concept",
+    "front": "A service with `internal` ingress rejects requests from another Cloud Run service. What is the likely cause?",
+    "back": "Requests from another Cloud Run service count as internal only if they go through a VPC network. One fix: route all traffic of the calling service through Direct VPC egress or a connector, and enable Private Google Access on that subnet.",
+    "aws": null,
+    "source": {
+      "title": "Private networking and Cloud Run",
+      "url": "https://docs.cloud.google.com/run/docs/securing/private-networking",
+      "evidence": "When your destination Cloud Run resource receives traffic from other Cloud Run resources or App Engine, and it uses the \"internal\" or \"internal and load balancing\" ingress setting, the traffic must use the VPC network to be considered internal."
+    }
+  },
+  {
+    "id": "sec-f041",
+    "note": "1.2-service-to-service",
+    "kind": "term",
+    "front": "Direct VPC egress",
+    "back": "A Cloud Run setting that sends outbound traffic from a service or job to a VPC network without a Serverless VPC Access connector. Google recommends it over a connector, because it has lower latency, higher throughput, and no connector VM charges.",
+    "aws": null,
+    "source": {
+      "title": "Compare Direct VPC egress and VPC connectors",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/connecting-vpc",
+      "evidence": "Setup: Cloud Run services and jobs can send traffic to a VPC network without the overhead of managing a Serverless VPC Access connector."
+    }
+  },
+  {
+    "id": "sec-f042",
+    "note": "1.2-service-to-service",
+    "kind": "term",
+    "front": "Private Google Access",
+    "back": "A subnet setting that lets VMs that have only internal IP addresses reach Google APIs and services, including `run.app` URLs. It has no effect on VMs that have external IP addresses.",
+    "aws": null,
+    "source": {
+      "title": "Private Google Access",
+      "url": "https://docs.cloud.google.com/vpc/docs/private-google-access",
+      "evidence": "VM instances that only have internal IP addresses (no external IP addresses) can use Private Google Access. They can reach the external IP addresses of Google APIs and services."
+    }
+  },
+  {
+    "id": "sec-f043",
+    "note": "1.2-service-to-service",
+    "kind": "term",
+    "front": "Private Service Connect",
+    "back": "A feature that lets consumers reach Google APIs, or services that another VPC network publishes, at internal IP addresses in their own VPC network. NAT between consumer and producer removes the need to coordinate IP address ranges.",
+    "aws": "AWS PrivateLink",
+    "source": {
+      "title": "Private Service Connect",
+      "url": "https://docs.cloud.google.com/vpc/docs/private-service-connect",
+      "evidence": "With Private Service Connect, consumers can use their own internal IP addresses to access services without leaving their VPC networks. Traffic remains entirely within Google Cloud."
+    }
+  },
+  {
+    "id": "sec-f044",
+    "note": "1.2-service-to-service",
+    "kind": "term",
+    "front": "Private services access",
+    "back": "A VPC Network Peering connection between your VPC network and a service producer's network. Use it to reach VPC-hosted services, such as Cloud SQL or Memorystore for Redis, by internal IP address. Do not use it to reach Google APIs.",
+    "aws": null,
+    "source": {
+      "title": "Private access options for services",
+      "url": "https://docs.cloud.google.com/vpc/docs/private-access-options",
+      "evidence": "Connect to a Google or third-party managed VPC network through a VPC Network Peering connection."
+    }
+  },
+  {
+    "id": "sec-f045",
+    "note": "1.2-service-to-service",
+    "kind": "concept",
+    "front": "Without network policies, which Pods in a GKE cluster can communicate with each other?",
+    "back": "All of them. Pods in a cluster communicate freely by default. Network policies add Pod-level firewall rules that limit which Pods and Services can reach each other.",
+    "aws": null,
+    "source": {
+      "title": "Control communication between Pods and Services using network policies",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/network-policy",
+      "evidence": "By default, all Pods within a cluster can communicate with each other freely. Network policies create Pod-level firewall rules that determine which Pods and Services can access one another inside your cluster."
+    }
+  },
+  {
+    "id": "sec-f046",
+    "note": "1.2-service-to-service",
+    "kind": "term",
+    "front": "GKE Dataplane V2",
+    "back": "The recommended GKE network plugin, based on Cilium and eBPF, and the default for Autopilot clusters. It has built-in enforcement of Kubernetes network policies. You can enable it only when you create a cluster.",
+    "aws": null,
+    "source": {
+      "title": "Control communication between Pods and Services using network policies",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/network-policy",
+      "evidence": "GKE Dataplane V2 is the recommended network plugin for all clusters and is default for Autopilot clusters."
+    }
+  },
+  {
+    "id": "sec-f047",
+    "note": "1.2-service-to-service",
+    "kind": "term",
+    "front": "Cloud Service Mesh",
+    "back": "A managed service mesh (formerly Anthos Service Mesh and Traffic Director). On GKE, it runs a sidecar proxy next to each workload and uses the Istio APIs. It adds mTLS and authorization policies without app code changes.",
+    "aws": "AWS App Mesh",
+    "source": {
+      "title": "Cloud Service Mesh overview",
+      "url": "https://docs.cloud.google.com/service-mesh/docs/overview",
+      "evidence": "This document is for you if you're a new Cloud Service Mesh user or a continuing Anthos Service Mesh or Traffic Director customer."
+    }
+  },
+  {
+    "id": "sec-f048",
+    "note": "1.2-service-to-service",
+    "kind": "concept",
+    "front": "Why do services still accept plaintext traffic after you add Cloud Service Mesh sidecars?",
+    "back": "The default mTLS mode is `PERMISSIVE`, which accepts both plaintext and mTLS. To accept only mTLS, apply a `PeerAuthentication` policy with mode `STRICT`, for example mesh-wide in `istio-system`.",
+    "aws": null,
+    "source": {
+      "title": "Configure transport security",
+      "url": "https://docs.cloud.google.com/service-mesh/docs/security/configuring-mtls",
+      "evidence": "To prevent all your services in the mesh from accepting plain-text traffic, set a mesh-wide `PeerAuthentication` policy with the mTLS mode set to `STRICT` (the default is `PERMISSIVE`)."
+    }
+  },
+  {
+    "id": "sec-f049",
+    "note": "1.2-service-to-service",
+    "kind": "term",
+    "front": "VPC Service Controls",
+    "back": "A service that puts a security perimeter around Google Cloud services, such as Cloud Storage and BigQuery, to reduce the risk of data exfiltration. It works independently of IAM, and Google recommends that you use both.",
+    "aws": null,
+    "source": {
+      "title": "Overview of VPC Service Controls",
+      "url": "https://docs.cloud.google.com/vpc-service-controls/docs/overview",
+      "evidence": "VPC Service Controls provides an extra layer of security defense for Google Cloud services that is independent of Identity and Access Management (IAM)."
+    }
+  }
+]

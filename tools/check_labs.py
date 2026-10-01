@@ -2,7 +2,8 @@
 """Check lab commands against the locally installed gcloud CLI.
 
 Usage:
-  python3 tools/check_labs.py                 # all labs
+  python3 tools/check_labs.py                 # all labs of the PCA guide
+  python3 tools/check_labs.py --guide pcd     # all labs of the PCD guide (pcd/labs/)
   python3 tools/check_labs.py labs/12-ha-vpn  # one lab folder (or file)
 
 For every gcloud command in lab READMEs (fenced shell blocks) and *.sh files:
@@ -25,6 +26,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import fetch_doc  # noqa: E402
+import guides  # noqa: E402
 
 REF = "https://docs.cloud.google.com/sdk/gcloud/reference/"
 GLOBAL_FLAGS = {"--access-token-file", "--account", "--billing-project", "--configuration", "--flags-file",
@@ -354,7 +356,7 @@ def check_file(path, cmds, leaves, problems):
 
 
 def main():
-    targets = sys.argv[1:] or [os.path.join(ROOT, "labs")]
+    targets = guides.strip_guide(sys.argv[1:]) or [guides.labs_dir(guides.select(sys.argv[1:]))]
     files = []
     for t in targets:
         if os.path.isdir(t):

@@ -1,0 +1,3600 @@
+{
+  "categories": [
+    {
+      "id": "compute",
+      "name": "Compute and serverless",
+      "short": "Compute",
+      "blurb": "Where a container or an app runs: Cloud Run, GKE, Compute Engine, and the cost options for each.",
+      "intro": "Platform questions ask where a container or an app runs. Google recommends serverless first, GKE Autopilot when the app needs Kubernetes, and Compute Engine for full OS control.",
+      "decide": [
+        {
+          "if": "A stateless HTTP or gRPC API has spiky traffic, and nothing in the app needs Kubernetes",
+          "then": [
+            "cloud-run"
+          ],
+          "why": "Google recommends serverless first, and a Cloud Run service scales out fast and to zero."
+        },
+        {
+          "if": "The app calls Kubernetes APIs, uses custom resources, or deploys with Helm",
+          "then": [
+            "gke"
+          ],
+          "why": "Cloud Run does not support Kubernetes, and Autopilot is the recommended GKE mode."
+        },
+        {
+          "if": "A legacy app needs a specific OS, kernel, or software license",
+          "then": [
+            "compute-engine"
+          ],
+          "why": "Compute Engine gives you control of the full VM, the OS, and all software."
+        },
+        {
+          "if": "Single-purpose code must run on an HTTP request or an event, and the team deploys only source code",
+          "then": [
+            "cloud-run-functions"
+          ],
+          "why": "A Cloud Run function is a Cloud Run service that you deploy from function source code."
+        },
+        {
+          "if": "A containerized task runs to completion for hours and serves no requests",
+          "then": [
+            "cloud-run"
+          ],
+          "why": "A Cloud Run job has no endpoint, and a task can run for up to 168 hours."
+        },
+        {
+          "if": "Batch or fault-tolerant work must run at the lowest compute price",
+          "then": [
+            "spot-vms"
+          ],
+          "why": "Spot VMs cost up to 91% less, but Compute Engine can preempt them at any time."
+        },
+        {
+          "if": "A public TCP or UDP server, for example an email server",
+          "then": [
+            "gke",
+            "compute-engine"
+          ],
+          "why": "Cloud Run services accept only HTTP, HTTP/2, WebSockets, and gRPC."
+        }
+      ]
+    },
+    {
+      "id": "build",
+      "name": "Build, artifacts, and deployment",
+      "short": "Build and deploy",
+      "blurb": "How code becomes a trusted image in a registry and reaches Cloud Run or GKE.",
+      "intro": "Pipeline questions ask how code becomes a tested, scanned, and trusted image. Cloud Build runs the steps, Artifact Registry stores the image, Binary Authorization checks it at deploy time, and Cloud Deploy promotes it.",
+      "decide": [
+        {
+          "if": "Each push to a branch must run tests, build an image, and push it to a registry",
+          "then": [
+            "cloud-build",
+            "artifact-registry"
+          ],
+          "why": "A repository trigger starts a build, and the images field pushes the image to Artifact Registry after all steps complete."
+        },
+        {
+          "if": "A pipeline still pushes images to Container Registry (gcr.io)",
+          "then": [
+            "artifact-registry"
+          ],
+          "why": "Container Registry shut down on March 18, 2025, and Artifact Registry is the recommended registry."
+        },
+        {
+          "if": "Stored images must be watched for new CVEs while they are in use",
+          "then": [
+            "artifact-analysis"
+          ],
+          "why": "Automatic scanning scans each pushed image and updates the results when new vulnerability data arrives."
+        },
+        {
+          "if": "A build must stop an image with critical vulnerabilities before the push",
+          "then": [
+            "artifact-analysis",
+            "cloud-build"
+          ],
+          "why": "On-Demand Scanning scans a local image in a build step, so the build can fail."
+        },
+        {
+          "if": "Only images that Cloud Build built can deploy to Cloud Run or GKE",
+          "then": [
+            "binary-authorization",
+            "cloud-build"
+          ],
+          "why": "Cloud Build signs attestations, and a policy can require the built-by-cloud-build attestor."
+        },
+        {
+          "if": "One release must move through test, staging, and production, with an approval and a canary",
+          "then": [
+            "cloud-deploy"
+          ],
+          "why": "Cloud Deploy delivers a release to a series of targets in a promotion sequence."
+        },
+        {
+          "if": "A build must reach a database or Git server that has only a private IP address",
+          "then": [
+            "cloud-build"
+          ],
+          "why": "A private pool can peer with your VPC network, and the default pool cannot."
+        }
+      ]
+    },
+    {
+      "id": "devtools",
+      "name": "Developer tools and AI assistance",
+      "short": "Dev tools",
+      "blurb": "Where developers write, run, and test code, how code calls Google Cloud APIs, and the AI assistants that help.",
+      "intro": "Developer tool questions ask which tool fits a task and how each tool gets credentials. The gcloud CLI and the client libraries use separate credentials, emulators replace services in local tests, and Gemini assistants help in the IDE and the console.",
+      "decide": [
+        {
+          "if": "Code on a workstation must call Google Cloud APIs as the developer, or as a service account, without a key",
+          "then": [
+            "client-libraries",
+            "gcloud-sdk"
+          ],
+          "why": "The client libraries read ADC, which gcloud auth application-default login sets up, with impersonation if needed."
+        },
+        {
+          "if": "Unit tests must run against Pub/Sub, Firestore, Bigtable, or Spanner on the local machine",
+          "then": [
+            "gcloud-sdk"
+          ],
+          "why": "The gcloud emulators run local copies, and an environment variable sends client library calls to them."
+        },
+        {
+          "if": "A call fails with SERVICE_DISABLED",
+          "then": [
+            "service-usage"
+          ],
+          "why": "Enable the API in the consumer project that the error names, for example with gcloud services enable."
+        },
+        {
+          "if": "Developers need a standard, secured environment in the company VPC network",
+          "then": [
+            "cloud-workstations"
+          ],
+          "why": "Each workstation runs on a VM in your project, from a shared configuration."
+        },
+        {
+          "if": "A quick terminal with tools and credentials ready, for interactive work only",
+          "then": [
+            "cloud-shell"
+          ],
+          "why": "Cloud Shell is ready in the browser, but non-interactive sessions end after 40 minutes."
+        },
+        {
+          "if": "A developer wants AI help to write code and unit tests in the IDE",
+          "then": [
+            "gemini-code-assist"
+          ],
+          "why": "Gemini Code Assist completes code, chats about it, and generates unit tests from selected code."
+        },
+        {
+          "if": "An AI agent must use Google Cloud resources, such as BigQuery or Cloud Run, as tools",
+          "then": [
+            "mcp-servers"
+          ],
+          "why": "Google Cloud remote MCP servers expose tools over HTTP, with IAM checks on each call."
+        }
+      ]
+    },
+    {
+      "id": "apis",
+      "name": "APIs",
+      "short": "APIs",
+      "blurb": "Managed gateways in front of your own APIs: keys, tokens, rate limits, versions, and analytics.",
+      "intro": "API management questions ask which gateway fits the API consumers and the backend. API Gateway fits serverless backends with keys, JWTs, and simple quotas, and Apigee fits partner APIs with products, policies, and analytics.",
+      "decide": [
+        {
+          "if": "Cloud Run or Cloud Run functions backends need API keys, JWT checks, and per-minute quotas, with pay-per-use pricing",
+          "then": [
+            "api-gateway"
+          ],
+          "why": "API Gateway is a fully managed, pay-per-use gateway that Google designed for serverless backends."
+        },
+        {
+          "if": "Partners and third parties use the API, and they need a developer portal, API products, or monetization",
+          "then": [
+            "apigee"
+          ],
+          "why": "Apigee has developer portals, API products, and monetization, and API Gateway has no portal."
+        },
+        {
+          "if": "Each partner app must stay under a contract limit of requests per day or per month",
+          "then": [
+            "apigee"
+          ],
+          "why": "The Quota policy counts requests per app or developer over periods from minutes to months."
+        },
+        {
+          "if": "The backend must be protected from sudden traffic spikes from all clients",
+          "then": [
+            "apigee"
+          ],
+          "why": "The SpikeArrest policy limits the request rate to the backend for all clients."
+        },
+        {
+          "if": "Backends run on premises and in other clouds, at very high API volume",
+          "then": [
+            "apigee"
+          ],
+          "why": "Apigee runs in Google Cloud, on premises, or in a hybrid deployment."
+        },
+        {
+          "if": "The gateway proxy must run next to the app, in your private network, or on your own machine for tests",
+          "then": [
+            "cloud-endpoints"
+          ],
+          "why": "With Cloud Endpoints, you deploy and operate the ESPv2 proxy yourself."
+        }
+      ]
+    },
+    {
+      "id": "integration",
+      "name": "Events, messaging, and orchestration",
+      "short": "Integration",
+      "blurb": "Asynchronous messages, event routing, task queues, schedules, and workflows between services.",
+      "intro": "Integration questions ask how services work together without a direct, synchronous call. Pub/Sub fans out messages, Eventarc routes events as CloudEvents, Cloud Tasks calls one named endpoint at a controlled rate, and Workflows controls a multi-step flow.",
+      "decide": [
+        {
+          "if": "One event must reach several independent consumers, and the producer does not know them",
+          "then": [
+            "pub-sub"
+          ],
+          "why": "Pub/Sub uses implicit invocation, and each subscription gets a copy of every message."
+        },
+        {
+          "if": "A Cloud Run service must react to a change in a Google Cloud service, such as a new object in a bucket",
+          "then": [
+            "eventarc"
+          ],
+          "why": "An Eventarc trigger filters the events and delivers each one to Cloud Run as a CloudEvent over HTTP."
+        },
+        {
+          "if": "A third-party API must not get more calls than it can handle",
+          "then": [
+            "cloud-tasks"
+          ],
+          "why": "A Cloud Tasks queue sets the dispatch rate, the concurrency, and the retries."
+        },
+        {
+          "if": "One call must run once at a set time in the future",
+          "then": [
+            "cloud-tasks"
+          ],
+          "why": "Cloud Tasks can schedule a task up to 30 days in advance, and Pub/Sub has no scheduled delivery."
+        },
+        {
+          "if": "Several services must run in a defined order, with branches, retries, and a wait for a human approval",
+          "then": [
+            "workflows"
+          ],
+          "why": "Workflows controls the flow in one place, and a callback waits without polling."
+        },
+        {
+          "if": "A call must run on a repeating schedule",
+          "then": [
+            "cloud-scheduler"
+          ],
+          "why": "Cloud Scheduler runs cron jobs with HTTP, Pub/Sub, or App Engine targets."
+        },
+        {
+          "if": "Messages must land in BigQuery or Cloud Storage with no subscriber code",
+          "then": [
+            "pub-sub"
+          ],
+          "why": "A BigQuery or Cloud Storage subscription writes each message with no extra processing."
+        }
+      ]
+    },
+    {
+      "id": "networking",
+      "name": "Networking and service-to-service traffic",
+      "short": "Networking",
+      "blurb": "Load balancers, edge caching, private paths to Google APIs and managed services, and secure traffic between services.",
+      "intro": "Networking questions ask how traffic reaches an app and how services reach each other privately. Pick the load balancer by protocol and client location, then pick the private path that matches the target: Google APIs, a published service, or a managed database.",
+      "decide": [
+        {
+          "if": "A Cloud Run service needs a custom domain with your own certificate, Cloud CDN, or one IP address for several regions",
+          "then": [
+            "alb"
+          ],
+          "why": "A global external Application Load Balancer with serverless NEGs gives one anycast IP address and sends each user to the closest region."
+        },
+        {
+          "if": "UDP or other non-HTTP traffic, or the backend must see the client source IP address",
+          "then": [
+            "nlb"
+          ],
+          "why": "A passthrough Network Load Balancer handles any IP protocol and keeps the client source IP address."
+        },
+        {
+          "if": "Static files and public responses must load fast for users far from the backend",
+          "then": [
+            "cloud-cdn"
+          ],
+          "why": "Cloud CDN caches responses at the edge on a global external Application Load Balancer."
+        },
+        {
+          "if": "A Cloud Run service must reach a private IP address, such as a Memorystore instance",
+          "then": [
+            "serverless-vpc"
+          ],
+          "why": "Direct VPC egress sends Cloud Run traffic into the VPC network, and Google recommends it over a connector."
+        },
+        {
+          "if": "Traffic between microservices on GKE must use mTLS and rules on workload identity, with no code change",
+          "then": [
+            "cloud-service-mesh"
+          ],
+          "why": "Cloud Service Mesh runs a sidecar proxy that encrypts traffic and enforces authorization policies."
+        },
+        {
+          "if": "Code must reach Cloud SQL, AlloyDB, or Memorystore for Redis at a private IP address",
+          "then": [
+            "psa"
+          ],
+          "why": "Private services access connects your VPC network to these services through VPC Network Peering."
+        },
+        {
+          "if": "VMs with no external IP addresses, or clients in another network, must reach Google APIs privately",
+          "then": [
+            "pga",
+            "psc"
+          ],
+          "why": "Private Google Access works per subnet, and a Private Service Connect endpoint gives an internal IP address that you choose."
+        }
+      ]
+    },
+    {
+      "id": "storage",
+      "name": "Object, file, and block storage",
+      "short": "Storage",
+      "blurb": "Objects in buckets, shared file systems, and disks: access, uploads, retention, and protection.",
+      "intro": "Storage questions ask where files and objects go and how users get to them. Cloud Storage keeps objects and gives signed URLs to users without accounts, Filestore gives a shared NFS file system, and a disk attaches to one VM or Pod.",
+      "decide": [
+        {
+          "if": "Users without Google accounts must download or upload one object for a short time",
+          "then": [
+            "cloud-storage"
+          ],
+          "why": "A V4 signed URL gives anyone who has it time-limited access to one object, and public access prevention does not block it."
+        },
+        {
+          "if": "A plain HTML form must upload a file directly to a bucket, with a limit on the size or the content type",
+          "then": [
+            "cloud-storage"
+          ],
+          "why": "HTML forms do not support signed URLs. A signed policy document authorizes the upload and can limit the size and the content type."
+        },
+        {
+          "if": "Two workers must not overwrite the same object, or a duplicate job must not replace the first result",
+          "then": [
+            "cloud-storage"
+          ],
+          "why": "With a generation-match precondition, the second write fails with 412 Precondition Failed."
+        },
+        {
+          "if": "Deleted or overwritten objects, and a deleted bucket, must be recoverable for up to 90 days",
+          "then": [
+            "cloud-storage"
+          ],
+          "why": "Soft delete keeps them for 7 to 90 days, and Google recommends it instead of Object Versioning."
+        },
+        {
+          "if": "Nobody may delete or change the records for a fixed number of years, because of a regulation",
+          "then": [
+            "cloud-storage"
+          ],
+          "why": "A locked retention policy blocks deletion and replacement until each object is older than the period, and nobody can remove the lock."
+        },
+        {
+          "if": "Several VMs, GKE Pods, or Cloud Run instances need one shared POSIX file system",
+          "then": [
+            "filestore"
+          ],
+          "why": "Filestore is a managed NFS file server, and Cloud Run mounts it as an NFS volume."
+        },
+        {
+          "if": "A VM or a GKE Pod needs a durable disk, or fast scratch space",
+          "then": [
+            "block-storage"
+          ],
+          "why": "Hyperdisk and Persistent Disk are durable block devices. Local SSD is fast, but its data is lost when the VM stops."
+        }
+      ]
+    },
+    {
+      "id": "databases",
+      "name": "Databases and caches",
+      "short": "Databases",
+      "blurb": "Relational and NoSQL databases and in-memory caches: choice, schema, consistency, and connections.",
+      "intro": "Database questions give a data model, a scale, and a consistency need. Cloud SQL fits general-purpose relational apps, AlloyDB fits demanding PostgreSQL apps, Spanner scales relational writes horizontally, Bigtable and Firestore are NoSQL databases, and Memorystore caches hot data.",
+      "decide": [
+        {
+          "if": "A general-purpose relational app uses MySQL, PostgreSQL, or SQL Server, with up to 64 TB of data",
+          "then": [
+            "cloud-sql"
+          ],
+          "why": "Google suggests Cloud SQL for general-purpose SQL databases. One primary instance takes all writes."
+        },
+        {
+          "if": "Relational writes must scale past one primary instance, with ACID transactions across rows",
+          "then": [
+            "spanner"
+          ],
+          "why": "Spanner scales horizontally, and its read and write throughput grow linearly with compute capacity."
+        },
+        {
+          "if": "A PostgreSQL app needs fast analytics on live transactional data, with no ETL pipeline",
+          "then": [
+            "alloydb"
+          ],
+          "why": "The AlloyDB columnar engine keeps selected columns in memory in a column format, which speeds up scans and aggregates."
+        },
+        {
+          "if": "Terabytes of time-series or key-value data need high write throughput and low-latency reads by key",
+          "then": [
+            "bigtable"
+          ],
+          "why": "Bigtable is built for large amounts of single-keyed data, and the row key is its only index."
+        },
+        {
+          "if": "A mobile app must work offline and sync later, and dashboards need real-time updates, with no capacity planning",
+          "then": [
+            "firestore"
+          ],
+          "why": "Firestore is a serverless document database with real-time listeners and offline support."
+        },
+        {
+          "if": "All instances of an app need one shared cache with sub-millisecond access",
+          "then": [
+            "memorystore"
+          ],
+          "why": "The memory of one instance is not shared. All instances reach Memorystore through the VPC network."
+        },
+        {
+          "if": "The app must read and write its data during a region outage, with no manual failover",
+          "then": [
+            "spanner",
+            "firestore"
+          ],
+          "why": "A Spanner multi-region configuration and a Firestore multi-region location replicate synchronously across regions."
+        }
+      ]
+    },
+    {
+      "id": "analytics",
+      "name": "Analytics and data pipelines",
+      "short": "Analytics",
+      "blurb": "Writes to BigQuery from code, Pub/Sub, and pipelines, and large reads for analytics and ML.",
+      "intro": "Analytics questions give a data source, a latency need, and a rule for duplicates, and ask for the write path into BigQuery. Load jobs fit batches, the Storage Write API fits streams from code, a Pub/Sub BigQuery subscription needs no code, and Dataflow transforms the data first.",
+      "decide": [
+        {
+          "if": "Files arrive in batches, and the load must cost as little as possible",
+          "then": [
+            "bigquery"
+          ],
+          "why": "Batch load jobs from Cloud Storage are free when they use the shared slot pool."
+        },
+        {
+          "if": "Code streams rows that must be ready for queries at once, with no duplicates after retries",
+          "then": [
+            "bigquery"
+          ],
+          "why": "A Storage Write API stream of committed type, with an offset in each append, gives exactly-once delivery."
+        },
+        {
+          "if": "Pub/Sub messages already match the table schema and need no processing",
+          "then": [
+            "pub-sub",
+            "bigquery"
+          ],
+          "why": "A BigQuery subscription writes each message to the table with no subscriber code, with at-least-once delivery."
+        },
+        {
+          "if": "Messages need complex transforms, windows, or aggregation before the write",
+          "then": [
+            "dataflow"
+          ],
+          "why": "A Dataflow pipeline transforms the data, and BigQueryIO with STORAGE_WRITE_API writes it exactly once."
+        },
+        {
+          "if": "A job must read hundreds of millions of rows from a table quickly",
+          "then": [
+            "bigquery"
+          ],
+          "why": "The Storage Read API reads in parallel streams, with column projection and row filters."
+        },
+        {
+          "if": "A simple model must train on data that is already in BigQuery",
+          "then": [
+            "bigquery"
+          ],
+          "why": "BigQuery ML creates and runs models with GoogleSQL, so the data stays in BigQuery."
+        }
+      ]
+    },
+    {
+      "id": "security",
+      "name": "Security, secrets, and keys",
+      "short": "Security",
+      "blurb": "Secrets, encryption keys, access to web apps, vulnerability findings, and guardrails for resources and data.",
+      "intro": "Security questions ask where a credential belongs, who may open an app, and how to find and fix a vulnerability. Secret Manager stores secrets, Cloud KMS manages keys, IAP checks users before they reach an app, and Web Security Scanner and Security Command Center report issues.",
+      "decide": [
+        {
+          "if": "An app needs a password, an API key, or a certificate at runtime",
+          "then": [
+            "secret-manager"
+          ],
+          "why": "Secret Manager stores secret versions, with IAM on each secret and rotation schedules."
+        },
+        {
+          "if": "An app must encrypt data with a key that no one can view or export",
+          "then": [
+            "cloud-kms"
+          ],
+          "why": "In envelope encryption, a key encryption key in Cloud KMS wraps the local data encryption key, and it never leaves Cloud KMS."
+        },
+        {
+          "if": "Only signed-in employees or partners may open an internal web app, with no VPN",
+          "then": [
+            "iap"
+          ],
+          "why": "IAP checks the user's identity and IAM role before a request reaches the app."
+        },
+        {
+          "if": "A running public web app must be tested for XSS, mixed content, and outdated libraries",
+          "then": [
+            "web-security-scanner"
+          ],
+          "why": "Web Security Scanner crawls public App Engine, GKE, and Compute Engine apps and reports these issues."
+        },
+        {
+          "if": "Findings from many services must be seen and prioritized in one place",
+          "then": [
+            "scc"
+          ],
+          "why": "Security Command Center collects findings from its built-in services, from other Google Cloud services, and from third-party tools."
+        },
+        {
+          "if": "No project may allow public buckets or create service account keys, also when IAM allows it",
+          "then": [
+            "org-policy"
+          ],
+          "why": "IAM controls who can act on a resource. An organization policy controls which configurations are allowed."
+        },
+        {
+          "if": "Data in Cloud Storage or BigQuery must not leave a perimeter through Google Cloud APIs",
+          "then": [
+            "vpc-sc"
+          ],
+          "why": "VPC Service Controls puts a perimeter around Google Cloud services to reduce the risk of data exfiltration."
+        }
+      ]
+    },
+    {
+      "id": "identity",
+      "name": "Identity and access",
+      "short": "Identity",
+      "blurb": "How code, developers, pipelines, and end users prove who they are, and which roles they get.",
+      "intro": "Identity questions ask which identity makes a call and how it gets credentials. Code on Google Cloud uses an attached service account, external workloads use Workload Identity Federation, customers sign in with Identity Platform, and IAM roles at the smallest scope control access.",
+      "decide": [
+        {
+          "if": "Code on Cloud Run, GKE, or Compute Engine calls Google APIs",
+          "then": [
+            "service-accounts"
+          ],
+          "why": "Google lists an attached user-managed service account as the most secure way, and the code stores no secret."
+        },
+        {
+          "if": "A developer must test code locally with the permissions of a service account, without a key",
+          "then": [
+            "service-accounts"
+          ],
+          "why": "Impersonation with the Service Account Token Creator role gives short-lived credentials."
+        },
+        {
+          "if": "A pipeline on GitHub Actions, AWS, or on premises must deploy to Google Cloud, and key creation is blocked",
+          "then": [
+            "wif"
+          ],
+          "why": "Workload Identity Federation exchanges the external credential for a short-lived token, with no service account key."
+        },
+        {
+          "if": "Customers sign in with email, social providers, or their company's SAML provider, with MFA and tenants",
+          "then": [
+            "identity-platform"
+          ],
+          "why": "Identity Platform is a CIAM platform with SAML and OIDC providers, MFA, and multi-tenancy."
+        },
+        {
+          "if": "The app must read or change a user's data in a Google API, such as Drive",
+          "then": [
+            "oauth"
+          ],
+          "why": "The OAuth 2.0 authorization code flow gets the user's consent to scopes, and access_type=offline adds a refresh token."
+        },
+        {
+          "if": "An app must connect to Cloud SQL or AlloyDB with IAM authorization and encryption, without authorized networks",
+          "then": [
+            "auth-proxies"
+          ],
+          "why": "The Auth Proxy and the Language Connectors authorize with IAM and encrypt the traffic."
+        },
+        {
+          "if": "A role must apply only to one bucket prefix, or end at a set time",
+          "then": [
+            "iam"
+          ],
+          "why": "An IAM condition adds a CEL expression, such as an expiry time or a resource name prefix, to a role binding."
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "name": "Generative AI",
+      "short": "AI",
+      "blurb": "Calls to Gemini models from application code: credentials, endpoints, output control, tools, and cost.",
+      "intro": "Generative AI questions ask how application code calls Gemini models and how to control the result. Agent Platform gives credentials, endpoints, quotas, and batch jobs, and the request settings control the output format, the tools, and safety.",
+      "decide": [
+        {
+          "if": "A production app on Cloud Run must call Gemini",
+          "then": [
+            "agent-platform"
+          ],
+          "why": "Google recommends ADC with the attached service account for production, and an API key only for tests."
+        },
+        {
+          "if": "ML processing must stay in the European Union or the United States",
+          "then": [
+            "agent-platform"
+          ],
+          "why": "A multi-region endpoint keeps ML processing in its jurisdiction. You cannot control where the global endpoint processes a request."
+        },
+        {
+          "if": "The app needs valid JSON with the required fields every time",
+          "then": [
+            "gemini-models"
+          ],
+          "why": "A response_schema, together with the application/json MIME type, makes the output follow the schema."
+        },
+        {
+          "if": "The model must use live data from your own API, such as an order status",
+          "then": [
+            "gemini-models"
+          ],
+          "why": "In function calling, the model returns the function name and the arguments, and your app runs the function."
+        },
+        {
+          "if": "Many prompts need no real-time answer, and cost matters",
+          "then": [
+            "agent-platform"
+          ],
+          "why": "Batch inference costs 50% less than real-time inference, and one job holds up to 200,000 requests."
+        },
+        {
+          "if": "Requests on Standard pay-as-you-go fail with 429 errors",
+          "then": [
+            "agent-platform"
+          ],
+          "why": "The error shows temporary contention for shared capacity. Retry with exponential backoff, and use the global endpoint."
+        }
+      ]
+    },
+    {
+      "id": "ops",
+      "name": "Observability",
+      "short": "Observability",
+      "blurb": "Logs, metrics, traces, errors, and profiles: how code emits them and which tool answers which question.",
+      "intro": "Observability questions ask how code emits telemetry and which tool answers a question. Cloud Logging stores log entries, Cloud Monitoring stores metrics and alerts, Cloud Trace shows the spans of a request, Error Reporting groups exceptions, and Cloud Profiler finds expensive functions.",
+      "decide": [
+        {
+          "if": "A developer needs the exact error message of one request",
+          "then": [
+            "cloud-logging"
+          ],
+          "why": "The Logs Explorer finds and filters individual log entries."
+        },
+        {
+          "if": "A team needs a count of errors for each hour or each version, or a join of logs with traces",
+          "then": [
+            "cloud-logging"
+          ],
+          "why": "Observability Analytics runs SQL on upgraded log buckets. The Logs Explorer does not aggregate."
+        },
+        {
+          "if": "An error count or a latency value must come from logs that the app already writes, with no code change",
+          "then": [
+            "cloud-monitoring"
+          ],
+          "why": "A log-based metric turns matching log entries into a Cloud Monitoring metric."
+        },
+        {
+          "if": "Some requests are slow, and nobody knows which service or call is slow",
+          "then": [
+            "cloud-trace"
+          ],
+          "why": "Cloud Trace shows the latency of each span of a request as a waterfall graph."
+        },
+        {
+          "if": "A team must see which exceptions are new and how often they occur",
+          "then": [
+            "error-reporting"
+          ],
+          "why": "Error Reporting groups error events from log entries with stack traces and from its API and client libraries."
+        },
+        {
+          "if": "A service uses too much CPU or memory under normal load",
+          "then": [
+            "cloud-profiler"
+          ],
+          "why": "Cloud Profiler shows the functions that use the most CPU time or memory, from production data."
+        },
+        {
+          "if": "The on-call developer needs probable root causes across logs, metrics, and configuration",
+          "then": [
+            "gemini-cloud-assist"
+          ],
+          "why": "A Gemini Cloud Assist investigation (Preview) gives observations, hypotheses, and next steps."
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "compute-engine",
+      "name": "Compute Engine",
+      "category": "compute",
+      "patterns": [
+        "Compute Engine(?! default)",
+        "\\bMIGs?\\b",
+        "managed instance groups?"
+      ],
+      "what": "Compute Engine runs VMs on Google infrastructure. You choose the image, the machine type, and the disks, and you manage the OS and all software.",
+      "cues": [
+        "A legacy app has specific licensing, OS, kernel, or networking requirements, for example a Windows app or SAP HANA.",
+        "A group of identical VMs must keep serving during a zone failure.",
+        "A public TCP or UDP server cannot run on Cloud Run, and the team does not need Kubernetes."
+      ],
+      "traps": [
+        "A regional MIG sized for normal load adds no instances after a zone outage without autoscaling. Overprovision it by 50% for three zones.",
+        "Compute Engine does not make rightsizing recommendations for GKE node VMs. Use the VPA recommendations instead."
+      ],
+      "confused": [
+        {
+          "with": "cloud-run",
+          "tell": "Cloud Run bills per use and scales to zero, but it gives no OS control, and its services accept only HTTP-family protocols."
+        },
+        {
+          "with": "gke",
+          "tell": "Pick GKE for containers that need Kubernetes features. Pick Compute Engine when the OS, the kernel, or a license is the requirement."
+        }
+      ],
+      "aws": "Amazon EC2, EC2 Auto Scaling",
+      "docs": {
+        "title": "Compute Engine overview",
+        "url": "https://docs.cloud.google.com/compute/docs/overview"
+      },
+      "sources": [
+        "1.1-platform-choice",
+        "1.1-resources-and-cost",
+        "1.1-regions-and-replication"
+      ]
+    },
+    {
+      "id": "spot-vms",
+      "name": "Spot VMs",
+      "category": "compute",
+      "formerly": "Preemptible VMs",
+      "patterns": [
+        "Spot VMs?",
+        "(?i)preemptible VMs?",
+        "Spot Pods?"
+      ],
+      "guidePatterns": [
+        "(?i)optimizing for cost"
+      ],
+      "what": "Spot VMs are the latest version of preemptible VMs. They cost up to 91% less than standard VMs, but Compute Engine can preempt them at any time, and no SLA covers them.",
+      "cues": [
+        "Batch or fault-tolerant jobs must run at the lowest compute price, and the work can restart.",
+        "A fault-tolerant workload on GKE Autopilot must cost less and can accept eviction with a short grace period.",
+        "Non-critical work must use fewer resources and cost less."
+      ],
+      "traps": [
+        "Spot VMs for a stateful serving tier. They can stop at any time and have no SLA.",
+        "A GKE cluster with only Spot nodes. Keep a node pool without Spot VMs, so that a node is always available."
+      ],
+      "confused": [
+        {
+          "with": "compute-engine",
+          "tell": "Spot is a Compute Engine provisioning model for fault-tolerant work. A stateful serving tier needs standard VMs, because Spot VMs have no SLA."
+        }
+      ],
+      "docs": {
+        "title": "Spot VMs",
+        "url": "https://docs.cloud.google.com/compute/docs/instances/spot"
+      },
+      "sources": [
+        "1.1-resources-and-cost"
+      ]
+    },
+    {
+      "id": "cloud-run",
+      "name": "Cloud Run",
+      "category": "compute",
+      "patterns": [
+        "Cloud Run(?! [Ff]unctions?\\b)",
+        "Cloud Run Invoker",
+        "(?i)instance-based billing",
+        "(?i)request-based billing",
+        "(?i)startup CPU boost",
+        "(?i)revision tags?",
+        "(?i)(?<!build )\\bworker pools?\\b",
+        "(?i)container runtime contract"
+      ],
+      "guidePatterns": [
+        "(?i)from source code",
+        "(?i)event receivers",
+        "(?i)resource requirements"
+      ],
+      "what": "Cloud Run is a serverless platform that runs containers as services, jobs, and worker pools. It bills per use, rounded up to the nearest 100 ms, and services scale to zero.",
+      "cues": [
+        "A stateless HTTP or gRPC API has spiky traffic, and nothing in the app needs Kubernetes.",
+        "A containerized task runs to completion for hours and has no HTTP endpoint, which fits a Cloud Run job.",
+        "A continuous Pub/Sub or Kafka pull consumer needs no endpoint and no request-based scaling, which fits a worker pool.",
+        "GPU inference must scale to zero when no requests arrive."
+      ],
+      "traps": [
+        "A request stops at the 60-minute request timeout. Run multi-hour work as a Cloud Run job, where a task can run for up to 168 hours.",
+        "Background threads after the response get no CPU with request-based billing, the default. Use instance-based billing for this work."
+      ],
+      "confused": [
+        {
+          "with": "gke",
+          "tell": "Pick GKE Autopilot when the app needs the Kubernetes API, Helm, Arm images, or a persistent disk. Cloud Run supports none of these."
+        },
+        {
+          "with": "cloud-run-functions",
+          "tell": "A Cloud Run function is a Cloud Run service that you deploy from function source code, for single-purpose, event-driven code."
+        },
+        {
+          "with": "app-engine",
+          "tell": "App Engine is the older platform. Google recommends Cloud Run for new apps and for the modernization of existing apps."
+        }
+      ],
+      "aws": "AWS App Runner, AWS Fargate",
+      "docs": {
+        "title": "What is Cloud Run",
+        "url": "https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run"
+      },
+      "sources": [
+        "1.1-platform-choice",
+        "1.1-resources-and-cost",
+        "1.1-containers",
+        "3.1-deploy-from-source"
+      ]
+    },
+    {
+      "id": "cloud-run-functions",
+      "name": "Cloud Run functions",
+      "category": "compute",
+      "formerly": "Cloud Functions",
+      "patterns": [
+        "Cloud Run [Ff]unctions?\\b",
+        "Cloud Functions",
+        "Functions Framework"
+      ],
+      "what": "A Cloud Run function is a Cloud Run service that you deploy from function source code. It runs single-purpose code on HTTP requests or events.",
+      "cues": [
+        "Single-purpose, event-driven code must run when an event arrives, and the team wants to deploy only source code.",
+        "An existing 1st gen function needs more than one request per instance, a longer timeout, or traffic splitting.",
+        "An older question names Cloud Functions, which is now Cloud Run functions."
+      ],
+      "traps": [
+        "The --allow-unauthenticated flag on an event-triggered function. Omit it, and use it only for a public HTTP function.",
+        "An event-driven function created with the Cloud Functions v2 API has a timeout of up to 9 minutes, not the 60 minutes of HTTP functions."
+      ],
+      "confused": [
+        {
+          "with": "cloud-run",
+          "tell": "A function is a Cloud Run service built from source with the Functions Framework. Deploy a service when you build the container image yourself."
+        }
+      ],
+      "aws": "AWS Lambda",
+      "docs": {
+        "title": "Compare Cloud Run functions",
+        "url": "https://docs.cloud.google.com/run/docs/functions/comparison"
+      },
+      "sources": [
+        "1.1-platform-choice",
+        "3.1-deploy-from-source"
+      ]
+    },
+    {
+      "id": "gke",
+      "name": "Google Kubernetes Engine (GKE)",
+      "category": "compute",
+      "patterns": [
+        "\\bGKE\\b(?! (?:Ingress|Gateway)\\b)",
+        "Google Kubernetes Engine",
+        "\\bGKE (?:Autopilot|Standard|Dataplane V2)\\b",
+        "(?i)\\bcompute class(?:es)?\\b",
+        "(?i)multidimensional Pod autoscaling"
+      ],
+      "guidePatterns": [
+        "(?i)Kubernetes",
+        "(?i)Horizontal Pod Autoscaler",
+        "(?i)containerized applications"
+      ],
+      "what": "GKE runs containerized apps on managed Kubernetes clusters. Autopilot, the recommended mode, manages the nodes and bills Pod resource requests.",
+      "cues": [
+        "The app calls Kubernetes APIs, uses custom resources, or deploys with Helm.",
+        "A workload needs Arm nodes, TPUs, or a self-managed database on a persistent disk.",
+        "A workload needs privileged Pods or Windows Server containers, which need a GKE Standard cluster.",
+        "A queue worker must scale on the Pub/Sub backlog with a Horizontal Pod Autoscaler on an External metric."
+      ],
+      "traps": [
+        "A CPU utilization HPA never scales when the containers have no CPU requests, because utilization targets need requests.",
+        "A liveness probe that checks the database causes cascading restarts. Probe logic must not access other services."
+      ],
+      "confused": [
+        {
+          "with": "cloud-run",
+          "tell": "Pick Cloud Run when nothing needs Kubernetes. Kubernetes adds complexity, and Google recommends serverless first."
+        },
+        {
+          "with": "compute-engine",
+          "tell": "Pick Compute Engine when the requirement is a specific OS, kernel, or license, not a container platform."
+        }
+      ],
+      "aws": "Amazon EKS",
+      "docs": {
+        "title": "GKE Autopilot overview",
+        "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/autopilot-overview"
+      },
+      "sources": [
+        "1.1-platform-choice",
+        "3.2-gke-deployments",
+        "3.2-health-checks",
+        "3.2-autoscaling"
+      ]
+    },
+    {
+      "id": "app-engine",
+      "name": "App Engine",
+      "category": "compute",
+      "patterns": [
+        "App Engine"
+      ],
+      "what": "App Engine runs apps in the standard environment and the flexible environment. For new Google Cloud users, Google recommends Cloud Run as the preferred alternative.",
+      "cues": [
+        "An app already runs in the App Engine standard or flexible environment, and the question asks about that existing app.",
+        "A legacy App Engine app depends on the Datastore API, so its data is in Firestore in Datastore mode."
+      ],
+      "traps": [
+        "App Engine for a new app. Google recommends Cloud Run for new projects and for the modernization of existing apps."
+      ],
+      "confused": [
+        {
+          "with": "cloud-run",
+          "tell": "For a new app or a modernization, Google recommends Cloud Run instead of App Engine."
+        }
+      ],
+      "aws": "AWS Elastic Beanstalk",
+      "docs": {
+        "title": "Choose an App Engine environment",
+        "url": "https://docs.cloud.google.com/appengine/docs/the-appengine-environments"
+      },
+      "sources": [
+        "1.1-platform-choice"
+      ]
+    },
+    {
+      "id": "cloud-build",
+      "name": "Cloud Build",
+      "category": "build",
+      "patterns": [
+        "Cloud Build",
+        "(?i)build triggers?",
+        "(?i)private pools?",
+        "(?i)build config(?: files?)?\\b"
+      ],
+      "guidePatterns": [
+        "(?i)provenance",
+        "(?i)integration tests"
+      ],
+      "what": "Cloud Build runs builds on Google Cloud. Each build step runs as a container, and one build config can run tests, build and push an image, and deploy it.",
+      "cues": [
+        "Each push to a branch or each pull request must run unit tests, build an image, and push it to Artifact Registry.",
+        "Integration tests need an emulator or a database container that runs next to the test step.",
+        "A build must reach a private database or Git server in a VPC network, which needs a private pool.",
+        "Images must carry build provenance that meets SLSA level 3."
+      ],
+      "traps": [
+        "The serviceAccount field in cloudbuild.yaml does not apply to a triggered build. Cloud Build uses the service account on the trigger.",
+        "allowFailure: true on a test step lets the build succeed when the tests fail, so the deploy steps still run."
+      ],
+      "confused": [
+        {
+          "with": "cloud-deploy",
+          "tell": "Cloud Build builds and tests the image. Cloud Deploy promotes the same release through targets and rolls it back."
+        },
+        {
+          "with": "binary-authorization",
+          "tell": "Cloud Build signs attestations at build time. Binary Authorization checks them when an image deploys."
+        }
+      ],
+      "aws": "AWS CodeBuild",
+      "docs": {
+        "title": "Overview of Cloud Build",
+        "url": "https://docs.cloud.google.com/build/docs/overview"
+      },
+      "sources": [
+        "2.2-cloud-build-artifact-registry",
+        "2.3-integration-tests-cloud-build",
+        "2.2-provenance-binary-authorization"
+      ]
+    },
+    {
+      "id": "artifact-registry",
+      "name": "Artifact Registry",
+      "category": "build",
+      "patterns": [
+        "Artifact Registry",
+        "pkg\\.dev",
+        "(?i)remote repositor(?:y|ies)",
+        "(?i)virtual repositor(?:y|ies)",
+        "(?i)cleanup polic(?:y|ies)"
+      ],
+      "what": "Artifact Registry stores container images, language packages, and OS packages in repositories. Each repository has one format and one mode, such as standard, remote, or virtual.",
+      "cues": [
+        "Builds must continue during a Docker Hub outage, and public dependencies must be scanned, which fits a remote repository.",
+        "Developers need one endpoint for several upstream repositories and protection against dependency confusion attacks, which fits a virtual repository.",
+        "Old image versions must be deleted by age or tag state, which fits a cleanup policy on a standard repository.",
+        "Cloud Run or GKE in another project cannot pull an image from the repository."
+      ],
+      "traps": [
+        "A new pipeline that pushes to Container Registry. It shut down on March 18, 2025, so push to an Artifact Registry pkg.dev repository.",
+        "A tag can move to another image. Deploy by digest, which identifies one image version and cannot change."
+      ],
+      "confused": [
+        {
+          "with": "artifact-analysis",
+          "tell": "Artifact Registry stores the artifacts. Artifact Analysis scans the images in it for vulnerabilities."
+        },
+        {
+          "with": "cloud-build",
+          "tell": "Cloud Build creates the image, and its images field pushes the image to Artifact Registry."
+        }
+      ],
+      "aws": "Amazon ECR, AWS CodeArtifact",
+      "docs": {
+        "title": "Artifact Registry overview",
+        "url": "https://docs.cloud.google.com/artifact-registry/docs/overview"
+      },
+      "sources": [
+        "2.2-cloud-build-artifact-registry",
+        "3.2-gke-deployments"
+      ]
+    },
+    {
+      "id": "artifact-analysis",
+      "name": "Artifact Analysis",
+      "category": "build",
+      "formerly": "Container Analysis",
+      "patterns": [
+        "Artifact Analysis",
+        "Container Analysis",
+        "On-Demand Scanning",
+        "Container Scanning API"
+      ],
+      "what": "Artifact Analysis finds CVEs in the OS and language packages of container images. Automatic scanning runs on each push to Artifact Registry, and On-Demand Scanning runs when you run a command.",
+      "cues": [
+        "Images in Artifact Registry must be watched for newly published CVEs while they are in use.",
+        "A Cloud Build pipeline must stop an image with critical vulnerabilities before it reaches the registry.",
+        "A developer must scan a local image before it is pushed."
+      ],
+      "traps": [
+        "A new tag on an image does not start a new scan, because scans are per digest. Build and push a new image.",
+        "On-Demand Scanning results are not updated after the scan. Use automatic scanning to watch stored images over time."
+      ],
+      "confused": [
+        {
+          "with": "binary-authorization",
+          "tell": "Artifact Analysis reports vulnerabilities. Binary Authorization blocks a deploy that lacks a required attestation."
+        },
+        {
+          "with": "web-security-scanner",
+          "tell": "Web Security Scanner tests a running public web app for issues such as XSS. Artifact Analysis does not test the running app."
+        },
+        {
+          "with": "scc",
+          "tell": "Security Command Center shows image findings only for HIGH and CRITICAL vulnerabilities in deployed images, with findings from many other services."
+        }
+      ],
+      "aws": "Amazon ECR image scanning",
+      "docs": {
+        "title": "Artifact Analysis overview",
+        "url": "https://docs.cloud.google.com/artifact-analysis/docs/artifact-analysis"
+      },
+      "sources": [
+        "1.2-protect-and-scan",
+        "2.2-provenance-binary-authorization"
+      ]
+    },
+    {
+      "id": "binary-authorization",
+      "name": "Binary Authorization",
+      "category": "build",
+      "patterns": [
+        "Binary Authorization",
+        "(?i)\\battestors?\\b",
+        "(?i)\\battestations?\\b",
+        "(?i)continuous validation"
+      ],
+      "guidePatterns": [
+        "(?i)provenance"
+      ],
+      "what": "Binary Authorization is a deploy-time control for GKE and Cloud Run. Its policy can require attestations, which are signatures over an image digest, before an image deploys.",
+      "cues": [
+        "Only images that Cloud Build built may deploy to Cloud Run or GKE.",
+        "A new image policy must be tested without blocking any deploy, which fits dry-run mode.",
+        "A blocked image must deploy in an emergency, and the deploy must leave an audit log entry, which fits breakglass."
+      ],
+      "traps": [
+        "One cloudbuild.yaml that builds and then deploys under a built-by-cloud-build policy. The attestation exists only after the build completes, so use separate build and deploy configs.",
+        "A cluster, namespace, or service account rule for Cloud Run. Cloud Run supports only the default rule."
+      ],
+      "confused": [
+        {
+          "with": "artifact-analysis",
+          "tell": "Artifact Analysis finds and reports vulnerabilities. Binary Authorization blocks the deploy of an image without the required attestation."
+        },
+        {
+          "with": "cloud-build",
+          "tell": "Cloud Build generates provenance and signs attestations at build time. Binary Authorization checks attestations at deploy time."
+        }
+      ],
+      "docs": {
+        "title": "Binary Authorization overview",
+        "url": "https://docs.cloud.google.com/binary-authorization/docs/overview"
+      },
+      "sources": [
+        "2.2-provenance-binary-authorization"
+      ]
+    },
+    {
+      "id": "cloud-deploy",
+      "name": "Cloud Deploy",
+      "category": "build",
+      "patterns": [
+        "Cloud Deploy"
+      ],
+      "guidePatterns": [
+        "(?i)gradual rollouts"
+      ],
+      "what": "Cloud Deploy is a continuous delivery service for GKE and Cloud Run. It delivers one release to a series of targets in a promotion sequence, with approvals, canary strategies, and rollbacks.",
+      "cues": [
+        "One build must move through test, staging, and production, with an approval before production.",
+        "A new version must get a small share of traffic in phases before it gets all traffic.",
+        "Test containers must run after each deploy, and a failed test must fail the rollout."
+      ],
+      "traps": [
+        "A Cloud Deploy canary on GKE with service networking splits by Pod count, so the split is not exact. Use the Gateway API for a split by traffic.",
+        "The first release to a target skips the canary phases."
+      ],
+      "confused": [
+        {
+          "with": "cloud-build",
+          "tell": "Cloud Build builds and tests the image. Cloud Deploy promotes the release, and a rollback is a new rollout of the last successful release."
+        }
+      ],
+      "aws": "AWS CodePipeline, AWS CodeDeploy",
+      "docs": {
+        "title": "Overview of Cloud Deploy",
+        "url": "https://docs.cloud.google.com/deploy/docs/overview"
+      },
+      "sources": [
+        "3.2-gke-deployments",
+        "1.1-traffic-splitting",
+        "2.3-integration-tests-cloud-build"
+      ]
+    },
+    {
+      "id": "gcloud-sdk",
+      "name": "Google Cloud CLI, Cloud SDK, and emulators",
+      "category": "devtools",
+      "patterns": [
+        "Google Cloud CLI",
+        "gcloud CLI",
+        "Cloud SDK",
+        "gcloud (?:auth|configurations?|config|components)\\b",
+        "(?i)\\bemulators?\\b",
+        "\\bgsutil\\b"
+      ],
+      "what": "The Google Cloud CLI (gcloud) is the main command-line tool of the Google Cloud SDK, which also has tools such as bq. Its emulators run local copies of Pub/Sub, Firestore, Bigtable, Spanner, and Datastore for development and unit tests.",
+      "cues": [
+        "Local development and unit tests need Pub/Sub, Firestore, Bigtable, or Spanner, with no cloud resources.",
+        "A developer works in several projects or accounts and must switch between them with named sets of properties.",
+        "A script must get predictable gcloud output and run with no prompts.",
+        "A developer must run one gcloud command as a service account, with no key."
+      ],
+      "traps": [
+        "gcloud auth login gives credentials only to the gcloud CLI. Code that uses the client libraries needs gcloud auth application-default login.",
+        "Emulators do not check IAM, and the Firestore emulator does not track manual indexes. Test IAM and indexes in a real project."
+      ],
+      "confused": [
+        {
+          "with": "client-libraries",
+          "tell": "The gcloud CLI uses its own credentials. Code that uses the client libraries uses ADC, and switching the gcloud configuration does not change the ADC file."
+        },
+        {
+          "with": "cloud-shell",
+          "tell": "Cloud Shell has the gcloud CLI ready in the browser, but it is for interactive use, and non-interactive sessions end after 40 minutes."
+        }
+      ],
+      "aws": "AWS CLI",
+      "docs": {
+        "title": "Managing gcloud CLI components",
+        "url": "https://docs.cloud.google.com/sdk/docs/components"
+      },
+      "sources": [
+        "2.1-developer-tools",
+        "2.1-emulators"
+      ]
+    },
+    {
+      "id": "client-libraries",
+      "name": "Cloud Client Libraries, ADC, and APIs Explorer",
+      "category": "devtools",
+      "patterns": [
+        "(?i)client librar(?:y|ies)",
+        "APIs? Explorer",
+        "Application Default Credentials",
+        "\\bADC\\b",
+        "application-default"
+      ],
+      "what": "The Cloud Client Libraries are the recommended way to call Google Cloud APIs from code. They find credentials with Application Default Credentials (ADC), and the APIs Explorer runs one API method from its reference page.",
+      "cues": [
+        "Application code must call a Google Cloud API with idiomatic code, built-in authentication, and gRPC where the API supports it.",
+        "The same code must get credentials on a workstation and on Cloud Run with no code change.",
+        "Code lists many resources, and the client must request the next pages for you.",
+        "A developer wants to try one API method from its reference page, with no code."
+      ],
+      "traps": [
+        "The Google API Client Libraries for new code. Use the Cloud Client Libraries, because the older libraries support only REST.",
+        "An application retry loop around a client library call. The Cloud Client Libraries retry automatically, so the attempts multiply."
+      ],
+      "confused": [
+        {
+          "with": "gcloud-sdk",
+          "tell": "gcloud auth login gives credentials only to the gcloud CLI. The client libraries read the ADC file that gcloud auth application-default login creates."
+        },
+        {
+          "with": "service-accounts",
+          "tell": "On Google Cloud, attach a service account to the resource, and ADC gets its token from the metadata server."
+        }
+      ],
+      "aws": "AWS SDKs (Cloud Client Libraries) and the SDK default credential chain (ADC)",
+      "docs": {
+        "title": "Client libraries and Cloud APIs explained",
+        "url": "https://docs.cloud.google.com/apis/docs/client-libraries-explained"
+      },
+      "sources": [
+        "4.2-calling-google-apis",
+        "1.2-authenticating-to-google-cloud",
+        "4.2-efficient-api-calls"
+      ]
+    },
+    {
+      "id": "service-usage",
+      "name": "Service Usage (enabling APIs)",
+      "category": "devtools",
+      "patterns": [
+        "Service Usage",
+        "SERVICE_DISABLED",
+        "gcloud services (?:enable|disable)"
+      ],
+      "guidePatterns": [
+        "(?i)enabling google cloud services"
+      ],
+      "what": "Service Usage enables and disables Google APIs and services in a project. You must enable most APIs in a project before you use them.",
+      "cues": [
+        "A call fails with the reason SERVICE_DISABLED, and the error metadata names the consumer project.",
+        "A setup script must turn on the APIs that an app needs in a new project."
+      ],
+      "traps": [
+        "SERVICE_DISABLED fixed in the resource project. Enable the API in the project that the consumer field of the error names.",
+        "Disabling the Cloud Run API to stop charges for a test. It deletes the Cloud Run resources."
+      ],
+      "confused": [
+        {
+          "with": "client-libraries",
+          "tell": "A client library call fails until the API is enabled. The project that is checked for API activation is also the project that is checked for rate quota."
+        }
+      ],
+      "docs": {
+        "title": "Service Usage overview",
+        "url": "https://docs.cloud.google.com/service-usage/docs/overview"
+      },
+      "sources": [
+        "4.2-calling-google-apis"
+      ]
+    },
+    {
+      "id": "console",
+      "name": "Google Cloud console",
+      "category": "devtools",
+      "patterns": [
+        "Google Cloud console",
+        "Equivalent code"
+      ],
+      "what": "The Google Cloud console is useful when you learn a task or check a resource. When you create a resource there, Equivalent code shows the gcloud command and the REST request for the same action.",
+      "cues": [
+        "A developer creates a resource in the console and needs the same action as a gcloud command or a REST request for a script.",
+        "A developer learns a new task or checks a resource before automating it.",
+        "A developer needs a terminal for the project that is open in the console."
+      ],
+      "traps": [
+        "The Pub/Sub emulator does not support the console or gcloud pubsub commands. Create topics with a client library."
+      ],
+      "confused": [
+        {
+          "with": "gcloud-sdk",
+          "tell": "Use the console to learn a task or check a resource. Use the gcloud CLI, with --format, --filter, and --quiet, for scripts."
+        },
+        {
+          "with": "gemini-cloud-assist",
+          "tell": "Gemini Cloud Assist (Preview) is an AI assistant panel in the console that takes prompts in natural language."
+        }
+      ],
+      "docs": {
+        "title": "Google Cloud console",
+        "url": "https://docs.cloud.google.com/compute/docs/console"
+      },
+      "sources": [
+        "2.1-developer-tools"
+      ]
+    },
+    {
+      "id": "cloud-code",
+      "name": "Cloud Code",
+      "category": "devtools",
+      "patterns": [
+        "Cloud Code\\b"
+      ],
+      "what": "Cloud Code is an extension for VS Code and JetBrains IDEs, and it is built into the Cloud Shell Editor. It supports GKE and Cloud Run development, Secret Manager, and the Cloud APIs.",
+      "cues": [
+        "A developer must run and debug a Cloud Run service locally from VS Code, with environment variables and Cloud SQL connections.",
+        "A Kubernetes app must be built, deployed, and debugged from the IDE, with a skaffold.yaml file.",
+        "A developer wants to browse Cloud APIs, enable them, and install client libraries from the IDE.",
+        "Secrets must be created, viewed, and updated from the IDE."
+      ],
+      "traps": [
+        "Cloud Code as the AI assistant. Gemini Code Assist is now a separate plugin, and its Standard and Enterprise editions are not enabled automatically."
+      ],
+      "confused": [
+        {
+          "with": "cloud-workstations",
+          "tell": "Cloud Code is an IDE extension. Cloud Workstations gives managed development environments that run in your project and VPC network."
+        },
+        {
+          "with": "gemini-code-assist",
+          "tell": "Cloud Code helps you build, deploy, and debug for Cloud Run and GKE. Gemini Code Assist is the AI coding assistant."
+        }
+      ],
+      "aws": "AWS Toolkit for VS Code and JetBrains",
+      "docs": {
+        "title": "Cloud Code overview",
+        "url": "https://docs.cloud.google.com/code/docs/vscode/overview"
+      },
+      "sources": [
+        "2.1-developer-tools",
+        "2.1-emulators"
+      ]
+    },
+    {
+      "id": "cloud-shell",
+      "name": "Cloud Shell",
+      "category": "devtools",
+      "patterns": [
+        "Cloud Shell"
+      ],
+      "what": "Cloud Shell is an interactive terminal and editor on a VM that Google owns, with tools and credentials ready. Only the 5 GB $HOME directory persists between sessions.",
+      "cues": [
+        "A developer needs a quick terminal with the gcloud CLI and credentials ready, for interactive work.",
+        "A developer wants to edit code in the browser with Cloud Code, with no local install."
+      ],
+      "traps": [
+        "Cloud Shell for a long batch job. Non-interactive sessions end after 40 minutes, and the weekly quota is 50 hours.",
+        "Software installed outside $HOME. It is lost when the VM ends."
+      ],
+      "confused": [
+        {
+          "with": "cloud-workstations",
+          "tell": "Cloud Workstations runs in your project and VPC network, with more storage and no weekly limit. Cloud Shell runs on a VM that is not in any of your projects."
+        }
+      ],
+      "aws": "AWS CloudShell",
+      "docs": {
+        "title": "How Cloud Shell works",
+        "url": "https://docs.cloud.google.com/shell/docs/how-cloud-shell-works"
+      },
+      "sources": [
+        "2.1-developer-tools"
+      ]
+    },
+    {
+      "id": "cloud-workstations",
+      "name": "Cloud Workstations",
+      "category": "devtools",
+      "patterns": [
+        "Cloud Workstations",
+        "(?i)workstation (?:clusters?|configurations?)"
+      ],
+      "what": "Cloud Workstations runs developer environments on Compute Engine VMs in your project. A workstation configuration is the template, and a workstation cluster sets the region and the VPC network.",
+      "cues": [
+        "Developers need a standard, secured environment in the company VPC network, with more storage and no weekly limit.",
+        "Source code must stay inside a VPC Service Controls perimeter, and developer environments must have no public IP addresses.",
+        "All developers must get the same tools and IDE from one custom container image."
+      ],
+      "traps": [
+        "A configuration change does not reach running workstations. It applies at the next start of each workstation.",
+        "Tools added to /home in the custom image Dockerfile. The persistent home disk mounts over /home and hides them, so use a startup script."
+      ],
+      "confused": [
+        {
+          "with": "cloud-shell",
+          "tell": "Cloud Shell runs on a VM that Google owns, with a 5 GB home and a weekly limit of 50 hours. Cloud Workstations runs in your project."
+        }
+      ],
+      "aws": "AWS Cloud9",
+      "docs": {
+        "title": "Cloud Workstations overview",
+        "url": "https://docs.cloud.google.com/workstations/docs/overview"
+      },
+      "sources": [
+        "2.1-developer-tools"
+      ]
+    },
+    {
+      "id": "gemini-code-assist",
+      "name": "Gemini Code Assist",
+      "category": "devtools",
+      "formerly": "Duet AI for Developers",
+      "patterns": [
+        "Gemini Code Assist",
+        "Gemini CLI",
+        "Duet AI for Developers",
+        "GEMINI\\.md",
+        "\\.aiexclude",
+        "(?i)\\bagent mode\\b",
+        "(?i)code customization"
+      ],
+      "guidePatterns": [
+        "(?i)coding assistants?",
+        "(?i)AI tooling"
+      ],
+      "what": "Gemini Code Assist is an AI coding assistant for IDEs, with Standard and Enterprise editions. It completes and generates code, chats about your code, generates unit tests, and runs multi-step tasks in agent mode (Preview) and the Gemini CLI.",
+      "cues": [
+        "A developer wants unit tests for a selected function from the IDE.",
+        "Every prompt must follow the team's test framework and coding conventions.",
+        "Suggestions must use the company's private GitHub, GitLab, or Bitbucket repositories, which needs the Enterprise edition.",
+        "Pull requests on GitHub need automatic reviews with a severity on each comment."
+      ],
+      "traps": [
+        "A .gitignore in a subfolder to keep secrets out of context. Only the root .gitignore counts, and code customization ignores .gitignore, so use .aiexclude.",
+        "Generated code or tests without review. Output can look correct and still be wrong, and you are responsible for its security and tests."
+      ],
+      "confused": [
+        {
+          "with": "gemini-cloud-assist",
+          "tell": "Gemini Code Assist works on code in the IDE. Gemini Cloud Assist (Preview) works in the console on running resources, logs, and metrics."
+        },
+        {
+          "with": "mcp-servers",
+          "tell": "Agent mode and the Gemini CLI use MCP servers as extra tools. An MCP server only exposes tools and data."
+        }
+      ],
+      "aws": "Amazon Q Developer",
+      "docs": {
+        "title": "Gemini Code Assist Standard and Enterprise overview",
+        "url": "https://docs.cloud.google.com/gemini/docs/codeassist/overview"
+      },
+      "sources": [
+        "2.1-ai-assisted-development",
+        "2.3-unit-tests-with-ai"
+      ]
+    },
+    {
+      "id": "gemini-cloud-assist",
+      "name": "Gemini Cloud Assist",
+      "category": "devtools",
+      "patterns": [
+        "Gemini Cloud Assist",
+        "(?i)Cloud Assist investigations?"
+      ],
+      "guidePatterns": [
+        "(?i)AI-assisted observability"
+      ],
+      "what": "Gemini Cloud Assist (Preview) is an AI assistant in the Google Cloud console. It helps you design and build, find probable root causes with investigations of logs, metrics, and configuration, and optimize cost.",
+      "cues": [
+        "An engineer must find a probable root cause across logs, metrics, and configuration, with prompts in natural language.",
+        "An alert must start a preliminary root-cause analysis automatically.",
+        "A developer wants a gcloud command, a Kubernetes manifest, or Terraform code from a prompt in the console."
+      ],
+      "traps": [
+        "Gemini Cloud Assist for projects with data residency or CMEK requirements. It can store data in any Google Cloud data center.",
+        "Since April 10, 2026, only users with a Premium Support contract, or with access from their account team, can create or run investigations."
+      ],
+      "confused": [
+        {
+          "with": "gemini-code-assist",
+          "tell": "Gemini Code Assist helps with code and tests in the IDE. Gemini Cloud Assist works on running resources in the console."
+        },
+        {
+          "with": "error-reporting",
+          "tell": "Error Reporting groups application errors. An investigation looks for a probable root cause across logs, metrics, and configuration."
+        }
+      ],
+      "aws": "Amazon Q in the AWS console",
+      "docs": {
+        "title": "Gemini Cloud Assist overview",
+        "url": "https://docs.cloud.google.com/cloud-assist/overview"
+      },
+      "sources": [
+        "2.1-developer-tools",
+        "4.3-troubleshooting"
+      ]
+    },
+    {
+      "id": "mcp-servers",
+      "name": "MCP servers (Model Context Protocol)",
+      "category": "devtools",
+      "patterns": [
+        "\\bMCP\\b",
+        "Model Context Protocol",
+        "(?i)remote MCP servers?"
+      ],
+      "what": "MCP is an open source protocol that standardizes how AI applications connect to data sources and tools. Google Cloud remote MCP servers have HTTP endpoints, and a local MCP server uses stdio.",
+      "cues": [
+        "A coding agent must query BigQuery or manage Cloud Run through tools.",
+        "A team must host its own MCP server for an internal API.",
+        "Agents must be blocked from tools that create, change, or delete resources."
+      ],
+      "traps": [
+        "Only roles/mcp.toolUser for an agent. A tool call also needs the permissions for the underlying resource.",
+        "A stdio MCP server on Cloud Run. Cloud Run hosts only streamable HTTP MCP servers."
+      ],
+      "confused": [
+        {
+          "with": "gemini-code-assist",
+          "tell": "Agent mode and the Gemini CLI are the AI applications. MCP servers give them tools and data."
+        }
+      ],
+      "aws": "MCP servers that AWS publishes",
+      "docs": {
+        "title": "Google Cloud MCP servers overview",
+        "url": "https://docs.cloud.google.com/mcp/overview"
+      },
+      "sources": [
+        "2.1-ai-assisted-development"
+      ]
+    },
+    {
+      "id": "api-gateway",
+      "name": "API Gateway",
+      "category": "apis",
+      "patterns": [
+        "(?<!Amazon )API Gateway",
+        "(?i)\\bAPI configs?\\b"
+      ],
+      "what": "API Gateway is a fully managed, pay-per-use gateway that Google designed for serverless backends. You configure it with an OpenAPI document, and it checks API keys and JWTs and enforces per-minute quotas.",
+      "cues": [
+        "A Cloud Run API needs API keys and a per-minute quota for each consumer project, with little operational work.",
+        "Clients send JWTs from an identity provider, and the gateway must validate them before requests reach the backend.",
+        "A gRPC service on Cloud Run needs a managed gateway with a gRPC service configuration."
+      ],
+      "traps": [
+        "A public Cloud Run backend behind API Gateway. Keep the backend private, and give the gateway's service account the Cloud Run Invoker role.",
+        "An edit to a deployed API config. An API config cannot change, so upload a new API config and switch the gateway to it."
+      ],
+      "confused": [
+        {
+          "with": "apigee",
+          "tell": "Pick Apigee when partners need a developer portal, API products, monetization, or many policies. API Gateway has no portal."
+        },
+        {
+          "with": "cloud-endpoints",
+          "tell": "With Cloud Endpoints, you deploy and operate the ESPv2 proxy. API Gateway is a fully managed, regional gateway."
+        }
+      ],
+      "aws": "Amazon API Gateway",
+      "docs": {
+        "title": "About API Gateway",
+        "url": "https://docs.cloud.google.com/api-gateway/docs/about-api-gateway"
+      },
+      "sources": [
+        "1.1-api-management",
+        "3.1-api-versioning-and-exposure",
+        "1.1-api-design"
+      ]
+    },
+    {
+      "id": "cloud-endpoints",
+      "name": "Cloud Endpoints",
+      "category": "apis",
+      "patterns": [
+        "Cloud Endpoints",
+        "\\bESPv2\\b",
+        "Extensible Service Proxy"
+      ],
+      "what": "Cloud Endpoints manages APIs through the Extensible Service Proxy V2 (ESPv2), an Envoy-based proxy that you deploy. It supports OpenAPI and gRPC backends.",
+      "cues": [
+        "The API gateway must run next to the app, in your private network, or on your own machine for tests.",
+        "An API on GKE or Compute Engine needs API key or JWT checks from a proxy that runs in front of the app or as a sidecar."
+      ],
+      "traps": [
+        "Endpoints for gRPC on App Engine or Cloud Run functions. It does not work there, because they do not support HTTP/2."
+      ],
+      "confused": [
+        {
+          "with": "api-gateway",
+          "tell": "API Gateway is fully managed. With Cloud Endpoints, you deploy and operate the proxy, with more control and more operational work."
+        }
+      ],
+      "docs": {
+        "title": "About Cloud Endpoints",
+        "url": "https://docs.cloud.google.com/endpoints/docs/openapi/about-cloud-endpoints"
+      },
+      "sources": [
+        "1.1-api-management"
+      ]
+    },
+    {
+      "id": "apigee",
+      "name": "Apigee",
+      "category": "apis",
+      "patterns": [
+        "Apigee",
+        "\\bSpikeArrest\\b",
+        "\\bVerifyAPIKey\\b",
+        "\\bVerifyJWT\\b",
+        "(?i)\\bAPI products?\\b",
+        "(?i)\\bAPI prox(?:y|ies)\\b",
+        "Quota polic(?:y|ies)",
+        "(?i)proxy revisions?"
+      ],
+      "what": "Apigee is Google Cloud's native API management platform. It puts API proxies with policies between clients and backends, and it supports REST, gRPC, SOAP, and GraphQL.",
+      "cues": [
+        "Partners and other developers find the API in a portal and register apps to get keys for API products.",
+        "Each partner app has a contract limit on requests over days or months.",
+        "The backend must be protected from sudden traffic spikes from all clients.",
+        "A new API version needs its own base path, and a tested proxy revision must move from the test environment to prod."
+      ],
+      "traps": [
+        "An API product with no VerifyAPIKey or OAuthV2 VerifyAccessToken policy in the proxy. Apigee does not check keys automatically, so any caller gets through.",
+        "SpikeArrest to enforce a contract limit per partner. Its counts are best effort and cover all clients, so use the Quota policy."
+      ],
+      "confused": [
+        {
+          "with": "api-gateway",
+          "tell": "API Gateway fits serverless backends with keys, JWTs, and simple per-minute quotas. It has no developer portal, API products, or monetization."
+        }
+      ],
+      "aws": "Amazon API Gateway",
+      "docs": {
+        "title": "What is Apigee?",
+        "url": "https://docs.cloud.google.com/apigee/docs/api-platform/get-started/what-apigee"
+      },
+      "sources": [
+        "1.1-api-management",
+        "3.1-api-versioning-and-exposure"
+      ]
+    },
+    {
+      "id": "pub-sub",
+      "name": "Pub/Sub",
+      "category": "integration",
+      "patterns": [
+        "Pub/Sub(?! Lite)",
+        "(?i)dead-letter topics?",
+        "(?i)ordering keys?",
+        "(?i)\\b(?:pull|push|export) subscriptions?\\b",
+        "\\bStreamingPull\\b",
+        "(?i)acknowledge?ment deadlines?",
+        "(?i)negative acknowledge?ments?"
+      ],
+      "what": "Pub/Sub is an asynchronous messaging service that decouples the services that produce messages from the services that process them. Each subscription gets a copy of every message, with at-least-once delivery by default.",
+      "cues": [
+        "One event must reach several independent consumers, and the producer must not know them.",
+        "A consumer that is down must get the backlog of messages when it comes back.",
+        "Messages must land in a BigQuery table or a Cloud Storage bucket with no subscriber code.",
+        "A worker pulls a large volume of messages and has no public HTTPS endpoint."
+      ],
+      "traps": [
+        "Exactly-once delivery on a push subscription. Only pull subscriptions support it, and publisher retries can still create copies, so keep handlers idempotent.",
+        "A dead-letter topic on the topic. You configure it on the subscription."
+      ],
+      "confused": [
+        {
+          "with": "cloud-tasks",
+          "tell": "In Cloud Tasks, the producer names one endpoint and the queue controls the rate. Pub/Sub fans out to subscribers that the publisher does not know."
+        },
+        {
+          "with": "eventarc",
+          "tell": "A Pub/Sub push subscription sends a Pub/Sub JSON envelope. An Eventarc trigger sends a CloudEvent, and its retries are settings of its Pub/Sub subscription."
+        },
+        {
+          "with": "managed-kafka",
+          "tell": "Managed Service for Apache Kafka fits existing Kafka workloads and portability across clouds. For new workloads, Google recommends Pub/Sub because it is easier to use."
+        }
+      ],
+      "aws": "Amazon Kinesis Data Streams, Amazon MQ",
+      "docs": {
+        "title": "What is Pub/Sub?",
+        "url": "https://docs.cloud.google.com/pubsub/docs/overview"
+      },
+      "sources": [
+        "1.1-async-events",
+        "4.1-messaging",
+        "3.1-triggers-and-receivers"
+      ]
+    },
+    {
+      "id": "eventarc",
+      "name": "Eventarc",
+      "category": "integration",
+      "patterns": [
+        "Eventarc(?: Advanced| Standard| triggers?)?\\b"
+      ],
+      "what": "Eventarc routes events from providers, such as Cloud Storage, Cloud Audit Logs, and Pub/Sub, to destinations such as Cloud Run and Workflows. It delivers each event as an HTTP request in the CloudEvents format.",
+      "cues": [
+        "A Cloud Run service must run when an object is finalized in a Cloud Storage bucket.",
+        "A service must react to an action that has no direct event but that Cloud Audit Logs records.",
+        "Many teams and projects need a central event bus, with filters on any attribute and transformation, which fits Eventarc Advanced."
+      ],
+      "traps": [
+        "A trigger that is active but delivers nothing. The trigger service account needs roles/run.invoker on the authenticated Cloud Run service.",
+        "A slow receiver that gets the same event again. The trigger's Pub/Sub subscription has a 10-second acknowledgment deadline by default, and Google recommends 600 seconds."
+      ],
+      "confused": [
+        {
+          "with": "pub-sub",
+          "tell": "Pub/Sub carries your own messages to many subscriptions. Eventarc routes events as CloudEvents, and Pub/Sub subscriptions carry its trigger traffic."
+        },
+        {
+          "with": "workflows",
+          "tell": "Eventarc delivers one event to one destination. Workflows controls a flow of many steps, and an Eventarc trigger can start a workflow."
+        }
+      ],
+      "aws": "AWS EventBridge",
+      "docs": {
+        "title": "Eventarc overview",
+        "url": "https://docs.cloud.google.com/eventarc/docs/overview"
+      },
+      "sources": [
+        "1.1-async-events",
+        "3.1-triggers-and-receivers"
+      ]
+    },
+    {
+      "id": "workflows",
+      "name": "Workflows",
+      "category": "integration",
+      "patterns": [
+        "(?<!Managed )\\bWorkflows\\b"
+      ],
+      "what": "Workflows is a serverless orchestration platform that calls services in a defined order, with branches, parallel steps, and retries. It has no charges while idle, and a workflow can wait for up to a year.",
+      "cues": [
+        "Several services must run in a defined order, with branches, parallel steps, and retries, and the flow must be visible in one place.",
+        "A process must pause until a person approves it, with no polling.",
+        "A step must call a Google Cloud API for which a connector exists."
+      ],
+      "traps": [
+        "A workflow that calls a private Cloud Run service with no auth block. Workflows adds no token by default, so add type: OIDC.",
+        "An OIDC token to call a googleapis.com API. Google APIs expect an OAuth 2.0 access token, so prefer a connector."
+      ],
+      "confused": [
+        {
+          "with": "cloud-tasks",
+          "tell": "Cloud Tasks hands off one HTTP call to run later at a controlled rate. Workflows controls a flow of many steps."
+        },
+        {
+          "with": "eventarc",
+          "tell": "Workflows is orchestration, where one service controls the flow. Eventarc and Pub/Sub are choreography, where each service reacts to events."
+        },
+        {
+          "with": "managed-airflow",
+          "tell": "Managed Airflow runs ETL or ELT pipelines as Python DAGs, with latency in seconds. Workflows orchestrates service calls with latency in milliseconds, and you pay for each step."
+        }
+      ],
+      "aws": "AWS Step Functions",
+      "docs": {
+        "title": "Workflows overview",
+        "url": "https://docs.cloud.google.com/workflows/docs/overview"
+      },
+      "sources": [
+        "1.1-orchestration"
+      ]
+    },
+    {
+      "id": "cloud-tasks",
+      "name": "Cloud Tasks",
+      "category": "integration",
+      "patterns": [
+        "Cloud Tasks"
+      ],
+      "what": "Cloud Tasks queues work for explicit invocation: the producer names the endpoint of each task, and the queue controls the dispatch rate, the concurrency, and the retries.",
+      "cues": [
+        "A third-party API must not get more calls than it can handle.",
+        "One call must run once at a set time in the future, up to 30 days in advance.",
+        "Duplicate work must be rejected when it is created.",
+        "An HTTP handler needs more than 10 minutes, and up to 30 minutes."
+      ],
+      "traps": [
+        "Cloud Tasks for a request where the user waits for the result. Cloud Tasks gives no strong timing guarantee.",
+        "Deduplication with an auto-generated task name. Set your own task name."
+      ],
+      "confused": [
+        {
+          "with": "pub-sub",
+          "tell": "Pub/Sub fans out each message to many subscriptions that the publisher does not know. A task goes to one endpoint that the producer names."
+        },
+        {
+          "with": "cloud-scheduler",
+          "tell": "Cloud Scheduler runs a call on a repeating schedule. For a one-time call in the future, use a task with a schedule time."
+        }
+      ],
+      "aws": "Amazon SQS, Amazon SNS",
+      "docs": {
+        "title": "Understand Cloud Tasks",
+        "url": "https://docs.cloud.google.com/tasks/docs/dual-overview"
+      },
+      "sources": [
+        "1.1-orchestration",
+        "1.1-async-events"
+      ]
+    },
+    {
+      "id": "cloud-scheduler",
+      "name": "Cloud Scheduler",
+      "category": "integration",
+      "patterns": [
+        "Cloud Scheduler"
+      ],
+      "what": "Cloud Scheduler runs cron jobs on a unix-cron schedule. Each job sends a request to one target: an HTTP or HTTPS endpoint, a Pub/Sub topic, or an App Engine app.",
+      "cues": [
+        "A call must run on a repeating schedule, for example every night.",
+        "A Cloud Run job or a workflow must start on a schedule.",
+        "A message must go to a Pub/Sub topic on a schedule."
+      ],
+      "traps": [
+        "A Cloud Scheduler job that is expected to retry. The retry count defaults to 0, so set --max-retry-attempts.",
+        "Cloud Scheduler for a one-time future call. Use a Cloud Tasks task with a schedule time."
+      ],
+      "confused": [
+        {
+          "with": "cloud-tasks",
+          "tell": "Cloud Tasks runs one call at a set time or at a controlled rate. Cloud Scheduler repeats a call on a cron schedule."
+        },
+        {
+          "with": "workflows",
+          "tell": "Cloud Scheduler only starts the flow. It calls the Workflow Executions API with an OAuth token, and Workflows runs the steps."
+        }
+      ],
+      "aws": "Amazon EventBridge",
+      "docs": {
+        "title": "About Cloud Scheduler",
+        "url": "https://docs.cloud.google.com/scheduler/docs/overview"
+      },
+      "sources": [
+        "1.1-orchestration"
+      ]
+    },
+    {
+      "id": "managed-airflow",
+      "name": "Managed Service for Apache Airflow",
+      "category": "integration",
+      "formerly": "Cloud Composer",
+      "patterns": [
+        "Managed Service for Apache Airflow",
+        "Managed Airflow",
+        "Cloud Composer"
+      ],
+      "what": "Managed Service for Apache Airflow (Managed Airflow) runs ETL or ELT pipelines as Python DAGs and is designed for data-driven batch workflows. Its latency is in seconds, and you pay for provisioned capacity instead of each step.",
+      "cues": [
+        "A data team must run ETL or ELT pipelines as Python DAGs.",
+        "The work is a data-driven batch workflow, not a chain of low-latency service calls."
+      ],
+      "traps": [
+        "Managed Airflow to orchestrate calls to Cloud Run services. Its latency is in seconds, and Workflows has latency in milliseconds.",
+        "A DAG that polls each minute for an approval that can take hours. Polling wastes work, and a Workflows callback waits without polling."
+      ],
+      "confused": [
+        {
+          "with": "workflows",
+          "tell": "Workflows orchestrates service calls with latency in milliseconds, and you pay for each step. Managed Airflow runs batch data pipelines, with latency in seconds and provisioned capacity."
+        }
+      ],
+      "aws": "Managed Workflows for Apache Airflow",
+      "docs": {
+        "title": "Choose Workflows or Managed Airflow for service orchestration",
+        "url": "https://docs.cloud.google.com/workflows/docs/choose-orchestration"
+      },
+      "sources": [
+        "1.1-orchestration"
+      ]
+    },
+    {
+      "id": "managed-kafka",
+      "name": "Managed Service for Apache Kafka",
+      "category": "integration",
+      "patterns": [
+        "Managed Service for Apache Kafka"
+      ],
+      "what": "Managed Service for Apache Kafka gives Kafka APIs on Google Cloud. It fits existing Kafka workloads and portability across clouds, with minimal code changes.",
+      "cues": [
+        "Existing Kafka workloads must move to Google Cloud with minimal code changes.",
+        "The messaging layer must stay portable across clouds."
+      ],
+      "traps": [
+        "Managed Service for Apache Kafka for a new event pipeline with no Kafka code. For new workloads, Google recommends Pub/Sub because it is easier to use."
+      ],
+      "confused": [
+        {
+          "with": "pub-sub",
+          "tell": "Google recommends Pub/Sub for new workloads and for users new to streaming on Google Cloud. Managed Service for Apache Kafka fits existing Kafka workloads and portability across clouds."
+        }
+      ],
+      "docs": {
+        "title": "Choose Pub/Sub or Cloud Managed Service for Apache Kafka",
+        "url": "https://docs.cloud.google.com/pubsub/docs/choose-pubsub-kafka"
+      },
+      "sources": [
+        "1.1-async-events"
+      ]
+    },
+    {
+      "id": "alb",
+      "name": "Application Load Balancer",
+      "category": "networking",
+      "formerly": "HTTP(S) Load Balancing",
+      "patterns": [
+        "(?<!AWS )(?<!Balancing, )Application Load Balancers?",
+        "HTTP\\(S\\) Load Balancing",
+        "serverless NEGs?",
+        "GKE Gateway",
+        "(?<!API )Gateway API",
+        "GKE Ingress",
+        "\\bHTTPRoutes?\\b"
+      ],
+      "guidePatterns": [
+        "(?i)load balancers?",
+        "(?i)session affinity"
+      ],
+      "what": "An Application Load Balancer is a Layer 7 proxy for HTTP and HTTPS traffic, which includes gRPC and WebSocket. The global external Application Load Balancer gives one anycast IP address for backends in many regions.",
+      "cues": [
+        "A Cloud Run service needs a custom domain with your own TLS certificate, Cloud CDN, or Cloud Armor.",
+        "One IP address must serve a Cloud Run service that runs in several regions, and each user must go to the closest region.",
+        "A GKE app needs HTTP routing by host, path, or header, or weighted traffic splitting between versions.",
+        "Internal HTTP services must be reachable from clients in several regions."
+      ],
+      "traps": [
+        "Load balancer session affinity for a Cloud Run backend. A serverless NEG does not support it, so enable Cloud Run session affinity on the service.",
+        "GKE Ingress for a new design. Ingress is in maintenance mode, and Google recommends the Gateway API."
+      ],
+      "confused": [
+        {
+          "with": "nlb",
+          "tell": "Pick a Network Load Balancer for TCP, UDP, or other IP protocols, or to keep the client source IP address. Network Load Balancers do not support serverless NEGs."
+        },
+        {
+          "with": "cloud-cdn",
+          "tell": "Cloud CDN is not a separate entry point. You turn it on for a backend of the global external or classic Application Load Balancer."
+        }
+      ],
+      "aws": "Elastic Load Balancing, Application Load Balancer",
+      "docs": {
+        "title": "Choose a load balancer",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer"
+      },
+      "sources": [
+        "1.1-load-balancing",
+        "1.1-traffic-splitting",
+        "3.1-api-versioning-and-exposure",
+        "3.2-gke-deployments"
+      ]
+    },
+    {
+      "id": "nlb",
+      "name": "Network Load Balancer",
+      "category": "networking",
+      "formerly": "TCP Proxy, SSL Proxy, Network, and Internal TCP/UDP Load Balancing",
+      "patterns": [
+        "(?<!Balancing, )Network Load Balancers?",
+        "Network Load Balancing",
+        "LoadBalancer Services?\\b"
+      ],
+      "guidePatterns": [
+        "(?i)load balancers?"
+      ],
+      "what": "A Network Load Balancer is a Layer 4 load balancer. A proxy Network Load Balancer handles TCP with optional SSL offload, and a passthrough Network Load Balancer handles UDP and other IP protocols and keeps the client source IP address.",
+      "cues": [
+        "A game server on UDP must be reachable from the internet.",
+        "The backend must see the client source IP address.",
+        "A GKE app needs Layer 4 access for TCP or UDP clients."
+      ],
+      "traps": [
+        "A Network Load Balancer in front of Cloud Run. Network Load Balancers do not support serverless NEGs, so use an Application Load Balancer.",
+        "A LoadBalancer Service for HTTP path routing on GKE. It creates a passthrough Network Load Balancer, so use a Gateway and an HTTPRoute."
+      ],
+      "confused": [
+        {
+          "with": "alb",
+          "tell": "Pick an Application Load Balancer for HTTP and HTTPS, which includes gRPC and WebSocket, and for path routing or Cloud CDN."
+        }
+      ],
+      "aws": "Elastic Load Balancing, Network Load Balancer",
+      "docs": {
+        "title": "Choose a load balancer",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer"
+      },
+      "sources": [
+        "1.1-load-balancing",
+        "3.2-gke-deployments"
+      ]
+    },
+    {
+      "id": "cloud-cdn",
+      "name": "Cloud CDN",
+      "category": "networking",
+      "patterns": [
+        "Cloud CDN",
+        "(?i)cache modes?",
+        "(?i)cache invalidation",
+        "(?i)signed cookies",
+        "\\b(?:CACHE_ALL_STATIC|FORCE_CACHE_ALL|USE_ORIGIN_HEADERS)\\b"
+      ],
+      "what": "Cloud CDN caches HTTP responses at the edge, near users. It works only with the global external and the classic Application Load Balancer.",
+      "cues": [
+        "Static files and public responses must load fast for users who are far from the backend region.",
+        "Changed files must reach users after a deploy, with few cache invalidations."
+      ],
+      "traps": [
+        "HTML or JSON responses with no Cache-Control header. The default CACHE_ALL_STATIC mode does not cache them.",
+        "FORCE_CACHE_ALL on a backend that serves per-user content. Cloud CDN then caches the private responses."
+      ],
+      "confused": [
+        {
+          "with": "memorystore",
+          "tell": "Memorystore caches data, such as query results, for all app instances in the VPC network. Cloud CDN caches HTTP responses for users at the edge."
+        },
+        {
+          "with": "alb",
+          "tell": "Cloud CDN needs the global external or classic Application Load Balancer, not a regional one."
+        }
+      ],
+      "aws": "Amazon CloudFront",
+      "docs": {
+        "title": "Cloud CDN overview",
+        "url": "https://docs.cloud.google.com/cdn/docs/overview"
+      },
+      "sources": [
+        "1.1-caching"
+      ]
+    },
+    {
+      "id": "serverless-vpc",
+      "name": "Direct VPC egress and Serverless VPC Access",
+      "category": "networking",
+      "patterns": [
+        "Direct VPC(?: egress)?",
+        "Serverless VPC Access",
+        "VPC connectors?"
+      ],
+      "what": "Direct VPC egress and Serverless VPC Access connectors send Cloud Run traffic to internal IP addresses, for example to Memorystore instances. Google recommends Direct VPC egress, and both are for outbound traffic only.",
+      "cues": [
+        "A Cloud Run service must reach a Memorystore instance or a Cloud SQL private IP address.",
+        "A Cloud Run service calls another service with internal ingress, and the call must go through a VPC network.",
+        "Egress firewall rules must apply to the traffic of one Cloud Run service by network tag."
+      ],
+      "traps": [
+        "A Serverless VPC Access connector as the first choice. Direct VPC egress has lower latency, higher throughput, and no connector VM charges.",
+        "Direct VPC egress so that VMs can call a Cloud Run service. It is outbound only, so use Private Google Access, Private Service Connect, or an internal Application Load Balancer."
+      ],
+      "confused": [
+        {
+          "with": "psa",
+          "tell": "Private services access connects your VPC network to Cloud SQL, AlloyDB, or Memorystore for Redis. Direct VPC egress gets Cloud Run traffic into your VPC network."
+        }
+      ],
+      "docs": {
+        "title": "Compare Direct VPC egress and VPC connectors",
+        "url": "https://docs.cloud.google.com/run/docs/configuring/connecting-vpc"
+      },
+      "sources": [
+        "1.2-service-to-service",
+        "1.1-caching"
+      ]
+    },
+    {
+      "id": "psc",
+      "name": "Private Service Connect",
+      "category": "networking",
+      "patterns": [
+        "Private Service Connect"
+      ],
+      "guidePatterns": [
+        "(?i)private service connectivity"
+      ],
+      "what": "Private Service Connect lets a consumer reach Google APIs, Cloud Run, or a service that another VPC network publishes, at an internal IP address that the consumer chooses. It uses NAT, so the two networks need no IP address coordination.",
+      "cues": [
+        "Code must call Google APIs or Cloud Run at an internal IP address that the team chooses.",
+        "A team must consume a service that another VPC network, team, or company publishes."
+      ],
+      "traps": [
+        "A Private Service Connect endpoint for Cloud Run with no DNS change. Add a private DNS zone for run.app."
+      ],
+      "confused": [
+        {
+          "with": "psa",
+          "tell": "Private services access uses VPC Network Peering, so the IP ranges must not overlap. Private Service Connect uses NAT and needs no IP address coordination."
+        },
+        {
+          "with": "pga",
+          "tell": "Private Google Access lets VMs without external IP addresses reach Google APIs, with no endpoint IP address to choose."
+        }
+      ],
+      "aws": "AWS PrivateLink",
+      "docs": {
+        "title": "Private Service Connect",
+        "url": "https://docs.cloud.google.com/vpc/docs/private-service-connect"
+      },
+      "sources": [
+        "1.2-service-to-service"
+      ]
+    },
+    {
+      "id": "psa",
+      "name": "Private services access",
+      "category": "networking",
+      "patterns": [
+        "(?i)private services access"
+      ],
+      "guidePatterns": [
+        "(?i)private service connectivity"
+      ],
+      "what": "Private services access gives internal IP access to Cloud SQL, AlloyDB, Memorystore for Redis, and Filestore. It uses VPC Network Peering with an allocated IP range.",
+      "cues": [
+        "An app must reach a Cloud SQL or AlloyDB instance at a private IP address.",
+        "Memorystore for Redis must be reached from a VPC-native GKE cluster at a private IP address."
+      ],
+      "traps": [
+        "Private services access to reach Google APIs. It is for VPC-hosted services such as Cloud SQL, so use Private Google Access or Private Service Connect.",
+        "An allocated range that overlaps other ranges. The ranges must not overlap."
+      ],
+      "confused": [
+        {
+          "with": "psc",
+          "tell": "Private Service Connect uses NAT and endpoints, so the networks need no IP address coordination. Private services access uses peering."
+        }
+      ],
+      "docs": {
+        "title": "Private access options for services",
+        "url": "https://docs.cloud.google.com/vpc/docs/private-access-options"
+      },
+      "sources": [
+        "1.2-service-to-service",
+        "1.1-caching"
+      ]
+    },
+    {
+      "id": "pga",
+      "name": "Private Google Access",
+      "category": "networking",
+      "patterns": [
+        "Private Google Access"
+      ],
+      "guidePatterns": [
+        "(?i)private service connectivity"
+      ],
+      "what": "Private Google Access lets VMs without external IP addresses call Google APIs and run.app URLs. You enable it for each subnet.",
+      "cues": [
+        "VMs with no external IP addresses must call Cloud Storage or other Google APIs.",
+        "Cloud Workstations must run with no public IP addresses."
+      ],
+      "traps": [
+        "Private Google Access for VMs that have external IP addresses. It has no effect on them.",
+        "Private Google Access for rep.googleapis.com regional endpoints. It does not support them."
+      ],
+      "confused": [
+        {
+          "with": "psc",
+          "tell": "A Private Service Connect endpoint gives Google APIs an internal IP address that you choose. Private Google Access needs no endpoint."
+        },
+        {
+          "with": "psa",
+          "tell": "Private services access is for VPC-hosted services, such as Cloud SQL, not for Google APIs."
+        }
+      ],
+      "docs": {
+        "title": "Private Google Access",
+        "url": "https://docs.cloud.google.com/vpc/docs/private-google-access"
+      },
+      "sources": [
+        "1.2-service-to-service",
+        "2.1-developer-tools"
+      ]
+    },
+    {
+      "id": "cloud-service-mesh",
+      "name": "Cloud Service Mesh",
+      "category": "networking",
+      "formerly": "Anthos Service Mesh and Traffic Director",
+      "patterns": [
+        "Cloud Service Mesh",
+        "Anthos Service Mesh",
+        "Traffic Director",
+        "\\bIstio\\b",
+        "\\bPeerAuthentication\\b",
+        "\\bAuthorizationPolicy\\b",
+        "(?i)proxyless gRPC",
+        "(?i)(?<!Binary )authorization polic(?:y|ies)"
+      ],
+      "what": "Cloud Service Mesh manages and secures traffic between services. It authenticates and encrypts traffic with mTLS, controls access with authorization policies, and can split traffic between versions.",
+      "cues": [
+        "Traffic between microservices on GKE must be encrypted and authenticated, with no change to the application code.",
+        "Only one workload identity may call a service, and rules must check HTTP methods, paths, or JWT claims.",
+        "gRPC clients must get endpoints and policy from a control plane, with no sidecar proxy."
+      ],
+      "traps": [
+        "A mesh without a STRICT PeerAuthentication policy. The default mode is PERMISSIVE, so services still accept plaintext.",
+        "A mesh with no authorization policies. All requests are then allowed, so start with an allow-nothing policy and add ALLOW policies."
+      ],
+      "confused": [
+        {
+          "with": "gke",
+          "tell": "Kubernetes network policies on GKE control which Pods can open connections. They do not encrypt traffic or authorize by service identity."
+        }
+      ],
+      "aws": "AWS App Mesh",
+      "docs": {
+        "title": "Cloud Service Mesh overview",
+        "url": "https://docs.cloud.google.com/service-mesh/docs/overview"
+      },
+      "sources": [
+        "1.2-service-to-service",
+        "1.1-traffic-splitting",
+        "1.1-api-design"
+      ]
+    },
+    {
+      "id": "cloud-armor",
+      "name": "Google Cloud Armor",
+      "category": "networking",
+      "patterns": [
+        "Cloud Armor"
+      ],
+      "what": "Google Cloud Armor protects a public app at an external Application Load Balancer. On Cloud Run, it protects only the traffic that comes through the load balancer.",
+      "cues": [
+        "A public app on Cloud Run needs Cloud Armor, and all internet traffic must pass through the load balancer."
+      ],
+      "traps": [
+        "Cloud Armor on the load balancer while Cloud Run ingress allows all traffic. Clients call the default URL and bypass Cloud Armor, so set ingress to internal-and-cloud-load-balancing."
+      ],
+      "confused": [
+        {
+          "with": "alb",
+          "tell": "Cloud Armor is not an entry point. It works on an external Application Load Balancer in front of the app."
+        }
+      ],
+      "docs": {
+        "title": "Set up a global external Application Load Balancer with Cloud Run, App Engine, or Cloud Run functions",
+        "url": "https://docs.cloud.google.com/load-balancing/docs/https/setup-global-ext-https-serverless"
+      },
+      "sources": [
+        "1.1-load-balancing",
+        "3.1-api-versioning-and-exposure"
+      ]
+    },
+    {
+      "id": "cloud-storage",
+      "name": "Cloud Storage",
+      "category": "storage",
+      "patterns": [
+        "Cloud Storage",
+        "\\bgs://",
+        "gcloud storage",
+        "Object Versioning",
+        "Bucket Lock",
+        "Object Retention Lock",
+        "Object Lifecycle Management",
+        "(?i)signed policy documents?",
+        "\\bNearline\\b",
+        "\\bColdline\\b",
+        "(?i)turbo replication",
+        "(?i)public access prevention",
+        "(?i)uniform bucket-level access",
+        "(?i)soft delete",
+        "(?i)storage class(?:es)?",
+        "(?i)(?:event-based|temporary) holds?",
+        "(?i)retention polic(?:y|ies)",
+        "HMAC keys?",
+        "(?i)resumable uploads?",
+        "(?i)XML API multipart uploads?",
+        "(?i)parallel composite uploads?"
+      ],
+      "what": "Cloud Storage keeps objects in buckets, with no lower or upper capacity limit and up to 5 TiB for each object. Object writes, deletes, and listings are strongly consistent in all location types.",
+      "cues": [
+        "Users without Google accounts must download or upload one object for a short time, which fits a V4 signed URL.",
+        "A plain HTML form must upload a file directly to a bucket, which fits a signed policy document.",
+        "Two workers must not overwrite the same object, which fits a generation-match precondition.",
+        "Records must stay unchanged for years because of a regulation, which fits a locked retention policy."
+      ],
+      "traps": [
+        "Object Versioning to recover from an accidental delete. Google recommends soft delete, which also protects against bucket deletion.",
+        "Object names that start with a timestamp at a high write rate. Sequential names slow autoscaling, so add a hash prefix."
+      ],
+      "confused": [
+        {
+          "with": "filestore",
+          "tell": "Filestore is a managed NFS file server that VMs, GKE, and Cloud Run share. A Cloud Storage volume mount has no file locking, so the last write wins."
+        },
+        {
+          "with": "cloud-cdn",
+          "tell": "A Cloud Storage signed URL gives access to one object through the XML API. Cloud CDN signed URLs and signed cookies give time-limited access to cached content, with a key that you add to the backend."
+        }
+      ],
+      "aws": "Amazon S3",
+      "docs": {
+        "title": "Signed URLs",
+        "url": "https://docs.cloud.google.com/storage/docs/access-control/signed-urls"
+      },
+      "sources": [
+        "1.3-storage-choice",
+        "1.3-signed-urls",
+        "1.2-retention-and-org-policy",
+        "4.1-reading-writing-data",
+        "1.3-consistency-and-replication"
+      ]
+    },
+    {
+      "id": "filestore",
+      "name": "Filestore",
+      "category": "storage",
+      "patterns": [
+        "\\bFilestore\\b"
+      ],
+      "guidePatterns": [
+        "(?i)appropriate storage system"
+      ],
+      "what": "Filestore is a managed NFS file server with 1 to 100 TiB for each instance. VMs, GKE clusters, and Cloud Run services can use one file system at the same time.",
+      "cues": [
+        "Several VMs, GKE Pods, or Cloud Run instances need one shared POSIX file system.",
+        "Files that a Cloud Run service writes must stay after the instance stops, and other instances must read them as files."
+      ],
+      "traps": [
+        "Filestore for clients that need SMB. Filestore is an NFS server, so use NetApp Volumes.",
+        "A Filestore mount from Cloud Run with no VPC connection. The service needs one, preferably Direct VPC egress."
+      ],
+      "confused": [
+        {
+          "with": "cloud-storage",
+          "tell": "Cloud Storage keeps objects that code reads and writes through the API. A Cloud Storage volume mount has no file locking, so the last write wins."
+        },
+        {
+          "with": "block-storage",
+          "tell": "A Persistent Disk or Hyperdisk volume attaches to a VM or a Pod, with only limited multi-writer access. Filestore gives many clients one shared file system."
+        }
+      ],
+      "aws": "Amazon EFS",
+      "docs": {
+        "title": "Filestore overview",
+        "url": "https://docs.cloud.google.com/filestore/docs/overview"
+      },
+      "sources": [
+        "1.3-storage-choice"
+      ]
+    },
+    {
+      "id": "block-storage",
+      "name": "Persistent Disk, Hyperdisk, and Local SSD",
+      "category": "storage",
+      "patterns": [
+        "Persistent Disk",
+        "Hyperdisk",
+        "Local SSD"
+      ],
+      "guidePatterns": [
+        "(?i)appropriate storage system"
+      ],
+      "what": "Hyperdisk and Persistent Disk are durable block devices for Compute Engine VMs and GKE clusters. Local SSD gives fast scratch space, but its data is lost when the VM stops or is deleted.",
+      "cues": [
+        "A VM or a GKE Pod needs a durable disk, for example for a self-managed database.",
+        "A VM needs fast scratch space or a cache, and the data need not survive a VM stop.",
+        "A disk must survive a zone outage, which fits regional Persistent Disk or Hyperdisk Balanced High Availability."
+      ],
+      "traps": [
+        "Local SSD for data that must survive. Local SSD is ephemeral.",
+        "A zonal disk for redundancy across zones. A zonal disk stays in one zone, so use a disk that replicates synchronously to a second zone."
+      ],
+      "confused": [
+        {
+          "with": "filestore",
+          "tell": "Block disks support only limited multi-writer access. Filestore gives many VMs, Pods, and Cloud Run instances one shared file system."
+        }
+      ],
+      "aws": "Amazon EBS, AWS Nitro SSD",
+      "docs": {
+        "title": "Build HA services using synchronously replicated disks",
+        "url": "https://docs.cloud.google.com/compute/docs/disks/high-availability-regional-persistent-disk"
+      },
+      "sources": [
+        "1.3-storage-choice",
+        "1.1-regions-and-replication"
+      ]
+    },
+    {
+      "id": "cloud-sql",
+      "name": "Cloud SQL",
+      "category": "databases",
+      "patterns": [
+        "Cloud SQL(?! (?:Auth Proxy|Language Connectors?|(?:Python|Java|Go|Node\\.js) Connector|[Cc]onnectors?\\b))"
+      ],
+      "what": "Cloud SQL runs managed MySQL, PostgreSQL, and SQL Server databases. One primary instance takes all writes, and an instance with dedicated cores stores up to 64 TB.",
+      "cues": [
+        "A general-purpose web app, CRM, or e-commerce app needs MySQL, PostgreSQL, or SQL Server, with up to 64 TB of data.",
+        "The database must survive a zone outage with automatic failover and no loss of committed transactions, which fits the high availability (HA) configuration.",
+        "The database must recover in another region after a region outage, which fits a cross-region read replica that you promote.",
+        "Cloud Run scales out, and the database reaches its connection limit, which needs a smaller pool or a maximum number of instances."
+      ],
+      "traps": [
+        "A read replica as the failover target. Read replicas are read-only, can lag, and give no failover, and you promote them manually.",
+        "HA as protection against a region outage. The primary and the standby instances are in two zones of one region."
+      ],
+      "confused": [
+        {
+          "with": "alloydb",
+          "tell": "AlloyDB is PostgreSQL-compatible only, stores up to 128 TiB, and has a columnar engine for analytics on live data. Cloud SQL also runs MySQL and SQL Server."
+        },
+        {
+          "with": "spanner",
+          "tell": "Spanner scales writes horizontally. Cloud SQL scales vertically, and Google suggests it for general-purpose SQL databases."
+        },
+        {
+          "with": "auth-proxies",
+          "tell": "The Cloud SQL Auth Proxy and the Language Connectors authorize and encrypt connections to Cloud SQL, but they do not create a network path."
+        }
+      ],
+      "aws": "Amazon RDS, Amazon Aurora",
+      "docs": {
+        "title": "Cloud SQL overview",
+        "url": "https://docs.cloud.google.com/sql/docs/introduction"
+      },
+      "sources": [
+        "1.3-storage-choice",
+        "1.3-consistency-and-replication",
+        "1.1-regions-and-replication",
+        "4.1-datastore-connections"
+      ]
+    },
+    {
+      "id": "alloydb",
+      "name": "AlloyDB for PostgreSQL",
+      "category": "databases",
+      "patterns": [
+        "AlloyDB(?! (?:Auth Proxy|Language Connectors?|(?:Python|Java|Go|Node\\.js) Connector|[Cc]onnectors?\\b))",
+        "(?i)columnar engine",
+        "(?i)secondary clusters?"
+      ],
+      "what": "AlloyDB for PostgreSQL is a PostgreSQL-compatible database for demanding transactional workloads and for analytics on live transactional data. It separates compute from storage and stores up to 128 TiB for each cluster.",
+      "cues": [
+        "A PostgreSQL app needs fast dashboard queries on live data with no ETL pipeline, which fits the columnar engine.",
+        "A PostgreSQL database grows past the 64 TB limit of Cloud SQL.",
+        "Slow queries need index recommendations from the real workload, which fits the index advisor.",
+        "Reads must scale out with read pool instances of up to 20 nodes."
+      ],
+      "traps": [
+        "Reads from a read pool that must show the user's own change. A read pool receives changes after a lag, so read from the primary instance.",
+        "AlloyDB for a MySQL or SQL Server app. AlloyDB is PostgreSQL-compatible only."
+      ],
+      "confused": [
+        {
+          "with": "cloud-sql",
+          "tell": "A Cloud SQL instance is a VM with a persistent disk, stores up to 64 TB, and runs MySQL, PostgreSQL, or SQL Server. AlloyDB is PostgreSQL only and stores up to 128 TiB."
+        },
+        {
+          "with": "spanner",
+          "tell": "An AlloyDB cluster has one primary instance for all writes, and read pools add only read capacity. Spanner scales writes horizontally."
+        }
+      ],
+      "aws": "Amazon Aurora",
+      "docs": {
+        "title": "AlloyDB overview",
+        "url": "https://docs.cloud.google.com/alloydb/docs/overview"
+      },
+      "sources": [
+        "1.3-storage-choice",
+        "1.3-relational-schema",
+        "1.3-consistency-and-replication"
+      ]
+    },
+    {
+      "id": "spanner",
+      "name": "Spanner",
+      "category": "databases",
+      "formerly": "Cloud Spanner",
+      "patterns": [
+        "\\bSpanner\\b",
+        "(?i)\\binterleav(?:e|ed|ing)\\b",
+        "(?i)bit-reversed",
+        "\\bTrueTime\\b",
+        "(?i)commit timestamps?",
+        "(?i)partitioned DML",
+        "(?i)leader regions?",
+        "(?i)external consistency"
+      ],
+      "what": "Spanner is a relational database that scales horizontally, with strong consistency and up to 99.999% availability. Its read and write throughput grow linearly with compute capacity, and each node holds 10 TiB of data.",
+      "cues": [
+        "Relational writes outgrow the largest Cloud SQL primary instance, and the data needs ACID transactions across rows.",
+        "A page far from the leader region must load fast and can show data that is a few seconds old, which fits a stale read.",
+        "A report reads several tables at one point in time and must take no locks, which fits a read-only transaction.",
+        "A bulk UPDATE or DELETE passes the limits of one transaction, which fits partitioned DML."
+      ],
+      "traps": [
+        "A primary key that starts with a timestamp or a sequence. All inserts go to one split, so use a UUID version 4 or a bit-reversed sequence.",
+        "Spanner for every relational app. For a general-purpose SQL database, Google suggests Cloud SQL."
+      ],
+      "confused": [
+        {
+          "with": "cloud-sql",
+          "tell": "Cloud SQL scales vertically, with one primary instance and up to 64 TB. Spanner scales writes horizontally and adds storage with each node."
+        },
+        {
+          "with": "bigtable",
+          "tell": "Bigtable is NoSQL, with transactions only within one row and eventual consistency between clusters. Spanner has relational tables, SQL, and strong consistency."
+        }
+      ],
+      "aws": "Amazon Aurora, Amazon DynamoDB",
+      "docs": {
+        "title": "Schema design best practices",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-design"
+      },
+      "sources": [
+        "1.3-storage-choice",
+        "1.3-relational-schema",
+        "1.3-consistency-and-replication",
+        "4.1-reading-writing-data"
+      ]
+    },
+    {
+      "id": "bigtable",
+      "name": "Bigtable",
+      "category": "databases",
+      "formerly": "Cloud Bigtable",
+      "patterns": [
+        "\\bBigtable\\b",
+        "(?i)\\brow keys?\\b",
+        "(?i)\\bapp profiles?\\b",
+        "(?i)column famil(?:y|ies)",
+        "(?i)(?:single|multi)-cluster routing",
+        "(?i)garbage collection polic(?:y|ies)"
+      ],
+      "what": "Bigtable is a wide-column NoSQL database for terabytes or petabytes of single-keyed data, with high throughput at low latency. The row key is the only index, and operations are atomic only within one row.",
+      "cues": [
+        "Millions of devices write time-series readings, and an app reads the data of one device for a time range with low latency.",
+        "The data grows by terabytes each month, and nightly batch jobs scan all of it.",
+        "A lookup by a value other than the row key must be fast, which fits a continuous materialized view with a different row key.",
+        "A workload on a replicated instance runs increments and must read its own writes, which fits an app profile with single-cluster routing."
+      ],
+      "traps": [
+        "A row key that starts with a timestamp. Sequential writes go to one node, so put a high-cardinality value, such as a device ID, first.",
+        "Bigtable for a small dataset, joins, or transactions across rows. It performs best with large tables and is atomic only per row."
+      ],
+      "confused": [
+        {
+          "with": "bigquery",
+          "tell": "BigQuery is an analytics warehouse for SQL queries over large datasets. Bigtable serves low-latency reads and writes by row key."
+        },
+        {
+          "with": "firestore",
+          "tell": "Firestore is a serverless document database with ACID transactions, real-time listeners, and offline support. You size Bigtable clusters in nodes."
+        }
+      ],
+      "aws": "Amazon DynamoDB",
+      "docs": {
+        "title": "Bigtable overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/overview"
+      },
+      "sources": [
+        "1.3-storage-choice",
+        "1.3-nosql-schema",
+        "1.3-consistency-and-replication",
+        "4.1-reading-writing-data"
+      ]
+    },
+    {
+      "id": "firestore",
+      "name": "Firestore",
+      "category": "databases",
+      "formerly": "Cloud Datastore",
+      "patterns": [
+        "\\bFirestore\\b",
+        "\\bDatastore\\b",
+        "Firestore in (?:Datastore|Native) mode",
+        "(?i)\\bsubcollections?\\b",
+        "(?i)distributed counters?",
+        "500/50/5",
+        "(?i)\\b(?:automatic|manual) index(?:es)?\\b"
+      ],
+      "what": "Firestore is a serverless document database with automatic scaling, ACID transactions, and strong reads by default. Its web and mobile client libraries give real-time listeners and offline support.",
+      "cues": [
+        "A mobile app must read and edit data offline, sync when the device reconnects, and update dashboards in real time.",
+        "Web, mobile, and server apps need a document database with no capacity planning.",
+        "One document that counts events at a high rate gets contention errors, which fits a distributed counter with shards.",
+        "A query with an equality filter and a range filter on different fields fails, which needs a manual (composite) index."
+      ],
+      "traps": [
+        "Sequential document IDs or an indexed timestamp at a high write rate. Use automatic document IDs, and exempt the timestamp field if no query uses it.",
+        "Datastore mode for a new app, or a plan to change the mode later. Use the Firestore API, because the mode is fixed when you create the database."
+      ],
+      "confused": [
+        {
+          "with": "bigtable",
+          "tell": "Bigtable is for terabytes of single-keyed data at high throughput. It has no mobile client libraries, and you size its clusters in nodes."
+        }
+      ],
+      "aws": "Amazon DynamoDB, Amazon DocumentDB",
+      "docs": {
+        "title": "Firestore overview",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/overview"
+      },
+      "sources": [
+        "1.3-storage-choice",
+        "1.3-nosql-schema",
+        "1.3-consistency-and-replication",
+        "4.1-reading-writing-data",
+        "4.1-datastore-connections"
+      ]
+    },
+    {
+      "id": "memorystore",
+      "name": "Memorystore",
+      "category": "databases",
+      "patterns": [
+        "\\bMemorystore(?: for (?:Valkey|Redis Cluster|Redis|Memcached))?\\b"
+      ],
+      "what": "Memorystore gives managed Valkey, Redis Cluster, Redis, and Memcached caches with sub-millisecond data access. Clients reach an instance through the VPC network, not the internet.",
+      "cues": [
+        "All instances of an app need one shared cache for query results, session data, or API responses.",
+        "A cache must fail over automatically across zones and scale without downtime, which fits Memorystore for Valkey or Memorystore for Redis Cluster.",
+        "A Cloud Run service needs a cache, and it connects through Direct VPC egress."
+      ],
+      "traps": [
+        "Keys with no TTL under the default volatile-lru eviction policy. Redis then has no keys to evict, and memory fills up.",
+        "Memorystore for Memcached in a new design. It is deprecated and shuts down on January 31, 2029, so use Memorystore for Valkey."
+      ],
+      "confused": [
+        {
+          "with": "cloud-cdn",
+          "tell": "Cloud CDN caches GET responses for users at the edge. Memorystore caches data, such as query results, for all app instances in the VPC network."
+        },
+        {
+          "with": "bigtable",
+          "tell": "Bigtable is a durable store for terabytes of data that grows. Memorystore is a cache for hot data."
+        }
+      ],
+      "aws": "Amazon ElastiCache",
+      "docs": {
+        "title": "Memorystore for Valkey overview",
+        "url": "https://docs.cloud.google.com/memorystore/docs/valkey/product-overview"
+      },
+      "sources": [
+        "1.1-caching",
+        "1.3-storage-choice"
+      ]
+    },
+    {
+      "id": "bigquery",
+      "name": "BigQuery",
+      "category": "analytics",
+      "patterns": [
+        "BigQuery(?!IO)",
+        "(?i)Storage Write API",
+        "(?i)Storage Read API",
+        "(?i)\\bload jobs?\\b",
+        "(?i)(?:committed|pending) type",
+        "(?i)default stream"
+      ],
+      "what": "BigQuery is a serverless analytics platform with columnar storage. It queries terabytes in seconds and petabytes in minutes, but it is not a database for frequent small updates.",
+      "cues": [
+        "Analysts and ML jobs query large datasets with SQL.",
+        "A service streams rows that dashboards must see within seconds, with no duplicates after retries, which fits the Storage Write API with committed type and offsets.",
+        "A nightly job reads hundreds of millions of rows, which fits the Storage Read API with column projection.",
+        "A simple model must train where the data is, which fits BigQuery ML."
+      ],
+      "traps": [
+        "BigQuery as the database of a transactional app. A table runs at most 2 mutating DML statements at the same time.",
+        "insertId or tabledata.insertAll to prevent duplicate rows. Its de-duplication is best effort, so use committed type with offsets."
+      ],
+      "confused": [
+        {
+          "with": "bigtable",
+          "tell": "Bigtable serves low-latency reads and writes by row key. BigQuery runs analytical SQL queries over large datasets."
+        },
+        {
+          "with": "dataflow",
+          "tell": "Dataflow transforms the data in a pipeline before the write. BigQuery stores the data and runs the queries."
+        }
+      ],
+      "aws": "Amazon Redshift, Amazon Athena",
+      "docs": {
+        "title": "BigQuery overview",
+        "url": "https://docs.cloud.google.com/bigquery/docs/introduction"
+      },
+      "sources": [
+        "1.3-bigquery-writes",
+        "1.3-storage-choice",
+        "4.1-reading-writing-data"
+      ]
+    },
+    {
+      "id": "dataflow",
+      "name": "Dataflow",
+      "category": "analytics",
+      "patterns": [
+        "\\bDataflow\\b",
+        "BigQueryIO",
+        "Managed I/O"
+      ],
+      "what": "Dataflow runs data pipelines for custom sources, complex transforms, windows, and aggregation. It writes to BigQuery through Managed I/O or the BigQueryIO write methods.",
+      "cues": [
+        "Messages need complex transforms, windows, or aggregation before they reach BigQuery.",
+        "Pub/Sub messages must reach BigQuery exactly once, which fits the Pub/Sub to BigQuery template.",
+        "A streaming pipeline must write to BigQuery with exactly-once semantics, which fits the STORAGE_WRITE_API method."
+      ],
+      "traps": [
+        "Dataflow when the messages need no processing. A BigQuery subscription removes the Dataflow overhead.",
+        "STREAMING_INSERTS in a new pipeline. It costs more and is slower, so use a Storage Write API method."
+      ],
+      "confused": [
+        {
+          "with": "pub-sub",
+          "tell": "A Pub/Sub BigQuery subscription writes messages with no code and at least once, with at most a Single Message Transform. Dataflow runs a pipeline for complex processing."
+        }
+      ],
+      "aws": "Amazon Kinesis Data Streams with Amazon Managed Service for Apache Flink",
+      "docs": {
+        "title": "Write from Dataflow to BigQuery",
+        "url": "https://docs.cloud.google.com/dataflow/docs/guides/write-to-bigquery"
+      },
+      "sources": [
+        "1.3-bigquery-writes",
+        "1.1-async-events"
+      ]
+    },
+    {
+      "id": "secret-manager",
+      "name": "Secret Manager",
+      "category": "security",
+      "patterns": [
+        "Secret Manager",
+        "Parameter Manager",
+        "SECRET_ROTATE",
+        "(?i)regional secrets?",
+        "(?i)rotation schedules?",
+        "(?:Secret Manager )?Secret Accessor"
+      ],
+      "what": "Secret Manager stores passwords, API keys, and certificates as secrets, and each secret version holds the secret data. You grant access on each secret, and Cloud Run and GKE can mount secrets as files.",
+      "cues": [
+        "An app needs a database password or an API key at runtime, and the value must not be in code, images, or plain environment variables.",
+        "A service must read only one secret, which fits the Secret Accessor role on that secret. The Editor role cannot read payloads.",
+        "Rotated values must reach running Cloud Run instances, which fits a secret in a mounted volume.",
+        "A new secret version must reach production gradually and roll back with the release process, which fits a pinned version number."
+      ],
+      "traps": [
+        "The latest alias in a Cloud Run environment variable to get new versions. Cloud Run reads environment variables only when an instance starts.",
+        "A rotation schedule that is expected to rotate the secret. It only sends a SECRET_ROTATE message, and your subscriber must add the new version."
+      ],
+      "confused": [
+        {
+          "with": "cloud-kms",
+          "tell": "Cloud KMS keeps keys that no one can view or export. By default, Secret Manager destroys a version at once, and Cloud KMS keeps a destroyed key version scheduled for destruction for 30 days."
+        },
+        {
+          "with": "service-accounts",
+          "tell": "An app on Google Cloud uses the identity of its attached service account. Do not store a service account key in Secret Manager for it."
+        }
+      ],
+      "aws": "AWS Secrets Manager, AWS Systems Manager Parameter Store",
+      "docs": {
+        "title": "Secret Manager best practices",
+        "url": "https://docs.cloud.google.com/secret-manager/docs/best-practices"
+      },
+      "sources": [
+        "1.2-secrets-and-keys"
+      ]
+    },
+    {
+      "id": "cloud-kms",
+      "name": "Cloud Key Management Service (Cloud KMS)",
+      "category": "security",
+      "patterns": [
+        "Cloud KMS",
+        "Cloud Key Management Service",
+        "\\bCMEK\\b",
+        "(?i)customer-managed encryption keys?",
+        "(?i)envelope encryption",
+        "\\bAutokey\\b",
+        "(?i)\\bkey rings?\\b",
+        "\\bKEKs?\\b",
+        "\\bDEKs?\\b",
+        "(?i)key encryption keys?",
+        "(?i)data encryption keys?",
+        "(?i)\\bkey versions?\\b"
+      ],
+      "what": "Cloud KMS manages encryption keys in key rings, and no one can view or export the key material. Apps use it for envelope encryption, and Google Cloud services use it for customer-managed encryption keys (CMEK).",
+      "cues": [
+        "An app must encrypt files larger than 64 KiB with a key that never leaves Cloud KMS, which fits envelope encryption with a local data encryption key.",
+        "The company must control the location, rotation, and destruction of the key that protects data in a Google Cloud service, which fits CMEK.",
+        "Key versions older than one year must be destroyed, and old data must stay readable, which needs a rewrap with the primary version first."
+      ],
+      "traps": [
+        "The Cloud KMS Admin role for an app that encrypts data. The admin role cannot encrypt or decrypt, so grant CryptoKey Encrypter/Decrypter on the key.",
+        "The Encrypter/Decrypter role for the user who creates a CMEK resource. The service agent of the Google Cloud service needs it."
+      ],
+      "confused": [
+        {
+          "with": "secret-manager",
+          "tell": "Secret Manager stores values that the app reads, such as passwords. Cloud KMS keeps keys that no one can read, and it encrypts and decrypts with them."
+        }
+      ],
+      "aws": "AWS Key Management Service (KMS)",
+      "docs": {
+        "title": "Envelope encryption",
+        "url": "https://docs.cloud.google.com/kms/docs/envelope-encryption"
+      },
+      "sources": [
+        "1.2-secrets-and-keys"
+      ]
+    },
+    {
+      "id": "iap",
+      "name": "Identity-Aware Proxy (IAP)",
+      "category": "security",
+      "patterns": [
+        "Identity-Aware Proxy",
+        "\\bIAP\\b"
+      ],
+      "what": "IAP is an authorization layer for apps that users reach over HTTPS. It checks the user's identity and IAM role before a request reaches the app, and you can enable it directly on a Cloud Run service.",
+      "cues": [
+        "Only employees in a Google group may open an internal web app in a browser, and the company has no VPN.",
+        "Every path to a Cloud Run service, including the run.app URL, must be protected, which fits IAP enabled on the service.",
+        "The app must identify users safely even if someone bypasses IAP, which fits a check of the signed x-goog-iap-jwt-assertion header."
+      ],
+      "traps": [
+        "The Cloud Run Invoker role for users. Users need roles/iap.httpsResourceAccessor, and the IAP service agent needs roles/run.invoker.",
+        "IAP on the load balancer while the run.app URL stays open. Enable IAP on the Cloud Run service, or disable the default URL."
+      ],
+      "confused": [
+        {
+          "with": "identity-platform",
+          "tell": "Identity Platform signs customers in to your app. IAP decides who can reach an app, for employees and partners with IAM roles."
+        },
+        {
+          "with": "web-security-scanner",
+          "tell": "Web Security Scanner finds vulnerabilities in a running public app. IAP does not find vulnerabilities."
+        }
+      ],
+      "aws": "AWS Application Load Balancer with Cognito, AWS Verified Access",
+      "docs": {
+        "title": "Identity-Aware Proxy overview",
+        "url": "https://docs.cloud.google.com/iap/docs/concepts-overview"
+      },
+      "sources": [
+        "1.2-protect-and-scan",
+        "1.2-user-authentication"
+      ]
+    },
+    {
+      "id": "web-security-scanner",
+      "name": "Web Security Scanner",
+      "category": "security",
+      "patterns": [
+        "Web Security Scanner"
+      ],
+      "what": "Web Security Scanner is a Security Command Center service that crawls public App Engine, GKE, and Compute Engine web apps. It reports issues such as XSS, mixed content, and outdated libraries.",
+      "cues": [
+        "A running public web app must be tested for XSS, mixed content, or outdated JavaScript libraries.",
+        "Pages behind a sign-in must be scanned, which needs a custom scan with a test account, because managed scans do not authenticate."
+      ],
+      "traps": [
+        "A scan of production with an admin account. The scanner clicks buttons and submits forms, so scan a test environment with a test account.",
+        "Web Security Scanner for an internal-only app. It scans only public IPv4 URLs that are not behind a firewall."
+      ],
+      "confused": [
+        {
+          "with": "artifact-analysis",
+          "tell": "Artifact Analysis finds CVEs in the packages of container images. Web Security Scanner tests the running app."
+        },
+        {
+          "with": "scc",
+          "tell": "Security Command Center shows the Web Security Scanner findings together with the findings of many other services."
+        }
+      ],
+      "docs": {
+        "title": "Overview of Web Security Scanner",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/concepts-web-security-scanner-overview"
+      },
+      "sources": [
+        "1.2-protect-and-scan"
+      ]
+    },
+    {
+      "id": "scc",
+      "name": "Security Command Center",
+      "category": "security",
+      "patterns": [
+        "Security Command Center",
+        "\\bSCC\\b",
+        "CONTAINER_IMAGE_VULNERABILITY",
+        "Security Health Analytics"
+      ],
+      "what": "Security Command Center is a risk management service. It collects findings from its built-in services, from integrated Google Cloud services, and from third-party tools.",
+      "cues": [
+        "Findings from many services must be seen and prioritized in one place.",
+        "A vulnerable image runs on Cloud Run, GKE, or App Engine, and the finding must resolve after the fix.",
+        "Findings for an isolated test asset do not apply, which fits a mute rule."
+      ],
+      "traps": [
+        "A fixed image deployed with --no-traffic. The finding resolves only when no traffic goes to the vulnerable revision.",
+        "Muting a finding as the fix. Muting only hides it."
+      ],
+      "confused": [
+        {
+          "with": "artifact-analysis",
+          "tell": "Artifact Analysis scans the images in Artifact Registry. Security Command Center shows image findings only for HIGH and CRITICAL vulnerabilities in deployed images."
+        }
+      ],
+      "aws": "Amazon GuardDuty, AWS Security Hub, AWS Config",
+      "docs": {
+        "title": "Security Command Center overview",
+        "url": "https://docs.cloud.google.com/security-command-center/docs/security-command-center-overview"
+      },
+      "sources": [
+        "1.2-protect-and-scan"
+      ]
+    },
+    {
+      "id": "org-policy",
+      "name": "Organization Policy Service",
+      "category": "security",
+      "patterns": [
+        "(?i)organization polic(?:y|ies)",
+        "Organization Policy Service",
+        "(?i)\\borg polic(?:y|ies)",
+        "constraints/",
+        "(?i)\\b(?:custom|managed|list|boolean) constraints?\\b"
+      ],
+      "what": "The Organization Policy Service controls which configurations are allowed on resources, and descendant resources inherit each policy. IAM controls who can act on a resource.",
+      "cues": [
+        "No project may make a bucket public or create service account keys, also when IAM allows it.",
+        "Resources may be created only in approved locations, which fits the gcp.resourceLocations constraint.",
+        "A new constraint must be tested before it denies requests, which fits dry-run mode."
+      ],
+      "traps": [
+        "A new organization policy to fix existing resources. Most constraints apply only to new create and update requests.",
+        "A service account key exception for a pipeline. New organizations block key creation by default, so use attached service accounts or Workload Identity Federation."
+      ],
+      "confused": [
+        {
+          "with": "iam",
+          "tell": "IAM controls who can act on a resource. An organization policy controls which configurations are allowed."
+        }
+      ],
+      "aws": "AWS Config",
+      "docs": {
+        "title": "Organization Policy overview",
+        "url": "https://docs.cloud.google.com/organization-policy/overview"
+      },
+      "sources": [
+        "1.2-retention-and-org-policy"
+      ]
+    },
+    {
+      "id": "vpc-sc",
+      "name": "VPC Service Controls",
+      "category": "security",
+      "patterns": [
+        "VPC Service Controls",
+        "(?i)service perimeters?",
+        "\\bVPC-SC\\b"
+      ],
+      "what": "VPC Service Controls puts a perimeter around Google Cloud services, such as Cloud Storage and BigQuery, to reduce the risk of data exfiltration. It is independent of IAM, and Google recommends both.",
+      "cues": [
+        "Data in Cloud Storage or BigQuery must not leave a perimeter through Google Cloud APIs.",
+        "A Cloud Run service with internal ingress must still receive requests from Pub/Sub, Eventarc, or Cloud Scheduler in the same perimeter.",
+        "A deploy from source must build inside a perimeter, which needs a Cloud Build private pool."
+      ],
+      "traps": [
+        "VPC Service Controls instead of IAM. Use both.",
+        "A Pub/Sub push subscription to a custom domain inside a perimeter. A new push subscription can only target a run.app URL or a Workflows execution."
+      ],
+      "confused": [
+        {
+          "with": "iam",
+          "tell": "IAM controls who can call an API. A VPC Service Controls perimeter controls whether data can leave the perimeter through Google Cloud APIs."
+        }
+      ],
+      "docs": {
+        "title": "Overview of VPC Service Controls",
+        "url": "https://docs.cloud.google.com/vpc-service-controls/docs/overview"
+      },
+      "sources": [
+        "1.2-service-to-service",
+        "3.1-triggers-and-receivers",
+        "3.1-deploy-from-source"
+      ]
+    },
+    {
+      "id": "iam",
+      "name": "IAM (roles, conditions, and recommendations)",
+      "category": "identity",
+      "patterns": [
+        "\\bIAM\\b(?! database authentication)",
+        "Identity and Access Management",
+        "(?i)predefined roles?",
+        "(?i)custom roles?",
+        "(?i)basic roles?",
+        "(?i)role recommendations?",
+        "Policy Simulator",
+        "(?i)\\bIAM conditions?\\b",
+        "\\b[Aa]llow polic(?:y|ies)",
+        "\\b[Dd]eny polic(?:y|ies)"
+      ],
+      "what": "IAM grants roles to principals on resources. Predefined roles fit most tasks, custom roles fill the gaps, and IAM Conditions limit a grant by time or resource name.",
+      "cues": [
+        "A service must publish to one topic, which fits the Pub/Sub Publisher role on that topic, not on the project.",
+        "A contractor needs access to one bucket prefix for 14 days, which fits a predefined role with an IAM condition.",
+        "An Editor role must be replaced without breaking the workloads, which fits role recommendations and Policy Simulator."
+      ],
+      "traps": [
+        "A condition on an Editor grant. Legacy basic roles do not accept conditions.",
+        "A custom role on a folder. Custom roles exist only at the organization or project level."
+      ],
+      "confused": [
+        {
+          "with": "org-policy",
+          "tell": "An organization policy controls which configurations are allowed. IAM controls who can act on a resource."
+        },
+        {
+          "with": "service-accounts",
+          "tell": "A service account is an identity for code. IAM roles decide what it can do, and roles on the service account decide who can attach or impersonate it."
+        }
+      ],
+      "aws": "AWS Identity and Access Management",
+      "docs": {
+        "title": "Roles overview",
+        "url": "https://docs.cloud.google.com/iam/docs/roles-overview"
+      },
+      "sources": [
+        "1.2-service-accounts-least-privilege",
+        "1.2-retention-and-org-policy"
+      ]
+    },
+    {
+      "id": "service-accounts",
+      "name": "Service accounts and impersonation",
+      "category": "identity",
+      "patterns": [
+        "(?i)service accounts?",
+        "(?i)impersonat(?:e|es|ed|ion)\\b",
+        "(?i)service agents?",
+        "Token Creator",
+        "Service Account User",
+        "(?i)user-managed service accounts?",
+        "Service Account Token Creator",
+        "(?i)service account impersonation",
+        "Service Account Credentials API",
+        "(?i)metadata server"
+      ],
+      "what": "A service account is the identity of a workload, and it is also a resource that other principals get roles on. Code on Google Cloud gets the credentials of its attached service account from the metadata server.",
+      "cues": [
+        "Each Cloud Run service needs its own identity with only the roles that it uses, instead of the Compute Engine default service account.",
+        "A deployer must attach a service account to a Cloud Run service, which needs Service Account User on that account.",
+        "A developer must test with the permissions of a production workload without a key, which fits impersonation with Service Account Token Creator."
+      ],
+      "traps": [
+        "Service Account User for --impersonate-service-account. Impersonation needs Service Account Token Creator, also for a project Owner.",
+        "A key file in GOOGLE_APPLICATION_CREDENTIALS on Cloud Run or GKE. It overrides the attached service account and Workload Identity Federation for GKE."
+      ],
+      "confused": [
+        {
+          "with": "wif",
+          "tell": "Code outside Google Cloud has no attached service account. Workload Identity Federation gives it short-lived credentials with no key."
+        },
+        {
+          "with": "client-libraries",
+          "tell": "A service account is the identity. Application Default Credentials is how the client libraries find its credentials."
+        }
+      ],
+      "aws": "AWS STS AssumeRole, EC2 instance profiles",
+      "docs": {
+        "title": "Best practices for using service accounts securely",
+        "url": "https://docs.cloud.google.com/iam/docs/best-practices-service-accounts"
+      },
+      "sources": [
+        "1.2-service-accounts-least-privilege",
+        "1.2-authenticating-to-google-cloud"
+      ]
+    },
+    {
+      "id": "wif",
+      "name": "Workload Identity Federation",
+      "category": "identity",
+      "patterns": [
+        "Workload Identity(?: Federation)?",
+        "(?i)workload identity pools?",
+        "Security Token Service",
+        "(?i)attribute conditions?",
+        "(?i)identity sameness"
+      ],
+      "what": "Workload Identity Federation gives workloads on AWS, on Azure, on premises, or in deployment pipelines access to Google Cloud without a service account key. Workload Identity Federation for GKE is the recommended way for GKE workloads to access Google Cloud services.",
+      "cues": [
+        "A GitHub Actions workflow must deploy to Cloud Run, and an organization policy blocks service account keys.",
+        "An app on AWS or Azure must call Google Cloud APIs without a stored key.",
+        "Each app in a GKE cluster must call Google Cloud APIs with its own identity and no key file."
+      ],
+      "traps": [
+        "A GitHub provider without an attribute condition. GitHub uses one issuer for all organizations, so add a condition for your organization, preferably on its numeric ID.",
+        "An untrusted GKE cluster in the same project. All clusters in a project share one workload identity pool, so the same namespace and ServiceAccount name get the same access."
+      ],
+      "confused": [
+        {
+          "with": "service-accounts",
+          "tell": "Code on Google Cloud uses its attached service account. Workload Identity Federation is for code outside Google Cloud and for Kubernetes ServiceAccounts on GKE."
+        },
+        {
+          "with": "secret-manager",
+          "tell": "A service account key in a secret store is still a long-lived key. Workload Identity Federation needs no key."
+        }
+      ],
+      "aws": "AWS IAM Roles Anywhere, IAM roles for service accounts on Amazon EKS",
+      "docs": {
+        "title": "Workload Identity Federation",
+        "url": "https://docs.cloud.google.com/iam/docs/workload-identity-federation"
+      },
+      "sources": [
+        "1.2-authenticating-to-google-cloud",
+        "1.2-secrets-and-keys"
+      ]
+    },
+    {
+      "id": "identity-platform",
+      "name": "Identity Platform",
+      "category": "identity",
+      "patterns": [
+        "Identity Platform",
+        "Firebase Authentication",
+        "(?i)blocking functions?"
+      ],
+      "what": "Identity Platform is a customer identity and access management (CIAM) platform. It signs in the end users of your app with email and password, phone, social providers, SAML, or OIDC, and it adds MFA and multi-tenancy.",
+      "cues": [
+        "Customers of a consumer app sign in with email and password or with Google, and the backend must verify their ID tokens.",
+        "Business customers must sign in through their own SAML providers, with MFA and a separate set of users for each customer.",
+        "An app on Firebase Authentication needs SAML, MFA, tenants, or an SLA, which fits an upgrade with no app change."
+      ],
+      "traps": [
+        "IAM authentication on a Cloud Run service for customers. Customers have no IAM permissions, so allow unauthenticated calls and verify the ID token in code.",
+        "Trusting the claims of a decoded token. Verify the signature, iss, aud, and exp first, and use sub, not the email address, as the user key."
+      ],
+      "confused": [
+        {
+          "with": "iap",
+          "tell": "IAP decides who can reach an app, for employees and partners with IAM roles. Identity Platform signs customers in to your app."
+        },
+        {
+          "with": "oauth",
+          "tell": "OAuth 2.0 authorization lets your app call Google APIs, such as Drive, with the user's consent. Identity Platform signs users in to your own app."
+        }
+      ],
+      "aws": "Amazon Cognito",
+      "docs": {
+        "title": "Differences between Identity Platform and Firebase Authentication",
+        "url": "https://docs.cloud.google.com/identity-platform/docs/product-comparison"
+      },
+      "sources": [
+        "1.2-user-authentication"
+      ]
+    },
+    {
+      "id": "oauth",
+      "name": "OAuth 2.0 and the Google Auth Platform",
+      "category": "identity",
+      "patterns": [
+        "OAuth(?!V2)",
+        "Google Auth Platform",
+        "(?i)consent screen",
+        "Sign In With Google",
+        "(?i)authorization code flow",
+        "(?i)refresh tokens?"
+      ],
+      "what": "OAuth 2.0 lets your app call Google APIs for a user after the user gives consent. You configure the OAuth clients and the consent screen in the Google Auth Platform.",
+      "cues": [
+        "A web app must read files in the Google Drive of each user, which fits the authorization code flow with user consent.",
+        "A nightly job must keep calling a Google API for each user, which needs access_type=offline for a refresh token.",
+        "Only users in your organization may authorize the app, which fits the Internal user type."
+      ],
+      "traps": [
+        "Refresh tokens that stop working after seven days. The app is External and in Testing status, so publish it to In production status.",
+        "User credentials on a server for a job that runs as the app. Use a service account, which needs no OAuth client ID and no user consent."
+      ],
+      "confused": [
+        {
+          "with": "service-accounts",
+          "tell": "A service account calls APIs as the app, with no user consent. OAuth 2.0 user authorization calls APIs for one user after consent."
+        },
+        {
+          "with": "identity-platform",
+          "tell": "Identity Platform signs users in to your app. OAuth 2.0 authorization gets the user's consent to call Google APIs with their data."
+        }
+      ],
+      "docs": {
+        "title": "Using OAuth 2.0 for Web Server Applications",
+        "url": "https://developers.google.com/identity/protocols/oauth2/web-server"
+      },
+      "sources": [
+        "1.2-user-authentication"
+      ]
+    },
+    {
+      "id": "auth-proxies",
+      "name": "Cloud SQL Auth Proxy, AlloyDB Auth Proxy, and Language Connectors",
+      "category": "identity",
+      "patterns": [
+        "(?:Cloud SQL |AlloyDB )?Auth Proxy",
+        "Language Connectors?",
+        "(?:Cloud SQL|AlloyDB) (?:Python|Java|Go|Node\\.js) Connector",
+        "(?:Cloud SQL|AlloyDB) [Cc]onnectors?\\b",
+        "(?i)IAM database authentication",
+        "--auto-iam-authn",
+        "(?i)connector enforcement"
+      ],
+      "what": "The Cloud SQL Auth Proxy, the AlloyDB Auth Proxy, and the Language Connectors authorize database connections with IAM and encrypt the traffic. They do not create a network path, and they support automatic IAM database authentication.",
+      "cues": [
+        "A client with an ephemeral IP address must connect to a Cloud SQL public IP address without authorized networks.",
+        "A Ruby or PHP app, or a tool such as psql, must connect with IAM authorization, which fits the Auth Proxy, because Language Connectors exist only for some languages.",
+        "A connection pool must use IAM database authentication without expired tokens, which fits automatic mode in a connector.",
+        "Cloud SQL must reject every connection that does not come through a connector, which fits connector enforcement."
+      ],
+      "traps": [
+        "The Auth Proxy or a connector to reach a private IP address from a network without VPC access. They do not create a network path.",
+        "Only the Cloud SQL Client role for an IAM database login. The login also needs the Cloud SQL Instance User role."
+      ],
+      "confused": [
+        {
+          "with": "serverless-vpc",
+          "tell": "Direct VPC egress gives a Cloud Run service a network path to a private IP address. A connector then authorizes and encrypts the connection on that path."
+        },
+        {
+          "with": "cloud-sql",
+          "tell": "Cloud SQL is the database. The Auth Proxy and the connectors are ways for clients to connect to it with IAM."
+        }
+      ],
+      "aws": "Amazon RDS IAM database authentication",
+      "docs": {
+        "title": "About the Cloud SQL Auth Proxy",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/sql-proxy"
+      },
+      "sources": [
+        "1.2-authenticating-to-google-cloud",
+        "4.1-datastore-connections"
+      ]
+    },
+    {
+      "id": "agent-platform",
+      "name": "Gemini Enterprise Agent Platform",
+      "category": "ai",
+      "formerly": "Vertex AI",
+      "patterns": [
+        "(?:Gemini Enterprise )?Agent Platform",
+        "Vertex AI(?! Search)",
+        "\\baiplatform\\b",
+        "(?i)batch inference",
+        "Provisioned Throughput"
+      ],
+      "what": "Gemini Enterprise Agent Platform (Agent Platform) serves the Gemini API on Google Cloud, with IAM access control. It has global, regional, and multi-region endpoints, batch inference, and Provisioned Throughput.",
+      "cues": [
+        "A production app on Cloud Run must call Gemini with its attached service account and the Gemini Enterprise Agent Platform User role.",
+        "ML processing of customer data must stay in the European Union, which fits the eu multi-region endpoint.",
+        "Many prompts need no real-time answer, and cost matters, which fits batch inference at a 50% discount.",
+        "Requests on Standard pay-as-you-go fail with 429 errors, which needs exponential backoff and the global endpoint."
+      ],
+      "traps": [
+        "The global endpoint for a data residency requirement. You cannot control where it processes a request.",
+        "A quota increase as the first fix for 429 errors on Standard pay-as-you-go. The errors show temporary contention for shared capacity."
+      ],
+      "confused": [
+        {
+          "with": "gemini-models",
+          "tell": "The Gemini models generate the content. Agent Platform is where your code calls them on Google Cloud, with IAM, endpoints, quotas, and batch jobs."
+        },
+        {
+          "with": "bigquery",
+          "tell": "For data that is already in BigQuery, BigQuery ML trains and runs models with SQL, with no data movement."
+        }
+      ],
+      "aws": "Amazon Bedrock, Amazon SageMaker",
+      "docs": {
+        "title": "Deployments and endpoints",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/locations"
+      },
+      "sources": [
+        "4.2-generative-ai-apis",
+        "1.3-bigquery-writes"
+      ]
+    },
+    {
+      "id": "gemini-models",
+      "name": "Gemini models and the Gemini API",
+      "category": "ai",
+      "patterns": [
+        "\\bGemini\\b(?! (?:Enterprise|Code Assist|Cloud Assist|CLI|for Google Cloud)\\b)",
+        "(?:Google )?Gen AI SDK",
+        "google-genai",
+        "(?i)function calling",
+        "Grounding with Google Search",
+        "(?i)context caching",
+        "(?i)structured output",
+        "(?i)system instructions?",
+        "(?i)safety filters?",
+        "(?i)\\bgrounding\\b"
+      ],
+      "what": "The Gemini models generate text and structured output from prompts. With the Google Gen AI SDK, code can ask for JSON that follows a schema, declare functions that the model can ask to call, and ground answers in Google Search or your own data.",
+      "cues": [
+        "The app needs valid JSON with the required fields every time, which fits a response_schema.",
+        "The model must use live data from your own API, such as an order status, which fits function calling.",
+        "Answers need current public information, which fits Grounding with Google Search.",
+        "Many requests start with the same large content, which fits context caching."
+      ],
+      "traps": [
+        "Google Search grounding and function calling in one request. The API does not support this combination, so send separate requests.",
+        "The application/json MIME type without a schema. It is only a strong hint, so add a response_schema."
+      ],
+      "confused": [
+        {
+          "with": "agent-platform",
+          "tell": "Agent Platform serves the Gemini API on Google Cloud, with IAM, endpoints, quotas, and batch jobs. The request settings control what the model returns."
+        },
+        {
+          "with": "gemini-code-assist",
+          "tell": "Gemini Code Assist helps developers write code. Your app calls the Gemini API to build its own AI features."
+        }
+      ],
+      "aws": "Amazon Bedrock runtime APIs",
+      "docs": {
+        "title": "Google Gen AI SDK",
+        "url": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/sdks/overview"
+      },
+      "sources": [
+        "4.2-generative-ai-apis"
+      ]
+    },
+    {
+      "id": "cloud-logging",
+      "name": "Cloud Logging and Observability Analytics",
+      "category": "ops",
+      "patterns": [
+        "Cloud Logging",
+        "Logs Explorer",
+        "Observability Analytics",
+        "Log Analytics",
+        "Logging query language",
+        "(?i)log buckets?",
+        "(?i)log sinks?",
+        "Log Router",
+        "Stackdriver Logging"
+      ],
+      "guidePatterns": [
+        "(?i)\\blogs\\b"
+      ],
+      "what": "Cloud Logging stores timestamped log entries, and the Logs Explorer finds and filters them. Observability Analytics (formerly Log Analytics) runs SQL queries that aggregate log data and join it with trace data.",
+      "cues": [
+        "A Cloud Run or GKE service must send logs with a severity and fields that you can query, with no agent, which fits JSON lines on stdout and stderr.",
+        "A team needs the count of an error for each hour of the past two weeks, which fits a SQL query in Observability Analytics.",
+        "Container logs must appear under their request log, which needs the trace ID in the logging.googleapis.com/trace field."
+      ],
+      "traps": [
+        "A logging agent for a Cloud Run service. Cloud Run collects stdout and stderr itself.",
+        "A query that mixes AND and OR without parentheses. In the Logging query language, OR has a higher precedence than AND."
+      ],
+      "confused": [
+        {
+          "with": "cloud-monitoring",
+          "tell": "Cloud Monitoring stores metric time series and alerting policies. A log-based metric turns matching log entries into a metric."
+        },
+        {
+          "with": "error-reporting",
+          "tell": "Error Reporting groups the error events in log entries that contain stack traces. Cloud Logging stores all the entries."
+        }
+      ],
+      "aws": "Amazon CloudWatch Logs",
+      "docs": {
+        "title": "Analyze logs using Logs Explorer and Observability Analytics",
+        "url": "https://docs.cloud.google.com/logging/docs/log-analytics"
+      },
+      "sources": [
+        "4.3-instrumentation",
+        "4.3-troubleshooting",
+        "4.3-tracing-and-correlation"
+      ]
+    },
+    {
+      "id": "cloud-monitoring",
+      "name": "Cloud Monitoring and Managed Service for Prometheus",
+      "category": "ops",
+      "patterns": [
+        "Cloud Monitoring",
+        "Metrics Explorer",
+        "(?i)log-based metrics?",
+        "(?i)uptime checks?",
+        "(?i)alerting polic(?:y|ies)",
+        "Managed Service for Prometheus",
+        "(?i)synthetic monitors?",
+        "Stackdriver Monitoring"
+      ],
+      "guidePatterns": [
+        "(?i)\\bmetrics\\b"
+      ],
+      "what": "Cloud Monitoring stores metric time series, uptime checks, alerting policies, and SLOs. Managed Service for Prometheus collects Prometheus metrics on GKE, so teams keep their PromQL queries and Grafana dashboards.",
+      "cues": [
+        "An error count or a latency value must come from logs that the app already writes, with no code change, which fits a log-based metric.",
+        "Services on GKE already expose Prometheus metrics, and the team does not want to run Prometheus servers.",
+        "App metrics from Cloud Run must reach Cloud Monitoring, which fits OpenTelemetry through a collector sidecar with instance-based billing."
+      ],
+      "traps": [
+        "A user ID or a request URL as a metric label. Each unique combination of label values creates a time series, so use a small set of values.",
+        "A new log-based metric to chart last week's errors. It counts only the entries that arrive after you create it."
+      ],
+      "confused": [
+        {
+          "with": "cloud-logging",
+          "tell": "Cloud Logging stores the individual log entries. Cloud Monitoring stores metrics, and a log-based metric connects the two."
+        },
+        {
+          "with": "cloud-trace",
+          "tell": "Cloud Trace shows where one request spends its time. Cloud Monitoring shows how a metric changes over time."
+        }
+      ],
+      "aws": "Amazon CloudWatch",
+      "docs": {
+        "title": "Alerting overview",
+        "url": "https://docs.cloud.google.com/monitoring/alerts"
+      },
+      "sources": [
+        "4.3-instrumentation",
+        "4.3-troubleshooting"
+      ]
+    },
+    {
+      "id": "cloud-trace",
+      "name": "Cloud Trace",
+      "category": "ops",
+      "patterns": [
+        "Cloud Trace",
+        "Trace Explorer",
+        "\\btraceparent\\b",
+        "X-Cloud-Trace-Context",
+        "(?i)\\btrace context\\b",
+        "Stackdriver Trace"
+      ],
+      "guidePatterns": [
+        "(?i)\\btraces\\b",
+        "(?i)trace IDs"
+      ],
+      "what": "Cloud Trace stores the spans of each request across services and shows their latency. Cloud Run sends request traces automatically, but your code must propagate the trace context to join the services in one trace.",
+      "cues": [
+        "Some requests are slow, and nobody knows which service or call is slow.",
+        "Each user request appears as two separate traces, which needs OpenTelemetry instrumentation that propagates the trace context.",
+        "Log entries must link to a span, which needs the trace ID and a 16-character hexadecimal span ID in each entry."
+      ],
+      "traps": [
+        "Cloud Trace to link the services. Cloud Trace does not propagate context, so each service must pass it on.",
+        "A higher Cloud Run sample rate. You cannot configure it, so add your own instrumentation for more detail."
+      ],
+      "confused": [
+        {
+          "with": "cloud-profiler",
+          "tell": "Cloud Profiler shows which functions use the most CPU or memory. Cloud Trace shows which span of a slow request takes the time."
+        }
+      ],
+      "aws": "AWS Application Signals",
+      "docs": {
+        "title": "Trace context",
+        "url": "https://docs.cloud.google.com/trace/docs/trace-context"
+      },
+      "sources": [
+        "4.3-tracing-and-correlation",
+        "4.3-instrumentation",
+        "4.3-troubleshooting"
+      ]
+    },
+    {
+      "id": "error-reporting",
+      "name": "Error Reporting",
+      "category": "ops",
+      "patterns": [
+        "Error Reporting",
+        "ReportedErrorEvent"
+      ],
+      "what": "Error Reporting groups error events from log entries that contain a stack trace, and from its API and client libraries. It sends a notification for a new error and for an error that comes back after you resolve it.",
+      "cues": [
+        "A team must see which exceptions are new and how often they occur.",
+        "Error messages without a stack trace must appear as error groups, which needs @type set to the ReportedErrorEvent type.",
+        "The log buckets use CMEK, so the code must send errors with the Error Reporting client library."
+      ],
+      "traps": [
+        "A stack trace logged at WARNING on Cloud Run. The severity must be not set or at least ERROR.",
+        "Muted instead of Resolved for a fixed bug. A muted group records no new events, and a resolved group reopens when the error comes back."
+      ],
+      "confused": [
+        {
+          "with": "cloud-logging",
+          "tell": "Cloud Logging stores every entry. Error Reporting reads the entries that contain stack traces and groups them by exception type and top frames."
+        },
+        {
+          "with": "gemini-cloud-assist",
+          "tell": "Gemini Cloud Assist can explain an error group and look for probable root causes. Error Reporting groups and counts the errors."
+        }
+      ],
+      "docs": {
+        "title": "Error Reporting overview",
+        "url": "https://docs.cloud.google.com/error-reporting/docs/grouping-errors"
+      },
+      "sources": [
+        "4.3-troubleshooting",
+        "4.3-instrumentation"
+      ]
+    },
+    {
+      "id": "cloud-profiler",
+      "name": "Cloud Profiler",
+      "category": "ops",
+      "patterns": [
+        "Cloud Profiler",
+        "(?<!CodeGuru |Cloud )\\bProfiler\\b",
+        "googlecloudprofiler"
+      ],
+      "guidePatterns": [
+        "(?i)Google Cloud Observability"
+      ],
+      "what": "Cloud Profiler continuously collects CPU and memory-allocation data from production code with low overhead. You add a language-specific agent library to the application.",
+      "cues": [
+        "A service uses much more CPU or memory under normal load, and the team must find the functions that use the most.",
+        "The analysis must use production data, with an overhead that is commonly below 0.5%."
+      ],
+      "traps": [
+        "No profiles from a service with a user-created service account. Grant the Cloud Profiler Agent role.",
+        "Cloud Trace for high CPU use under normal load. Cloud Trace shows the latency of spans, and Cloud Profiler shows the functions that use the most CPU time."
+      ],
+      "confused": [
+        {
+          "with": "cloud-trace",
+          "tell": "Cloud Trace shows which service or call in a slow request takes the time. Cloud Profiler shows which functions use the most CPU or memory."
+        }
+      ],
+      "aws": "Amazon CodeGuru Profiler",
+      "docs": {
+        "title": "Cloud Profiler overview",
+        "url": "https://docs.cloud.google.com/profiler/docs/about-profiler"
+      },
+      "sources": [
+        "4.3-instrumentation",
+        "4.3-troubleshooting"
+      ]
+    }
+  ]
+}

@@ -7,3 +7,8 @@ node_modules/
 .terraform.lock.hcl
 __pycache__/
 *.pyc
+.venv/
+
+# Files that a PCD lab writes into the repository (its teardown.sh deletes them).
+# Keep this entry here: a .gitignore inside app/ would stop gcloud from uploading the file.
+pcd/labs/62-memorystore-cache/app/server-ca.pem

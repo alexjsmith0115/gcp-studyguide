@@ -1,0 +1,1011 @@
+[
+  {
+    "id": "data-001",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "firestore",
+      "mobile",
+      "offline",
+      "database-choice"
+    ],
+    "stem": "A team builds a field-inspection app for Android and iOS. Inspectors often work in places with no network. They must read and edit inspection records offline, and the app must sync their changes when the device reconnects. Supervisor dashboards must show the changes in real time. The team wants a serverless database with no capacity planning. Which database should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Cloud SQL for PostgreSQL, behind a REST API that runs on Cloud Run"
+      },
+      {
+        "id": "B",
+        "text": "Firestore in Datastore mode, with the Datastore client libraries"
+      },
+      {
+        "id": "C",
+        "text": "Firestore in Native mode, with its Android and iOS client libraries"
+      },
+      {
+        "id": "D",
+        "text": "Bigtable, with one row for each inspection record and a Cloud Run API"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding needs are offline reads and writes on mobile devices, sync after the device reconnects, and real-time updates. Firestore caches the data that the app uses, so the app can read, write, and query it offline. When the device is online again, Firestore syncs the local changes. Real-time listeners update the dashboards, and Firestore needs no capacity planning.",
+    "whyWrong": {
+      "A": "Cloud SQL is a relational database on provisioned instances. It has no mobile client libraries with offline sync or real-time listeners, so the team must build them.",
+      "B": "Datastore mode is for legacy apps that depend on the Datastore API. It does not give the real-time updates and the mobile client libraries of Firestore.",
+      "D": "Bigtable has no mobile client libraries, offline support, or real-time listeners. You also size its clusters in nodes."
+    },
+    "sources": [
+      {
+        "title": "Firestore",
+        "url": "https://firebase.google.com/docs/firestore",
+        "evidence": "Cloud Firestore caches data that your app is actively using, so the app can write, read, listen to, and query data even if the device is offline."
+      },
+      {
+        "title": "Choose between Firestore APIs",
+        "url": "https://docs.cloud.google.com/datastore/docs/firestore-or-datastore",
+        "evidence": "Firestore is backward compatible with Datastore, but the new data model, real-time updates, and mobile and web client library features aren't."
+      }
+    ]
+  },
+  {
+    "id": "data-002",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "bigtable",
+      "time-series",
+      "database-choice"
+    ],
+    "stem": "A utility company collects a reading every 15 seconds from 10 million smart meters. The data grows by several terabytes each month. A customer portal must show the readings of one meter for a chosen time range with millisecond latency. Nightly batch jobs scan all readings. The app always reads by meter ID and time, and it needs no joins or transactions across rows. Which database should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Bigtable, with autoscaling that adds nodes as the data grows"
+      },
+      {
+        "id": "B",
+        "text": "Cloud SQL for PostgreSQL, with read replicas that serve the portal"
+      },
+      {
+        "id": "C",
+        "text": "BigQuery, with a table that is partitioned by day and clustered by meter ID"
+      },
+      {
+        "id": "D",
+        "text": "Memorystore for Valkey, with persistence turned on for durability"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "The deciding needs are a very large volume of single-keyed time-series data, a high write rate, and low-latency reads by key. Bigtable is built for large amounts of single-keyed data, with high read and write throughput at low latency. Time-series data is one of its main use cases, and it also works well as a storage engine for batch processing. You add nodes, or turn on autoscaling, as the data grows.",
+    "whyWrong": {
+      "B": "Cloud SQL scales vertically, and one primary instance takes all writes. Read replicas add only read capacity, and this volume passes the storage limit of an instance within a few years.",
+      "C": "BigQuery is an analytics warehouse for OLAP queries. For low-latency reads of single-keyed data, the docs point to Bigtable.",
+      "D": "Memorystore is a managed cache for sub-millisecond access to hot data. It is not the main store for terabytes of history that grows every month."
+    },
+    "sources": [
+      {
+        "title": "Bigtable overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/overview",
+        "evidence": "Bigtable is ideal for storing large amounts of single-keyed data with low latency. It supports high read and write throughput at low latency, and it's an ideal data source for MapReduce operations."
+      },
+      {
+        "title": "Bigtable overview",
+        "url": "https://docs.cloud.google.com/bigtable/docs/overview",
+        "evidence": "Time-series data, such as CPU and memory usage over time for multiple servers."
+      }
+    ]
+  },
+  {
+    "id": "data-003",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "alloydb",
+      "htap",
+      "columnar-engine",
+      "database-choice"
+    ],
+    "stem": "A retailer runs its order-management app on Cloud SQL for PostgreSQL. The app uses PostgreSQL extensions and stored procedures. Managers now want dashboards that run complex aggregate queries on the live order data. On Cloud SQL, these queries take minutes and slow down order processing. The team wants fast dashboard queries on current data, no separate ETL pipeline, and few code changes. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a Cloud SQL read replica, and run the dashboard queries on the replica"
+      },
+      {
+        "id": "B",
+        "text": "Migrate to Spanner, and connect the app through the Spanner PostgreSQL interface"
+      },
+      {
+        "id": "C",
+        "text": "Export the order tables to BigQuery each night, and run the dashboards there"
+      },
+      {
+        "id": "D",
+        "text": "Migrate to AlloyDB for PostgreSQL, and use its columnar engine for the dashboards"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding needs are fast analytical queries on live transactional data, PostgreSQL compatibility, and no ETL pipeline. AlloyDB is fully PostgreSQL-compatible, and it is designed for hybrid transactional and analytical processing (HTAP). Its columnar engine stores selected columns in memory in a columnar format, which speeds up scans and aggregates. The engine can also run on a read pool instance, away from the primary instance.",
+    "whyWrong": {
+      "A": "A read replica moves the dashboard load off the primary instance, but the queries run no faster there. The dashboards still wait minutes for each result.",
+      "B": "The Spanner PostgreSQL interface does not support PostgreSQL extensions or user-defined stored procedures. The app needs rework, which breaks the few-changes requirement.",
+      "C": "A nightly export is an ETL pipeline. The dashboards then show data that is up to one day old, not live data."
+    },
+    "sources": [
+      {
+        "title": "AlloyDB overview",
+        "url": "https://docs.cloud.google.com/alloydb/docs/overview",
+        "evidence": "Hybrid Transactional and Analytical Processing (HTAP): run complex analytical queries against your live transactional data without impacting performance or availability."
+      },
+      {
+        "title": "About the AlloyDB columnar engine",
+        "url": "https://docs.cloud.google.com/alloydb/docs/columnar-engine/about",
+        "evidence": "The AlloyDB columnar engine accelerates SQL query processing of scans, joins, and aggregates"
+      },
+      {
+        "title": "PostgreSQL interface",
+        "url": "https://docs.cloud.google.com/spanner/docs/postgresql-interface",
+        "evidence": "Some PostgreSQL language features aren't supported: extensions, user-defined data types, user-defined stored procedures, and other features aren't supported."
+      }
+    ]
+  },
+  {
+    "id": "data-004",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "request-rate",
+      "object-naming"
+    ],
+    "stem": "A Cloud Run service stores sensor uploads in one Cloud Storage bucket. At peak, it writes several thousand objects each second. Each object name starts with a timestamp, for example `2026-09-30T12:00:01.123Z_sensor-0042.json`. The team ramps up traffic gradually, but writes still show higher latency and error rates during peaks. The team wants to keep the timestamp in each object name. How should you change the object names?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Put the time in date-based folder names, for example `2026/09/30/12/00/01.123Z_sensor-0042.json`"
+      },
+      {
+        "id": "B",
+        "text": "Add a short hash before the timestamp, for example `a3f9c1_2026-09-30T12:00:01.123Z_sensor-0042.json`"
+      },
+      {
+        "id": "C",
+        "text": "Add a random suffix after the timestamp, for example `2026-09-30T12:00:01.123Z_sensor-0042_a3f9c1.json`"
+      },
+      {
+        "id": "D",
+        "text": "Replace the timestamp with a global sequence number, for example `000004211876_sensor-0042.json`"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Names that start with a timestamp are sequential, so every new write goes to the same range of the object key index. This slows the autoscaling of that index range. A short hash before the timestamp spreads the writes across key ranges, and each name still contains the timestamp.",
+    "whyWrong": {
+      "A": "The folder path is a prefix of each object name. The names still increase in time order, so new writes still go to one index range.",
+      "C": "The random part comes after the timestamp. The names still sort by time, so new writes still go to one index range.",
+      "D": "A global sequence number is also sequential, so it has the same problem. It also removes the timestamp that the team wants to keep."
+    },
+    "sources": [
+      {
+        "title": "Request rate and access distribution guidelines",
+        "url": "https://docs.cloud.google.com/storage/docs/request-rate",
+        "evidence": "If you want to use sequential numbers or timestamps as part of your object names, introduce randomness to the object names by adding a hash value before the sequence number or timestamp."
+      },
+      {
+        "title": "Request rate and access distribution guidelines",
+        "url": "https://docs.cloud.google.com/storage/docs/request-rate",
+        "evidence": "Auto-scaling of an index range can be slowed when using sequential names, such as object keys based on a sequence of numbers or timestamp."
+      }
+    ]
+  },
+  {
+    "id": "data-005",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "spanner",
+      "write-scaling",
+      "database-choice"
+    ],
+    "stem": "A gaming company runs a player-inventory service on Cloud SQL for PostgreSQL. Writes already use most of the CPU of the largest machine type for the primary instance. After a global launch, write traffic will grow several times, and it will keep growing. The data needs relational tables, SQL, and ACID transactions across rows. Players on three continents must always read current data. Which approach should you take?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add Cloud SQL read replicas in each region, and send part of the traffic to them"
+      },
+      {
+        "id": "B",
+        "text": "Migrate to AlloyDB for PostgreSQL, and add read pool instances to the cluster"
+      },
+      {
+        "id": "C",
+        "text": "Migrate to Bigtable, and use an app profile with multi-cluster routing"
+      },
+      {
+        "id": "D",
+        "text": "Migrate to Spanner, and add compute capacity as the write traffic grows"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The deciding needs are write throughput beyond one primary instance, relational SQL with ACID transactions, and current reads on three continents. Spanner scales horizontally: its read and write throughput grow about linearly as you add nodes or processing units. Google suggests Spanner for large-scale, globally scalable, and strongly consistent workloads.",
+    "whyWrong": {
+      "A": "Read replicas are read-only and can lag. All writes still go to one primary instance, and reads from a replica can return old data.",
+      "B": "An AlloyDB cluster has exactly one primary instance for all writes. Read pool instances add only read capacity.",
+      "C": "Bigtable has no relational tables, and its transactions cover only one row. Replication between its clusters is eventually consistent."
+    },
+    "sources": [
+      {
+        "title": "Performance overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/performance",
+        "evidence": "In general, both the read and write throughputs of a Spanner instance scale linearly as you add more compute capacity (nodes or processing units) to the instance."
+      },
+      {
+        "title": "Your Google Cloud database options, explained",
+        "url": "https://cloud.google.com/blog/topics/developers-practitioners/your-google-cloud-database-options-explained",
+        "evidence": "In Google Cloud use Cloud SQL for any general-purpose SQL database and Cloud Spanner for large-scale globally scalable, strongly consistent use cases."
+      },
+      {
+        "title": "AlloyDB overview",
+        "url": "https://docs.cloud.google.com/alloydb/docs/overview",
+        "evidence": "Primary instance: provides read and write access to your data. Every cluster has exactly one primary instance."
+      }
+    ]
+  },
+  {
+    "id": "data-006",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "spanner",
+      "primary-key",
+      "hotspot",
+      "schema"
+    ],
+    "stem": "You review this Spanner table before the first release:\n\n```sql\nCREATE TABLE UserAccessLogs (\n  LastAccess TIMESTAMP NOT NULL,\n  UserId     INT64 NOT NULL,\n  Device     STRING(256),\n) PRIMARY KEY (LastAccess, UserId);\n```\n\nThe app inserts one row for each user sign-in, thousands of times each second. The main query reads the most recent sign-ins of one user. In a load test, inserts are slow and one server receives all the writes. How should you change the table?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Put the user first, and sort the time in descending order: `PRIMARY KEY (UserId, LastAccess DESC)`"
+      },
+      {
+        "id": "B",
+        "text": "Keep the key columns, and sort the time in descending order: `PRIMARY KEY (LastAccess DESC, UserId)`"
+      },
+      {
+        "id": "C",
+        "text": "Keep the key, and make `LastAccess` a commit timestamp column with `allow_commit_timestamp=true`"
+      },
+      {
+        "id": "D",
+        "text": "Keep the key, and add a secondary index on `(UserId, LastAccess DESC)` for the main query"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "A timestamp as the first key part sends every insert to the end of the table. One split and one server then take all the writes. With `UserId` first, the inserts spread across splits, because one user does not create thousands of events each second. `LastAccess DESC` stores the newest sign-ins of each user first, which suits the main query.",
+    "whyWrong": {
+      "B": "Descending order only moves the inserts to the top of the table. One server still receives all of them.",
+      "C": "A commit timestamp as the first part of the primary key also creates a hotspot, even at low write rates.",
+      "D": "The index helps the query, but the table keeps its timestamp-first key. All inserts still go to one split."
+    },
+    "sources": [
+      {
+        "title": "Schema design best practices",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-design",
+        "evidence": "This schema spreads writes among different splits because it's unlikely that a single user produces thousands of events per second."
+      },
+      {
+        "title": "Schema design best practices",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-design",
+        "evidence": "doesn't solve this problem because then all the writes are inserted at the top of the table instead, which still sends all the inserts to a single server."
+      },
+      {
+        "title": "Commit timestamps in GoogleSQL-dialect databases",
+        "url": "https://docs.cloud.google.com/spanner/docs/commit-timestamp",
+        "evidence": "Hotspots reduce data performance, even with low write rates."
+      }
+    ]
+  },
+  {
+    "id": "data-007",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "spanner",
+      "primary-key",
+      "bit-reversed-sequence",
+      "migration"
+    ],
+    "stem": "A team migrates an order service from MySQL to Spanner (GoogleSQL dialect). In MySQL, the `Orders` table has a `BIGINT AUTO_INCREMENT` primary key. Other systems store order IDs as 64-bit integers. The app needs the IDs only to be unique, not ordered, and the table will get thousands of inserts each second. How should you define the key column in Spanner?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`OrderId UUID DEFAULT (NEW_UUID())`, which generates random UUID version 4 keys"
+      },
+      {
+        "id": "B",
+        "text": "`OrderId INT64`, set by the app from a counter row that each insert transaction increments"
+      },
+      {
+        "id": "C",
+        "text": "`OrderId INT64 GENERATED BY DEFAULT AS IDENTITY (BIT_REVERSED_POSITIVE)`"
+      },
+      {
+        "id": "D",
+        "text": "`OrderId INT64`, set by the app to the current time in microseconds"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The deciding needs are unique 64-bit integer keys and a high insert rate. An `IDENTITY` column with `BIT_REVERSED_POSITIVE` takes values from an internal counter and bit-reverses them. The values spread evenly across the key space, so the inserts do not create a hotspot. The Spanner docs give a bit-reversed sequence for an integer key that only needs to be unique.",
+    "whyWrong": {
+      "A": "Spanner recommends UUID version 4 keys for new apps, but other systems need 64-bit integer IDs. A UUID breaks that requirement.",
+      "B": "A counter gives increasing values. All inserts then go to the end of the key space, which creates a hotspot on one server.",
+      "D": "Time values always increase, so all inserts go to one split. Two orders in the same microsecond can also get the same ID."
+    },
+    "sources": [
+      {
+        "title": "Primary key default values management",
+        "url": "https://docs.cloud.google.com/spanner/docs/primary-key-default-value",
+        "evidence": "If you are using an integer primary key, and your application only needs the key to be unique, you can use a key column in INT64 and use a bit-reversed positive sequence for the default value for the primary key."
+      },
+      {
+        "title": "Primary key default values management",
+        "url": "https://docs.cloud.google.com/spanner/docs/primary-key-default-value",
+        "evidence": "Bit-reversed sequences are especially useful for primary keys, because bit-reversed values are evenly distributed across the key space so that they don't cause hotspots."
+      },
+      {
+        "title": "Schemas overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-and-data-model",
+        "evidence": "if you insert records with a monotonically increasing integer as the key, you'll always insert at the end of your key space."
+      }
+    ]
+  },
+  {
+    "id": "data-008",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "spanner",
+      "interleaving",
+      "foreign-keys",
+      "schema"
+    ],
+    "stem": "An e-commerce app on Spanner has an `Orders` table with the primary key `OrderId`. You design an `OrderItems` table. The app usually reads an order together with all of its items. An item must never exist without its order. When the app deletes an order, Spanner must also delete its items. Which design follows Google's recommendations?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Key `(OrderId, ItemId)`, declared with `INTERLEAVE IN Orders`"
+      },
+      {
+        "id": "B",
+        "text": "Key `(ItemId)`, with an enforced foreign key on `OrderId` that uses `ON DELETE CASCADE`"
+      },
+      {
+        "id": "C",
+        "text": "Key `(OrderId, ItemId)`, declared with `INTERLEAVE IN PARENT Orders ON DELETE CASCADE`"
+      },
+      {
+        "id": "D",
+        "text": "Key `(OrderId, ItemId)`, interleaved in parent `Orders`, plus an enforced foreign key on `OrderId`"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The app reads each order with its items, so the items belong next to their order row. `INTERLEAVE IN PARENT` stores the items of each order with the order row, and Spanner checks that the parent order exists. `ON DELETE CASCADE` deletes the items when the app deletes the order.",
+    "whyWrong": {
+      "A": "`INTERLEAVE IN` gives the same physical layout, but Spanner does not enforce referential integrity. Items can then exist without their order.",
+      "B": "A foreign key enforces the relationship, but Spanner does not store the items with their order. A read of an order and its items can then touch several splits.",
+      "D": "Google recommends interleaving or a foreign key for a parent-child relationship, but not both."
+    },
+    "sources": [
+      {
+        "title": "Foreign keys",
+        "url": "https://docs.cloud.google.com/spanner/docs/foreign-keys/overview",
+        "evidence": "However, you also know that you often want to run queries across orders and their respective order items. Because co-location of this data boosts performance, you would want to create the parent-child relationship using Spanner's table interleaving capability."
+      },
+      {
+        "title": "Schemas overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-and-data-model",
+        "evidence": "This parent-child relationship is enforced when interleaved with the INTERLEAVE IN PARENT clause. INTERLEAVE IN child tables share the same physical row interleaving characteristics, but Spanner doesn't enforce referential integrity between parent and child."
+      },
+      {
+        "title": "Schemas overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/schema-and-data-model",
+        "evidence": "Google recommends that you choose to represent parent-child relationships either as interleaved tables or as foreign keys, but not both."
+      }
+    ]
+  },
+  {
+    "id": "data-009",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "bigtable",
+      "row-key",
+      "hotspot",
+      "time-series"
+    ],
+    "stem": "A monitoring service writes CPU and memory readings to Bigtable once each second for each of 50,000 machines. A dashboard reads the readings of one machine for a chosen time range. You must choose the row key. Which row key design should you use?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`1425330757685#machine_4223421`: the timestamp, then the machine ID"
+      },
+      {
+        "id": "B",
+        "text": "`machine_4223421#1425330757685`: the machine ID, then the timestamp"
+      },
+      {
+        "id": "C",
+        "text": "`machine_4223421#cpu`: one row for each machine and metric, with a new cell for each reading"
+      },
+      {
+        "id": "D",
+        "text": "A hash of `machine_4223421#1425330757685`, so that the writes spread evenly"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "A row key that starts with the machine ID, a high-cardinality value, spreads the writes across nodes. The timestamp at the end keeps the readings of each machine in time order, so the dashboard reads one contiguous range of rows.",
+    "whyWrong": {
+      "A": "A row key that starts with a timestamp sends sequential writes to one node, which creates a hotspot.",
+      "C": "A row that the app updates every second overloads the tablet that stores it. The row can also pass its size limit, because old cells stay until garbage collection removes them.",
+      "D": "A hash removes the natural sort order, so the readings of one machine for a time range are no longer one row range. Hashes also make Key Visualizer output hard to read."
+    },
+    "sources": [
+      {
+        "title": "Schema design best practices",
+        "url": "https://docs.cloud.google.com/bigtable/docs/schema-design",
+        "evidence": "If you put a timestamp in a row key, precede it with a high-cardinality value like a user ID to avoid hotspots."
+      },
+      {
+        "title": "Schema design best practices",
+        "url": "https://docs.cloud.google.com/bigtable/docs/schema-design",
+        "evidence": "Your row key for this data could combine an identifier for the machine with a timestamp for the data (for example, machine_4223421#1425330757685)."
+      }
+    ]
+  },
+  {
+    "id": "data-010",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 3,
+    "tags": [
+      "bigtable",
+      "secondary-index",
+      "materialized-view",
+      "schema"
+    ],
+    "stem": "A user-profile service stores profiles in Bigtable. The row key is the email address of the user, and the phone number is a column value. A new support tool must find profiles by phone number with low latency, and lookups by email must stay as fast as they are now. The tool accepts results that lag behind writes by a few seconds. The team does not want to add write logic to the application. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Scan the table with a value filter that matches the phone number column"
+      },
+      {
+        "id": "B",
+        "text": "Create a new table with the row key `phone#email`, and move the data to it"
+      },
+      {
+        "id": "C",
+        "text": "Also write each profile to a second table, keyed by phone number, in the same request"
+      },
+      {
+        "id": "D",
+        "text": "Create a continuous materialized view whose row key starts with the phone number"
+      }
+    ],
+    "answer": [
+      "D"
+    ],
+    "explanation": "The row key is the only index of a Bigtable table, so a lookup by a column value scans the full table. A continuous materialized view with a different row key works as an asynchronous secondary index. Bigtable keeps it eventually consistent with the source table, and the application keeps writing only to the source table.",
+    "whyWrong": {
+      "A": "A filter on a column value does not use the row key, so each lookup reads the full table.",
+      "B": "Email lookups then need a full table scan, because the row key no longer starts with the email address.",
+      "C": "This adds write logic to the application, which the team does not want. The two writes are also not atomic, because Bigtable transactions cover only one row."
+    },
+    "sources": [
+      {
+        "title": "Create an asynchronous secondary index",
+        "url": "https://docs.cloud.google.com/bigtable/docs/asynchronous-secondary-index",
+        "evidence": "If you make the email address your Bigtable row key and store telephone numbers in a column, then the performance of the phone number lookup is slower because it requires a full table scan."
+      },
+      {
+        "title": "Create an asynchronous secondary index",
+        "url": "https://docs.cloud.google.com/bigtable/docs/asynchronous-secondary-index",
+        "evidence": "Bigtable synchronizes asynchronous secondary indexes with the source table automatically in a way that is eventually consistent."
+      },
+      {
+        "title": "Create an asynchronous secondary index",
+        "url": "https://docs.cloud.google.com/bigtable/docs/asynchronous-secondary-index",
+        "evidence": "Applications don't write directly to the index, which continuously synchronizes with the source table. Always write to the source table."
+      }
+    ]
+  },
+  {
+    "id": "data-011",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "firestore",
+      "hotspot",
+      "indexes",
+      "document-ids"
+    ],
+    "stem": "An IoT backend writes sensor readings to a Firestore collection (Standard edition). The write rate grows toward several thousand documents each second. The backend builds each document ID from a counter, for example `reading-000123457`, and each document has a `recordedAt` timestamp field. The app queries readings by `sensorId` only, and it never filters or sorts on `recordedAt`. As the rate grows, write latency and contention errors increase. Which two changes should you make? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a manual (composite) index on `sensorId` and `recordedAt`"
+      },
+      {
+        "id": "B",
+        "text": "Create the documents with automatic document IDs instead of counter-based IDs"
+      },
+      {
+        "id": "C",
+        "text": "Write the readings of each day to a new collection, so that each collection stays small"
+      },
+      {
+        "id": "D",
+        "text": "Store the readings of each sensor in an array field of one document per sensor"
+      },
+      {
+        "id": "E",
+        "text": "Exempt the `recordedAt` field from automatic indexing in this collection"
+      }
+    ],
+    "answer": [
+      "B",
+      "E"
+    ],
+    "explanation": "Two sequential values cause the hotspot. Counter-based IDs increase monotonically, so new documents go to one key range. Automatic document IDs use a scatter algorithm and avoid this. An indexed field that increases from document to document, like a timestamp, also limits the write rate of the collection. Because the app never queries on `recordedAt`, you can exempt it from automatic indexing.",
+    "whyWrong": {
+      "A": "A manual index adds index entries to every write, and index fanout is the main cause of write latency. The app also never queries on `recordedAt`.",
+      "C": "A high write rate to a collection with few documents is also a cause of hotspots. The counter-based IDs also stay sequential.",
+      "D": "One document for each sensor becomes a hot document that takes every reading of that sensor. The document also grows with each reading."
+    },
+    "sources": [
+      {
+        "title": "Best practices",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/best-practices",
+        "evidence": "Firestore allocates document IDs using a scatter algorithm. You should not encounter hotspotting on writes if you create new documents using automatic document IDs."
+      },
+      {
+        "title": "Best practices",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/best-practices",
+        "evidence": "If you don't query based on the field with sequential values, you can exempt the field from indexing to bypass this limit."
+      }
+    ]
+  },
+  {
+    "id": "data-012",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "firestore",
+      "distributed-counter",
+      "hot-document"
+    ],
+    "stem": "A live-voting feature keeps the vote count of each poll in one Firestore document. Each vote runs this code:\n\n```python\npoll_ref.update({\"votes\": firestore.Increment(1)})\n```\n\nDuring popular polls, the updates show contention errors and high latency. The app reads the total only a few times each minute. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Use a distributed counter: increment a random shard, and sum the shards for the total"
+      },
+      {
+        "id": "B",
+        "text": "Run each increment in a transaction, and retry the transaction when it fails"
+      },
+      {
+        "id": "C",
+        "text": "Move the vote count to a document in a subcollection of the poll document"
+      },
+      {
+        "id": "D",
+        "text": "Exempt the `votes` field from automatic indexing to reduce the write latency"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Firestore cannot update one document at an unlimited rate, so a single counter document gets contention. A distributed counter is a document with a subcollection of shards, and the count is the sum of the shards. Write throughput grows with the number of shards. Each read of the total reads every shard, which is acceptable because the app reads the total rarely.",
+    "whyWrong": {
+      "B": "A transaction still writes the same document. Retries add more load to the hot document and do not raise its update rate.",
+      "C": "The count is still in one document, so all votes still update a single document.",
+      "D": "An exemption removes index entries from each write, but the single document still limits the update rate."
+    },
+    "sources": [
+      {
+        "title": "Support frequent and distributed counters",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/solutions/counters",
+        "evidence": "In Firestore, you can't update a single document at an unlimited rate. If you have a counter based on single document and frequent enough increments to it you will eventually see contention on the updates to the document."
+      },
+      {
+        "title": "Support frequent and distributed counters",
+        "url": "https://docs.cloud.google.com/firestore/native/docs/solutions/counters",
+        "evidence": "To support more frequent counter updates, create a distributed counter. Each counter is a document with a subcollection of \"shards,\" and the value of the counter is the sum of the value of the shards."
+      }
+    ]
+  },
+  {
+    "id": "data-013",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "alloydb",
+      "index-advisor",
+      "indexes",
+      "schema"
+    ],
+    "stem": "A team moved a PostgreSQL app to AlloyDB for PostgreSQL. Several API endpoints now run slow queries that scan large tables. The team does not know which indexes the whole query workload needs. It wants index recommendations that come from the queries that the database runs, with little manual analysis. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add a read pool instance, and send the slow queries to its nodes"
+      },
+      {
+        "id": "B",
+        "text": "Create a B-tree index on each column that appears in a `WHERE` clause"
+      },
+      {
+        "id": "C",
+        "text": "Query the `google_db_advisor_recommended_indexes` view of the index advisor"
+      },
+      {
+        "id": "D",
+        "text": "Increase the number of vCPUs of the primary instance to speed up the scans"
+      }
+    ],
+    "answer": [
+      "C"
+    ],
+    "explanation": "The AlloyDB index advisor tracks the queries that the database runs and analyzes them periodically. It recommends new indexes that make these queries faster. The `google_db_advisor_recommended_indexes` view lists each recommended index, its estimated storage, and the number of queries that it can affect.",
+    "whyWrong": {
+      "A": "A read pool adds read capacity, but the queries still scan the large tables.",
+      "B": "This guesses at indexes instead of analyzing the workload. It can create many indexes that no query uses.",
+      "D": "More vCPUs add capacity, but the query plans still scan the large tables."
+    },
+    "sources": [
+      {
+        "title": "Use the index advisor",
+        "url": "https://docs.cloud.google.com/alloydb/docs/use-index-advisor",
+        "evidence": "AlloyDB for PostgreSQL offers an index advisor that tracks the queries your database regularly handles. Periodically, it analyzes these queries to recommend new indexes that can increase the queries' performance."
+      },
+      {
+        "title": "Use the index advisor",
+        "url": "https://docs.cloud.google.com/alloydb/docs/use-index-advisor",
+        "evidence": "google_db_advisor_recommended_indexes lists any recommended new indexes for its database. It also includes estimates of the storage required for each index, and the number of queries that each index can affect."
+      }
+    ]
+  },
+  {
+    "id": "data-014",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 1,
+    "tags": [
+      "alloydb",
+      "read-pool",
+      "replication-lag",
+      "read-your-writes"
+    ],
+    "stem": "A Cloud Run service uses AlloyDB for PostgreSQL. It sends writes to the primary instance and all `SELECT` queries to a read pool instance. After users save a profile change, the next page sometimes shows the old value. The page must always show the user's own change. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Add more nodes to the read pool instance to reduce its load"
+      },
+      {
+        "id": "B",
+        "text": "Send the reads that must show the user's own change to the primary instance"
+      },
+      {
+        "id": "C",
+        "text": "Turn on the columnar engine on the read pool instance for these queries"
+      },
+      {
+        "id": "D",
+        "text": "Turn on high availability for the primary instance of the cluster"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "Writes go to the primary instance, and the read pool nodes receive and apply the changes after a lag. A delay in either step gives stale data on the read pool. The primary instance always has the committed change, so send the reads that need read-your-writes behavior to it.",
+    "whyWrong": {
+      "A": "More nodes add read capacity and can reduce lag, but they do not make sure that a read sees the latest write.",
+      "C": "The columnar engine speeds up analytical queries. It does not change how fresh the data on the read pool is.",
+      "D": "High availability protects the primary instance from zone and node failures. The read pool still receives changes after a lag."
+    },
+    "sources": [
+      {
+        "title": "Troubleshoot replication issues",
+        "url": "https://docs.cloud.google.com/alloydb/docs/troubleshoot/replication-issues",
+        "evidence": "In an AlloyDB cluster, writes are performed on the primary instance and then recorded in the Write-Ahead Log (WAL). These changes are then replicated to the read pool nodes."
+      },
+      {
+        "title": "Troubleshoot replication issues",
+        "url": "https://docs.cloud.google.com/alloydb/docs/troubleshoot/replication-issues",
+        "evidence": "A delay in either step — whether in transmitting the WAL or applying it — results in stale data on your read replicas."
+      }
+    ]
+  },
+  {
+    "id": "data-015",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "spanner",
+      "stale-reads",
+      "read-write-transactions",
+      "consistency"
+    ],
+    "stem": "A retailer uses a Spanner multi-region instance. The default leader region is in the US, and the configuration has a read-only replica in Asia. Two features need a read design:\n\n- A product page that is served from Asia must load fast. Product data that is up to 15 seconds old is acceptable.\n- A checkout service in the US reads the stock level of an item and then decrements it. It must never oversell.\n\nWrites must not get slower. Which two approaches should you use? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Product page: read with a bounded staleness of 15 seconds"
+      },
+      {
+        "id": "B",
+        "text": "Product page: make Asia a read lease region, and use strong reads"
+      },
+      {
+        "id": "C",
+        "text": "Checkout: read the stock with a 15-second stale read, and then write the new value"
+      },
+      {
+        "id": "D",
+        "text": "Checkout: read the stock and write the decrement in the same read-write transaction"
+      },
+      {
+        "id": "E",
+        "text": "Product page: read the product data inside a read-write transaction"
+      }
+    ],
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "The product page tolerates 15 seconds of staleness and needs low latency far from the leader. A nearby read-only replica can usually serve a stale read of 15 seconds or more without a round trip to the leader region. The checkout writes a value that depends on a read, so the read and the write belong in one read-write transaction.",
+    "whyWrong": {
+      "B": "A read lease gives local strong reads, but every write must then contact the read lease regions. Writes get slower, which the stem does not allow.",
+      "C": "A stale read can return an old stock level, so a decrement that is based on it can oversell.",
+      "E": "Reads in a read-write transaction go to the leader and take locks. Reads from Asia then need a round trip to the US, and the locks can delay writes."
+    },
+    "sources": [
+      {
+        "title": "Replication",
+        "url": "https://docs.cloud.google.com/spanner/docs/replication",
+        "evidence": "If it is the nearest replica to your application, the read-only replica can usually serve stale reads without needing a round trip to the leader region, assuming staleness is at least 15 seconds."
+      },
+      {
+        "title": "Transactions overview",
+        "url": "https://docs.cloud.google.com/spanner/docs/transactions",
+        "evidence": "If write operations depend on read operations, perform both within the same read-write transaction, even if the writes don't execute."
+      },
+      {
+        "title": "Read lease",
+        "url": "https://docs.cloud.google.com/spanner/docs/read-lease",
+        "evidence": "However, writes experience higher latency when you use the feature, because enabling read lease requires the leader to contact read lease regions when serving writes."
+      }
+    ]
+  },
+  {
+    "id": "data-016",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "multi",
+    "difficulty": 3,
+    "tags": [
+      "bigtable",
+      "app-profiles",
+      "replication",
+      "consistency"
+    ],
+    "stem": "A Bigtable instance has two clusters in two regions. Two workloads use it:\n\n- A ticketing service increments sold-ticket counters with read-modify-write requests. It must read its own writes.\n- A catalog API only reads. It must keep serving if one cluster fails, and it accepts slightly stale data.\n\nYou create one app profile for each workload. Which two app profile settings should you use? (Choose two.)",
+    "options": [
+      {
+        "id": "A",
+        "text": "Ticketing: multi-cluster routing to any cluster, with single-row transactions allowed"
+      },
+      {
+        "id": "B",
+        "text": "Catalog: single-cluster routing to the cluster that is nearest to the API"
+      },
+      {
+        "id": "C",
+        "text": "Ticketing: single-cluster routing to one cluster, with single-row transactions allowed"
+      },
+      {
+        "id": "D",
+        "text": "Ticketing: multi-cluster routing with row-affinity routing turned on"
+      },
+      {
+        "id": "E",
+        "text": "Catalog: multi-cluster routing to any cluster in the instance"
+      }
+    ],
+    "answer": [
+      "C",
+      "E"
+    ],
+    "explanation": "Read-modify-write requests are single-row transactions, and single-cluster routing is the only policy that allows them. It also gives read-your-writes consistency when the workload reads and writes on the same cluster. The catalog needs availability more than fresh data. Multi-cluster routing fails over automatically to the nearest available cluster, with eventual consistency.",
+    "whyWrong": {
+      "A": "Bigtable does not allow single-row transactions with multi-cluster routing, because increments on two clusters can conflict.",
+      "B": "With single-cluster routing, you must fail over manually. If that cluster fails, the catalog stops until you change the routing.",
+      "D": "Row-affinity routing raises the rate of read-your-writes consistency, but it does not guarantee it. It is still multi-cluster routing, so single-row transactions are not allowed."
+    },
+    "sources": [
+      {
+        "title": "Routing options",
+        "url": "https://docs.cloud.google.com/bigtable/docs/routing",
+        "evidence": "you can achieve read-your-writes consistency for a workload in a replicated instance if you configure an app profile for that workload to use single-cluster routing"
+      },
+      {
+        "title": "Routing options",
+        "url": "https://docs.cloud.google.com/bigtable/docs/routing",
+        "evidence": "This is the only routing policy that lets you enable single-row transactions."
+      },
+      {
+        "title": "Routing options",
+        "url": "https://docs.cloud.google.com/bigtable/docs/routing",
+        "evidence": "If the cluster becomes unavailable, traffic automatically fails over to the nearest cluster that is available."
+      }
+    ]
+  },
+  {
+    "id": "data-017",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-storage",
+      "consistency",
+      "cache-control"
+    ],
+    "stem": "A public Cloud Storage bucket serves `config.json` to a web app. The object has no `Cache-Control` metadata. After the team uploads a new version, some users get the old version for up to an hour. The team wants users to get updates within one minute, and it still wants caching to reduce load. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Set the `Cache-Control` metadata of the object to `public, max-age=60`"
+      },
+      {
+        "id": "B",
+        "text": "Turn on Object Versioning for the bucket that stores the object"
+      },
+      {
+        "id": "C",
+        "text": "Move the object to a dual-region bucket with turbo replication"
+      },
+      {
+        "id": "D",
+        "text": "Make the web app send a `Cache-Control: no-cache` request header"
+      }
+    ],
+    "answer": [
+      "A"
+    ],
+    "explanation": "Cloud Storage writes are strongly consistent, but a cached public object stays in caches until its cache lifetime ends. Without a lifetime in `Cache-Control`, a public object can be cached for up to 60 minutes. A `max-age` of 15 to 60 seconds limits how old a cached copy can be, and it keeps the benefit of caching.",
+    "whyWrong": {
+      "B": "Object Versioning keeps older versions of objects. It does not change how long caches keep a copy.",
+      "C": "Turbo replication speeds up the copy of new objects to the second region. The old reads come from caches, not from replication.",
+      "D": "Cloud Storage ignores request headers that try to avoid cached content. The `Cache-Control` metadata of the object sets the cache lifetime."
+    },
+    "sources": [
+      {
+        "title": "Cloud Storage consistency",
+        "url": "https://docs.cloud.google.com/storage/docs/consistency",
+        "evidence": "If you allow an object to be cached, and the object is in the cache when it is updated or deleted, the cached object is not updated or deleted until its cache lifetime expires."
+      },
+      {
+        "title": "Caching with Cloud Storage built-in cache",
+        "url": "https://docs.cloud.google.com/storage/docs/caching",
+        "evidence": "Consider instead setting the object's Cache-Control metadata to public with max-age of 15-60 seconds."
+      },
+      {
+        "title": "Cloud Storage consistency",
+        "url": "https://docs.cloud.google.com/storage/docs/consistency",
+        "evidence": "while requests for the object can include their own Cache-Control header, these headers are ignored by Cloud Storage if they're set to avoid cached content."
+      }
+    ]
+  },
+  {
+    "id": "data-018",
+    "objective": "1.3",
+    "caseStudy": null,
+    "type": "single",
+    "difficulty": 2,
+    "tags": [
+      "cloud-sql",
+      "high-availability",
+      "read-replicas",
+      "replication"
+    ],
+    "stem": "An order service uses a Cloud SQL for PostgreSQL instance in one zone. The service must keep running after a zone outage, with automatic failover and no loss of committed transactions. A developer proposes a read replica in another zone. What should you do?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Create the read replica in another zone, and promote it if the primary zone fails"
+      },
+      {
+        "id": "B",
+        "text": "Configure the instance for high availability, with a standby in a second zone"
+      },
+      {
+        "id": "C",
+        "text": "Create a cross-region read replica, and promote it after a zone outage"
+      },
+      {
+        "id": "D",
+        "text": "Turn on point-in-time recovery, and restore to a new instance after an outage"
+      }
+    ],
+    "answer": [
+      "B"
+    ],
+    "explanation": "The deciding needs are automatic failover and no loss of committed data. High availability (HA) replicates each write synchronously to the disks in two zones before the commit returns. If the zone or the instance fails, Cloud SQL fails over to the standby automatically, and the standby has every committed transaction.",
+    "whyWrong": {
+      "A": "Read replicas give no failover capability. Promotion is manual, and a replica can lag, so recent transactions can be lost.",
+      "C": "A cross-region replica is asynchronous and needs manual promotion. The failover is not automatic, and recent data can be lost.",
+      "D": "A restore is a manual recovery, not an automatic failover. The service stays down while the restore runs."
+    },
+    "sources": [
+      {
+        "title": "About high availability",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/high-availability",
+        "evidence": "Through synchronous replication to each zone's persistent disk, all writes made to the primary instance are replicated to disks in both zones before a transaction is reported as committed."
+      },
+      {
+        "title": "About replication in Cloud SQL",
+        "url": "https://docs.cloud.google.com/sql/docs/postgres/replication",
+        "evidence": "Read replicas don't provide failover capability. To provide failover capability for an instance, see Configuring an instance for high availability."
+      }
+    ]
+  }
+]

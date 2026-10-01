@@ -2,7 +2,7 @@
   "name": "pca-studyguide",
   "private": true,
   "type": "module",
-  "description": "Google Cloud Professional Cloud Architect study guide: notes, labs, question bank, flashcards, and a study app.",
+  "description": "Google Cloud study guides for the Professional Cloud Architect (PCA) and Professional Cloud Developer (PCD) exams: notes, labs, question banks, flashcards, and a study app.",
   "scripts": {
     "build": "node app/build.mjs",
     "test": "node --test app/test/*.test.mjs",
@@ -10,7 +10,13 @@
     "check:flashcards": "python3 tools/check_flashcards.py --all",
     "check:labs": "python3 tools/check_labs.py",
     "check:links": "python3 tools/check_links.py",
-    "share": "node app/build.mjs --strict --share"
+    "share": "node app/build.mjs --strict --share",
+    "build:pcd": "node app/build.mjs --guide pcd",
+    "check:pcd:questions": "python3 tools/check_questions.py --guide pcd --all",
+    "check:pcd:flashcards": "python3 tools/check_flashcards.py --guide pcd --all",
+    "check:pcd:labs": "python3 tools/check_labs.py --guide pcd",
+    "check:pcd:links": "python3 tools/check_links.py --guide pcd",
+    "share:pcd": "node app/build.mjs --guide pcd --strict --share"
   },
   "devDependencies": {
     "gray-matter": "^4.0.3",

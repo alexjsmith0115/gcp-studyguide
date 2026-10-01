@@ -1,0 +1,15 @@
+# Lab 61: the Gateway. The GKE Gateway controller creates a load balancer for it.
+# https://docs.cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: lab61-gateway
+  namespace: lab61
+spec:
+  # A global external Application Load Balancer. It supports weights and header matches,
+  # and it needs no proxy-only subnet. gke-l7-gxlb (classic) does not support traffic splitting.
+  gatewayClassName: gke-l7-global-external-managed
+  listeners:
+  - name: http
+    protocol: HTTP      # HTTP on port 80 keeps the lab short. Use HTTPS for a real app.
+    port: 80            # by default, only routes in the same namespace (lab61) can attach

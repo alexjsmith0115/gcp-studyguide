@@ -1,0 +1,470 @@
+[
+  {
+    "id": "net-f001",
+    "note": "1.1-load-balancing",
+    "kind": "term",
+    "front": "Application Load Balancer",
+    "back": "The Layer 7 proxy load balancer (formerly HTTP(S) Load Balancing). Use it for HTTP and HTTPS traffic, which includes gRPC and WebSocket.",
+    "aws": "Elastic Load Balancing, Application Load Balancer",
+    "source": {
+      "title": "Cloud Load Balancing release notes",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/release-notes",
+      "evidence": "As a general rule, you'd choose an Application Load Balancer when you need a Layer 7 load balancer for your applications with HTTP(S) traffic."
+    }
+  },
+  {
+    "id": "net-f002",
+    "note": "1.1-load-balancing",
+    "kind": "term",
+    "front": "Passthrough Network Load Balancer",
+    "back": "A Layer 4 load balancer that does not terminate connections. Backends see the original client source IP address and reply to clients directly. Use it for UDP, ESP, or ICMP traffic, or when the backend needs the client IP address.",
+    "aws": "Elastic Load Balancing, Network Load Balancer",
+    "source": {
+      "title": "Choose a load balancer",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+      "evidence": "Choose a passthrough Network Load Balancer to preserve client source IP addresses, avoid the overhead of proxies, and to support additional protocols like UDP, ESP, and ICMP."
+    }
+  },
+  {
+    "id": "net-f003",
+    "note": "1.1-load-balancing",
+    "kind": "concept",
+    "front": "Which load balancer serves internal clients when the backends are in several regions?",
+    "back": "A cross-region internal load balancer. Only external load balancers can be global.",
+    "aws": null,
+    "source": {
+      "title": "Choose a load balancer",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+      "evidence": "Only external load balancers are available as global load balancers. For internal load balancers with backends in multiple regions, choose the cross-region load balancer."
+    }
+  },
+  {
+    "id": "net-f004",
+    "note": "1.1-load-balancing",
+    "kind": "term",
+    "front": "Classic Application Load Balancer",
+    "back": "The classic mode of the global external Application Load Balancer, with the load balancing scheme `EXTERNAL`. It is global in Premium Tier and regional in Standard Tier. Google recommends migration to the global external Application Load Balancer (`EXTERNAL_MANAGED`).",
+    "aws": null,
+    "source": {
+      "title": "Choose a load balancer",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/choosing-load-balancer",
+      "evidence": "To take advantage of new features available only with the global external Application Load Balancer, we recommend that you migrate your existing `EXTERNAL` resources to `EXTERNAL_MANAGED`"
+    }
+  },
+  {
+    "id": "net-f005",
+    "note": "1.1-load-balancing",
+    "kind": "term",
+    "front": "Serverless NEG",
+    "back": "A network endpoint group that points to a Cloud Run, Cloud Run functions, App Engine, or API Gateway (Preview) resource. Use it to put a serverless app behind an Application Load Balancer. Network Load Balancers do not support it.",
+    "aws": null,
+    "source": {
+      "title": "Serverless network endpoint groups overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts",
+      "evidence": "A serverless NEG is a backend that points to a Cloud Run, App Engine, Cloud Run functions, or API Gateway resource."
+    }
+  },
+  {
+    "id": "net-f006",
+    "note": "1.1-load-balancing",
+    "kind": "concept",
+    "front": "Which Cloud Run ingress setting stops clients from bypassing the load balancer and Cloud Armor?",
+    "back": "`internal-and-cloud-load-balancing`. Without it, clients can call the service's default URL and skip the load balancer, its Cloud Armor policies, and its certificates.",
+    "aws": null,
+    "source": {
+      "title": "Set up a global external Application Load Balancer with Cloud Run, App Engine, or Cloud Run functions",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/https/setup-global-ext-https-serverless",
+      "evidence": "Ensure external traffic only reaches your serverless application from the load balancer by using setting ingress to \"Internal and Cloud Load Balancing\"."
+    }
+  },
+  {
+    "id": "net-f007",
+    "note": "1.1-load-balancing",
+    "kind": "concept",
+    "front": "How does a global external Application Load Balancer stop sending requests to a failed Cloud Run region?",
+    "back": "Serverless NEGs do not support health checks. Enable outlier detection on the backend service, or configure Cloud Run service health. Without one of them, the load balancer keeps sending requests to the failed region.",
+    "aws": null,
+    "source": {
+      "title": "Serverless network endpoint groups overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/negs/serverless-neg-concepts",
+      "evidence": "Unless you have configured Cloud Run service health or enabled outlier detection, a load balancer configured with a serverless NEG can't detect whether the underlying resource is working as expected."
+    }
+  },
+  {
+    "id": "net-f008",
+    "note": "1.1-load-balancing",
+    "kind": "term",
+    "front": "GKE Gateway API",
+    "back": "The Kubernetes API that GKE uses to create Google Cloud load balancers. The GatewayClass of each Gateway decides the load balancer type. Google hosts the Gateway controllers outside your cluster and project.",
+    "aws": "Amazon EKS with an Ingress controller",
+    "source": {
+      "title": "About Gateway API",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/gateway-api",
+      "evidence": "Both Gateway controllers are Google-hosted controllers that watch the Kubernetes API for GKE clusters. Unlike the GKE Ingress controller, the Gateway controllers are not hosted on GKE control planes or in the user project"
+    }
+  },
+  {
+    "id": "net-f009",
+    "note": "1.1-load-balancing",
+    "kind": "term",
+    "front": "Container-native load balancing",
+    "back": "The load balancer sends traffic directly to Pod IP addresses through `GCE_VM_IP_PORT` NEGs, not to nodes. Traffic skips the node and kube-proxy, so latency is lower and throughput is higher. All GKE-managed Layer 7 load balancers use it.",
+    "aws": null,
+    "source": {
+      "title": "GKE Ingress for Application Load Balancers",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/ingress",
+      "evidence": "With container-native load balancing, traffic is load balanced directly to the Pods, bypassing the need to route through the VM IP and `kube-proxy` networking on the node."
+    }
+  },
+  {
+    "id": "net-f010",
+    "note": "1.1-load-balancing",
+    "kind": "concept",
+    "front": "Why must an app not rely on load balancer session affinity to keep users signed in?",
+    "back": "Session affinity is best effort. It can break when backends are added or removed, fail health checks, or become full. Keep session state in a shared store, such as Memorystore.",
+    "aws": null,
+    "source": {
+      "title": "Request distribution for external Application Load Balancers",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/https/request-distribution",
+      "evidence": "Don't rely on session affinity for authentication or security purposes. Session affinity, except for stateful cookie-based session affinity, can break whenever the number of serving and healthy backends changes."
+    }
+  },
+  {
+    "id": "net-f011",
+    "note": "1.1-load-balancing",
+    "kind": "concept",
+    "front": "What goes wrong with `CLIENT_IP` session affinity when many users share one corporate NAT?",
+    "back": "All those users have the same source IP address, so the load balancer sends them to the same backend. Some backends then get more requests than others.",
+    "aws": null,
+    "source": {
+      "title": "Request distribution for external Application Load Balancers",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/https/request-distribution",
+      "evidence": "In situations where many clients share the same effective source IP address, some backend VMs might receive more connections or requests than others."
+    }
+  },
+  {
+    "id": "net-f012",
+    "note": "1.1-load-balancing",
+    "kind": "concept",
+    "front": "How do you keep each client on the same Cloud Run instance when the service is behind a load balancer?",
+    "back": "Turn on Cloud Run session affinity on the service. A serverless NEG does not support load balancer session affinity, so do not set it on the backend service.",
+    "aws": null,
+    "source": {
+      "title": "Set session affinity for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/session-affinity",
+      "evidence": "You can enable Cloud Run's session affinity on a Cloud Run service, even if it's behind a load balancer. However, you shouldn't enable Cloud Load Balancing session affinity on a serverless network endpoint group, since it's not supported."
+    }
+  },
+  {
+    "id": "net-f013",
+    "note": "1.1-caching",
+    "kind": "concept",
+    "front": "Why is a global variable a poor cache for data that all Cloud Run instances must share?",
+    "back": "Each instance has its own memory, and a new instance starts with an empty cache. You cannot assume that Cloud Run keeps state between requests. Put shared data in Memorystore or in the database.",
+    "aws": null,
+    "source": {
+      "title": "General development tips",
+      "url": "https://docs.cloud.google.com/run/docs/tips/general",
+      "evidence": "In Cloud Run, you cannot assume that service state is preserved between requests."
+    }
+  },
+  {
+    "id": "net-f014",
+    "note": "1.1-caching",
+    "kind": "term",
+    "front": "Memorystore for Valkey",
+    "back": "A managed in-memory data store that is compatible with open source Valkey. It scales without downtime, keeps replicas in other zones, and fails over automatically, with a 99.99% SLA. Use it when a cache needs high availability.",
+    "aws": "Amazon ElastiCache",
+    "source": {
+      "title": "Memorystore",
+      "url": "https://cloud.google.com/memorystore",
+      "evidence": "Memorystore for Valkey and Redis Cluster have zero-downtime scaling, automatically distributed replicas across availability zones, and automated failover. Memorystore for Valkey and Redis Cluster also offer a 99.99% SLA."
+    }
+  },
+  {
+    "id": "net-f015",
+    "note": "1.1-caching",
+    "kind": "concept",
+    "front": "Which tier of Memorystore for Redis fits a production cache?",
+    "back": "The Standard Tier. It replicates across zones and fails over automatically, with a 99.9% SLA. The Basic Tier has no replication and no automatic failover.",
+    "aws": null,
+    "source": {
+      "title": "Memorystore for Redis overview",
+      "url": "https://docs.cloud.google.com/memorystore/docs/redis/memorystore-for-redis-overview",
+      "evidence": "Memorystore for Redis instances in the Standard Tier are replicated across zones, monitored for health and have fast automatic failover. Standard Tier instances also provide an SLA of 99.9%."
+    }
+  },
+  {
+    "id": "net-f016",
+    "note": "1.1-caching",
+    "kind": "concept",
+    "front": "What does Google recommend for a workload that runs on Memorystore for Memcached?",
+    "back": "Migrate it to Memorystore for Valkey. Memorystore for Memcached is deprecated and shuts down on January 31, 2029.",
+    "aws": null,
+    "source": {
+      "title": "Memorystore for Memcached release notes",
+      "url": "https://docs.cloud.google.com/memorystore/docs/memcached/release-notes",
+      "evidence": "We recommend that you migrate your workloads to Memorystore for Valkey, which offers superior performance and features."
+    }
+  },
+  {
+    "id": "net-f017",
+    "note": "1.1-caching",
+    "kind": "term",
+    "front": "Cache-aside",
+    "back": "A caching pattern in which the app reads the cache first. On a miss, the app reads the database, writes the value to the cache with a TTL, and returns it. Use it for frequent queries whose results do not need to appear in the app immediately.",
+    "aws": null,
+    "source": {
+      "title": "Caching data with Memorystore",
+      "url": "https://docs.cloud.google.com/appengine/docs/standard/using-memorystore",
+      "evidence": "Subsequent requests can check the cache and only query the database if the results are absent or have expired."
+    }
+  },
+  {
+    "id": "net-f018",
+    "note": "1.1-caching",
+    "kind": "term",
+    "front": "`volatile-lru`",
+    "back": "The default eviction policy of Memorystore for Redis. It evicts only keys that have a TTL. If the app sets no TTLs, Redis has no keys to evict, and the instance can run out of memory.",
+    "aws": null,
+    "source": {
+      "title": "Memory management best practices",
+      "url": "https://docs.cloud.google.com/memorystore/docs/redis/memory-management-best-practices",
+      "evidence": "The default eviction policy of a Memorystore instance is `volatile-lru`. If you are using a `volatile-*` eviction policy, make sure you are setting TTLs on keys that you want to expire, otherwise Redis has no keys to evict."
+    }
+  },
+  {
+    "id": "net-f019",
+    "note": "1.1-caching",
+    "kind": "concept",
+    "front": "Which network path does Google recommend from a Cloud Run service to a Memorystore for Redis instance?",
+    "back": "Direct VPC egress to the private IP address of the instance. Compared with a Serverless VPC Access connector, it has lower latency, higher throughput, and lower cost, because it needs no connector instances.",
+    "aws": null,
+    "source": {
+      "title": "Connect to a Redis instance from a Cloud Run service",
+      "url": "https://docs.cloud.google.com/memorystore/docs/redis/connect-redis-instance-cloud-run",
+      "evidence": "We recommend that you use Direct VPC egress because it offers lower latency, higher throughput, and lower costs by eliminating the need for managed connector instances."
+    }
+  },
+  {
+    "id": "net-f020",
+    "note": "1.1-caching",
+    "kind": "concept",
+    "front": "Why can an unplanned Memorystore for Valkey failover lose acknowledged writes?",
+    "back": "Replication from the primary to its replicas is asynchronous. A write that the primary acknowledged can be missing on the replica that becomes the new primary.",
+    "aws": null,
+    "source": {
+      "title": "High availability and replicas",
+      "url": "https://docs.cloud.google.com/memorystore/docs/valkey/ha-and-replicas",
+      "evidence": "During a failover resulting from an unexpected failure, acknowledged writes may be lost due to the asynchronous nature of Valkey's replication protocol."
+    }
+  },
+  {
+    "id": "net-f021",
+    "note": "1.1-caching",
+    "kind": "term",
+    "front": "Cloud CDN",
+    "back": "Google's content delivery network. It caches responses at Google edge locations, close to users. You turn it on for a backend service or backend bucket of a global external or classic Application Load Balancer.",
+    "aws": "Amazon CloudFront",
+    "source": {
+      "title": "Cloud CDN overview",
+      "url": "https://docs.cloud.google.com/cdn/docs/overview",
+      "evidence": "Cloud CDN works with the global external Application Load Balancer or the classic Application Load Balancer to deliver content to your users."
+    }
+  },
+  {
+    "id": "net-f022",
+    "note": "1.1-caching",
+    "kind": "term",
+    "front": "`CACHE_ALL_STATIC`",
+    "back": "The default Cloud CDN cache mode. It caches successful responses with static content types, such as CSS, JavaScript, fonts, and images, also when they have no cache headers. HTML and JSON responses need a valid `Cache-Control` header.",
+    "aws": null,
+    "source": {
+      "title": "Caching overview",
+      "url": "https://docs.cloud.google.com/cdn/docs/caching",
+      "evidence": "caches successful responses with static content that isn't otherwise non-cacheable. Origin responses that set valid caching directives are also cached. This behavior is the default for Cloud CDN-enabled backends created by using the Google Cloud CLI or the REST API."
+    }
+  },
+  {
+    "id": "net-f023",
+    "note": "1.1-caching",
+    "kind": "term",
+    "front": "`FORCE_CACHE_ALL`",
+    "back": "A Cloud CDN cache mode that caches all successful responses and ignores the cache directives of the origin, such as `private` and `no-store`. Use it only when the backend serves public content, never per-user content.",
+    "aws": null,
+    "source": {
+      "title": "Caching overview",
+      "url": "https://docs.cloud.google.com/cdn/docs/caching",
+      "evidence": "Unconditionally caches successful responses, overriding any cache directives set by the origin. This mode might not be appropriate if the backend serves private, per-user (user identifiable) content, such as dynamic HTML or API responses."
+    }
+  },
+  {
+    "id": "net-f024",
+    "note": "1.1-caching",
+    "kind": "concept",
+    "front": "What does Google recommend as the default way to update content that Cloud CDN caches?",
+    "back": "Versioned URLs, for example `file_v100.ext` or `/v100/file.ext`, with a long expiration time. Versioning is free. Use cache invalidation only as a last resort, because it is rate limited and does not clear browser caches.",
+    "aws": null,
+    "source": {
+      "title": "Content delivery best practices",
+      "url": "https://docs.cloud.google.com/cdn/docs/best-practices",
+      "evidence": "Because versioning is free, we recommend that you use versioning as the default approach for updating cacheable content."
+    }
+  },
+  {
+    "id": "net-f025",
+    "note": "1.1-traffic-splitting",
+    "kind": "term",
+    "front": "Blue/green deployment",
+    "back": "A release strategy with two full environments. The new version goes to the idle environment, and then all traffic moves to it at once. Rollback reverses the routing change, but the setup uses twice the resources.",
+    "aws": null,
+    "source": {
+      "title": "Canarying Releases",
+      "url": "https://sre.google/workbook/canarying-releases/",
+      "evidence": "The cutover doesn't require downtime, and rollback is a trivial reversal of the router change. One downside is that this setup uses twice as many resources as a more \"traditional\" deployment."
+    }
+  },
+  {
+    "id": "net-f026",
+    "note": "1.1-traffic-splitting",
+    "kind": "term",
+    "front": "Traffic mirroring",
+    "back": "A release test that copies live traffic to the new version. Users get responses only from the current version, and the new version discards its responses. On GKE, a `RequestMirror` filter in an `HTTPRoute` does this.",
+    "aws": null,
+    "source": {
+      "title": "Canarying Releases",
+      "url": "https://sre.google/workbook/canarying-releases/",
+      "evidence": "While the production system serves the actual traffic and delivers responses to users, the canary deployment serves the copy and discards the responses."
+    }
+  },
+  {
+    "id": "net-f027",
+    "note": "1.1-traffic-splitting",
+    "kind": "term",
+    "front": "Cloud Run revision",
+    "back": "An immutable version of a Cloud Run service. Each deployment or configuration change creates a new revision. Cloud Run can split the traffic of a service between its revisions.",
+    "aws": "AWS Lambda weighted aliases",
+    "source": {
+      "title": "Manage revisions",
+      "url": "https://docs.cloud.google.com/run/docs/managing/revisions",
+      "evidence": "When you deploy to a service or change the configuration of a service, an immutable revision is created."
+    }
+  },
+  {
+    "id": "net-f028",
+    "note": "1.1-traffic-splitting",
+    "kind": "concept",
+    "front": "After one deployment with `--no-traffic`, why do later Cloud Run deployments also get no traffic?",
+    "back": "The traffic assignment stays in place for later deployments, so the latest revision no longer gets traffic by default. Run `gcloud run services update-traffic SERVICE --to-latest` to restore the default.",
+    "aws": null,
+    "source": {
+      "title": "gcloud run deploy",
+      "url": "https://docs.cloud.google.com/sdk/gcloud/reference/run/deploy",
+      "evidence": "After a deployment with this flag the LATEST revision will not receive traffic on future deployments. To restore sending traffic to the LATEST revision by default, run the `gcloud run services update-traffic` command with `--to-latest`."
+    }
+  },
+  {
+    "id": "net-f029",
+    "note": "1.1-traffic-splitting",
+    "kind": "term",
+    "front": "Revision tag",
+    "back": "A name on a Cloud Run revision that gives the revision its own URL. The URL starts with the tag name and works at any traffic percentage, also 0%. Use it to test a revision before it gets traffic.",
+    "aws": null,
+    "source": {
+      "title": "gcloud run services update-traffic",
+      "url": "https://docs.cloud.google.com/sdk/gcloud/reference/run/services/update-traffic",
+      "evidence": "Assigning a tag to a revision generates a URL prefixed with the tag that allows addressing that revision directly, regardless of the percent traffic specified."
+    }
+  },
+  {
+    "id": "net-f030",
+    "note": "1.1-traffic-splitting",
+    "kind": "concept",
+    "front": "How do you roll back a Cloud Run service to the last known good version?",
+    "back": "Send 100% of traffic to the earlier revision with `gcloud run services update-traffic SERVICE --to-revisions REVISION=100`. You do not rebuild or redeploy, because the earlier revision still exists.",
+    "aws": null,
+    "source": {
+      "title": "Rollbacks, gradual rollouts, and traffic migration",
+      "url": "https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration",
+      "evidence": "This feature lets you rollback to a previous revision, gradually deploy a revision, and split traffic between multiple revisions."
+    }
+  },
+  {
+    "id": "net-f031",
+    "note": "1.1-traffic-splitting",
+    "kind": "concept",
+    "front": "What happens to a Cloud Run traffic split when session affinity is on?",
+    "back": "Session affinity takes precedence over the split. If one client sends most of the requests, all of them can go to one revision, whatever the split percentages are.",
+    "aws": null,
+    "source": {
+      "title": "Set session affinity for services",
+      "url": "https://docs.cloud.google.com/run/docs/configuring/session-affinity",
+      "evidence": "If you enable session affinity on a Cloud Run revision and also use traffic splitting, session affinity takes precedence over any traffic splitting."
+    }
+  },
+  {
+    "id": "net-f032",
+    "note": "1.1-traffic-splitting",
+    "kind": "term",
+    "front": "Header-based canary",
+    "back": "A canary stage in which an `HTTPRoute` rule sends only requests with a test header, such as `env: canary`, to the new version. Real users stay on the current version. Use it to check the new version before it gets user traffic.",
+    "aws": null,
+    "source": {
+      "title": "Deploy a multi-cluster Gateway for weighted traffic splitting",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/deploy-gateway-traffic-splitting",
+      "evidence": "Header-based canarying lets the service owner match synthetic test traffic that does not come from real users. This is an easy way of validating that the basic networking of the application is functioning without exposing users directly."
+    }
+  },
+  {
+    "id": "net-f033",
+    "note": "1.1-traffic-splitting",
+    "kind": "concept",
+    "front": "On GKE Gateway, why can a user switch versions on a weighted route rule that has session affinity?",
+    "back": "Weighted traffic splitting takes precedence over session affinity. The load balancer first selects a backend by weight and then applies affinity. Do not put weights on a rule that needs stickiness.",
+    "aws": null,
+    "source": {
+      "title": "Configure Gateway resources using Policies",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/how-to/configure-gateway-resources",
+      "evidence": "Weighted traffic splitting takes precedence over session affinity. If an HTTPRoute defines weights for multiple backends, the load balancer first selects a backend based on weights before applying affinity logic."
+    }
+  },
+  {
+    "id": "net-f034",
+    "note": "1.1-traffic-splitting",
+    "kind": "term",
+    "front": "Cloud Deploy canary strategy",
+    "back": "A Cloud Deploy rollout in phases: one phase for each canary percentage, for example 25, 50, and 75, then a final `stable` phase at 100%. It supports Cloud Run services and worker pools (not jobs), and GKE.",
+    "aws": "AWS CodeDeploy canary and blue/green deployments",
+    "source": {
+      "title": "Use a canary deployment strategy",
+      "url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/canary",
+      "evidence": "When you create a release for a canary deployment, the rollout is created with a phase for each canary increment, plus a final `stable` phase for 100%."
+    }
+  },
+  {
+    "id": "net-f035",
+    "note": "1.1-traffic-splitting",
+    "kind": "concept",
+    "front": "Why can a Cloud Deploy canary on GKE with service networking miss an exact traffic percentage?",
+    "back": "It splits by Pod count, not by traffic. Cloud Deploy creates a `-canary` Deployment with a percentage of the Pods. For a split based on traffic, use Gateway API networking.",
+    "aws": null,
+    "source": {
+      "title": "Canary Deployments to GKE and GKE attached clusters using service-based networking",
+      "url": "https://docs.cloud.google.com/deploy/docs/deployment-strategies/canary/gke/service-networking",
+      "evidence": "This is based on the number of pods, not traffic to the pods. If you want your canary to be based on traffic, you need to use Gateway API."
+    }
+  },
+  {
+    "id": "net-f036",
+    "note": "1.1-traffic-splitting",
+    "kind": "concept",
+    "front": "Which resources set the traffic weights for a canary in Cloud Service Mesh on GKE?",
+    "back": "A `DestinationRule` defines subsets by the Pod `version` label, and a `VirtualService` sets the `weight` of each subset. Cloud Service Mesh (formerly Anthos Service Mesh and Traffic Director) uses these Istio APIs on GKE.",
+    "aws": null,
+    "source": {
+      "title": "Cloud Service Mesh by example: canary deployments",
+      "url": "https://docs.cloud.google.com/service-mesh/docs/tutorials/canary-deployment",
+      "evidence": "The subset field indicates the version, and the weight field indicates the percentage split of traffic. 75% of traffic goes to v1 of productcatalog, and 25% goes to v2."
+    }
+  }
+]

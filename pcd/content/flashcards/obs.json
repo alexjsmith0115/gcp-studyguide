@@ -1,0 +1,470 @@
+[
+  {
+    "id": "obs-f001",
+    "note": "4.3-instrumentation",
+    "kind": "term",
+    "front": "Google Cloud Observability",
+    "back": "The group name for the Google Cloud services that store and analyze telemetry, such as Cloud Logging, Cloud Monitoring, and Cloud Trace. Its former name is Stackdriver.",
+    "aws": null,
+    "source": {
+      "title": "Modernization path for .NET applications on Google Cloud",
+      "url": "https://docs.cloud.google.com/dotnet/docs/modernization-path-dotnet-applications-google-cloud",
+      "evidence": "Google Cloud Observability (formerly Stackdriver) offers several services that let you modernize the observability of your application:"
+    }
+  },
+  {
+    "id": "obs-f002",
+    "note": "4.3-instrumentation",
+    "kind": "term",
+    "front": "OpenTelemetry",
+    "back": "An open-source, vendor-neutral framework that instruments code to emit traces, metrics, and logs. Google recommends it instead of product-specific APIs or client libraries, even when you send telemetry only to Google Cloud.",
+    "aws": null,
+    "source": {
+      "title": "Observability in Google Cloud",
+      "url": "https://docs.cloud.google.com/stackdriver/docs",
+      "evidence": "To instrument your application, we recommend that you use an open-source, vendor-neutral instrumentation framework, such as OpenTelemetry, instead of vendor- and product-specific APIs or client libraries."
+    }
+  },
+  {
+    "id": "obs-f003",
+    "note": "4.3-instrumentation",
+    "kind": "concept",
+    "front": "Does a Cloud Run service need a logging agent to send its logs to Cloud Logging?",
+    "back": "No. Cloud Run has built-in log collection and does not use logging agents. Write JSON-structured lines to `stdout` and `stderr`, and Cloud Run sends them to Cloud Logging.",
+    "aws": null,
+    "source": {
+      "title": "Logging and viewing logs in Cloud Run",
+      "url": "https://docs.cloud.google.com/run/docs/logging",
+      "evidence": "Cloud Run does not use logging agents because it has built-in support for log collection."
+    }
+  },
+  {
+    "id": "obs-f004",
+    "note": "4.3-instrumentation",
+    "kind": "concept",
+    "front": "Which severity does GKE give to a plain-text log line on standard error?",
+    "back": "`ERROR`. Lines on standard output get `INFO`. To set another level, write a JSON line with a `severity` field.",
+    "aws": null,
+    "source": {
+      "title": "About GKE logs",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/concepts/about-logs",
+      "evidence": "By default, logs written to the standard output are on the `INFO` level and logs written to the standard error are on the `ERROR` level. Structured logs can include a `severity` field, which defines the log's severity."
+    }
+  },
+  {
+    "id": "obs-f005",
+    "note": "4.3-instrumentation",
+    "kind": "concept",
+    "front": "When does Google recommend direct in-process OpenTelemetry export instead of an OpenTelemetry collector?",
+    "back": "Only when a separate collector process is not practical in the compute environment. When the environment supports a collector, Google recommends that the SDK sends OTLP data to the collector.",
+    "aws": null,
+    "source": {
+      "title": "Choose an instrumentation approach",
+      "url": "https://docs.cloud.google.com/stackdriver/docs/instrumentation/choose-approach",
+      "evidence": "We recommend that you use an OpenTelemetry collector when your compute environment supports one. For environments where running a separate collector process isn't practical, use direct in-process export."
+    }
+  },
+  {
+    "id": "obs-f006",
+    "note": "4.3-instrumentation",
+    "kind": "term",
+    "front": "Telemetry (OTLP) API",
+    "back": "The Google Cloud API at `telemetry.googleapis.com` that implements the OpenTelemetry Protocol (OTLP). OpenTelemetry collectors and SDKs send logs, metrics, and traces to it.",
+    "aws": null,
+    "source": {
+      "title": "Telemetry (OTLP) API overview",
+      "url": "https://docs.cloud.google.com/stackdriver/docs/reference/telemetry/overview",
+      "evidence": "This document describes the Telemetry (OTLP) API, which implements the OpenTelemetry Protocol. This API is designed for use with applications that are instrumented by using one of the OpenTelemetry SDKs or that use any OpenTelemetry Collector."
+    }
+  },
+  {
+    "id": "obs-f007",
+    "note": "4.3-instrumentation",
+    "kind": "concept",
+    "front": "Which billing setting does a Cloud Run service with an OpenTelemetry collector sidecar need, and why?",
+    "back": "Instance-based billing. It allocates CPU for the whole instance lifecycle, and OpenTelemetry instrumentation needs this because it does background processing.",
+    "aws": null,
+    "source": {
+      "title": "Choose an instrumentation approach",
+      "url": "https://docs.cloud.google.com/stackdriver/docs/instrumentation/choose-approach",
+      "evidence": "For your Cloud Run service, use instance-based billing. With instance-based billing, the CPU is allocated for the entire instance lifecycle, which is necessary because OpenTelemetry instrumentation does background processing."
+    }
+  },
+  {
+    "id": "obs-f008",
+    "note": "4.3-instrumentation",
+    "kind": "concept",
+    "front": "How do you get a custom metric from a Cloud Run function into Cloud Monitoring?",
+    "back": "Write the value to the logs and create a log-based metric. Cloud Run functions (formerly Cloud Functions) does not support writing metric data directly.",
+    "aws": null,
+    "source": {
+      "title": "Choose an instrumentation approach",
+      "url": "https://docs.cloud.google.com/stackdriver/docs/instrumentation/choose-approach",
+      "evidence": "Writing metric data directly isn't supported in Cloud Run functions. You can generate log-based metrics."
+    }
+  },
+  {
+    "id": "obs-f009",
+    "note": "4.3-instrumentation",
+    "kind": "term",
+    "front": "Log-based metrics",
+    "back": "Cloud Monitoring metrics that Cloud Logging derives from log entries that match a filter. Counter metrics count entries, and distribution metrics collect extracted values such as latency. Use them to measure what your logs already contain, without code changes.",
+    "aws": null,
+    "source": {
+      "title": "Log-based metrics overview",
+      "url": "https://docs.cloud.google.com/logging/docs/logs-based-metrics",
+      "evidence": "Log-based metrics are Cloud Monitoring metrics that are derived from the content of log entries. For example, you can use a log-based metric to count the number of log entries that contain a particular message"
+    }
+  },
+  {
+    "id": "obs-f010",
+    "note": "4.3-instrumentation",
+    "kind": "concept",
+    "front": "Which log entries does a new user-defined log-based metric count?",
+    "back": "Only the entries that Cloud Logging receives after you create the metric. It does not backfill older entries, so a new metric cannot chart last week's errors.",
+    "aws": null,
+    "source": {
+      "title": "Log-based metrics overview",
+      "url": "https://docs.cloud.google.com/logging/docs/logs-based-metrics",
+      "evidence": "The data for a user-defined log-based metric comes only from log entries received after the metric is created. A metric isn't retroactively populated with data from log entries that are already in Logging."
+    }
+  },
+  {
+    "id": "obs-f011",
+    "note": "4.3-instrumentation",
+    "kind": "concept",
+    "front": "Which kinds of values must you not use as metric labels in Cloud Monitoring?",
+    "back": "High-resolution values, such as timestamps, unique identifiers, user IDs, IP addresses, and unparameterized URLs. Each unique combination of label values creates a time series. Use a small set of discrete values.",
+    "aws": null,
+    "source": {
+      "title": "Components of the metric model",
+      "url": "https://docs.cloud.google.com/monitoring/api/v3/metric-model",
+      "evidence": "Do not use high-resolution values like timestamps, any kind of unique identifier, user IDs, IP addresses, unparameterized URLs, and so forth, for metric labels."
+    }
+  },
+  {
+    "id": "obs-f012",
+    "note": "4.3-instrumentation",
+    "kind": "term",
+    "front": "Managed Service for Prometheus",
+    "back": "Google Cloud's managed service for Prometheus metrics. It collects metrics from Prometheus exporters, and you query them with PromQL, so existing Grafana dashboards and PromQL alerts keep working. Google recommends its managed collection for all Kubernetes environments.",
+    "aws": null,
+    "source": {
+      "title": "Google Cloud Managed Service for Prometheus",
+      "url": "https://docs.cloud.google.com/stackdriver/docs/managed-prometheus",
+      "evidence": "Managed Service for Prometheus collects metrics from Prometheus exporters and lets you query the data globally using PromQL, meaning that you can keep using any existing Grafana dashboards, PromQL-based alerts, and workflows."
+    }
+  },
+  {
+    "id": "obs-f013",
+    "note": "4.3-instrumentation",
+    "kind": "term",
+    "front": "Cloud Profiler",
+    "back": "A low-overhead profiler that continuously collects CPU and memory-allocation data from production applications and links it to the source code. Use it to find the functions that use the most CPU or memory. You add a language-specific profiling agent to the application.",
+    "aws": "Amazon CodeGuru Profiler",
+    "source": {
+      "title": "Cloud Profiler overview",
+      "url": "https://docs.cloud.google.com/profiler/docs/about-profiler",
+      "evidence": "Cloud Profiler is a statistical, low-overhead profiler that continuously gathers CPU usage and memory-allocation information from your production applications."
+    }
+  },
+  {
+    "id": "obs-f014",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "term",
+    "front": "Cloud Trace",
+    "back": "Google Cloud's distributed tracing system. It collects latency data from Google Cloud services and instrumented applications, so you can find which service or call in a request path is slow.",
+    "aws": "AWS Application Signals",
+    "source": {
+      "title": "Cloud Trace overview",
+      "url": "https://docs.cloud.google.com/trace/docs/overview",
+      "evidence": "Cloud Trace is a distributed tracing system for Google Cloud that tracks request latency and helps you troubleshoot performance bottlenecks across services and generative AI applications."
+    }
+  },
+  {
+    "id": "obs-f015",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "term",
+    "front": "Context propagation",
+    "back": "Passing the trace ID, the parent span ID, and the sampling decision to the next service, in request headers or gRPC metadata. Cloud Trace does not do it. The Google Cloud services and your applications must do it.",
+    "aws": null,
+    "source": {
+      "title": "Trace context",
+      "url": "https://docs.cloud.google.com/trace/docs/trace-context",
+      "evidence": "Cloud Trace isn't responsible for context propagation. Context propagation is the responsibility of the components that submit data to Cloud Trace. These components include Google Cloud services and user applications."
+    }
+  },
+  {
+    "id": "obs-f016",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "term",
+    "front": "`traceparent` header",
+    "back": "The W3C Trace Context header, in the format `VERSION-TRACE_ID-PARENT_SPAN_ID-TRACE_FLAGS`. It carries the trace ID, the parent span ID, and the parent's sampling decision. Google recommends that applications use it when possible.",
+    "aws": null,
+    "source": {
+      "title": "Trace context",
+      "url": "https://docs.cloud.google.com/trace/docs/trace-context",
+      "evidence": "When possible, use the `traceparent` header in your applications. If an application only supports the `X-Cloud-Trace-Context` header, then we recommend that you update the application to support and prioritize the `traceparent` header."
+    }
+  },
+  {
+    "id": "obs-f017",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "term",
+    "front": "`X-Cloud-Trace-Context` header",
+    "back": "The legacy Google Cloud trace header, older than the W3C standard. Its format is `TRACE_ID/SPAN_ID;o=OPTIONS`, with a decimal span ID. Some Google Cloud services still accept, generate, and propagate it. Google recommends that applications prioritize `traceparent`.",
+    "aws": null,
+    "source": {
+      "title": "Trace context",
+      "url": "https://docs.cloud.google.com/trace/docs/trace-context",
+      "evidence": "The `X-Cloud-Trace-Context` header used by Google Cloud predates the W3C specification. For backwards compatibility, some Google Cloud services continue to accept, generate, and propagate the `X-Cloud-Trace-Context` header."
+    }
+  },
+  {
+    "id": "obs-f018",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "concept",
+    "front": "Can you change the rate at which Cloud Run samples incoming requests for Cloud Trace?",
+    "back": "No. Cloud Run samples at most 0.1 requests per second for each instance, and it does not support configuration of this rate.",
+    "aws": null,
+    "source": {
+      "title": "Using distributed tracing",
+      "url": "https://docs.cloud.google.com/run/docs/trace",
+      "evidence": "Cloud Run does not support configuration of the Cloud Run sample rate."
+    }
+  },
+  {
+    "id": "obs-f019",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "concept",
+    "front": "Does an Application Load Balancer send spans to Cloud Trace?",
+    "back": "No. Application Load Balancers export no traces or spans. The global external and classic Application Load Balancers only add the `X-Cloud-Trace-Context` header when the request does not have it.",
+    "aws": null,
+    "source": {
+      "title": "External Application Load Balancer overview",
+      "url": "https://docs.cloud.google.com/load-balancing/docs/https",
+      "evidence": "Trace is not supported with Application Load Balancers. The global and classic Application Load Balancers add the `X-Cloud-Trace-Context` header if it is not present."
+    }
+  },
+  {
+    "id": "obs-f020",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "term",
+    "front": "Tail-based sampling",
+    "back": "Sampling that decides to keep a trace only after the full trace is available. Cloud Trace does not support it. Use an OpenTelemetry Collector with the Tail Sampling Processor, and send all spans of one trace ID to the same collector.",
+    "aws": null,
+    "source": {
+      "title": "Trace sampling",
+      "url": "https://docs.cloud.google.com/trace/docs/trace-sampling",
+      "evidence": "Cloud Trace doesn't support tail-based sampling; sampling decisions must be made in the components that send data to Cloud Trace."
+    }
+  },
+  {
+    "id": "obs-f021",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "term",
+    "front": "`ParentBased` sampler",
+    "back": "An OpenTelemetry sampler that makes your code respect the parent's `sampled` flag. Use it in a downstream service, so that the service samples the requests that its caller sampled.",
+    "aws": null,
+    "source": {
+      "title": "Instrument for Cloud Trace",
+      "url": "https://docs.cloud.google.com/trace/docs/setup",
+      "evidence": "Your applications: You configure how the instrumentation logic respects the `sampled` flag. For example, when using OpenTelemetry, you can use the `ParentBased` sampler to ensure that the parent's sampling flag is respected."
+    }
+  },
+  {
+    "id": "obs-f022",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "concept",
+    "front": "How does the Pub/Sub client library pass trace context from the publisher to the subscriber?",
+    "back": "It adds a tracing attribute with the `googclient_` prefix on the publish side. The attribute exists only when OpenTelemetry tracing is on, so enable tracing in the publisher and subscriber clients.",
+    "aws": null,
+    "source": {
+      "title": "Pub/Sub OpenTelemetry tracing",
+      "url": "https://docs.cloud.google.com/pubsub/docs/open-telemetry-tracing",
+      "evidence": "the client libraries inject a tracing specific attribute on the publish side. The context propagation mechanism is only enabled when tracing is turned on and is prepended with the `googclient_` prefix."
+    }
+  },
+  {
+    "id": "obs-f023",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "concept",
+    "front": "Which value format does Google prefer for the `trace` field of a log entry?",
+    "back": "The trace ID alone, for example `12345`. The REST resource name `projects/PROJECT_ID/traces/TRACE_ID` still works, but Google does not recommend it.",
+    "aws": null,
+    "source": {
+      "title": "LogEntry",
+      "url": "https://docs.cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry",
+      "evidence": "The REST resource name of the trace is also supported, but using this format is not recommended. An example trace REST resource name is similar to \"projects/my-trace-project/traces/12345\"."
+    }
+  },
+  {
+    "id": "obs-f024",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "concept",
+    "front": "Which format does the `spanId` field of a log entry need?",
+    "back": "A 16-character hexadecimal encoding of the span ID, for example `000000000000004a` for span ID 74. The `X-Cloud-Trace-Context` header has a decimal span ID, so convert it before you copy it.",
+    "aws": null,
+    "source": {
+      "title": "Link log entries with traces",
+      "url": "https://docs.cloud.google.com/trace/docs/trace-log-integration",
+      "evidence": "To associate a log entry with a span when using the Logging API, set the `spanId` field in the `LogEntry` object to the 16-character hexadecimal encoding of the span's ID."
+    }
+  },
+  {
+    "id": "obs-f025",
+    "note": "4.3-tracing-and-correlation",
+    "kind": "concept",
+    "front": "What makes the Logs Explorer nest Cloud Run container logs under their request log?",
+    "back": "The same `trace` value in both entries. Use a Cloud Logging client library, or write the `logging.googleapis.com/trace` field in each JSON log line. Container logs are not correlated with request logs automatically.",
+    "aws": null,
+    "source": {
+      "title": "Logging and viewing logs in Cloud Run",
+      "url": "https://docs.cloud.google.com/run/docs/logging",
+      "evidence": "To correlate container logs with request logs without using a client library, you can use a structured JSON log line that contains a `logging.googleapis.com/trace` field with the trace identifier extracted from the `X-Cloud-Trace-Context` header"
+    }
+  },
+  {
+    "id": "obs-f026",
+    "note": "4.3-troubleshooting",
+    "kind": "term",
+    "front": "Observability Analytics",
+    "back": "The SQL query interface (formerly Log Analytics) for log data and trace data. It groups and aggregates log entries and can join logs with traces. Use it for counts and trends, which the Logs Explorer cannot calculate.",
+    "aws": null,
+    "source": {
+      "title": "Analyze logs using Logs Explorer and Observability Analytics",
+      "url": "https://docs.cloud.google.com/logging/docs/log-analytics",
+      "evidence": "The Logs Explorer doesn't support aggregate operations, like counting the number of log entries that contain a specific pattern. To perform aggregate operations, enable analytics on the log bucket and then use Observability Analytics."
+    }
+  },
+  {
+    "id": "obs-f027",
+    "note": "4.3-troubleshooting",
+    "kind": "concept",
+    "front": "In the Logging query language, which Boolean operator has higher precedence: `AND` or `OR`?",
+    "back": "`OR`. The order is `NOT`, then `OR`, then `AND`, so `a OR b AND c` means `(a OR b) AND c`. Use parentheses when you combine `AND` and `OR`.",
+    "aws": null,
+    "source": {
+      "title": "Logging query language",
+      "url": "https://docs.cloud.google.com/logging/docs/view/logging-query-language",
+      "evidence": "The `NOT` operator has the highest precedence, followed by `OR` and `AND` in that order."
+    }
+  },
+  {
+    "id": "obs-f028",
+    "note": "4.3-troubleshooting",
+    "kind": "concept",
+    "front": "A Cloud Run deployment reports \"Container failed to start\". Which address must the container listen on?",
+    "back": "All network interfaces (`0.0.0.0`), on the port in the `PORT` environment variable. A container that listens on `127.0.0.1` fails to start on Cloud Run.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot Cloud Run issues",
+      "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+      "evidence": "Check if your container is listening on all network interfaces, commonly denoted as `0.0.0.0`. Notably, your container should not listen on `127.0.0.1`."
+    }
+  },
+  {
+    "id": "obs-f029",
+    "note": "4.3-troubleshooting",
+    "kind": "concept",
+    "front": "On Cloud Run, what does HTTP 429 with \"no available instance\" mean?",
+    "back": "The service reached its maximum number of container instances. Check the container instance count metric, then raise the maximum instances or request more quota.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot Cloud Run issues",
+      "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+      "evidence": "The service reaching its maximum container instance limit (`HTTP 429`)."
+    }
+  },
+  {
+    "id": "obs-f030",
+    "note": "4.3-troubleshooting",
+    "kind": "concept",
+    "front": "A Cloud Run service returns HTTP 404, but the request logs do not show it. What is a likely cause?",
+    "back": "The request did not reach the container. The ingress setting (Internal, or Internal and Cloud Load Balancing) blocked it, or the client used a disabled `run.app` URL.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot Cloud Run issues",
+      "url": "https://docs.cloud.google.com/run/docs/troubleshooting",
+      "evidence": "A request doesn't satisfy the specified network restriction, especially when Cloud Run service's ingress settings are set to Internal or Internal and Cloud Load Balancing."
+    }
+  },
+  {
+    "id": "obs-f031",
+    "note": "4.3-troubleshooting",
+    "kind": "term",
+    "front": "`CrashLoopBackOff`",
+    "back": "A Pod status: a container starts and then crashes or exits again and again, with a growing restart delay. The Pod already has a node and its image. Look at the container: the exit code, the logs of the previous container, memory, and probes.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot CrashLoopBackOff events",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/troubleshooting/crashloopbackoff-events",
+      "evidence": "A `CrashLoopBackOff` event confirms that many foundational steps of Pod creation, such as assignment to a node and pulling the container image, have already completed."
+    }
+  },
+  {
+    "id": "obs-f032",
+    "note": "4.3-troubleshooting",
+    "kind": "concept",
+    "front": "Which identity does the kubelet use to pull an image from Artifact Registry?",
+    "back": "The service account of the node VM, not Workload Identity Federation for GKE. For a 403 pull error, grant Artifact Registry Reader (`roles/artifactregistry.reader`) to that service account.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot image pulls",
+      "url": "https://docs.cloud.google.com/kubernetes-engine/docs/troubleshooting/image-pulls",
+      "evidence": "Image pulls from Artifact Registry by the kubelet don't use Workload Identity Federation for GKE. Instead, these image pulls use the service account associated with the VM."
+    }
+  },
+  {
+    "id": "obs-f033",
+    "note": "4.3-troubleshooting",
+    "kind": "term",
+    "front": "Error Reporting",
+    "back": "A service that groups application error events by root cause. It finds stack traces in log entries automatically, and it also takes events from the Error Reporting API and client libraries. Use it to see which errors are new and how often they occur.",
+    "aws": null,
+    "source": {
+      "title": "Error Reporting overview",
+      "url": "https://docs.cloud.google.com/error-reporting/docs/grouping-errors",
+      "evidence": "Error Reporting collects events directly from the Error Reporting API or infers them by scanning log entries for stack traces and common error patterns."
+    }
+  },
+  {
+    "id": "obs-f034",
+    "note": "4.3-troubleshooting",
+    "kind": "concept",
+    "front": "A log entry has a stack trace. Which severity lets Error Reporting create an error event from it?",
+    "back": "No severity, or `ERROR` or higher. A stack trace that you log at `WARNING` does not create an error event.",
+    "aws": null,
+    "source": {
+      "title": "Instrument Python apps for Error Reporting",
+      "url": "https://docs.cloud.google.com/error-reporting/docs/setup/python",
+      "evidence": "Error Reporting automatically creates an error event when a log entry contains a stack trace and the severity level of the log entry isn't set or is set to at least `ERROR`."
+    }
+  },
+  {
+    "id": "obs-f035",
+    "note": "4.3-troubleshooting",
+    "kind": "concept",
+    "front": "What happens to an error group marked Resolved when the error occurs again?",
+    "back": "Error Reporting changes its resolution status back to Open. In contrast, a Muted group does not record new events.",
+    "aws": null,
+    "source": {
+      "title": "Manage error groups",
+      "url": "https://docs.cloud.google.com/error-reporting/docs/managing-errors",
+      "evidence": "If an error group marked as Resolved later reoccurs, then Error Reporting changes the resolution status to Open."
+    }
+  },
+  {
+    "id": "obs-f036",
+    "note": "4.3-troubleshooting",
+    "kind": "term",
+    "front": "Gemini Cloud Assist investigations",
+    "back": "A root-cause analysis tool (Preview). It reviews logs, metrics, and configurations, and gives observations, probable root causes as hypotheses, and next steps. Use it to troubleshoot an issue across several data sources.",
+    "aws": null,
+    "source": {
+      "title": "Troubleshoot issues with Gemini Cloud Assist investigations",
+      "url": "https://docs.cloud.google.com/cloud-assist/investigations",
+      "evidence": "Gemini Cloud Assist investigations are a root-cause analysis (RCA) tool for troubleshooting your infrastructure and applications in complex and distributed cloud environments."
+    }
+  }
+]
