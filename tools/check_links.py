@@ -8,7 +8,8 @@ Scans notes, case studies, reference pages, lab READMEs, and question sources. F
   - warns when the host is not an allowed source (content/SPEC.md, rule 2.1).
 
 Usage:
-  python3 tools/check_links.py            # check everything
+  python3 tools/check_links.py            # check everything in the PCA guide
+  python3 tools/check_links.py --guide pcd   # check everything in the PCD guide
   python3 tools/check_links.py FILE...    # check some files
   python3 tools/check_links.py --refresh  # ignore the cache
 Exit code 1 when a link is broken.
@@ -24,6 +25,7 @@ from urllib.parse import urldefrag, urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fetch_doc  # noqa: E402
+import guides  # noqa: E402
 
 ROOT = fetch_doc.ROOT
 URL_RE = re.compile(r"https?://[^\s<>\"'`)\]]+")
@@ -31,7 +33,7 @@ URL_RE = re.compile(r"https?://[^\s<>\"'`)\]]+")
 NO_FETCH_HOSTS = {"console.cloud.google.com", "shell.cloud.google.com", "docs.google.com"}
 
 
-def allowed(url):
+def allowed(url, guide="pca"):
     u = urlparse(url)
     host, path = u.netloc.lower(), u.path
     if host in ("docs.cloud.google.com", "cloud.google.com", "sre.google") or host.endswith(".cloud.google.com"):
@@ -40,12 +42,26 @@ def allowed(url):
         return True
     if host == "services.google.com" and path.startswith("/fh/files/misc/"):
         return True
+    if guide == "pcd":
+        # The PCD guide also allows Google's developer docs, the API design guide (AIPs),
+        # the Firebase docs for Firestore and Identity Platform, Kubernetes docs, the Gen AI SDK reference,
+        # and the Python reference for google-api-core and google-auth
+        # (pcd/content/SPEC.md, rule 2.1).
+        if host in ("developers.google.com", "google.aip.dev") or (host == "firebase.google.com" and path.startswith("/docs")):
+            return True
+        if host == "kubernetes.io" and path.startswith("/docs"):
+            return True
+        if host == "googleapis.github.io" and path.startswith("/python-genai"):
+            return True
+        if host == "googleapis.dev" and path.startswith("/python/"):
+            return True
     return host in NO_FETCH_HOSTS
 
 
-def default_files():
-    pats = ["content/notes/*.md", "content/case-studies/*.md", "content/reference/*.md", "labs/*/README.md",
-            "content/questions/*.json"]
+def default_files(guide="pca"):
+    c, labs = guides.GUIDES[guide]["content"], guides.GUIDES[guide]["labs"]
+    pats = [f"{c}/notes/*.md", f"{c}/case-studies/*.md", f"{c}/reference/*.md", f"{labs}/*/README.md",
+            f"{c}/questions/*.json", f"{c}/flashcards/*.json"]
     return sorted(f for p in pats for f in glob.glob(os.path.join(ROOT, p)))
 
 
@@ -54,7 +70,7 @@ def urls_in(path):
     if path.endswith(".json"):
         found = []
         for q in json.loads(text):
-            for s in q.get("sources", []):
+            for s in q.get("sources", []) + ([q["source"]] if isinstance(q.get("source"), dict) else []):
                 if s.get("url"):
                     found.append((s["url"], q.get("id", "?")))
         return found
@@ -90,8 +106,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs="*")
     ap.add_argument("--refresh", action="store_true")
+    ap.add_argument("--guide", choices=sorted(guides.GUIDES))
     args = ap.parse_args()
-    files = [os.path.abspath(f) for f in args.files] or default_files()
+    guide = args.guide or (guides.guide_of_path(args.files[0]) if args.files else "pca")
+    files = [os.path.abspath(f) for f in args.files] or default_files(guide)
 
     where = {}
     for f in files:
@@ -101,7 +119,7 @@ def main():
     errors, warnings = [], []
     to_fetch = []
     for url in sorted(where):
-        if not allowed(url):
+        if not allowed(url, guide):
             warnings.append((url, "host is not an allowed source (SPEC rule 2.1)"))
         if urlparse(url).netloc.lower() not in NO_FETCH_HOSTS:
             to_fetch.append(url)

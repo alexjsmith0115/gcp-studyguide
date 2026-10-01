@@ -5,6 +5,9 @@ Usage:
   python3 tools/check_flashcards.py content/flashcards/net.json [more.json ...]
   python3 tools/check_flashcards.py --all              # every file in content/flashcards/
   python3 tools/check_flashcards.py --all --no-evidence   # no page fetches
+  python3 tools/check_flashcards.py --guide pcd --all     # the PCD guide (pcd/content/flashcards/)
+
+A file under pcd/ is checked against the PCD notes without --guide.
 
 Rules are in content/SPEC.md section 8. The grounding check is the same as for
 questions: the "evidence" string must appear verbatim in the source page's
@@ -19,11 +22,21 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from check_questions import norm, page_text  # noqa: E402
+import guides  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-NOTES_DIR = os.path.join(ROOT, "content", "notes")
-NOTES = {os.path.basename(f)[:-3]: open(f, encoding="utf-8").read() for f in glob.glob(os.path.join(NOTES_DIR, "*.md"))}
-DOMAINS = ("arch", "net", "data", "comp", "ai", "sec", "mig", "ops")
+NOTES = {}      # note id -> Markdown, for the selected guide
+DOMAINS = ()    # flashcard file names (without .json) of the selected guide
+
+
+def load_guide(guide):
+    global DOMAINS
+    NOTES.clear()
+    for f in glob.glob(guides.content_dir(guide, "notes", "*.md")):
+        NOTES[os.path.basename(f)[:-3]] = open(f, encoding="utf-8").read()
+    DOMAINS = guides.GUIDES[guide]["flashcard_domains"]
+
+
 REQUIRED = ["id", "note", "kind", "front", "back", "source"]
 BANNED = re.compile(r"\b(seamless(ly)?|robust|leverag(e|es|ed|ing)|unlock(s|ed|ing)?)\b", re.I)
 
@@ -107,9 +120,12 @@ def check_card(c, domain, errors, evidence=True):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    argv = guides.strip_guide(sys.argv[1:])
+    args = [a for a in argv if not a.startswith("--")]
+    guide = guides.select(sys.argv[1:], args)
+    load_guide(guide)
     evidence = "--no-evidence" not in sys.argv
-    files = sorted(glob.glob(os.path.join(ROOT, "content", "flashcards", "*.json"))) if "--all" in sys.argv else args
+    files = sorted(glob.glob(guides.content_dir(guide, "flashcards", "*.json"))) if "--all" in sys.argv else args
     if not files:
         print(__doc__)
         sys.exit(1)

@@ -1,10 +1,12 @@
 // Build the study app: render all content to HTML at build time and inline
 // it, with the app's CSS and JS, into one file: dist/index.html.
 // dist/pca-workbook.html is the same app as a standalone page to open or send.
+// The repo holds more than one guide; --guide picks one (see GUIDES).
 //
-//   node app/build.mjs            build
-//   node app/build.mjs --strict   also fail on broken internal links
-//   node app/build.mjs --share    also write dist/pca-workbook.zip (standalone page and lab files)
+//   node app/build.mjs               build the PCA guide
+//   node app/build.mjs --guide pcd   build the PCD guide into dist/pcd/
+//   node app/build.mjs --strict      also fail on broken internal links
+//   node app/build.mjs --share       also write dist/pca-workbook.zip (standalone page and lab files)
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
@@ -22,16 +24,31 @@ const strict = process.argv.includes("--strict");
 const problems = [];
 const warn = (m) => problems.push(m);
 
+// ---------- guide ----------
+// Each guide has its own content and labs folders (relative to the repo root)
+// and its own output folder. The labs of every guide run from the repo root.
+const GUIDES = {
+  pca: { content: "content", labs: "labs", out: "dist" },
+  pcd: { content: "pcd/content", labs: "pcd/labs", out: "dist/pcd" },
+};
+const guideAt = process.argv.indexOf("--guide");
+const guideId = guideAt >= 0 ? process.argv[guideAt + 1] : "pca";
+const G = GUIDES[guideId];
+if (!G) throw new Error(`unknown guide ${guideId}; use one of ${Object.keys(GUIDES).join(", ")}`);
+const C = (...p) => P(G.content, ...p);
+const OUT = (...p) => P(G.out, ...p);
+const rel = (f) => path.relative(ROOT, f);
+
 // ---------- glossary ----------
 // content/glossary.json: terms that the app explains in a hover card.
-const glossaryFile = P("content", "glossary.json");
+const glossaryFile = C("glossary.json");
 let glossary = [];
 if (fs.existsSync(glossaryFile)) {
-  try { glossary = JSON.parse(read(glossaryFile)); } catch (e) { warn(`content/glossary.json: invalid JSON (${e.message})`); }
+  try { glossary = JSON.parse(read(glossaryFile)); } catch (e) { warn(`${rel(glossaryFile)}: invalid JSON (${e.message})`); }
 }
 glossary = glossary.filter((e) => e && e.term).map((e) => ({ ...e, id: e.id || glossaryId(e.term) }));
 const glossMatcher = buildMatcher(glossary);
-for (const c of glossMatcher.clashes) warn(`content/glossary.json: ${c}`);
+for (const c of glossMatcher.clashes) warn(`${rel(glossaryFile)}: ${c}`);
 const glossUsed = new Map();
 const gloss = (html) => glossify(html, glossMatcher, glossUsed);
 
@@ -110,7 +127,10 @@ function renderBlock(src, source) {
 const words = (s) => (s.replace(/```[\s\S]*?```/g, " ").match(/[A-Za-z0-9][\w'.-]*/g) || []).length;
 
 // ---------- load ----------
-const exam = JSON.parse(read(P("content", "exam.json")));
+const exam = JSON.parse(read(C("exam.json")));
+// exam.app: the app's name, file names, and labels for this guide.
+const app = { ...exam.app, id: guideId, labsDir: G.labs };
+for (const k of ["name", "slug", "subtitle", "labPrefix"]) if (!app[k]) throw new Error(`${rel(C("exam.json"))}: app.${k} is missing`);
 const objectiveIds = new Set(exam.sections.flatMap((s) => s.objectives.map((o) => o.id)));
 const sectionOf = (obj) => String(obj).split(".")[0];
 
@@ -127,7 +147,7 @@ const asList = (v) => (Array.isArray(v) ? v.map(String) : v == null || v === "" 
 // Notes
 const notes = [];
 const noteText = {};
-for (const f of listFiles(P("content", "notes"), /\.md$/)) {
+for (const f of listFiles(C("notes"), /\.md$/)) {
   const { data, body } = fm(f);
   const id = path.basename(f, ".md");
   if (data.id && String(data.id) !== id) warn(`${f}: frontmatter id ${data.id} differs from file name`);
@@ -147,8 +167,8 @@ notes.sort((a, b) => a.objective.localeCompare(b.objective, undefined, { numeric
 // Case studies
 const cases = [];
 for (const c of exam.caseStudies) {
-  const tf = P("content", "case-studies", `${c.id}.md`);
-  const af = P("content", "case-studies", `${c.id}.analysis.md`);
+  const tf = C("case-studies", `${c.id}.md`);
+  const af = C("case-studies", `${c.id}.analysis.md`);
   const entry = { id: c.id, name: c.name, pdf: c.pdf, textHtml: null, analysisHtml: null, toc: [], minutes: null, words: 0 };
   if (fs.existsSync(tf)) {
     const { body } = fm(tf);
@@ -167,9 +187,9 @@ for (const c of exam.caseStudies) {
 
 // Labs
 const labs = [];
-if (fs.existsSync(P("labs"))) {
-  for (const d of fs.readdirSync(P("labs")).sort()) {
-    const dir = P("labs", d);
+if (fs.existsSync(P(G.labs))) {
+  for (const d of fs.readdirSync(P(G.labs)).sort()) {
+    const dir = P(G.labs, d);
     const readme = path.join(dir, "README.md");
     if (!fs.statSync(dir).isDirectory() || !fs.existsSync(readme)) continue;
     const { data, body } = fm(readme);
@@ -190,7 +210,7 @@ if (fs.existsSync(P("labs"))) {
 
 // Reference pages (content/reference/*.md): the first H1 is the title.
 const refs = [];
-for (const f of listFiles(P("content", "reference"), /\.md$/)) {
+for (const f of listFiles(C("reference"), /\.md$/)) {
   const { body } = fm(f);
   const id = path.basename(f, ".md");
   const h1 = /^#\s+(.+)$/m.exec(body);
@@ -200,7 +220,7 @@ for (const f of listFiles(P("content", "reference"), /\.md$/)) {
 
 // Questions
 const questions = [];
-for (const f of listFiles(P("content", "questions"), /\.json$/)) {
+for (const f of listFiles(C("questions"), /\.json$/)) {
   let arr;
   try { arr = JSON.parse(read(f)); } catch (e) { warn(`${f}: invalid JSON (${e.message})`); continue; }
   for (const q of arr) {
@@ -223,11 +243,30 @@ for (const q of questions) {
   if (seenQ.has(q.id)) warn(`duplicate question id ${q.id}`);
   seenQ.add(q.id);
 }
+// The "Study" links of a question: the notes pages of its objective that cite one of
+// its sources, else the pages that also cover the objective and cite one, else any
+// page that cites one. An empty list makes the app link every page of the objective.
+const pageKey = (u) => u.split("#")[0].replace(/\/$/, "");
+const citedBy = new Map();
+for (const n of notes) {
+  for (const m of noteText[n.id].matchAll(/\]\((https?:\/\/[^)\s]+)\)/g)) {
+    const k = pageKey(m[1]);
+    if (!citedBy.has(k)) citedBy.set(k, new Set());
+    citedBy.get(k).add(n.id);
+  }
+}
+for (const q of questions) {
+  const hits = new Set(q.sources.flatMap((s) => [...(citedBy.get(pageKey(s.url)) || [])]));
+  const cited = notes.filter((n) => hits.has(n.id));
+  const own = cited.filter((n) => n.objective === q.objective);
+  const also = cited.filter((n) => n.also.includes(q.objective));
+  q.notes = (own.length ? own : also.length ? also : cited).map((n) => n.id);
+}
 
 // Flashcards: one file per author domain. A card takes the objective of its notes page.
 const cards = [];
 const noteIndex = new Map(notes.map((n, i) => [n.id, i]));
-for (const f of listFiles(P("content", "flashcards"), /\.json$/)) {
+for (const f of listFiles(C("flashcards"), /\.json$/)) {
   let arr;
   try { arr = JSON.parse(read(f)); } catch (e) { warn(`${f}: invalid JSON (${e.message})`); continue; }
   for (const c of arr) {
@@ -263,12 +302,12 @@ for (const n of notes) for (const l of n.labs) if (!labIds.has(l)) warn(`note:${
 // content/services.json: one profile per service. The build finds where each service
 // appears in the questions, notes, case studies, flashcards, and exam guide.
 let serviceSpec = { categories: [], services: [] };
-const servicesFile = P("content", "services.json");
+const servicesFile = C("services.json");
 if (fs.existsSync(servicesFile)) {
-  try { serviceSpec = JSON.parse(read(servicesFile)); } catch (e) { warn(`content/services.json: invalid JSON (${e.message})`); }
+  try { serviceSpec = JSON.parse(read(servicesFile)); } catch (e) { warn(`${rel(servicesFile)}: invalid JSON (${e.message})`); }
 }
 const serviceProblems = checkServices(serviceSpec, { noteIds, caseIds });
-for (const p of serviceProblems) warn(`content/${p}`);
+for (const p of serviceProblems) warn(`${G.content}/${p}`);
 
 // ---------- glossary checks ----------
 for (const p of checkGlossary(glossary, noteText)) warn(p);
@@ -290,10 +329,10 @@ const data = {
   glossary: glossary
     .map((e) => ({ id: e.id, term: String(e.term), expansion: e.expansion ? String(e.expansion) : "", def: String(e.def || ""), aws: e.aws ? String(e.aws) : "", note: noteTitle[e.note] ? e.note : "" }))
     .sort((a, b) => a.term.localeCompare(b.term, undefined, { sensitivity: "base" })),
-  notes, cases, labs, questions, refs, cards,
+  app, notes, cases, labs, questions, refs, cards,
 };
 let serviceData = { services: [], serviceCats: [], serviceGloss: {} };
-try { serviceData = buildServices(serviceSpec, { exam, notes, questions, cases, cards, glossary: data.glossary }); } catch (e) { warn(`content/services.json: ${e.message}`); }
+try { serviceData = buildServices(serviceSpec, { exam, notes, questions, cases, cards, glossary: data.glossary }); } catch (e) { warn(`${rel(servicesFile)}: ${e.message}`); }
 Object.assign(data, serviceData);
 const json = JSON.stringify(data).replace(/</g, "\\u003c");
 const css = read(P("app", "src", "styles.css"));
@@ -301,18 +340,20 @@ const stripExports = (s) => s.replace(/^export\s+(?=(async\s+)?function|const|le
 const js = [read(P("app", "src", "logic.js")), read(P("app", "src", "store.js")), read(P("app", "src", "app.js"))].map(stripExports).join("\n\n");
 if (/^\s*import\s/m.test(js)) throw new Error("app source must not contain import statements");
 let html = read(P("app", "src", "template.html"));
-html = html.replace("/*__CSS__*/", () => css).replace("/*__JS__*/", () => js).replace("__DATA__", () => json);
+html = html.replace("/*__CSS__*/", () => css).replace("/*__JS__*/", () => js).replace("__DATA__", () => json)
+  .replaceAll("__APP_NAME__", () => esc(app.name)).replaceAll("__APP_SUBTITLE__", () => esc(app.subtitle));
 
-fs.mkdirSync(P("dist"), { recursive: true });
-fs.writeFileSync(P("dist", "index.html"), html);
+fs.mkdirSync(OUT(), { recursive: true });
+fs.writeFileSync(OUT("index.html"), html);
+const page = `${app.slug}.html`;
 
 // The standalone page. The artifact publish step adds its own doctype, head,
 // and reset rules, so add the same ones here. Without Claude, progress saves in
 // the browser only.
 const bodyAt = html.indexOf('<div class="app"');
 if (bodyAt < 0) throw new Error('template.html must contain <div class="app">');
-fs.rmSync(P("dist", "preview.html"), { force: true }); // replaced by pca-workbook.html
-fs.writeFileSync(P("dist", "pca-workbook.html"), `<!doctype html>
+fs.rmSync(OUT("preview.html"), { force: true }); // replaced by pca-workbook.html
+fs.writeFileSync(OUT(page), `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -328,7 +369,7 @@ ${html.slice(bodyAt)}
 
 const byObj = {};
 for (const q of questions) byObj[q.objective] = (byObj[q.objective] || 0) + 1;
-console.log(`Built dist/index.html and dist/pca-workbook.html (${(html.length / 1024).toFixed(0)} KB each)`);
+console.log(`Built ${rel(OUT("index.html"))} and ${rel(OUT(page))} (${(html.length / 1024).toFixed(0)} KB each)`);
 console.log(`  notes: ${notes.length} pages, ${notes.reduce((a, n) => a + n.words, 0).toLocaleString()} words`);
 console.log(`  case studies: ${cases.filter((c) => c.textHtml).length} texts, ${cases.filter((c) => c.analysisHtml).length} analyses`);
 console.log(`  labs: ${labs.length}`);
@@ -346,24 +387,27 @@ if (problems.length) {
 
 if (process.argv.includes("--share")) {
   // One zip to send to other people: the standalone page, plus the lab files that
-  // the labs run from a terminal. Leaves out dotfiles and Terraform state.
-  const stage = P("dist", ".share");
-  const root = path.join(stage, "pca-workbook");
+  // the labs run from a terminal. Leaves out caches, editor files, and Terraform
+  // state, but keeps files that a lab needs, such as .python-version.
+  const stage = OUT(".share");
+  const root = path.join(stage, app.slug);
+  const zip = `${app.slug}.zip`;
   fs.rmSync(stage, { recursive: true, force: true });
   fs.mkdirSync(root, { recursive: true });
-  fs.copyFileSync(P("dist", "pca-workbook.html"), path.join(root, "pca-workbook.html"));
-  fs.cpSync(P("labs"), path.join(root, "labs"), { recursive: true, filter: (src) => !/(^\.|\.tfstate(\..*)?$)/.test(path.basename(src)) });
-  fs.writeFileSync(path.join(root, "README.txt"), `PCA Workbook: a study guide for the Google Cloud Professional Cloud Architect exam.
+  fs.copyFileSync(OUT(page), path.join(root, page));
+  // The labs keep their path from the repo root, so their commands work unchanged.
+  fs.cpSync(P(G.labs), path.join(root, G.labs), { recursive: true, filter: (src) => !/^(\.DS_Store|\.terraform|\.venv|__pycache__)$|\.pyc$|\.tfstate(\..*)?$/.test(path.basename(src)) });
+  fs.writeFileSync(path.join(root, "README.txt"), `${app.name}: a study guide for the ${exam.exam} exam.
 
-1. Open pca-workbook.html in a web browser on a computer. It has the notes,
-   practice questions, mock exams, case studies, and lab steps. Your progress
+1. Open ${page} in a web browser on a computer. It has the notes,
+   practice questions, mock exams,${cases.length ? " case studies," : ""} and lab steps. Your progress
    saves in that browser only.
 2. To do the labs, open a terminal in this folder. The labs call this folder
-   the repository root. Start with labs/00-setup/README.md. The labs create
+   the repository root. Start with ${G.labs}/00-setup/README.md. The labs create
    resources in your own Google Cloud project, and those resources cost money.
 `);
-  fs.rmSync(P("dist", "pca-workbook.zip"), { force: true });
-  execFileSync("zip", ["-qr", "-X", path.join("..", "pca-workbook.zip"), "pca-workbook"], { cwd: stage });
+  fs.rmSync(OUT(zip), { force: true });
+  execFileSync("zip", ["-qr", "-X", path.join("..", zip), app.slug], { cwd: stage });
   fs.rmSync(stage, { recursive: true, force: true });
-  console.log(`Built dist/pca-workbook.zip (${(fs.statSync(P("dist", "pca-workbook.zip")).size / 1024).toFixed(0)} KB)`);
+  console.log(`Built ${rel(OUT(zip))} (${(fs.statSync(OUT(zip)).size / 1024).toFixed(0)} KB)`);
 }

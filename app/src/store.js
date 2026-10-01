@@ -9,8 +9,8 @@
 //   progress/activity  { v, days:{"YYYY-MM-DD":{a,k,r,l,f}} }
 //   mocks/<id>         one document per mock exam
 // Uses deepMerge() from logic.js (the build concatenates the files).
-
-const CACHE_KEY = "pca-workbook-v1";
+// Store.slug names this guide's browser cache and exports; the app sets it
+// before init() (for example "pca-workbook" or "pcd-workbook").
 const DOC_PATHS = { state: "progress/state", qstats: "progress/qstats", cards: "progress/cards", activity: "progress/activity" };
 
 function emptyData() {
@@ -33,6 +33,8 @@ function lsSet(key, value) {
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 const Store = {
+  slug: "pca-workbook",     // the guide's file name; set by the app
+  appName: "PCA Workbook",  // the guide's display name; set by the app
   mode: "loading",          // "loading" | "cloud" | "local"
   note: "",                 // a short status message for the UI
   expectLocal: false,       // true when browser-only saving is normal (standalone page, other viewers)
@@ -52,7 +54,7 @@ const Store = {
   _emit(kind) { for (const fn of this._listeners) { try { fn(kind); } catch (e) { console.error(e); } } },
 
   async init() {
-    const cached = lsGet(CACHE_KEY);
+    const cached = lsGet(this._cacheKey());
     if (cached && cached.state) this.data = deepMerge(emptyData(), cached);
     this._emit("data");
     const ok = await this._connect().catch((e) => { console.warn("db connect failed", e); return false; });
@@ -217,11 +219,11 @@ const Store = {
   },
 
   exportData() {
-    return { app: "pca-workbook", version: 1, exportedAt: new Date().toISOString(), ...clone(this.data) };
+    return { app: this.slug, version: 1, exportedAt: new Date().toISOString(), ...clone(this.data) };
   },
 
   importData(obj) {
-    if (!obj || obj.app !== "pca-workbook" || !obj.state || !obj.qstats) throw new Error("This is not a PCA Workbook export.");
+    if (!obj || obj.app !== this.slug || !obj.state || !obj.qstats) throw new Error(`This is not a ${this.appName} export.`);
     const fresh = emptyData();
     this.data = {
       state: deepMerge(fresh.state, obj.state),
@@ -271,8 +273,10 @@ const Store = {
     if (n !== this.pendingWrites) { this.pendingWrites = n; this._emit("mode"); }
   },
 
+  _cacheKey() { return `${this.slug}-v1`; },
+
   _saveCache() {
     clearTimeout(this._cacheTimer);
-    this._cacheTimer = setTimeout(() => lsSet(CACHE_KEY, this.data), 250);
+    this._cacheTimer = setTimeout(() => lsSet(this._cacheKey(), this.data), 250);
   },
 };
