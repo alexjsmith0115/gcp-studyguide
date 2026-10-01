@@ -27,6 +27,7 @@ const QS = DATA.questions;
 const Q = Object.fromEntries(QS.map((q) => [q.id, q]));
 const groupBy = (arr, fn) => arr.reduce((m, x) => { for (const k of [].concat(fn(x))) (m[k] ||= []).push(x); return m; }, {});
 const NOTES_BY_OBJ = groupBy(NOTES, (n) => n.objective);
+const noteNum = (n) => `${n.objective}.${NOTES_BY_OBJ[n.objective].indexOf(n) + 1}`;
 const NOTES_ALSO = groupBy(NOTES.filter((n) => n.also.length), (n) => n.also);
 const LABS_BY_OBJ = groupBy(LABS, (l) => l.objectives);
 const QS_BY_OBJ = groupBy(QS, (q) => q.objective);
@@ -696,7 +697,7 @@ VIEWS.service = function ({ id }) {
   const pageItem = (n) => `<a class="page-item" href="#/note/${n.id}" data-route="note/${n.id}">
       <span class="${noteRead(n.id) ? "read" : "unread"}">${icon(noteRead(n.id) ? "s2" : "s0")}</span>
       <span><span class="t">${esc(n.title)}</span><span class="s"> · ${n.minutes} min</span></span>
-      <span class="objid">${n.objective}</span></a>`;
+      <span class="objid">${noteNum(n)}</span></a>`;
   return `<div class="page narrow">
     ${crumbs([["Services", "services"], [c?.name || "", null]])}
     ${titleBlock({ sheet: `${svcCatNo(s.cat)}.${idx + 1}`, title: s.name, cells: [["Questions", String(t)], ["Exam guide", guideCell], ["You", u.seen ? `${u.seen}/${u.total} · ${pct(u.lastAcc)}` : "–"]] })}
@@ -775,7 +776,7 @@ VIEWS.objective = function ({ id }) {
   const pageItem = (n) => `<a class="page-item" href="#/note/${n.id}" data-route="note/${n.id}">
       <span class="${noteRead(n.id) ? "read" : "unread"}">${icon(noteRead(n.id) ? "s2" : "s0")}</span>
       <span><span class="t">${esc(n.title)}</span><span class="s"> · ${n.minutes} min</span></span>
-      <span class="objid">${n.objective}</span></a>`;
+      <span class="objid">${noteNum(n)}</span></a>`;
   return `<div class="page narrow">
     ${crumbs([["Study guide", "study"], [`Section ${s.id}`, null], [o.id, null]])}
     ${titleBlock({ sheet: o.id, title: o.title, cells: [["Section", `${s.id} · ${s.weight}%`], ["Reading", `${objMinutes(id)} min`], ["Questions", String(os.total)]] })}
