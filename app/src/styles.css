@@ -800,3 +800,19 @@ a.svc-chip[data-role="a"] { background: var(--accent-soft); color: var(--accent-
 .guide-lines li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 10px; font: italic 400 15px/1.5 var(--font-read); color: var(--ink-2); }
 .guide-lines .objid { font-style: normal; text-decoration: none; padding-top: 3px; }
 .svc-in-q { gap: 6px; }
+
+/* ---------- narration ---------- */
+.narrator {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+  padding: 8px 12px; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+}
+.narrator.on { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; box-shadow: var(--shadow); }
+@media (max-width: 900px) { .narrator.on { top: calc(env(safe-area-inset-top, 0px) + 54px); } }
+.narrator .btn.small svg { width: 14px; height: 14px; }
+.narrator .btn.small[aria-label] { padding: 4px 8px; }
+.narrator select { height: 30px; border: 1px solid var(--rule-strong); border-radius: 5px; background: var(--surface); padding: 2px 6px; font-size: 13px; max-width: 220px; }
+.narr-pos { font-variant-numeric: tabular-nums; }
+.narr-block { scroll-margin: 120px 0; }
+.narrating .narr-block { cursor: pointer; }
+.narr-on { background: var(--accent-soft); box-shadow: -6px 0 0 var(--accent-soft), 6px 0 0 var(--accent-soft), -9px 0 0 var(--accent); border-radius: 2px; }
+@media (max-width: 560px) { .narrator .hint:not(.narr-pos) { display: none; } .narrator select { max-width: 150px; } }

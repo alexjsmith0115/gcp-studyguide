@@ -28,7 +28,7 @@ All content follows `pcd/content/SPEC.md`: official Google sources only, every p
 
 1. **Set up.** Open the app, go to **Progress**, and set your exam date. Then do [lab 00-setup](labs/00-setup/README.md) once.
 2. **Work through the objectives.** Go to **Study guide**. For each objective:
-   1. Read its notes pages. Mark each page as read.
+   1. Read its notes pages, or press **Listen** at the top of a page to hear it read aloud. Mark each page as read.
    2. Do its labs.
    3. Study the flashcards for each page (the **Flashcards** button at the end of the page).
    4. Practice its questions (10 at a time).

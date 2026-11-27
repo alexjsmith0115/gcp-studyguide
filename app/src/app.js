@@ -75,6 +75,11 @@ const ICON = {
   warn: '<path d="M12 3 2.5 20h19z"/><path d="M12 10v4.5M12 17.5v.5"/>',
   doc: '<path d="M6 3h8.5L19 7.5V21H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h5"/>',
   layers: '<path d="m12 3.5 9 4.75-9 4.75-9-4.75z"/><path d="m3 12.5 9 4.75 9-4.75"/><path d="m3 16.5 9 4.75 9-4.75"/>',
+  play: '<path d="M7 4.5v15l12-7.5z"/>',
+  pause: '<path d="M8 5v14M16 5v14"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="1.5"/>',
+  prev: '<path d="M6 5v14"/><path d="M18 5.5 9 12l9 6.5z"/>',
+  next: '<path d="M18 5v14"/><path d="M6 5.5 15 12l-9 6.5z"/>',
   cards: '<rect x="3" y="7" width="13" height="14" rx="1.5"/><path d="M8 7V4.5A1.5 1.5 0 0 1 9.5 3h10A1.5 1.5 0 0 1 21 4.5v11a1.5 1.5 0 0 1-1.5 1.5H16"/><path d="M6.5 12h6M6.5 15.5h4"/>',
 };
 const icon = (name, cls = "") => `<svg class="ic${cls ? " " + cls : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[name] || ""}</svg>`;
@@ -206,7 +211,10 @@ function render() {
   stopExamTimer();
   hideGloss();
   applyPrefs();
+  const keepNarr = narr.active && narr.route === ui.routeStr;
+  if (!keepNarr) narrStop();
   $("#main").innerHTML = view(ui.route) || "";
+  if (keepNarr) narrRefresh();
   renderNav();
   renderSaveState();
   if (ui.route.name === "exam") startExamTimer();
@@ -502,8 +510,9 @@ VIEWS.ref = function ({ id }) {
   return `<div class="page">
     ${crumbs([["Study guide", "study"], ["Reference", null]])}
     ${titleBlock({ sheet: "Ref", title: r.title, cells: [["Reading", `${Math.max(2, Math.round(r.words / 200))} min`], ["Type", "Reference table"]] })}
+    ${listenBar()}
     <div class="reader${r.toc.length > 1 ? "" : " solo"}">
-      <article class="prose" id="article">${r.html}</article>
+      <article class="prose" id="article" data-narrate>${r.html}</article>
       ${r.toc.length > 1 ? `<nav class="toc" aria-label="On this page"><span class="eyebrow">On this page</span>${r.toc.map((t) => `<a href="#${esc(t.id)}">${esc(t.text)}</a>`).join("")}</nav>` : ""}
     </div>
     <div class="reader-foot panel"><a class="btn ghost" href="#/study" data-route="study">Back to the study guide</a></div>
@@ -701,7 +710,8 @@ VIEWS.service = function ({ id }) {
   return `<div class="page narrow">
     ${crumbs([["Services", "services"], [c?.name || "", null]])}
     ${titleBlock({ sheet: `${svcCatNo(s.cat)}.${idx + 1}`, title: s.name, cells: [["Questions", String(t)], ["Exam guide", guideCell], ["You", u.seen ? `${u.seen}/${u.total} · ${pct(u.lastAcc)}` : "–"]] })}
-    <section class="panel">
+    ${listenBar()}
+    <section class="panel" data-narrate>
       <h2>What it is</h2>
       <p class="svc-lede">${esc(s.what)}</p>
       ${s.formerly ? `<p class="hint">Formerly ${esc(s.formerly)}. Older questions and training material can use that name.</p>` : ""}
@@ -712,14 +722,14 @@ VIEWS.service = function ({ id }) {
       </div>
     </section>
     <div class="grid-2">
-      <section class="panel"><h2>Pick it when</h2>
+      <section class="panel" data-narrate><h2>Pick it when</h2>
         <ul class="guide-list">${s.cues.map((x) => `<li><span>${esc(x)}</span></li>`).join("")}</ul>
       </section>
-      <section class="panel"><h2>Traps</h2>
+      <section class="panel" data-narrate><h2>Traps</h2>
         ${s.traps.length ? `<ul class="trap-list">${s.traps.map((x) => `<li>${icon("warn")}<span>${esc(x)}</span></li>`).join("")}</ul>` : `<p class="empty">No common traps in the notes.</p>`}
       </section>
     </div>
-    ${s.confused.length ? `<section class="panel"><h2>Commonly confused with</h2>
+    ${s.confused.length ? `<section class="panel" data-narrate><h2>Commonly confused with</h2>
       <div class="confused">${s.confused.filter((x) => SVC[x.with]).map((x) => `<div class="confused-row">${svcChip(x.with)}<span>${esc(x.tell)}</span></div>`).join("")}</div>
     </section>` : ""}
     <section class="panel">
@@ -830,8 +840,9 @@ VIEWS.note = function ({ id }) {
   return `<div class="page">
     ${crumbs([["Study guide", "study"], [`${o.id} ${shortTitle(o.title)}`, `objective/${o.id}`], [`Page ${idx + 1} of ${siblings.length}`, null]])}
     ${titleBlock({ sheet: `${o.id}.${idx + 1}`, title: n.title, cells: [["Reading", `${n.minutes} min`], ["Revised", esc(n.verified || "–")], ["Also for", n.also.length ? n.also.map((a) => `<a href="#/objective/${a}" data-route="objective/${a}">${a}</a>`).join(" ") : "–"]] })}
+    ${listenBar()}
     <div class="reader${n.toc.length ? "" : " solo"}">
-      <article class="prose" id="article">${n.html}</article>
+      <article class="prose" id="article" data-narrate>${n.html}</article>
       ${n.toc.length ? `<nav class="toc" aria-label="On this page"><span class="eyebrow">On this page</span>${n.toc.map((t) => `<a href="#${esc(t.id)}">${esc(t.text)}</a>`).join("")}</nav>` : ""}
     </div>
     <div class="reader-foot panel">
@@ -1403,8 +1414,9 @@ VIEWS.case = function ({ id }) {
       <button type="button" role="tab" aria-selected="${tab === "text"}" data-action="case-tab" data-id="${id}" data-tab="text">Case study</button>
       <button type="button" role="tab" aria-selected="${tab === "analysis"}" data-action="case-tab" data-id="${id}" data-tab="analysis">Analysis</button>
     </div>
+    ${listenBar()}
     <div class="reader">
-      <article class="prose">${html || `<p>Not written yet.</p>`}</article>
+      <article class="prose" data-narrate>${html || `<p>Not written yet.</p>`}</article>
       ${tab === "analysis" && c.toc.length ? `<nav class="toc" aria-label="On this page"><span class="eyebrow">On this page</span>${c.toc.map((t) => `<a href="#${esc(t.id)}">${esc(t.text)}</a>`).join("")}</nav>` : ""}
     </div>
     ${(() => { const inQs = svcChipsWhere((q) => q.caseStudy === id, 1, 14); const named = SVCS.filter((s) => s.caseNamed.includes(id) && !inQs.some((x) => x.s.id === s.id)).slice(0, Math.max(0, 20 - inQs.length)); return inQs.length || named.length ? `<section class="panel"><div class="panel-head"><h2>Services in this case study</h2><span class="hint">From its practice questions, then its analysis</span></div><div class="row svc-in-q">${inQs.map(({ s, n }) => svcChip(s.id, ` title="${plural(n, "question")}"`)).join("")}${named.map((s) => svcChip(s.id, ' title="Named in the analysis"')).join("")}</div></section>` : ""; })()}
@@ -1441,8 +1453,9 @@ VIEWS.lab = function ({ id }) {
     ${crumbs([["Labs", "labs"], [l.id, null]])}
     ${titleBlock({ sheet: l.id.split("-")[0], title: l.title, cells: [["Objectives", l.objectives.map((o) => `<a href="#/objective/${o}" data-route="objective/${o}">${o}</a>`).join(" ") || "–"], ["Time", `${l.minutes} min`], ["Organization", l.requiresOrg ? "Required" : "Not needed"]] })}
     ${l.cost ? `<div class="callout"><span><b>Cost.</b> ${esc(l.cost)}</span></div>` : ""}
+    ${listenBar()}
     <div class="reader">
-      <article class="prose">${l.html}${l.files.length ? `<h2>Files in this lab</h2>${l.files.map((f) => `<details><summary>${esc(f.name)}</summary>${f.html}</details>`).join("")}` : ""}</article>
+      <article class="prose" data-narrate>${l.html}${l.files.length ? `<h2>Files in this lab</h2>${l.files.map((f) => `<details><summary>${esc(f.name)}</summary>${f.html}</details>`).join("")}` : ""}</article>
       ${l.toc.length ? `<nav class="toc" aria-label="On this page"><span class="eyebrow">On this page</span>${l.toc.map((t) => `<a href="#${esc(t.id)}">${esc(t.text)}</a>`).join("")}</nav>` : ""}
     </div>
     <div class="reader-foot panel"><label class="check"><input type="checkbox" data-action="lab-done" data-id="${id}"${done ? " checked" : ""}>I finished this lab and ran the cleanup</label><div class="row">${returnLink("btn")}<a class="btn ghost" href="#/labs" data-route="labs">All labs</a></div></div>
@@ -1600,7 +1613,11 @@ const ACTIONS = {
     const ids = m.qids.filter((qid) => Q[qid] && !isCorrect(Q[qid], m.answers[qid] || []));
     startPractice({ kind: "ids", ids, count: ids.length });
   },
-  "case-tab": ({ id, tab }) => { ui.caseTab[id] = tab; render(); },
+  "case-tab": ({ id, tab }) => { narrStop(); ui.caseTab[id] = tab; render(); },
+  "narr-play": () => { if (narr.playing) narrPause(); else narrStart(); },
+  "narr-stop": () => narrStop(),
+  "narr-prev": () => narrSpeak(Math.max(0, narr.i - 1)),
+  "narr-next": () => narrSpeak(narr.i + 1),
   "svc-sort": ({ sort }) => { ui.svcSort = sort; render(); document.querySelector(".svc-tools")?.scrollIntoView({ block: "start" }); },
   "copy-code": (_, el) => {
     const pre = el.closest(".code")?.querySelector("pre");
@@ -1643,6 +1660,160 @@ function fallbackCopy(text, msg) {
   toast(ok ? msg : "Copy is blocked here. Select the text and copy it by hand.");
 }
 
+// ---------- narration ----------
+// "Listen" reads the main text of a page aloud with the browser's own speech
+// voices (Web Speech API), so no text leaves the device. It reads one block
+// (heading, paragraph, list item, table row) at a time, highlights it, and
+// skips code and the source links at the end of sentences.
+const SPEECH = typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function";
+const NARR_RATES = [0.8, 1, 1.25, 1.5, 1.75, 2];
+const narr = { active: false, playing: false, blocks: [], i: 0, token: 0, rate: Number(lsGetStr(`${KEY}-narr-rate`)) || 1, voice: lsGetStr(`${KEY}-narr-voice`) || "" };
+const NARR_BLOCKS = "h2, h3, h4, p, li, blockquote, tr, dt, dd, .confused-row";
+
+function narrVoices() {
+  if (!SPEECH) return [];
+  const all = window.speechSynthesis.getVoices();
+  const en = all.filter((v) => /^en(-|_|$)/i.test(v.lang));
+  return (en.length ? en : all).slice().sort((a, b) => a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name));
+}
+
+// The bar a readable page shows under its title. Pages mark their readable parts with data-narrate.
+function listenBar() {
+  if (!SPEECH) return "";
+  const voices = narrVoices();
+  return `<div class="narrator${narr.active ? " on" : ""}" role="region" aria-label="Listen to this page">
+    <button type="button" class="btn small ${narr.playing ? "" : "primary"}" data-action="narr-play" aria-pressed="${narr.playing}">${icon(narr.playing ? "pause" : "play")}${narr.playing ? "Pause" : narr.active ? "Resume" : "Listen"}</button>
+    ${narr.active ? `<button type="button" class="btn small" data-action="narr-prev" title="Previous paragraph" aria-label="Previous paragraph">${icon("prev")}</button>
+    <button type="button" class="btn small" data-action="narr-next" title="Next paragraph" aria-label="Next paragraph">${icon("next")}</button>
+    <button type="button" class="btn small" data-action="narr-stop" title="Stop" aria-label="Stop">${icon("stop")}</button>
+    <span class="narr-pos hint" aria-live="polite">${narr.blocks.length ? `${Math.min(narr.i + 1, narr.blocks.length)} / ${narr.blocks.length}` : ""}</span>` : `<span class="hint">Reads this page aloud. While it reads, tap a paragraph to jump to it.</span>`}
+    <span class="spacer"></span>
+    <label class="narr-field"><span class="sr-only">Speed</span><select data-change="narr-rate" aria-label="Speed">${NARR_RATES.map((r) => `<option value="${r}"${r === narr.rate ? " selected" : ""}>${r}×</option>`).join("")}</select></label>
+    ${voices.length > 1 ? `<label class="narr-field"><span class="sr-only">Voice</span><select data-change="narr-voice" aria-label="Voice"><option value="">Default voice</option>${voices.map((v) => `<option value="${esc(v.voiceURI)}"${v.voiceURI === narr.voice ? " selected" : ""}>${esc(v.name)}${v.localService ? "" : " (online)"}</option>`).join("")}</select></label>` : ""}
+  </div>`;
+}
+
+// The text to speak for one block: no code, no source links, no stray parentheses.
+function narrText(el) {
+  let t = el.innerText || el.textContent || "";
+  for (const x of el.querySelectorAll("a.ext, pre, .code, .copy, svg")) {
+    const s = (x.innerText || x.textContent || "").trim();
+    if (s) t = t.split(s).join(" ");
+  }
+  return t
+    .replace(/\t+/g, ", ")
+    .replace(/\s*\n+\s*/g, (m, off, str) => (/[.!?:;,]$/.test(str.slice(0, off).trim()) ? " " : ". "))
+    .replace(/\(\s*(?:[,;]\s*)*\)/g, "")
+    .replace(/\s+([.,;:!?])/g, "$1")
+    .replace(/([.,;:])(?:\s*[.,;:])+/g, "$1")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function narrCollect() {
+  const out = [];
+  const title = document.querySelector("#main .tb-title .tb-value");
+  if (title) out.push(title);
+  for (const root of document.querySelectorAll("#main [data-narrate]")) {
+    for (const el of root.querySelectorAll(NARR_BLOCKS)) {
+      if (el.closest("pre, .code, nav, .narrator")) continue;
+      if (el.parentElement.closest(NARR_BLOCKS) && root.contains(el.parentElement.closest(NARR_BLOCKS))) continue; // read the outer block once
+      if (el.closest("details:not([open])") && !el.closest("summary")) continue;
+      if (!narrText(el)) continue;
+      out.push(el);
+    }
+  }
+  out.forEach((el, i) => { el.classList.add("narr-block"); el.dataset.narr = String(i); });
+  return out;
+}
+
+function narrMark() {
+  document.querySelectorAll("#main .narr-on").forEach((el) => el.classList.remove("narr-on"));
+  const el = narr.blocks[narr.i];
+  document.getElementById("main")?.classList.toggle("narrating", narr.active);
+  if (!el) return;
+  el.classList.add("narr-on");
+  const r = el.getBoundingClientRect();
+  const top = document.querySelector(".narrator")?.getBoundingClientRect().bottom || 0;
+  if (r.top < top + 8 || r.bottom > window.innerHeight - 24) el.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+
+function narrBar() {
+  const bar = document.querySelector("#main .narrator");
+  if (bar) bar.outerHTML = listenBar();
+}
+
+// Speak block i. Long blocks go out in sentence-sized parts, because some browsers stop a long utterance early.
+function narrSpeak(i) {
+  const token = ++narr.token;
+  window.speechSynthesis.cancel();
+  if (i >= narr.blocks.length) { narrStop(); toast("Finished reading this page"); return; }
+  const changed = !narr.playing || !narr.active;
+  narr.i = Math.max(0, i);
+  narr.playing = true;
+  narr.active = true;
+  narrMark();
+  if (changed) narrBar();
+  else { const pos = document.querySelector("#main .narr-pos"); if (pos) pos.textContent = `${narr.i + 1} / ${narr.blocks.length}`; }
+  const text = narrText(narr.blocks[narr.i]);
+  const parts = text.match(/[^.!?]+(?:[.!?]+|$)/g)?.reduce((acc, s) => {
+    if (acc.length && (acc[acc.length - 1] + s).length < 220) acc[acc.length - 1] += s; else acc.push(s);
+    return acc;
+  }, []) || [text];
+  const voice = narrVoices().find((v) => v.voiceURI === narr.voice) || null;
+  let k = 0;
+  const next = () => {
+    if (token !== narr.token) return; // stopped, paused, or moved on
+    if (k >= parts.length) { narrSpeak(narr.i + 1); return; }
+    const u = new SpeechSynthesisUtterance(parts[k++].trim());
+    u.rate = narr.rate;
+    if (voice) { u.voice = voice; u.lang = voice.lang; }
+    u.onend = next;
+    u.onerror = (e) => { if (token === narr.token && e.error !== "interrupted" && e.error !== "canceled") { narrStop(); toast("This browser could not read the page aloud"); } };
+    window.speechSynthesis.speak(u);
+  };
+  next();
+}
+
+function narrStart() {
+  narr.route = ui.routeStr;
+  narr.blocks = narrCollect();
+  if (!narr.blocks.length) { toast("Nothing to read on this page"); return; }
+  narrSpeak(narr.active ? narr.i : 0);
+}
+function narrPause() {
+  narr.token++;
+  narr.playing = false;
+  window.speechSynthesis.cancel();
+  narrBar();
+}
+function narrStop() {
+  narr.token++;
+  if (SPEECH) window.speechSynthesis.cancel();
+  narr.playing = false;
+  narr.active = false;
+  narr.i = 0;
+  document.querySelectorAll("#main .narr-on").forEach((el) => el.classList.remove("narr-on"));
+  document.getElementById("main")?.classList.remove("narrating");
+  narrBar();
+}
+// After a re-render of the same page, find the blocks again and keep the place.
+function narrRefresh() {
+  if (!narr.active) return;
+  narr.blocks = narrCollect();
+  narrMark();
+}
+
+if (SPEECH) {
+  window.speechSynthesis.addEventListener?.("voiceschanged", () => { if (!narr.playing) narrBar(); });
+  window.addEventListener("pagehide", () => window.speechSynthesis.cancel());
+  document.addEventListener("click", (e) => {
+    if (!narr.active || e.target.closest("a, button, input, select, label, summary, .gl, .narrator")) return;
+    const b = e.target.closest("#main .narr-block");
+    if (b) narrSpeak(Number(b.dataset.narr));
+  });
+}
+
 // ---------- events ----------
 document.addEventListener("click", (e) => {
   // A tap on a marked term opens its card (a mouse uses hover instead).
@@ -1679,6 +1850,8 @@ document.addEventListener("change", (e) => {
   if (el.matches('input[type="checkbox"][data-action]')) { const fn = ACTIONS[el.dataset.action]; if (fn) fn(el.dataset, el, e); }
   if (el.dataset.change === "browse-obj") go(el.value ? `browse/${el.value}` : "browse", { replace: true });
   if (el.dataset.change === "svc-guide") { ui.svcGuideOnly = el.checked; filterServices(); saveSession(); }
+  if (el.dataset.change === "narr-rate") { narr.rate = Number(el.value) || 1; lsSetStr(`${KEY}-narr-rate`, String(narr.rate)); if (narr.playing) narrSpeak(narr.i); }
+  if (el.dataset.change === "narr-voice") { narr.voice = el.value; lsSetStr(`${KEY}-narr-voice`, narr.voice); if (narr.playing) narrSpeak(narr.i); }
   if (el.dataset.change === "hints") { Store.patch("state", { settings: { hints: el.checked } }); applyPrefs(); toast(el.checked ? "Term definitions on" : "Term definitions off"); }
   if (el.dataset.change === "exam-date") { Store.patch("state", { settings: { examDate: el.value || null } }); toast(el.value ? "Exam date saved" : "Exam date cleared"); }
 });
@@ -1817,6 +1990,7 @@ Store.onChange((kind) => {
     const y = window.scrollY;
     $("#main").innerHTML = (VIEWS[ui.route.name] || VIEWS.home)(ui.route);
     if (ui.route.name === "services") filterServices();
+    narrRefresh();
     window.scrollTo(0, y);
   }
 });
